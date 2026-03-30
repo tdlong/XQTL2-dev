@@ -1,6 +1,4 @@
 slurm*
-!Slurm.md
-process.Dec6/
 
 # large data/archives
 *.tar
@@ -18,17 +16,20 @@ process.Dec6/
 *.out
 *_report.txt
 
-# directories that are all output or data
+# directories that are all output or data (never tracked)
 data/
 ref/
 figures/
 process/
-# temp folder inside scripts
-scripts/temp/
+output/
+logs/
+configs/
 
-# configs folder exists publicly but contents are private
-configs/*
-!configs/.gitkeep
+# the pipeline symlink is machine-specific
+pipeline
 
-# one-off cluster state output
+# macOS
+.DS_Store
+
+# cluster state output
 check_cluster_state.out.txt
