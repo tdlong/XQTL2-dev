@@ -1,0 +1,5 @@
+"bam" "TRT" "REP" "REPrep" "Num" "Proportion"
+"1" "c_F_1" "C" 1 1 65 NA
+"2" "c_M_1" "C" 2 1 58 NA
+"3" "s_F_1" "Z" 1 1 43 0.086
+"4" "s_M_1" "Z" 2 1 51 0.102
