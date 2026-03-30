@@ -22,11 +22,7 @@ SCAN=malathion_scan
 mkdir -p ${PROCDIR}
 
 # ── Step 3: REFALT counts ────────────────────────────────────────────────────
-# Build bam list: pooled samples + A-pop founders
-find data/bam/${PROJECT} -name "*.bam" -size +100M \
-    | sort > helpfiles/${PROJECT}/bam_list.txt
-cat pipeline/helpfiles/A_founders.bams.txt >> helpfiles/${PROJECT}/bam_list.txt
-
+# bam_list.txt is committed in helpfiles/malathion/ — review it before running
 JID_REFALT=$(sbatch --parsable --array=1-5 \
     -A tdlong_lab -p standard \
     pipeline/scripts/bam2bcf2REFALT.sh \

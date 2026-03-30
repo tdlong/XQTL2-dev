@@ -1,0 +1,12 @@
+data/bam/malathion/c_F_1.bam
+data/bam/malathion/c_M_1.bam
+data/bam/malathion/s_F_1.bam
+data/bam/malathion/s_M_1.bam
+pipeline/data/founders/A1.dedup.bam
+pipeline/data/founders/A2.dedup.bam
+pipeline/data/founders/A3.dedup.bam
+pipeline/data/founders/A4.dedup.bam
+pipeline/data/founders/A5.dedup.bam
+pipeline/data/founders/A6.dedup.bam
+pipeline/data/founders/A7.dedup.bam
+pipeline/data/founders/AB8.dedup.bam
