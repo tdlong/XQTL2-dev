@@ -25,7 +25,7 @@ mkdir -p ${PROCDIR}
 # Build bam list: pooled samples + A-pop founders
 find data/bam/${PROJECT} -name "*.bam" -size +100M \
     | sort > helpfiles/${PROJECT}/bam_list.txt
-cat pipeline/helpfiles/founder.bams.txt >> helpfiles/${PROJECT}/bam_list.txt
+cat pipeline/helpfiles/A_founders.bams.txt >> helpfiles/${PROJECT}/bam_list.txt
 
 JID_REFALT=$(sbatch --parsable --array=1-5 \
     -A tdlong_lab -p standard \
