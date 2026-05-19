@@ -8,26 +8,20 @@
 
 set -euo pipefail
 
-PARFILE=helpfiles/ZINC2/ZINC2_haplotype_parameters.R
-SNP_TABLE=pipeline/helpfiles/FREQ_SNPs_Bpop.cM.txt.gz
-FOUNDERS=B1,B2,B3,B4,B5,B6,B7,AB8
 
-# Haplotypes + female scan
-bash pipeline/scripts/run_full_pipeline.sh \
-    --project      ZINC2 \
-    --parfile      ${PARFILE} \
-    --design       helpfiles/ZINC2/Zinc2.test.F.txt \
-    --scan         ZINC2_F_v4 \
-    --snp-table    ${SNP_TABLE} \
-    --founder-list ${FOUNDERS} \
-    --skip-fq2bam --skip-refalt
+# Submit haplotype job once; chain both scans off it
+JID=$(bash pipeline/scripts/run_haps.sh \
+    --parfile helpfiles/ZINC2/ZINC2_haplotype_parameters.R \
+    --dir     process/ZINC2)
 
-# Male scan only — haplotypes from above
-bash pipeline/scripts/run_full_pipeline.sh \
-    --project      ZINC2 \
-    --parfile      ${PARFILE} \
-    --design       helpfiles/ZINC2/Zinc2.test.M.txt \
-    --scan         ZINC2_M_v4 \
-    --snp-table    ${SNP_TABLE} \
-    --founder-list ${FOUNDERS} \
-    --skip-fq2bam --skip-refalt --skip-haps
+bash pipeline/scripts/run_scan.sh \
+    --after  ${JID} \
+    --dir    process/ZINC2 \
+    --scan   ZINC2_F_v4 \
+    --design helpfiles/ZINC2/Zinc2.test.F.txt
+
+bash pipeline/scripts/run_scan.sh \
+    --after  ${JID} \
+    --dir    process/ZINC2 \
+    --scan   ZINC2_M_v4 \
+    --design helpfiles/ZINC2/Zinc2.test.M.txt
