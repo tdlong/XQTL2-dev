@@ -4,7 +4,7 @@
 # Starts from existing REFALT files in process/ZINC2/.
 # Runs REFALT2haps (fixed haplotype estimator) then full scan for F and M.
 #
-# Run from: /dfs7/adl/tdlong/fly_pool/XQTL2
+# Run from: XQTL2-dev root
 
 set -euo pipefail
 
