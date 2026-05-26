@@ -22,7 +22,7 @@ Samples R8-R11 were sequenced twice across two runs:
   March 2026:  helpfiles/AGE_SY/readname.mapping.AGE_SY.March_26.txt
                raw FASTQs: /dfs7/adl/tdlong/fly_pool/XQTL2-dev/data/raw/AGE_SY/March_26
   April 2026:  helpfiles/AGE_SY/readname.mapping.AGE_SY.April5_26.txt
-               raw FASTQs: /dfs7/adl/tdlong/fly_pool/XQTL2-dev/data/raw/AGE_SY/April5/26
+               raw FASTQs: /dfs7/adl/tdlong/fly_pool/XQTL2-dev/data/raw/AGE_SY/April5_26
 
 Step 1: align each run to a temporary BAM directory
 
@@ -35,7 +35,7 @@ Step 1: align each run to a temporary BAM directory
   mkdir -p data/bam/AGE_SY_tempB
   JOBID_APRIL=$(sbatch --array=1-24 --parsable pipeline/scripts/fq2bam.sh \
       helpfiles/AGE_SY/readname.mapping.AGE_SY.April5_26.txt \
-      /dfs7/adl/tdlong/fly_pool/XQTL2-dev/data/raw/AGE_SY/April5/26 \
+      /dfs7/adl/tdlong/fly_pool/XQTL2-dev/data/raw/AGE_SY/April5_26 \
       data/bam/AGE_SY_tempB)
 
 Step 2: merge tempA + tempB into the main BAM directory
