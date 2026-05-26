@@ -52,3 +52,81 @@ Step 3: verify merged BAMs, then remove temp directories
   Once you are satisfied the merged BAMs in data/bam/AGE_SY/ are correct:
 
   rm -rf data/bam/AGE_SY_tempA data/bam/AGE_SY_tempB
+
+
+--- Updating helpfiles after merge ---
+
+Step 4: check BAM file sizes
+
+  The pipeline excludes BAMs under 1 GB (low coverage causes downstream
+  problems). Check sizes of the new R8-R11 BAMs on the cluster:
+
+  ls -l data/bam/AGE_SY/{AgeSY10,AgeSY20,Con}_R{8,9,10,11}_{F,M}.bam
+
+  Any BAM under 1 GB should be excluded from the analysis.
+
+Step 5: update the four design files
+
+  Design files are generated from helpfiles/AGE_SY/summary_info_v1.xlsx.
+  The script scripts_oneoffs/make_AGE_SY_design_files.py reads the
+  Control_Flies and Aged_Flies tabs to get Num and Proportion values.
+
+  Run from XQTL2-dev root (requires openpyxl):
+    python3 scripts_oneoffs/make_AGE_SY_design_files.py
+
+  This writes filesize=0 as a placeholder. After getting BAM sizes from
+  Step 4, replace the 0s with actual sizes. Also remove any rows for BAMs
+  that failed the 1 GB threshold.
+
+Step 6: update AGE_SY.bams
+
+  Add R8-R11 BAM paths (only those passing the 1 GB threshold) to
+  helpfiles/AGE_SY/AGE_SY.bams. The file already contains R1-R7 sample
+  BAMs and the B-population founder BAMs at the bottom — insert the new
+  sample paths before the founder lines.
+
+Step 7: update AGE_SY_haplotype_parameters.R
+
+  Add passing R8-R11 sample names to names_in_bam. The pipeline README
+  gives a one-liner to regenerate names_in_bam from the BAM directory
+  (filters by -size +1G automatically):
+
+    echo -n "names_in_bam <- c(" && \
+    find data/bam/AGE_SY -name "*.bam" -size +1G -print0 | \
+    xargs -0 -n1 basename | sed 's/.bam//' | sort | \
+    sed 's/.*/"&"/' | tr '\n' ',' | sed 's/,$//' && echo ")"
+
+  Paste the output into AGE_SY_haplotype_parameters.R replacing the
+  existing names_in_bam line.
+
+  Commit and push all updated helpfiles before submitting the pipeline.
+
+
+--- Running the pipeline (from REFALT onward) ---
+
+  mkdir -p process/AGE_SY
+
+  JID_REFALT=$(bash pipeline/scripts/run_refalt.sh \
+      --bamlist helpfiles/AGE_SY/AGE_SY.bams \
+      --dir     process/AGE_SY)
+
+  JID_HAPS=$(bash pipeline/scripts/run_haps.sh \
+      --after   $JID_REFALT \
+      --parfile helpfiles/AGE_SY/AGE_SY_haplotype_parameters.R \
+      --dir     process/AGE_SY)
+
+  bash pipeline/scripts/run_scan.sh \
+      --after $JID_HAPS --dir process/AGE_SY \
+      --scan AGE_SY10_F --design helpfiles/AGE_SY/AGE_SY10_F.test.txt
+
+  bash pipeline/scripts/run_scan.sh \
+      --after $JID_HAPS --dir process/AGE_SY \
+      --scan AGE_SY10_M --design helpfiles/AGE_SY/AGE_SY10_M.test.txt
+
+  bash pipeline/scripts/run_scan.sh \
+      --after $JID_HAPS --dir process/AGE_SY \
+      --scan AGE_SY20_F --design helpfiles/AGE_SY/AGE_SY20_F.test.txt
+
+  bash pipeline/scripts/run_scan.sh \
+      --after $JID_HAPS --dir process/AGE_SY \
+      --scan AGE_SY20_M --design helpfiles/AGE_SY/AGE_SY20_M.test.txt
