@@ -31,5 +31,8 @@ pipeline
 # macOS
 .DS_Store
 
+# Excel lock files
+~$*
+
 # cluster state output
 check_cluster_state.out.txt
