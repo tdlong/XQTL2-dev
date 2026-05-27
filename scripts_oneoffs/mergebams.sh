@@ -1,50 +1,30 @@
 #!/bin/bash
 #SBATCH --job-name=merge_bams
-#SBATCH -A tdlong_lab        ## account to charge 
-#SBATCH -p standard          ## partition/queue name
+#SBATCH -A tdlong_lab
+#SBATCH -p standard
+#SBATCH --time=4:00:00
+#SBATCH --mem=8G
 
 module load samtools/1.10
-module load java/17 
-module load picard-tools/1.87
 
-# Define directories
 TEMP_A="data/bam/AGE_SY_tempA"
 TEMP_B="data/bam/AGE_SY_tempB"
 OUTPUT_DIR="data/bam/AGE_SY"
 
-echo "Starting BAM merge process at $(date)"
+SAMPLE=$(ls ${TEMP_A}/*.bam | sed -n "${SLURM_ARRAY_TASK_ID}p" | xargs basename | sed 's/.bam//')
 
-# Loop through all BAM files in tempA
-for BAM_A in ${TEMP_A}/*.bam; do
-    # Get sample name
-    SAMPLE=$(basename ${BAM_A} .bam)
-    
-    BAM_B="${TEMP_B}/${SAMPLE}.bam"
-    OUTPUT_BAM="${OUTPUT_DIR}/${SAMPLE}.bam"
-    
-    echo "----------------------------------------"
-    echo "Processing: ${SAMPLE}"
-    
-    # Check if corresponding file exists in tempB
-    if [[ ! -f ${BAM_B} ]]; then
-        echo "WARNING: ${BAM_B} not found, skipping ${SAMPLE}"
-        continue
-    fi
-    
-    # Merge using samtools (faster for this loop approach)
-    echo "Merging BAM files..."
-    samtools merge -f ${OUTPUT_BAM} ${BAM_A} ${BAM_B}
-    
-    # Index the merged BAM
-    echo "Indexing merged BAM..."
-    samtools index ${OUTPUT_BAM}
-    
-    # Quick validation
-    if [[ -f ${OUTPUT_BAM} && -f ${OUTPUT_BAM}.bai ]]; then
-        echo "✓ Successfully merged and indexed ${SAMPLE}"
-        samtools flagstat ${OUTPUT_BAM} | head -n 1
-    else
-        echo "✗ ERROR: Failed to create output for ${SAMPLE}"
-    fi
-done
+BAM_A="${TEMP_A}/${SAMPLE}.bam"
+BAM_B="${TEMP_B}/${SAMPLE}.bam"
+OUTPUT_BAM="${OUTPUT_DIR}/${SAMPLE}.bam"
 
+echo "Task ${SLURM_ARRAY_TASK_ID}: merging ${SAMPLE}"
+
+if [[ ! -f ${BAM_B} ]]; then
+    echo "ERROR: ${BAM_B} not found" >&2
+    exit 1
+fi
+
+samtools merge -f ${OUTPUT_BAM} ${BAM_A} ${BAM_B}
+samtools index ${OUTPUT_BAM}
+
+echo "Done: ${OUTPUT_BAM}"
