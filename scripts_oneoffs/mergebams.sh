@@ -3,7 +3,8 @@
 #SBATCH -A tdlong_lab
 #SBATCH -p standard
 #SBATCH --time=4:00:00
-#SBATCH --mem=8G
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=4G
 
 module load samtools/1.10
 
