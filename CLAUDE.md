@@ -9,6 +9,12 @@ symlink in this directory.
 
 ## Rules — read before doing anything
 
+0. **Read `pipeline/Slurm.md` before writing any SLURM job.**
+   It defines partition memory limits, core allocation rules, and job
+   templates for this cluster. Key fact: standard partition is 6 GB max
+   per core — requesting more memory than one core allows implicitly
+   pulls additional cores.
+
 1. **Read the pipeline README before writing any script.**
    The pipeline is at `pipeline/` (symlink to the XQTL2 install).
    Read `pipeline/README.md` to understand what scripts already exist.
