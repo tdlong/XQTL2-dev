@@ -104,29 +104,32 @@ Step 7: update AGE_SY_haplotype_parameters.R
 
 --- Running the pipeline (from REFALT onward) ---
 
-  mkdir -p process/AGE_SY
+  Prior results (R1-R7 only) are in process/AGE_SY/.
+  This run (R1-R11) uses process/AGE_SY_v2/ to preserve old results.
+
+  mkdir -p process/AGE_SY_v2
 
   JID_REFALT=$(bash pipeline/scripts/run_refalt.sh \
       --bamlist helpfiles/AGE_SY/AGE_SY.bams \
-      --dir     process/AGE_SY)
+      --dir     process/AGE_SY_v2)
 
   JID_HAPS=$(bash pipeline/scripts/run_haps.sh \
       --after   $JID_REFALT \
       --parfile helpfiles/AGE_SY/AGE_SY_haplotype_parameters.R \
-      --dir     process/AGE_SY)
+      --dir     process/AGE_SY_v2)
 
   bash pipeline/scripts/run_scan.sh \
-      --after $JID_HAPS --dir process/AGE_SY \
+      --after $JID_HAPS --dir process/AGE_SY_v2 \
       --scan AGE_SY10_F --design helpfiles/AGE_SY/AGE_SY10_F.test.txt
 
   bash pipeline/scripts/run_scan.sh \
-      --after $JID_HAPS --dir process/AGE_SY \
+      --after $JID_HAPS --dir process/AGE_SY_v2 \
       --scan AGE_SY10_M --design helpfiles/AGE_SY/AGE_SY10_M.test.txt
 
   bash pipeline/scripts/run_scan.sh \
-      --after $JID_HAPS --dir process/AGE_SY \
+      --after $JID_HAPS --dir process/AGE_SY_v2 \
       --scan AGE_SY20_F --design helpfiles/AGE_SY/AGE_SY20_F.test.txt
 
   bash pipeline/scripts/run_scan.sh \
-      --after $JID_HAPS --dir process/AGE_SY \
+      --after $JID_HAPS --dir process/AGE_SY_v2 \
       --scan AGE_SY20_M --design helpfiles/AGE_SY/AGE_SY20_M.test.txt
