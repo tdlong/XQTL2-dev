@@ -109,9 +109,9 @@ Step 7: update AGE_SY_haplotype_parameters.R
 
   mkdir -p process/AGE_SY_v2
 
-  JID_REFALT=$(bash pipeline/scripts/run_refalt.sh \
-      --bamlist helpfiles/AGE_SY/AGE_SY.bams \
-      --dir     process/AGE_SY_v2)
+  JID_REFALT=$(sbatch --parsable --array=1-5 pipeline/scripts/bam2bcf2REFALT.sh \
+      helpfiles/AGE_SY/AGE_SY.bams \
+      process/AGE_SY_v2)
 
   JID_HAPS=$(bash pipeline/scripts/run_haps.sh \
       --after   $JID_REFALT \
