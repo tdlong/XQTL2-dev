@@ -122,6 +122,7 @@ p <- ggplot(scans_df,
     strip.background       = element_blank(),
     strip.text             = element_blank(),
     panel.grid.major.y     = element_blank(),
+    panel.grid.major.x     = element_line(colour = "grey92", linewidth = 0.3),
     panel.grid.minor.x     = element_line(colour = "grey92", linewidth = 0.3),
     panel.spacing          = unit(0.4, "lines")
   )
