@@ -113,7 +113,7 @@ p <- ggplot(scans_df,
             size = BASE_FONT * 0.25, colour = "grey30", fontface = "bold",
             inherit.aes = FALSE) +
   scale_colour_manual(values = colour_map, name = NULL) +
-  scale_x_continuous(expand = expansion(0)) +
+  scale_x_continuous(expand = expansion(0), minor_breaks = seq(0, 40, by = 1)) +
   scale_y_continuous(limits = c(0, NA), expand = expansion(mult = c(0, 0.15))) +
   labs(x = "Position (Mb)", y = expression(-log[10](italic(P)) ~ "Wald")) +
   theme_classic(base_size = BASE_FONT) +
@@ -121,7 +121,8 @@ p <- ggplot(scans_df,
     legend.position        = "none",
     strip.background       = element_blank(),
     strip.text             = element_blank(),
-    panel.grid.major.y     = element_line(colour = "grey92", linewidth = 0.3),
+    panel.grid.major.y     = element_blank(),
+    panel.grid.minor.x     = element_line(colour = "grey92", linewidth = 0.3),
     panel.spacing          = unit(0.4, "lines")
   )
 
