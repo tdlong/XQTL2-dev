@@ -20,10 +20,10 @@ BAM name convention: {longTRT}_R{n}_{sex}
   e.g. AgeSY10_R8_F, AgeSY20_R9_M, Con_R10_F
 
 Output files (in helpfiles/AGE_SY/):
-  AGE_SY10_F.test.txt  — AgeSY10 vs Con, females, R1-R11
-  AGE_SY10_M.test.txt  — AgeSY10 vs Con, males,   R1-R11
-  AGE_SY20_F.test.txt  — AgeSY20 vs Con, females, R1-R11
-  AGE_SY20_M.test.txt  — AgeSY20 vs Con, males,   R1-R11
+  AGE_SY10_F.test.txt  — AgeSY10 vs Con, females, R1-R12
+  AGE_SY10_M.test.txt  — AgeSY10 vs Con, males,   R1-R12
+  AGE_SY20_F.test.txt  — AgeSY20 vs Con, females, R1-R12
+  AGE_SY20_M.test.txt  — AgeSY20 vs Con, males,   R1-R12
 
 IMPORTANT: filesize (column 2) is written as 0 — a placeholder.
            After the BAMs are merged, update with actual sizes:
@@ -32,7 +32,11 @@ IMPORTANT: filesize (column 2) is written as 0 — a placeholder.
            with the --filesizes option once that is implemented).
 
 Run from: XQTL2-dev root
-  python3 scripts_oneoffs/make_AGE_SY_design_files.py
+  python3 scripts_oneoffs/AGE_SY/common/make_AGE_SY_design_files.py
+
+NOTE: R12 (round 3, July_26 run) requires its fly counts to be present in
+      summary_info_v1.xlsx first; rows missing from the xlsx are warned and
+      skipped, so add R12 to the sheets before relying on the R12 output.
 """
 
 import sys
@@ -41,7 +45,7 @@ from pathlib import Path
 
 XLSX   = Path("helpfiles/AGE_SY/summary_info_v1.xlsx")
 OUTDIR = Path("helpfiles/AGE_SY")
-REPS   = list(range(1, 12))   # R1–R11
+REPS   = list(range(1, 13))   # R1–R12
 
 # ── Read Control_Flies ────────────────────────────────────────────────────────
 # control[(rep_num, sex)] = Num_Random_Controls
