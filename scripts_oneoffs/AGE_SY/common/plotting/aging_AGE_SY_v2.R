@@ -15,4 +15,4 @@ OUT_HEIGHT_IN <- 5.8
 PEAKS        <- NULL
 GENES        <- NULL
 
-source("scripts_oneoffs/plot_pseudoscan.R")
+source("scripts_oneoffs/AGE_SY/common/plotting/plot_pseudoscan.R")
