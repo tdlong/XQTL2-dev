@@ -6,14 +6,20 @@
 #   - helpfiles/AGE_SY/AGE_SY.bams               (sample BAMs >1 GB + founders)
 #   - helpfiles/AGE_SY/AGE_SY_haplotype_parameters.R  (names_in_bam line)
 #
-# Both are written in the project's canonical order:
-#   for rep 1..12: for sex F,M: for trt AgeSY10,AgeSY20,Con
-# and the two files are guaranteed consistent (same samples, same order).
+# Both are written in a HUMAN-READABLE sorted order:
+#   treatment (AgeSY10, AgeSY20, Con) -> sex (F, M) -> rep (R1..R12, numeric)
+# i.e. six blocks of twelve, one per treatment x sex. Because each block is a
+# clean R1..R12 run, a missing/dropped library shows up as an obvious gap.
+# Order does NOT affect the pipeline (README: samples match by name, and the
+# only structural rule is "sample BAMs first, then founders") — this ordering
+# is purely for a human debugging the list. The two files stay consistent
+# (same samples, same order).
 #
 # BAMs <1 GB (or missing) are excluded automatically — the pipeline drops
 # low-coverage libraries, so they must not appear in either file.
 #
-# The founder block at the bottom of AGE_SY.bams is preserved verbatim.
+# The founder block at the bottom of AGE_SY.bams is preserved verbatim
+# (samples first, then founders — the one order rule the manual states).
 #
 # NOT handled here (needs real data — the only manual step): the four
 # design files. Add R12 fly counts to summary_info_v1.xlsx, then run
@@ -34,9 +40,9 @@ TRTS="AgeSY10 AgeSY20 Con"
 [ -f "$BAMLIST" ] || { echo "ERROR: $BAMLIST not found" >&2; exit 1; }
 [ -f "$PARFILE" ] || { echo "ERROR: $PARFILE not found" >&2; exit 1; }
 
-# --- collect samples present and >1 GB, in canonical order ---
+# --- collect samples present and >1 GB, sorted trt -> sex -> rep(numeric) ---
 samples=()
-for rep in $REPS; do for sex in $SEXES; do for trt in $TRTS; do
+for trt in $TRTS; do for sex in $SEXES; do for rep in $REPS; do
     s="${trt}_R${rep}_${sex}"; f="${BAMDIR}/${s}.bam"
     if [ -f "$f" ]; then
         if [ -n "$(find "$f" -size +1G 2>/dev/null)" ]; then
