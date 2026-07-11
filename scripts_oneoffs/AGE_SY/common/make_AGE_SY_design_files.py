@@ -34,9 +34,11 @@ IMPORTANT: filesize (column 2) is written as 0 — a placeholder.
 Run from: XQTL2-dev root
   python3 scripts_oneoffs/AGE_SY/common/make_AGE_SY_design_files.py
 
-NOTE: R12 (round 3, July_26 run) requires its fly counts to be present in
-      summary_info_v1.xlsx first; rows missing from the xlsx are warned and
-      skipped, so add R12 to the sheets before relying on the R12 output.
+HARD RULE: every rep in REPS must have complete counts (Num for controls;
+      Num and Percent_Aged for aged) for BOTH sexes. If ANY are missing, the
+      script prints exactly which samples are missing, writes NOTHING, and
+      exits non-zero. It will never emit a partial/placeholder design file.
+      So add R12's counts to summary_info_v1.xlsx before this will run.
 """
 
 import sys
@@ -86,33 +88,29 @@ for row in ws.iter_rows(values_only=True):
         aged[(rep_num, sex, diet)] = (int(num_aged), round(float(pct_aged) / 100, 4))
 
 # ── Build rows for one design file ───────────────────────────────────────────
-def make_rows(diet, sex):
+# Appends any samples with missing/incomplete counts to `missing` (they are the
+# reason to abort). A row is only produced when its counts are fully present.
+def make_rows(diet, sex, missing):
     long_trt = f"AgeSY{diet[2:]}"      # "SY10" → "AgeSY10"
     rows = []
 
     # Treatment rows first, then control rows
-    for long_trt_local, trt_code, reps_iter in [
-        (long_trt, "Z", REPS),
-        ("Con",    "C", REPS),
-    ]:
-        for rep in reps_iter:
-            if trt_code == "Z":
-                key = (rep, sex, diet)
-                if key not in aged:
-                    print(f"WARNING: no aged data for {key}", file=sys.stderr)
-                    continue
-                num, prop = aged[key]
-                prop_str = "NA" if prop is None else f"{prop:.4f}"
-                num_str  = "NA" if num  is None else str(num)
-            else:
-                key = (rep, sex)
-                if key not in control:
-                    print(f"WARNING: no control data for {key}", file=sys.stderr)
-                    continue
-                num_str  = str(control[key])
-                prop_str = "NA"
-
+    for long_trt_local, trt_code in [(long_trt, "Z"), ("Con", "C")]:
+        for rep in REPS:
             bam = f"{long_trt_local}_R{rep}_{sex}"
+            if trt_code == "Z":
+                num, prop = aged.get((rep, sex, diet), (None, None))
+                if num is None or prop is None:
+                    missing.append(f"{bam}  (aged: needs Num_Aged + Percent_Aged)")
+                    continue
+                num_str, prop_str = str(num), f"{prop:.4f}"
+            else:
+                num = control.get((rep, sex))
+                if num is None:
+                    missing.append(f"{bam}  (control: needs Num_Random_Controls)")
+                    continue
+                num_str, prop_str = str(num), "NA"
+
             rows.append({
                 "bam":     bam,
                 "longTRT": long_trt_local,
@@ -138,9 +136,26 @@ def write_design(path, rows):
     path.write_text("\n".join(lines) + "\n")
     print(f"Wrote {path}  ({len(rows)} rows)")
 
-# ── Generate all four files ───────────────────────────────────────────────────
+# ── Build everything in memory; abort HARD if any counts are missing ──────────
+# Nothing is written until every rep in REPS has complete counts for every
+# diet x sex. One missing value -> list all offenders, write no files, exit 1.
+missing = []
+outputs = []                                   # (path, rows) pending write
 for diet in ["SY10", "SY20"]:
     for sex in ["F", "M"]:
-        tag  = diet[2:]          # "10" or "20"
-        rows = make_rows(diet, sex)
-        write_design(OUTDIR / f"AGE_SY{tag}_{sex}.test.txt", rows)
+        tag  = diet[2:]                        # "10" or "20"
+        rows = make_rows(diet, sex, missing)
+        outputs.append((OUTDIR / f"AGE_SY{tag}_{sex}.test.txt", rows))
+
+if missing:
+    print(f"\nERROR: incomplete fly-count data in {XLSX}", file=sys.stderr)
+    print("Refusing to write design files. Missing counts for:", file=sys.stderr)
+    for m in missing:
+        print(f"  - {m}", file=sys.stderr)
+    print(f"\n{len(missing)} sample(s) missing. Fill them in and rerun. "
+          "No files were written.", file=sys.stderr)
+    sys.exit(1)
+
+# ── All complete — now (and only now) write all four files ────────────────────
+for path, rows in outputs:
+    write_design(path, rows)
