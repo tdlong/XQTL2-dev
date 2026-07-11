@@ -157,14 +157,37 @@ Step 1: align (single run, no merge)
   #       /dfs7/adl/tdlong/fly_pool/XQTL2-dev/data/raw/AGE_SY/July_26 \
   #       data/bam/AGE_SY
 
-Step 2: update helpfiles for R12 (same as Steps 4-7 above, now for R12)
-  - check R12 BAM sizes (>1 GB) in data/bam/AGE_SY/
-  - add R12 fly counts to summary_info_v1.xlsx, rerun make_AGE_SY_design_files.py
-    (REPS already bumped to R1-R12)
-  - add passing R12 BAMs to AGE_SY.bams; regenerate names_in_bam
-  - commit + push, then git pull on the cluster
+Step 2: SNP calling + haplotypes  (weekend job; needs NO fly counts)
 
-Step 3: recall SNPs -> haplotypes -> scan (into process/AGE_SY_v3)
+  bash scripts_oneoffs/AGE_SY/round3_v3_R12/run_snpcall_haps.sh
 
-  bash scripts_oneoffs/AGE_SY/round3_v3_R12/02_refalt_haps_scan.sh
-  # REFALT -> haps -> the four scans (AGE_SY10/20 x F/M), same as the v2 block above
+  One command. It:
+    - guards that all six R12 BAMs are present and >1 GB (fq2bam finished)
+    - runs 03_update_helpfiles.sh, which rebuilds AGE_SY.bams and names_in_bam
+      from the BAMs on disk (>1 GB filter, founders preserved at the bottom)
+    - submits REFALT (SNP calling, ~2 days) -> run_haps (~1 day, --after REFALT)
+      into process/AGE_SY_v3
+  Neither REFALT nor haps needs the design files / fly counts.
+
+  Bam-list ordering: AGE_SY.bams and names_in_bam are written sorted
+  treatment (AgeSY10, AgeSY20, Con) -> sex (F, M) -> rep (R1..R12, numeric),
+  giving six clean R1..R12 blocks so a missing/dropped library is an obvious
+  gap. Order does not affect the pipeline (README Steps 3-4: samples match by
+  name; only rule is "sample BAMs first, then founders") — it is purely for
+  human debugging. 03_update_helpfiles.sh regenerates this automatically;
+  do not hand-sort.
+
+Step 3: scans  (Monday job; the ONLY step that needs the R12 fly counts)
+
+  # a. add R12 rows (Num, % aged) to summary_info_v1.xlsx
+  # b. regenerate the four design files (REPS already covers R1-R12):
+  python3 scripts_oneoffs/AGE_SY/common/make_AGE_SY_design_files.py
+  # c. submit the four scans (REFALT + haps are done by now):
+  bash scripts_oneoffs/AGE_SY/round3_v3_R12/run_scans.sh
+  # -> AGE_SY10/20 x F/M into process/AGE_SY_v3/<scan>/<scan>.scan.txt
+
+  Then commit + push the regenerated helpfiles.
+
+  (02_refalt_haps_scan.sh is the older all-in-one variant that chains
+   REFALT->haps->scan together; it needs the design files up front, so it is
+   superseded here by the run_snpcall_haps.sh + run_scans.sh split.)
