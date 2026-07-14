@@ -21,9 +21,16 @@ data/
 ref/
 figures/
 process/
+process.*/          # dated/alt output dirs, e.g. process.Dec6/
 output/
 logs/
 configs/
+
+# stray figure images (figures live in figures/, never loose in git)
+*.png
+*.pdf
+*.jpg
+*.jpeg
 
 # the pipeline symlink is machine-specific
 pipeline
