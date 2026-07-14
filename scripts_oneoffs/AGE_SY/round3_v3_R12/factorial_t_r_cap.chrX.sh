@@ -38,9 +38,10 @@ EXAMPLES="16018400 16026914 16028272 16029051 16030427 16030958 16031180 1603170
 
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 
-# one condition -> file of: POS  nALT  QUAL  PASS(1/0)
+# one condition -> file of: POS  nALT  QUAL  PASS(1/0); also reports wall time
 run () {  # $1 = flag (-t|-r)   $2 = depth   $3 = outfile
   echo "  running mpileup $1 $REGION -d $2 ..." >&2
+  local t0=$SECONDS
   bcftools mpileup -I -d "$2" "$1" "$REGION" -a FORMAT/AD -f "$REF" -b "$BAMS" 2>/dev/null \
     | bcftools call -mv 2>/dev/null \
     | bcftools query -f '%POS\t%REF\t%ALT\t%QUAL\n' \
@@ -48,6 +49,7 @@ run () {  # $1 = flag (-t|-r)   $2 = depth   $3 = outfile
              issnp=(length($2)==1); for(i=1;i<=nalt;i++) if(length(a[i])!=1) issnp=0
              pass=(nalt==1 && issnp==1 && $4>59)?1:0
              printf "%s\t%d\t%s\t%d\n",$1,nalt,$4,pass }' > "$3"
+  printf "  TIMING  %-2s @ %-5s : %4d s\n" "$1" "$2" "$((SECONDS - t0))"
 }
 
 run -t 1000  "$TMP/t.1k"
