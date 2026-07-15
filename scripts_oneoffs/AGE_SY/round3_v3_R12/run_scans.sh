@@ -16,7 +16,7 @@
 # Runtime: hours.  Run from: XQTL2-dev repo root, on the cluster.
 ###############################################################################
 set -euo pipefail
-DIR=process/AGE_SY_v3
+DIR="${DIR:-process/AGE_SY_v3}"  # output dir; override: DIR=process/AGE_SY_v3_size75k bash run_scans.sh
 AFTER_FLAG=""
 [ -n "${AFTER:-}" ] && AFTER_FLAG="--after ${AFTER}"
 SMOOTH="${SMOOTH:-250}"          # smoothing half-window in kb; override: SMOOTH=100 bash run_scans.sh

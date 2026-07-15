@@ -9,7 +9,7 @@
 #
 # Output: figures/AGE_SY_v3_4scan.png
 
-BASE <- "process/AGE_SY_v3"
+BASE <- Sys.getenv("SCAN_DIR", "process/AGE_SY_v3")   # override: SCAN_DIR=process/AGE_SY_v3_size75k
 
 SCAN_FILES <- c(
   file.path(BASE, "AGE_SY10_F", "AGE_SY10_F.scan.txt"),
@@ -26,6 +26,6 @@ PEAKS         <- NULL
 GENES         <- NULL
 
 dir.create("figures", showWarnings = FALSE)
-OUT_FILE <- "figures/AGE_SY_v3_4scan.png"
+OUT_FILE <- file.path("figures", paste0(basename(BASE), "_4scan.png"))
 
 source("scripts_oneoffs/AGE_SY/common/plotting/plot_pseudoscan.R")
