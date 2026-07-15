@@ -21,12 +21,16 @@ AFTER_FLAG=""
 [ -n "${AFTER:-}" ] && AFTER_FLAG="--after ${AFTER}"
 SMOOTH="${SMOOTH:-250}"          # smoothing half-window in kb; override: SMOOTH=100 bash run_scans.sh
 
+JIDS=""
 for scan in AGE_SY10_F AGE_SY10_M AGE_SY20_F AGE_SY20_M; do
     design="helpfiles/AGE_SY/${scan}.test.txt"
     [ -f "$design" ] || { echo "ERROR: design not found: $design (run make_AGE_SY_design_files.py)" >&2; exit 1; }
-    bash pipeline/scripts/run_scan.sh $AFTER_FLAG \
-        --smooth "$SMOOTH" --dir "$DIR" --scan "$scan" --design "$design"
-    echo "SCAN submitted: $scan (smooth ${SMOOTH}kb)"
+    out=$(bash pipeline/scripts/run_scan.sh $AFTER_FLAG \
+        --smooth "$SMOOTH" --dir "$DIR" --scan "$scan" --design "$design")
+    printf '%s\n' "$out"
+    jid=$(printf '%s\n' "$out" | awk '/^done:/{print $2}')
+    JIDS="${JIDS:+$JIDS:}$jid"
+    echo "SCAN submitted: $scan (smooth ${SMOOTH}kb, concat job $jid)"
 done
-echo ""
+echo "CONCAT_JIDS=$JIDS"                  # colon-joined concat job ids (for chaining a figure)
 echo "All four scans submitted (smooth ${SMOOTH}kb) -> ${DIR}/<scan>/<scan>.scan.txt"

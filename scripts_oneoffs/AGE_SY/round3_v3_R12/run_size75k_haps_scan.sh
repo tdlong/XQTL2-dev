@@ -45,18 +45,24 @@ JID_HAPS=$(sbatch --parsable pipeline/scripts/REFALT2haps.sh \
 echo "haplotypes (size=$SIZE) submitted: $JID_HAPS  -> $NEW"
 
 # 4. the four scans at smooth=100 into the new folder, after haps completes
-AFTER="$JID_HAPS" SMOOTH="$SMOOTH" DIR="$NEW" bash "$HERE/run_scans.sh"
+scan_out=$(AFTER="$JID_HAPS" SMOOTH="$SMOOTH" DIR="$NEW" bash "$HERE/run_scans.sh")
+printf '%s\n' "$scan_out"
+CONCAT=$(printf '%s\n' "$scan_out" | sed -n 's/^CONCAT_JIDS=//p')
+[ -n "$CONCAT" ] || { echo "ERROR: could not capture scan concat job ids" >&2; exit 1; }
+
+# 5. the figure, after all four scans finish (no manual step)
+mkdir -p figures
+JID_FIG=$(sbatch --parsable --dependency=afterok:"$CONCAT" \
+    --export=ALL,SCAN_DIR="$NEW" "$HERE/plot_4scan.sh")
+echo "figure submitted (after the 4 scans): $JID_FIG"
 
 cat <<EOF
 
 ================================================================
-Queued as one chain (150 kb version in $SRC is untouched):
-  haps size=$SIZE ($JID_HAPS) -> smooth ${SMOOTH}kb -> scan -> concat  -> $NEW
+Queued as ONE chain — nothing else to run (150 kb version in $SRC untouched):
+  haps size=$SIZE ($JID_HAPS) -> smooth ${SMOOTH}kb -> scan -> concat -> figure ($JID_FIG)
 Monitor: squeue -u \$USER
-
-When the scans finish, make the figure for the new window:
-  module load R/4.2.2
-  SCAN_DIR=$NEW Rscript scripts_oneoffs/AGE_SY/common/plotting/aging_AGE_SY_v3.R
-  -> figures/$(basename "$NEW")_4scan.png   (compare to figures/AGE_SY_v3_4scan.png)
+Final figure appears at: figures/$(basename "$NEW")_4scan.png
+  (compare to figures/AGE_SY_v3_4scan.png)
 ================================================================
 EOF
