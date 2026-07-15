@@ -30,11 +30,13 @@ dump() {  # $1 = depth   $2 = outfile
         delete tot; nall=0
         for(i=5;i<=NF;i++){ n=split($i,a,","); if(n>nall)nall=n
                             for(j=1;j<=n;j++) if(a[j]!=".") tot[j]+=a[j] }
-        cs="ref="tot[1]; for(j=2;j<=nall;j++) cs=cs"  alt"(j-1)"="tot[j]
+        total=0; for(j=1;j<=nall;j++) total+=tot[j]
+        cs=sprintf("ref=%d(%.2f%%)", tot[1], total?100*tot[1]/total:0)
+        for(j=2;j<=nall;j++) cs=cs sprintf("  alt%d=%d(%.2f%%)", j-1, tot[j], total?100*tot[j]/total:0)
         nalt=split($3,aa,","); issnp=(length($2)==1)
         for(j=1;j<=nalt;j++) if(length(aa[j])!=1) issnp=0
         verdict=(nalt==1 && issnp && $4>59)?"kept":"THROWN-OUT"
-        printf "%s\t%s>%s\tQUAL=%s\t%-10s\t%s\n", $1,$2,$3,$4,verdict,cs
+        printf "%s\t%s>%s\tQUAL=%s\ttotreads=%d\t%-10s\t%s\n", $1,$2,$3,$4,total,verdict,cs
       }' > "$2"
 }
 
