@@ -19,13 +19,14 @@ set -euo pipefail
 DIR=process/AGE_SY_v3
 AFTER_FLAG=""
 [ -n "${AFTER:-}" ] && AFTER_FLAG="--after ${AFTER}"
+SMOOTH="${SMOOTH:-250}"          # smoothing half-window in kb; override: SMOOTH=100 bash run_scans.sh
 
 for scan in AGE_SY10_F AGE_SY10_M AGE_SY20_F AGE_SY20_M; do
     design="helpfiles/AGE_SY/${scan}.test.txt"
     [ -f "$design" ] || { echo "ERROR: design not found: $design (run make_AGE_SY_design_files.py)" >&2; exit 1; }
     bash pipeline/scripts/run_scan.sh $AFTER_FLAG \
-        --dir "$DIR" --scan "$scan" --design "$design"
-    echo "SCAN submitted: $scan"
+        --smooth "$SMOOTH" --dir "$DIR" --scan "$scan" --design "$design"
+    echo "SCAN submitted: $scan (smooth ${SMOOTH}kb)"
 done
 echo ""
-echo "All four scans submitted -> ${DIR}/<scan>/<scan>.scan.txt"
+echo "All four scans submitted (smooth ${SMOOTH}kb) -> ${DIR}/<scan>/<scan>.scan.txt"
