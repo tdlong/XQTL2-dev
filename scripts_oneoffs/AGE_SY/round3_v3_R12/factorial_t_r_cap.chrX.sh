@@ -44,34 +44,48 @@ if [[ -z "${SLURM_ARRAY_TASK_ID:-}" && "${1:-}" != "--merge" ]]; then
   exit 0
 fi
 
-# ============================ mode: merge (2x2) ==============================
+# ============================ mode: merge (verdict) ==========================
 if [[ "${1:-}" == "--merge" ]]; then
-  echo "per-arm wall times:"; cat "$OUT"/time.*.txt 2>/dev/null | sed 's/^/  /'
+  echo "==================================================================="
+  echo "FACTORIAL RESULT  —  region $REGION"
+  echo "Is the old-vs-new caller difference the FETCH FLAG (-t vs -r)"
+  echo "or the DEPTH CAP (-d 1000 vs -d 50000)?  Answer below."
+  echo "==================================================================="
   echo
-  echo "=================================================================="
-  echo "2x2 over $REGION   (each cell: nALT/QUAL/PASS)"
-  echo "=================================================================="
-  printf "%-10s  %-14s %-14s %-14s %-14s  %s\n" "POS" "-t @1000" "-r @1000" "-t @50000" "-r @50000" "note"
-  awk '
-    function cell(tag,pos){ if(!((tag,pos) in na)) return "----"; return na[tag,pos]"/"q[tag,pos]"/"(p[tag,pos]?"YES":"no") }
+  echo "Wall time per condition (this is why -t is the slow one):"
+  cat "$OUT"/time.*.txt 2>/dev/null | sed 's/^/  /'
+  echo
+  awk -v A="$OUT/cond.1.txt" -v B="$OUT/cond.2.txt" -v C="$OUT/cond.3.txt" -v D="$OUT/cond.4.txt" '
     function load(f,tag){ while((getline l < f)>0){ split(l,x,"\t"); pos=x[1]
-        na[tag,pos]=x[2]; q[tag,pos]=x[3]; p[tag,pos]=x[4]; seen[pos]=1 } close(f) }
+        na[tag,pos]=x[2]; pass[tag,pos]=x[4]; seen[pos]=1 } close(f) }
+    function P(tag,pos){ return ((tag,pos) in pass) ? pass[tag,pos]+0 : 0 }
+    function YN(tag,pos){ return ((tag,pos) in pass) ? (pass[tag,pos]+0 ? "SNP":"dropped") : "no-call" }
     BEGIN{
       load(A,"t1"); load(B,"r1"); load(C,"t5"); load(D,"r5")
-      ne=split(EX,ev," "); for(i=1;i<=ne;i++) isex[ev[i]]=1
       for(pos in seen){
-        differ = !(p["t1",pos]==p["r1",pos] && p["r1",pos]==p["t5",pos] && p["t5",pos]==p["r5",pos])
-        if(differ || (pos in isex)){
-          note=(pos in isex)?"<-- known disagreement":""
-          if(differ) note=note "  [conditions differ]"
-          printf "%-10s  %-14s %-14s %-14s %-14s  %s\n", pos, cell("t1",pos),cell("r1",pos),cell("t5",pos),cell("r5",pos), note
-        }
+        if(P("t1",pos)!=P("r1",pos)) f1++
+        if(P("t5",pos)!=P("r5",pos)) f5++
+        if(P("t1",pos)!=P("t5",pos) || P("r1",pos)!=P("r5",pos)){ capn++; flip[pos]=1 }
+      }
+      print "FETCH FLAG  (-t  vs  -r):"
+      printf "  positions where -t and -r give a different call at d=1000 : %d\n", f1+0
+      printf "  positions where -t and -r give a different call at d=50000: %d\n", f5+0
+      print (f1+f5==0) ? "  => the fetch flag changes ZERO calls. It only affects SPEED." \
+                       : "  => the fetch flag DOES change calls."
+      print ""
+      print "DEPTH CAP  (d=1000  vs  d=50000):"
+      printf "  positions whose SNP call changes when the cap is lifted: %d\n", capn+0
+      if(capn==0) print "  => the cap changes ZERO calls here."
+      else {
+        print "  => the CAP is responsible. The positions it flips:"
+        for(pos in flip)
+          printf "     %-10s  d1000: -t=%-7s -r=%-7s | d50000: -t=%-7s -r=%-7s | #alleles capped=%s uncapped=%s\n",
+            pos, YN("t1",pos),YN("r1",pos),YN("t5",pos),YN("r5",pos), na["t1",pos], na["t5",pos]
       }
     }
-  ' A="$OUT/cond.1.txt" B="$OUT/cond.2.txt" C="$OUT/cond.3.txt" D="$OUT/cond.4.txt" EX="$EXAMPLES" | sort -k1,1n
+  '
   echo
-  echo "PASS counts per condition:"
-  for i in 1 2 3 4; do printf "  cond %d : %d\n" "$i" "$(awk '$4==1' "$OUT/cond.$i.txt" | wc -l)"; done
+  echo "key: SNP = passes biallelic + QUAL>59 | dropped = called but filtered out | no-call = not variant"
   exit 0
 fi
 
