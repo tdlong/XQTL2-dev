@@ -47,45 +47,36 @@ fi
 # ============================ mode: merge (verdict) ==========================
 if [[ "${1:-}" == "--merge" ]]; then
   echo "==================================================================="
-  echo "FACTORIAL RESULT  —  region $REGION"
-  echo "Is the old-vs-new caller difference the FETCH FLAG (-t vs -r)"
-  echo "or the DEPTH CAP (-d 1000 vs -d 50000)?  Answer below."
+  echo "SNP-CALLING EXPERIMENT  —  region $REGION"
   echo "==================================================================="
   echo
-  echo "Wall time per condition (this is why -t is the slow one):"
+  echo "Per-condition wall time (-t is 6-8x slower than -r for identical calls):"
   cat "$OUT"/time.*.txt 2>/dev/null | sed 's/^/  /'
   echo
+  # one line: confirm -t and -r are identical, so we compare -r vs -r below
   awk -v A="$OUT/cond.1.txt" -v B="$OUT/cond.2.txt" -v C="$OUT/cond.3.txt" -v D="$OUT/cond.4.txt" '
-    function load(f,tag){ while((getline l < f)>0){ split(l,x,"\t"); pos=x[1]
-        na[tag,pos]=x[2]; pass[tag,pos]=x[4]; seen[pos]=1 } close(f) }
-    function P(tag,pos){ return ((tag,pos) in pass) ? pass[tag,pos]+0 : 0 }
-    function YN(tag,pos){ return ((tag,pos) in pass) ? (pass[tag,pos]+0 ? "SNP":"dropped") : "no-call" }
-    BEGIN{
-      load(A,"t1"); load(B,"r1"); load(C,"t5"); load(D,"r5")
-      for(pos in seen){
-        if(P("t1",pos)!=P("r1",pos)) f1++
-        if(P("t5",pos)!=P("r5",pos)) f5++
-        if(P("t1",pos)!=P("t5",pos) || P("r1",pos)!=P("r5",pos)){ capn++; flip[pos]=1 }
-      }
-      print "FETCH FLAG  (-t  vs  -r):"
-      printf "  positions where -t and -r give a different call at d=1000 : %d\n", f1+0
-      printf "  positions where -t and -r give a different call at d=50000: %d\n", f5+0
-      print (f1+f5==0) ? "  => the fetch flag changes ZERO calls. It only affects SPEED." \
-                       : "  => the fetch flag DOES change calls."
-      print ""
-      print "DEPTH CAP  (d=1000  vs  d=50000):"
-      printf "  positions whose SNP call changes when the cap is lifted: %d\n", capn+0
-      if(capn==0) print "  => the cap changes ZERO calls here."
-      else {
-        print "  => the CAP is responsible. The positions it flips:"
-        for(pos in flip)
-          printf "     %-10s  d1000: -t=%-7s -r=%-7s | d50000: -t=%-7s -r=%-7s | #alleles capped=%s uncapped=%s\n",
-            pos, YN("t1",pos),YN("r1",pos),YN("t5",pos),YN("r5",pos), na["t1",pos], na["t5",pos]
-      }
-    }
-  '
+    function load(f,tag){ while((getline l<f)>0){split(l,x,"\t"); pass[tag,x[1]]=x[4]; seen[x[1]]=1} close(f) }
+    function P(t,p){ return ((t,p) in pass)?pass[t,p]+0:0 }
+    BEGIN{ load(A,"t1"); load(B,"r1"); load(C,"t5"); load(D,"r5")
+      for(p in seen){ if(P("t1",p)!=P("r1",p))f1++; if(P("t5",p)!=P("r5",p))f5++ }
+      printf "-t vs -r differ at %d positions (d=1000) and %d (d=50000) -> identical; comparing -r vs -r below.\n", f1+0, f5+0 }'
   echo
-  echo "key: SNP = passes biallelic + QUAL>59 | dropped = called but filtered out | no-call = not variant"
+  echo "-r @ d=1000   vs   -r @ d=50000   — every position whose call changes (raw numbers):"
+  printf "  %-10s %-30s %-30s\n" "POS" "d=1000 (nALT/QUAL/verdict)" "d=50000 (nALT/QUAL/verdict)"
+  awk -v CAP="$OUT/cond.2.txt" -v UNC="$OUT/cond.4.txt" '
+    function load(f,tag){ while((getline l<f)>0){split(l,x,"\t"); pos=x[1]
+        na[tag,pos]=x[2]; q[tag,pos]=x[3]; pass[tag,pos]=x[4]; seen[pos]=1} close(f) }
+    function verdict(tag,pos){ if(!((tag,pos) in pass)) return "no-call"; return (pass[tag,pos]+0)?"SNP":"dropped" }
+    function side(tag,pos){ return (verdict(tag,pos)=="no-call") ? "-/-/no-call" : sprintf("%s/%s/%s", na[tag,pos], q[tag,pos], verdict(tag,pos)) }
+    BEGIN{
+      load(CAP,"c"); load(UNC,"u")
+      for(pos in seen){
+        if(verdict("c",pos)==verdict("u",pos)) continue
+        printf "  %-10s %-30s %-30s\n", pos, side("c",pos), side("u",pos)
+      }
+    }' | sort
+  echo
+  echo "verdict: SNP = passes (biallelic, QUAL>59) | dropped = variant called but filtered | no-call = not called a variant"
   exit 0
 fi
 
