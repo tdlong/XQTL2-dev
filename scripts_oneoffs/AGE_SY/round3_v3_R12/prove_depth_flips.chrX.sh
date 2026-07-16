@@ -38,8 +38,11 @@
 #   sbatch scripts_oneoffs/AGE_SY/round3_v3_R12/prove_depth_flips.chrX.sh
 ###############################################################################
 set -uo pipefail
+# bcftools/1.21 needs htslib>=1.16. Do NOT module-load samtools/1.10 alongside it:
+# that drags in htslib/1.10.2 and breaks bcftools (undefined symbol
+# bcf_has_variant_types, version HTSLIB_1.16). samtools is loaded ONLY inside an
+# isolated subshell for the raw-pileup step, so it can't corrupt bcftools here.
 module load bcftools/1.21 2>/dev/null || true
-module load samtools/1.10 2>/dev/null || true
 
 REF=pipeline/ref/dm6.fa
 BAMS=helpfiles/AGE_SY/AGE_SY.bams
@@ -57,11 +60,18 @@ for f in "$REF" "$BAMS"; do [[ -e "$f" ]] || { echo "missing: $f" >&2; exit 1; }
 # ---------------------------------------------------------------------------
 for d in "$D1" "$D2"; do
   vcf="$OUT/call.d$d.vcf.gz"
-  if [[ -s "$vcf" ]]; then echo "[skip] $vcf exists" >&2; continue; fi
   echo "[$(date +%H:%M:%S)] mpileup|call  -r $REGION  -d $d ..." >&2
-  bcftools mpileup -I -d "$d" -r "$REGION" -a FORMAT/AD,FORMAT/DP -f "$REF" -b "$BAMS" 2>/dev/null \
-    | bcftools call -mv -Oz -o "$vcf" 2>/dev/null
+  # stderr left visible on purpose: a tool/module failure must be seen, not hidden.
+  bcftools mpileup -I -d "$d" -r "$REGION" -a FORMAT/AD,FORMAT/DP -f "$REF" -b "$BAMS" \
+    | bcftools call -mv -Oz -o "$vcf"
   bcftools index -f "$vcf"
+  n=$(bcftools view -H "$vcf" 2>/dev/null | wc -l | tr -d ' ')
+  echo "  -> $n variant records at d=$d" >&2
+  if [[ "$n" -eq 0 ]]; then
+    echo "ERROR: caller emitted 0 records at d=$d. That is a tool/module failure," >&2
+    echo "       not biology (check the bcftools/htslib errors above). Aborting." >&2
+    exit 1
+  fi
 done
 
 bcftools query -l "$OUT/call.d$D1.vcf.gz" > "$OUT/samples.txt"
@@ -137,13 +147,15 @@ while read -r pos; do
     | awk -F'\t' -v OFS='' '$2!=$4 {printf "    %-20s %-22s %-22s\n", $1, $2":"$3, $4":"$5}'
 
   # raw base counts, independent of the caller (samtools), for those same samples.
-  if command -v samtools >/dev/null 2>&1; then
-    capped=$(join -t $'\t' -1 1 -2 1 <(sort -k1,1 "$OUT/.ad1") <(sort -k1,1 "$OUT/.ad2") \
-             | awk -F'\t' '$2!=$4 {print $1}')
-    if [[ -n "$capped" ]]; then
-      echo "  raw pileup base counts (samtools, min-BQ 0, no BAQ — independent of the caller):"
-      for d in "$D1" "$D2"; do
-        samtools mpileup -Q0 -B -d "$d" -f "$REF" -r "chrX:$pos-$pos" -b "$BAMS" 2>/dev/null \
+  # samtools/1.10 is loaded in an ISOLATED subshell (module purge first) so its
+  # old htslib can never leak back and break bcftools in the parent shell.
+  capped=$(join -t $'\t' -1 1 -2 1 <(sort -k1,1 "$OUT/.ad1") <(sort -k1,1 "$OUT/.ad2") \
+           | awk -F'\t' '$2!=$4 {print $1}')
+  if [[ -n "$capped" ]]; then
+    echo "  raw pileup base counts (samtools, min-BQ0, no BAQ — independent of the caller):"
+    for d in "$D1" "$D2"; do
+      ( module purge 2>/dev/null; module load samtools/1.10 2>/dev/null
+        samtools mpileup -Q0 -B -d "$d" -f "$REF" -r "chrX:$pos-$pos" -b "$BAMS" 2>/dev/null ) \
           | awk -v names="$OUT/samples.txt" -v cap="$capped" -v dd="$d" '
               function strip(s,   out,i,c,j,num,l){
                 gsub(/\^./,"",s); gsub(/\$/,"",s)              # read-start (^ + mapq) and read-end
@@ -163,8 +175,7 @@ while read -r pos; do
               { ref=$3
                 for(s=1;s<=ni;s++){ dp=$(3*s+1); bs=$(3*s+2)
                   if((nm2[s] in want)) printf "    d%-6s %-20s DP=%-6s %s\n", dd, nm2[s], dp, cnt(bs,ref) } }'
-      done
-    fi
+    done
   fi
   echo
 done < "$OUT/flips.pos"
