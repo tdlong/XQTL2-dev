@@ -38,9 +38,12 @@ POS="16025382 16030427 16030958 16031180 16031851 16045058 16363526"
 REGIONS="chrX:16015382-16055058,chrX:16353526-16373526"
 # task index -> "depth tag"
 C1="1000 d1000a"; C2="1000 d1000b"; C3="50000 d50000a"; C4="50000 d50000b"
-# QUAL the 500 kb run (prove_depth_flips) produced — the narrow window must match these
-EXPECTED_d1000="16025382=63.8933 16030427=no-call 16030958=635.87 16031180=50.7705 16031851=56.7382 16045058=64.0468 16363526=49.6448"
-EXPECTED_d50000="16025382=45.6247 16030427=180.213 16030958=320.263 16031180=99.064 16031851=123.154 16045058=58.0733 16363526=82.6348"
+# QUAL the earlier ±10 kb run (depth_cap_check) produced — SAME window as this
+# script, so if the caller is deterministic the a/b columns must equal these.
+# (They do NOT match the 500 kb run: window changes QUAL — that's a separate,
+# already-established finding.)
+EXPECTED_d1000="16025382=36.3391 16030427=96.212 16030958=390.393 16031180=110.727 16031851=134.905 16045058=64.0468 16363526=24.2829"
+EXPECTED_d50000="16025382=66.206 16030427=132.212 16030958=376.591 16031180=85.5538 16031851=111.443 16045058=67.0423 16363526=36.8386"
 
 # ======================= orchestrator (login node) ===========================
 if [[ -z "${SLURM_ARRAY_TASK_ID:-}" && "${1:-}" != "--merge" ]]; then
