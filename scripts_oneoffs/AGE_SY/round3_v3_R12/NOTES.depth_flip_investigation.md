@@ -98,7 +98,10 @@ Keep this file updated every step so we do NOT re-run the hour-plus jobs.
 
 7. **nondeterminism_check.chrX.sh** — the EXACT same command run TWICE (500 kb
    window, same `-d`) and diff the FULL filtered SNP tables (d1000 A/B, d50000 A/B).
-   **STATUS: RUNNING (submitted ~2026-07-16 evening). Answer → `nondet_merge.out`.**
+   **ANSWER: DETERMINISTIC.** `nondet_merge.out`: d=1000 → 6723 vs 6723 SNPs, 0 diff;
+   d=50000 → 6726 vs 6726 SNPs, 0 diff. Identical command → byte-identical result.
+   So the tiled/non-tiled disagreement is NOT run-to-run noise — it is a real,
+   reproducible **deterministic window-extent effect** (candidate b).
 
 ---
 
@@ -113,19 +116,31 @@ Keep this file updated every step so we do NOT re-run the hour-plus jobs.
     **not** read-subsampling. Mechanism unknown — do NOT guess.
   - **mid-window** (16031851 sits ~130 kb inside the 500 kb window; QUAL 56.7 there
     vs 134.9 in the ±10 kb window).
+- **The per-sample AD counts are stable across the WINDOW too, not just across `-d`.**
+  Same sample, same site, 500 kb window vs ±10 kb window: AD identical
+  (16030958 AgeSY10_R8_F d1000 = 944:711,228 in both; 16030427 AgeSY10_R8_F d50000
+  = 1170:1166,0 in both). Only pooled QUAL moves with the window; the counts do not.
 - **REJECTED: boundary/padding effect.** The tiled/non-tiled callers differ at MANY
   SNPs mid-tile, nowhere near edges — padding only affects near-edge positions.
+- **REJECTED: nondeterminism.** Identical command twice = byte-identical (see #7).
 
-## Open question (what #7 decides)
+## Open question — RESOLVED to "deterministic window effect"
 
-Two candidates remain for the mid-tile, many-SNP tiled-vs-non-tiled disagreement:
-- **(a) nondeterministic caller** — identical command twice → different SNP sets;
-- **(b) deterministic global window-extent effect.**
-`nondeterminism_check` (#7) splits them: run the identical command twice, diff full
-tables. Many scattered diffs ⇒ (a) noise, not tiling. Zero diffs ⇒ (b).
+Was: (a) nondeterministic caller vs (b) deterministic global window-extent effect.
+`nondeterminism_check` (#7) answered **(b)**: identical command → identical result,
+so the tiled/non-tiled disagreement is a real, reproducible consequence of the
+window each caller uses (5 Mb tile vs whole-chr), NOT noise. The internal mechanism
+(why window extent changes a mid-window, uncapped QUAL) is still not explained — but
+it does not need to be, because the fix below does not depend on it.
 
 ## Practical fix (holds regardless of the open question)
 
-The RefAlt allele counts are stable; only the pooled `QUAL>59` (and the biallelic)
-filter is depth/window-fragile. The durable fix is to select SNPs on a **count-based,
-depth-robust** criterion instead of pooled QUAL. NOT YET BUILT — do this once #7 lands.
+The RefAlt allele counts are stable across BOTH `-d` and window; only the pooled
+`QUAL>59` (and the biallelic `-m2 -M2`) filter is depth/window-fragile. The durable
+fix: select SNPs on a **count-based, depth/window-robust** criterion instead of
+pooled QUAL. NOT YET BUILT.
+
+**Validation is cheap and needs NO caller re-run:** apply the count-based rule to
+the two EXISTING production tables `AGE_SY_v3/RefAlt.chrX.txt` (non-tiled) and
+`AGE_SY_v3_tiled/RefAlt.chrX.txt` (tiled). If the rule makes their SNP sets agree,
+the fix works and the tiled/non-tiled discrepancy is closed.
