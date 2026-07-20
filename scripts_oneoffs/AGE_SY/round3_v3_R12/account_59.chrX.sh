@@ -1,4 +1,11 @@
-#!/usr/bin/env bash
+#!/bin/bash
+#SBATCH --job-name=account_59
+#SBATCH -A tdlong_lab
+#SBATCH -p standard
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=6G
+#SBATCH --time=00:30:00
+#SBATCH -o process/prove_flips/account_59_%j.out
 # account_59.chrX.sh  —  one row per disagreeing SNP, sorted into "explainable"
 # and "residual", from data already on disk. No mpileup.
 #
@@ -21,8 +28,10 @@
 #   RESIDUAL        NO capped sample -> identical reads yet flips -> window/QUAL,
 #                   mechanism unexplained (this is the honest leftover)
 #
-# Reads only (+ index the bcf once); login node:
-#   bash scripts_oneoffs/AGE_SY/round3_v3_R12/account_59.chrX.sh
+# Reads only (+ index the bcf once). Submit; read the log:
+#   mkdir -p process/prove_flips
+#   sbatch scripts_oneoffs/AGE_SY/round3_v3_R12/account_59.chrX.sh
+#   -> process/prove_flips/account_59_<jobid>.out
 set -uo pipefail
 module load bcftools/1.21 2>/dev/null || true
 
