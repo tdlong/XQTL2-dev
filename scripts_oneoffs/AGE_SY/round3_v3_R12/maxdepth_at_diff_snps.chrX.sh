@@ -33,7 +33,11 @@ awk '
     for(k=1;k<=ns;k++){ d=f[2*k+1]+f[2*k+2]; if(d>mx){mx=d;mi=k}; if(d>=900)nn++ }
     return mx"\t"mi"\t"nn
   }
-  function bucket(m){ return (m<300)?"<300":(m<500)?"300-499":(m<700)?"500-699":(m<900)?"700-899":">=900" }
+  # CALIBRATION: a sample capped at raw 1000 shows here as ref+alt ~= 940 (~6%
+  # lost to low-qual/non-ref-alt). Verified: 16030958 R8_F (true 2095, capped) =
+  # 939; 16045058 AB8 (true 271, uncapped) = 260. So the capped/uncapped line in
+  # THIS table is ~940, NOT 1000. maxDP < 900 => no sample capped.
+  function bucket(m){ return (m<500)?"<500":(m<700)?"500-699":(m<900)?"700-899":(m<940)?"900-939":">=940(capped)" }
 
   # ---- file A: header (sample names) then body ----
   FNR==1 && NR==FNR { n=split($0,h," "); for(k=1;k<=(n-2)/2;k++){ nm=h[2*k+1]; sub(/^REF_/,"",nm); name[k]=nm } next }
