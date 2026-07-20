@@ -96,6 +96,16 @@ Keep this file updated every step so we do NOT re-run the hour-plus jobs.
    d=50000 ×2 (parallel array + merge). Expected values baked in from #5.
    **STATUS: built, not yet the definitive run** (superseded in intent by #7).
 
+7b. **maxdepth_at_diff_snps.chrX.sh** — the RIGHT count-based analysis, NO rerun.
+   For the actual tiled-vs-whole disagreeing SNPs (from the two existing RefAlt
+   tables), computes MAX per-sample depth (ref+alt) and asks: is a sample sitting
+   near the -d 1000 ceiling? Disagreeing SNPs with max < 500 have no plausibly
+   capped sample → both callers saw identical reads → the disagreement is NOT
+   subsampling (residual). **STATUS: built, not yet run. Run on login node.**
+   This is the honest test of "can we explain every difference by sampling?"
+   NOTE: characterize_diff_snps.sh tracked the WRONG summary (summed reads +
+   alt-freq); the cap is per-sample so MAX per-sample depth is what matters.
+
 7. **nondeterminism_check.chrX.sh** — the EXACT same command run TWICE (500 kb
    window, same `-d`) and diff the FULL filtered SNP tables (d1000 A/B, d50000 A/B).
    **ANSWER: DETERMINISTIC.** `nondet_merge.out`: d=1000 → 6723 vs 6723 SNPs, 0 diff;
