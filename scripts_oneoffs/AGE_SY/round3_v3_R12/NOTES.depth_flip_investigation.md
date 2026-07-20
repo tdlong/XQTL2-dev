@@ -96,6 +96,26 @@ Keep this file updated every step so we do NOT re-run the hour-plus jobs.
    d=50000 ×2 (parallel array + merge). Expected values baked in from #5.
    **STATUS: built, not yet the definitive run** (superseded in intent by #7).
 
+7c. **account_59.chrX.sh** — per-SNP accounting of all 59 disagreements, NO rerun.
+   KEY: the whole-chr caller KEEPS its BCF (bam2bcf2REFALT.sh writes calls.chrX.bcf,
+   never deletes) — it's PRE the QUAL>59 filter, so it holds every called variant
+   incl. those with QUAL<=59 and 3rd alleles (nALT>=2). The tiled caller DELETES its
+   per-tile BCF (rm -f $tmpbcf). So the accounting is ONE-WAY: for the ~29 NEW-only
+   SNPs (tiled kept, whole-chr dropped) the whole-chr BCF says exactly why whole-chr
+   dropped it — 3rd allele (nALT>=2 -> -m2-M2), or biallelic QUAL<=59, or no-call.
+   Near-cap sample (ref+alt >= ~900, ceiling ~940) = subsampling was in play; no
+   capped sample = residual (identical reads yet flips = window effect on QUAL).
+   OLD-only rows are inferential only (tiled BCF gone). **STATUS: built, run it.**
+   The user accepted a one-way explanation (~30 SNPs) as sufficient.
+
+   Result so far (maxdepth_at_diff_snps): 250,771 SNPs agree, 59 disagree. The
+   disagreements sit at high depth: ~31/59 have a sample >=900 (near the ~940
+   capped ceiling) => subsampling-plausible; ~28/59 have max per-sample depth <900
+   => NO capped sample => residual window/QUAL effect (e.g. 16045058 AB8, true depth
+   271). So it is NOT all sampling — roughly half cap, half residual. (My first
+   read said "7 residual" using a wrong <500 threshold; the capped value in these
+   -d1000 tables is ~940, so <900 => uncapped, giving ~28.)
+
 7b. **maxdepth_at_diff_snps.chrX.sh** — the RIGHT count-based analysis, NO rerun.
    For the actual tiled-vs-whole disagreeing SNPs (from the two existing RefAlt
    tables), computes MAX per-sample depth (ref+alt) and asks: is a sample sitting
