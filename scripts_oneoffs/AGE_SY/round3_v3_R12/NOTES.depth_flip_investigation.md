@@ -105,8 +105,30 @@ Keep this file updated every step so we do NOT re-run the hour-plus jobs.
    dropped it — 3rd allele (nALT>=2 -> -m2-M2), or biallelic QUAL<=59, or no-call.
    Near-cap sample (ref+alt >= ~900, ceiling ~940) = subsampling was in play; no
    capped sample = residual (identical reads yet flips = window effect on QUAL).
-   OLD-only rows are inferential only (tiled BCF gone). **STATUS: built, run it.**
+   OLD-only rows are inferential only (tiled BCF gone). **STATUS: RUN — see below.**
    The user accepted a one-way explanation (~30 SNPs) as sufficient.
+
+   RESULT (account_59_54343282.out), 59 disagreements accounted:
+   - tally: 27 RESIDUAL, 17 EXPLAINED-cap (OLD-only, inferential), 12 EXPLAINED-QUAL
+     (NEW-only), 2 NO-CALL, 1 EXPLAINED-3rd.
+   - EVERY SNP is mid-tile: min dL=1,018,399, min dR=85,871 — none within the 10kb
+     pad. So NOT an edge/padding effect. (Confirms the user's original observation.)
+   - Rigorous half = 29 NEW-only (whole-chr BCF is the dropping side):
+     ~12 near-cap (wmaxDP 905-981, always the R8/Con_R8 deepest libraries) ->
+       subsampling shifted whole-chr QUAL <=59 (e.g. 23207874 QUAL 3.5).
+     ~15 UNCAPPED (wmaxDP down to 260, reads_same=YES) -> identical read counts yet
+       whole-chr QUAL<=59 while tiled kept it -> window moves QUAL on identical data.
+       Not hairline: 14279293 whole-chr QUAL=10.5, tiled kept (>59) — ~48pt swing.
+     + 1 uncapped 3rd-allele (8868954, window changed the allele call), 2 no-call.
+   - So ~half the disagreements = -d 1000 cap on the deepest libraries; ~half =
+     bcftools QUAL depending on the calling window with identical reads (mechanism
+     still unexplained). 59/250,830 = 0.02%.
+   - Caveats: OLD-only EXPLAINED-cap are inferential (tiled BCF deleted); reads_same
+     compares max+total depth, not the full 80-sample vector; wmaxDP 900-940 is
+     ambiguous capped-vs-not (needs true uncapped depth to resolve).
+   NEXT (optional): (1) airtight residual = full per-sample AD compare + samtools
+   true depth at the 59, one SLURM job; (2) FIX = count-based SNP filter (counts are
+   identical across callers; only pooled QUAL is fragile).
 
    Result so far (maxdepth_at_diff_snps): 250,771 SNPs agree, 59 disagree. The
    disagreements sit at high depth: ~31/59 have a sample >=900 (near the ~940
