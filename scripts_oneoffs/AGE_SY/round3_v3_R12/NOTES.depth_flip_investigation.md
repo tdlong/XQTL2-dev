@@ -130,6 +130,15 @@ Keep this file updated every step so we do NOT re-run the hour-plus jobs.
    true depth at the 59, one SLURM job; (2) FIX = count-based SNP filter (counts are
    identical across callers; only pooled QUAL is fragile).
 
+8. **forensic_residual.chrX.sh** — WHY does QUAL differ on identical reads? The
+   residual "window changes QUAL" is a restatement, not a cause. QUAL comes from
+   genotype likelihoods -> base qualities -> BAQ (base alignment quality, ON by
+   default, no -B). Hypothesis: BAQ is computed window-dependently. Calls 16045058
+   at window half-widths {50k,250k,1M,2.5M} x {BAQ on, -B off}, dumps QUAL + full
+   per-sample AD each time. Reads: ADeq=YES across all => data identical; QUAL
+   varies down BAQ-on col => window moves QUAL on same data; BAQ-off col FLAT =>
+   BAQ is the cause. **STATUS: submitted. Answer -> forensic_merge.out.**
+
    Result so far (maxdepth_at_diff_snps): 250,771 SNPs agree, 59 disagree. The
    disagreements sit at high depth: ~31/59 have a sample >=900 (near the ~940
    capped ceiling) => subsampling-plausible; ~28/59 have max per-sample depth <900
