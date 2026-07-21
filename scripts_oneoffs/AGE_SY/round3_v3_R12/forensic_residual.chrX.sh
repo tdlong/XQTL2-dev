@@ -23,8 +23,9 @@
 #   (2) does QUAL actually move with window size?            (reproduce it)
 #   (3) does -B (BAQ off) remove the window-dependence?      (is BAQ the cause?)
 #
-# 8 conditions {50k,250k,1M,2.5M half-width} x {BAQ on, off} as a parallel array
-# + a dependent merge. Whole-chr reference value: calls.chrX.bcf (QUAL 58.07).
+# 6 conditions {50k,250k,1M half-width} x {BAQ on, off} as a parallel array + a
+# dependent merge. (5 Mb dropped: 0.1/0.5/2 Mb already span the far-from-boundary
+# range and it doesn't add anything.) Whole-chr reference: calls.chrX.bcf (58.07).
 #
 # Submit from repo root (self-submits):
 #   bash scripts_oneoffs/AGE_SY/round3_v3_R12/forensic_residual.chrX.sh
@@ -41,14 +42,13 @@ POS=16045058
 C1="50000  '' BAQon_50k";    C2="50000  -B BAQoff_50k"
 C3="250000 '' BAQon_250k";   C4="250000 -B BAQoff_250k"
 C5="1000000 '' BAQon_1M";    C6="1000000 -B BAQoff_1M"
-C7="2500000 '' BAQon_2.5M";  C8="2500000 -B BAQoff_2.5M"
 
 # ======================= orchestrator =======================
 if [[ -z "${SLURM_ARRAY_TASK_ID:-}" && "${1:-}" != "--merge" ]]; then
   SELF=$(cd "$(dirname "$0")" && pwd)/$(basename "$0")
   mkdir -p "$OUT"
-  JID=$(sbatch --parsable --array=1-8 "$SELF")
-  echo "8 conditions submitted as a parallel array: $JID"
+  JID=$(sbatch --parsable --array=1-6 "$SELF")
+  echo "6 conditions submitted as a parallel array: $JID"
   MID=$(sbatch --parsable --dependency=afterok:${JID} \
         -A tdlong_lab -p standard --time=20:00 -o "$OUT/forensic_merge.out" \
         --wrap="bash '$SELF' --merge")
@@ -65,9 +65,9 @@ if [[ "${1:-}" == "--merge" ]]; then
   echo "whole-chr reference (calls.chrX.bcf):"
   bcftools query -r "chrX:$POS-$POS" -f '  QUAL=%QUAL  ALT=%ALT  INFO/DP=%INFO/DP\n' "$BCF" 2>/dev/null | head -1
   echo
-  printf "%-14s %-8s %-10s %-6s  %s\n" "condition" "QUAL" "nALT" "ADeq?" "(ADeq = per-sample AD identical to BAQon_2.5M)"
-  ref="$OUT/forensic.ad.7.txt"   # BAQon_2.5M as the reference AD vector
-  for i in $(seq 1 8); do
+  printf "%-14s %-8s %-10s %-6s  %s\n" "condition" "QUAL" "nALT" "ADeq?" "(ADeq = per-sample AD identical to BAQon_1M)"
+  ref="$OUT/forensic.ad.5.txt"   # BAQon_1M (largest window) as the reference AD vector
+  for i in $(seq 1 6); do
     eval "c=\$C$i"; read -r w b lab <<< "$c"
     q=$(cat "$OUT/forensic.q.$i.txt" 2>/dev/null); na=$(cat "$OUT/forensic.na.$i.txt" 2>/dev/null)
     adeq="?"; if [[ -f "$OUT/forensic.ad.$i.txt" && -f "$ref" ]]; then
