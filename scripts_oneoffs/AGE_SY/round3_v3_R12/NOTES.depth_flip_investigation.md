@@ -137,7 +137,41 @@ Keep this file updated every step so we do NOT re-run the hour-plus jobs.
    at window half-widths {50k,250k,1M,2.5M} x {BAQ on, -B off}, dumps QUAL + full
    per-sample AD each time. Reads: ADeq=YES across all => data identical; QUAL
    varies down BAQ-on col => window moves QUAL on same data; BAQ-off col FLAT =>
-   BAQ is the cause. **STATUS: submitted. Answer -> forensic_merge.out.**
+   BAQ is the cause. **STATUS: RUN (task 7=2.5M-BAQon TIMEOUT@8h, rest done; 5Mb
+   arm dropped anyway). ANSWER: BAQ IS THE CAUSE.**
+
+   RESULT (16045058, per-sample AD md5 + QUAL):
+     condition     QUAL      nALT  AD_md5
+     BAQon_50k     53.1493   1     8104e8c3
+     BAQoff_50k    291.812   1     525d29f8
+     BAQon_250k    64.0468   1     8104e8c3
+     BAQoff_250k   294.81    1     525d29f8
+     BAQon_1M      64.0468   1     8104e8c3
+     BAQoff_1M     294.81    1     525d29f8
+     BAQoff_2.5M   294.81    1     525d29f8
+   - AD md5 = ONE value across ALL window sizes within a BAQ setting => reads are
+     byte-identical regardless of window. Window size does NOT change the data.
+   - BAQ OFF: QUAL ~292-295, flat across windows.
+   - BAQ ON : QUAL 53->64, swings ACROSS the 59 cutoff (53.15@50k, 64.05@250k/1M).
+   => the residual flip is a pure BAQ artifact: BAQ (local realignment, on by
+      default, no -B) recomputes base qualities window-dependently; those feed
+      PL/QUAL. Identical reads, different BAQ-adjusted base quals, QUAL crosses 59.
+   - BAQ suppresses QUAL ~5x here (294 -> ~58): this site sits in context BAQ
+      distrusts (low-complexity/near-indel), and QUAL>59 cuts through the wiggle.
+   - Gap (small): BAQ-on QUAL stable by 250k (250k==1M==64.0468) but 50k=53.15 and
+      whole-chr -t=58.07; a small method/small-window residual remains, all within
+      the BAQ-on regime. Big picture settled: NO BAQ, NO FLIP.
+
+   ============================ BOTTOM LINE ============================
+   The tiled-vs-whole-chr SNP disagreements (59/250,830 = 0.02%, ALL mid-tile)
+   have TWO causes, both acting on the pooled QUAL>59 filter (never on the counts,
+   which are identical everywhere):
+     (1) ~half: -d 1000 cap on the deepest libraries (R8/Con_R8) -> different read
+         draw per window -> QUAL shifts.
+     (2) ~half: BAQ recomputes base qualities window-dependently on IDENTICAL reads
+         -> QUAL shifts (this experiment).
+   FIX: select SNPs on the depth/window-stable allele counts, not pooled QUAL>59.
+   (Optionally add -B to disable BAQ, but that changes calls globally.)
 
    Result so far (maxdepth_at_diff_snps): 250,771 SNPs agree, 59 disagree. The
    disagreements sit at high depth: ~31/59 have a sample >=900 (near the ~940
