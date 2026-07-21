@@ -50,9 +50,21 @@ phase 1 differs in sample set, so compare SNP-site membership there, not per-sam
 
 ## Status
 - [x] Phase-1 bam_list built + verified (36 R1-R6 + 8 founders, no R7-R12 leakage).
-- [ ] Phase 1 submitted / done.
-- [ ] Phase 2 submitted / done.
-- [ ] compare_refalt_calls.R run; result recorded here.
+- [x] Phase 1 submitted — **FAILED at catalog_build (exit 127).** BLOCKED on XQTL2 bug.
+- [ ] Phase 2 — blocked.
+- [ ] compare_refalt_calls.R — blocked.
+
+## BLOCKER: XQTL2 issue #13 (module htslib clash)
+Phase-1 catalog_build failed immediately (exit 127, 0-byte founders.calls.bcf).
+Root cause: `catalog_build.sh` (and `catalog_count.sh`) load BOTH `bcftools/1.21`
+and `samtools/1.10`; samtools/1.10's htslib/1.10.2 shadows the htslib>=1.16 that
+bcftools/1.21 needs -> every bcftools call dies with
+`undefined symbol: bcf_has_variant_types, version HTSLIB_1.16`. This is the SAME
+clash documented in ../round3_v3_R12/NOTES.depth_flip_investigation.md.
+Filed: https://github.com/tdlong/XQTL2/issues/13 (with error, root cause, and 3
+fix options: read SM tag via `bcftools view -h` / isolate samtools in a subshell /
+use samtools built on htslib>=1.16). NOT our bug — do not patch pipeline scripts
+here (CLAUDE.md rule 2). Resume phase 1 once XQTL2 ships the fix and we pull it.
 
 ## README-accuracy check (for a possible XQTL2 issue)
 Verified the appendix matches the wrapper's actual flags (`--bamlist/--parfile/
