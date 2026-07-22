@@ -105,10 +105,19 @@ Cause: the #14 fix changed count to `bcftools call -m -C alleles -T "$cat"`
 (catalog_count.sh:68), which needs the catalog as 3-col CHROM POS REF,ALT
 (REF,ALT comma-joined). But catalog_build.sh:146 still writes 4-col CHROM POS
 REF ALT. Fix updated the consumer, not the catalog format.
-Fix (reported): catalog_build.sh:146 -> `awk '{print $1,$3,$4","$5}'` + re-tabix.
-Reopened https://github.com/tdlong/XQTL2/issues/14 with cause + fix.
-Resume: pull pipeline fix, wipe process/AGE_SY_v4, rerun (same command block).
-- [ ] duplication gone / counts recovered (blocked on #14 refix).
+Already FIXED upstream by 227200a (catalog_gather.sh now emits CHROM POS REF,ALT
+comma-joined) — landed 15:39, ~11 min AFTER our count failed (15:28). Our run used
+the pre-fix pipeline + a stale 4-col catalog.tsv.gz. (I reopened #14 on stale info;
+corrected + re-closed — the format is in catalog_gather.sh, not catalog_build.sh.)
+
+RESUME WITHOUT REBUILD (the slow catalog.<chr>.bed pieces are good and reused;
+only the seconds-long gather produced the wrong-format tsv):
+  git -C pipeline pull origin main
+  rm -f process/AGE_SY_v4/catalog.tsv.gz process/AGE_SY_v4/catalog.tsv.gz.tbi
+  rm -rf process/AGE_SY_v4/counts
+  bash scripts_oneoffs/AGE_SY/catalog_v4/run_catalog_v4.sh   # build tasks skip; gather regenerates; count+merge
+  bash scripts/cluster_sync.sh
+- [ ] duplication gone / counts recovered (rerun with fixed gather).
 
 ## BLOCKER: XQTL2 issue #13 (module htslib clash)
 Phase-1 catalog_build failed immediately (exit 127, 0-byte founders.calls.bcf).
