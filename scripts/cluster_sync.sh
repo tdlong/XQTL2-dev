@@ -42,8 +42,13 @@ n=0; for f in slurm-*.out; do mv "$f" "logs/"; n=$((n+1)); done
 } > "logs/manifest_$STAMP.txt"
 echo "captured state + manifest ($STAMP)"
 
-# 4. commit + push (rebase first: the Mac side also pushes to this origin)
-git add logs/
+# 4. housekeeping: prune the ephemeral snapshots this script writes every run
+#    (state_/manifest_) once they are >14 days old. Real job -o logs are left
+#    alone — prune those by hand when you want. Deletions get committed below.
+find logs -type f \( -name 'state_*.txt' -o -name 'manifest_*.txt' \) -mtime +14 -delete 2>/dev/null || true
+
+# 5. commit + push (rebase first: the Mac side also pushes to this origin)
+git add -A logs/
 if git diff --cached --quiet; then echo "nothing new to sync"; exit 0; fi
 git commit -q -m "cluster sync $STAMP"
 git pull --rebase -q origin main 2>/dev/null || true

@@ -18,4 +18,5 @@ Claude then `git pull`s and reads `logs/`.
 - SLURM scripts point their `-o` under `logs/` (e.g. `logs/AGE_SY/<name>_%j.out`),
   so those logs are already here; `cluster_sync.sh` adds the pipeline logs it
   can't set `-o` for, plus job state and the output manifest.
-- Just tracked text. Delete old files anytime and commit — no retention policy.
+- Just tracked text. `cluster_sync.sh` auto-prunes its own `state_*`/`manifest_*`
+  snapshots after 14 days; delete old job logs by hand whenever, then commit.
