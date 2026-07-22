@@ -50,9 +50,34 @@ phase 1 differs in sample set, so compare SNP-site membership there, not per-sam
 
 ## Status
 - [x] Phase-1 bam_list built + verified (36 R1-R6 + 8 founders, no R7-R12 leakage).
-- [x] Phase 1 submitted — **FAILED at catalog_build (exit 127).** BLOCKED on XQTL2 bug.
-- [ ] Phase 2 — blocked.
-- [ ] compare_refalt_calls.R — blocked.
+- [x] Phase 1 — ran after #13 fix (catalog built, 44 BAMs counted, RefAlt produced).
+- [x] compare_and_diagnose.sh run (log: logs/AGE_SY/compare_v3_v4_54375203.out).
+- [ ] Phase 2 — hold until XQTL2 #14/#15 addressed (no point widening a malformed table).
+
+## RESULT + two XQTL2 issues filed (2026-07-22)
+Evaluation of the founder-catalog caller vs v3 surfaced two problems, both filed:
+
+1. **BUG #14 (confirmed, high priority): RefAlt duplicates nearly every position.**
+   `RefAlt.chrX.txt` = 196,427 lines but only 66,810 unique POS; `uniq -d` on
+   (CHROM,POS) = **66,793 duplicated positions**. Root cause: `catalog_count.sh:67`
+   writes each sample's OWN observed REF/ALT (not the catalog's fixed REF/ALT), and
+   `catalog_merge.R:33` outer-joins on (CHROM,POS,REF,ALT) -> positions fragment
+   when ALT text varies per sample. Corrupts the count table + the v3-vs-v4 compare
+   (the "0% identical / 0.35 freq diff" is this artifact) and would break REFALT2haps.
+   Fix: emit/merge on the catalog's fixed REF/ALT (or merge on CHROM,POS only).
+   https://github.com/tdlong/XQTL2/issues/14
+
+2. **DESIGN #15: `--min-dp 20` (all founders) too aggressive -> lower to ~10x.**
+   v4 keeps ~1/4 the SNPs of v3 (chrX 66,810 vs 250,801; chr2L 15,208 vs 326,237).
+   Per-founder mean DP (chr2R): B1 175, B3 121, AB8 119, B7 61, B2 36, B4 34,
+   B6 21, B5 15 (B5 chr2L 7.3). Requiring all 8 >= 20x at every site is the throttle;
+   chr2L gutted by B5. B5 is fixed-but-shallow (the `*.RG.bam`, reference reads
+   subtracted to fix an inversion het), so a lower floor is safe.
+   https://github.com/tdlong/XQTL2/issues/15
+
+Both belong to XQTL2 — do NOT patch pipeline scripts here (CLAUDE.md rule 2).
+NOTE: earlier "compare on quality" pass-criteria numbers are invalid until #14 is
+fixed (the comparison table is corrupted by the duplication).
 
 ## BLOCKER: XQTL2 issue #13 (module htslib clash)
 Phase-1 catalog_build failed immediately (exit 127, 0-byte founders.calls.bcf).
