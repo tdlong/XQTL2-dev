@@ -20,3 +20,8 @@ Claude then `git pull`s and reads `logs/`.
   can't set `-o` for, plus job state and the output manifest.
 - Just tracked text. `cluster_sync.sh` auto-prunes its own `state_*`/`manifest_*`
   snapshots after 14 days; delete old job logs by hand whenever, then commit.
+
+## Future refinement (not yet done)
+Name log files more descriptively and organize per run in subdirectories, e.g.
+`logs/<project>/<run>/<step>_<jobid>.out`, so a run's logs group together and are
+easy to prune as a unit. Apply when we next touch the logging convention.
