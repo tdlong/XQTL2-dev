@@ -79,6 +79,23 @@ Both belong to XQTL2 — do NOT patch pipeline scripts here (CLAUDE.md rule 2).
 NOTE: earlier "compare on quality" pass-criteria numbers are invalid until #14 is
 fixed (the comparison table is corrupted by the duplication).
 
+## UPDATE 2026-07-22: XQTL2 fixed #13, #14, #15 (all CLOSED)
+- #14 fix (commit 851f37b): catalog_count.sh now `bcftools call -m -C alleles -T cat`
+  (constrains every sample to the catalog's REF/ALT; emits CHROM POS + AD only);
+  catalog_merge.R keys on (CHROM,POS) alone. -> one row per position, no fragmentation.
+- #15 fix: MIN_DP default 10 (was 20), PLUS new `--exempt-founders` (default
+  `B5:chr2L`) dropping B5 from the depth/fixation gate on chr2L only. Rationale:
+  B5 chr2L is non-polymorphic BY CONSTRUCTION (reads forced to an ALT-only ref in
+  the inversion fix), so founder rules don't apply there. Added data/founders/FOUNDERS.md.
+- Our run_catalog_v4.sh unchanged (exemption default baked into catalog_build.sh).
+
+RERUN TO CONFIRM (stale process/AGE_SY_v4 must be wiped — catalog+count logic changed):
+  rm -rf process/AGE_SY_v4
+  bash scripts_oneoffs/AGE_SY/catalog_v4/run_catalog_v4.sh
+  bash scripts/cluster_sync.sh
+Check: (1) 0 duplicate positions, (2) chr2L recovered toward ~326k, (3) site counts up.
+- [ ] rerun done / duplication gone / counts recovered.
+
 ## BLOCKER: XQTL2 issue #13 (module htslib clash)
 Phase-1 catalog_build failed immediately (exit 127, 0-byte founders.calls.bcf).
 Root cause: `catalog_build.sh` (and `catalog_count.sh`) load BOTH `bcftools/1.21`

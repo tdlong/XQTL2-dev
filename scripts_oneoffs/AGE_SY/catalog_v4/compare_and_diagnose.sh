@@ -27,6 +27,18 @@ V4=process/AGE_SY_v4
 CHRS="chrX chr2L chr2R chr3L chr3R"
 
 echo "=================================================================="
+echo "0) DUPLICATION CHECK (confirms XQTL2 #14 fix): duplicate (CHROM,POS) per chr"
+echo "   expect 0 everywhere; pre-fix chrX had 66,793."
+echo "=================================================================="
+for c in $CHRS; do
+  f="$V4/RefAlt.$c.txt"
+  [[ -e "$f" ]] || { printf "  %-7s (missing)\n" "$c"; continue; }
+  d=$(tail -n +2 "$f" | cut -f1,2 | sort | uniq -d | wc -l | tr -d ' ')
+  printf "  %-7s duplicate positions: %s\n" "$c" "$d"
+done
+
+echo
+echo "=================================================================="
 echo "1) per-chr SNP counts: v3 (QUAL) vs v4 (founder-catalog)"
 echo "=================================================================="
 printf "  %-7s %12s %12s %8s\n" chr v3 v4 "v4/v3"
