@@ -119,6 +119,29 @@ only the seconds-long gather produced the wrong-format tsv):
   bash scripts/cluster_sync.sh
 - [ ] duplication gone / counts recovered (rerun with fixed gather).
 
+## RERUN 2 — catalog correct, but two more issues filed 2026-07-22
+Catalog regenerated to correct comma format (chr2L 9204 T,C). Kicked count+merge;
+user cancelled after seeing a tabix error in a count log. Two issues filed:
+- #16: catalog_count.sh prints `[E::get_intv] Failed to parse ... "CHROM POS
+  REF_x ALT_x"` on EVERY count, yet the job succeeds (unskipped header in
+  `tabix -s1 -b2 -e2`). Result is fine (merge reads whole file, .tbi unused) but a
+  clean run emitting an ERROR makes logs untrustworthy. Fix: `tabix -S 1`.
+  https://github.com/tdlong/XQTL2/issues/16
+- #17: catalog steps silently reuse any existing output by FILENAME (no provenance,
+  no staleness check) -> a final RefAlt can silently mix stale intermediates and its
+  origin is unknowable. Fix: loud reuse logging + provenance manifest + hash-based
+  staleness + explicit --fresh. https://github.com/tdlong/XQTL2/issues/17
+Our run_catalog_v4.sh now prints an explicit REUSE-vs-COMPUTE pre-flight (+DRYRUN)
+and auto-chains the verification after merge.
+- #18: catalog_count.sh over-requests 2 cores + 12GB; seff shows ~1 core (52% of 2)
+  and 268MB used. One count task per sample (44+/run) -> wasted core-hours. Fix:
+  --cpus-per-task=1. https://github.com/tdlong/XQTL2/issues/18
+  (seff also CONFIRMS the count job COMPLETED exit 0 despite the #16 tabix error.)
+Open XQTL2 issues from this evaluation: #16 (tabix log), #17 (provenance), #18 (cores).
+
+OPEN (my offer): make run_catalog_v4.sh run COUNT-ONLY when the catalog exists
+(catalog_count.sh array + merge), so the build never re-queues. Awaiting user call.
+
 ## BLOCKER: XQTL2 issue #13 (module htslib clash)
 Phase-1 catalog_build failed immediately (exit 127, 0-byte founders.calls.bcf).
 Root cause: `catalog_build.sh` (and `catalog_count.sh`) load BOTH `bcftools/1.21`
