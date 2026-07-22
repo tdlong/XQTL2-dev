@@ -94,7 +94,21 @@ RERUN TO CONFIRM (stale process/AGE_SY_v4 must be wiped — catalog+count logic 
   bash scripts_oneoffs/AGE_SY/catalog_v4/run_catalog_v4.sh
   bash scripts/cluster_sync.sh
 Check: (1) 0 duplicate positions, (2) chr2L recovered toward ~326k, (3) site counts up.
-- [ ] rerun done / duplication gone / counts recovered.
+- [x] rerun attempted (job 54377xxx).
+
+## RERUN 1 FAILED — #14 fix incomplete (REOPENED #14) 2026-07-22
+Build (54377096_1-5) + gather COMPLETED, but ALL 44 catalog_count tasks FAILED
+(exit 127, <1s); merge never ran (DependencyNeverSatisfied). Log:
+  Unable to parse the -T file; expected CHROM\tPOS\tREF,ALT with -C alleles
+  but found instead: chr2L 9204 T C
+Cause: the #14 fix changed count to `bcftools call -m -C alleles -T "$cat"`
+(catalog_count.sh:68), which needs the catalog as 3-col CHROM POS REF,ALT
+(REF,ALT comma-joined). But catalog_build.sh:146 still writes 4-col CHROM POS
+REF ALT. Fix updated the consumer, not the catalog format.
+Fix (reported): catalog_build.sh:146 -> `awk '{print $1,$3,$4","$5}'` + re-tabix.
+Reopened https://github.com/tdlong/XQTL2/issues/14 with cause + fix.
+Resume: pull pipeline fix, wipe process/AGE_SY_v4, rerun (same command block).
+- [ ] duplication gone / counts recovered (blocked on #14 refix).
 
 ## BLOCKER: XQTL2 issue #13 (module htslib clash)
 Phase-1 catalog_build failed immediately (exit 127, 0-byte founders.calls.bcf).
