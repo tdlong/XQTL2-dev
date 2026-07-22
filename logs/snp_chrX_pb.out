@@ -1,0 +1,10 @@
+Reading process/ZINC2/ZINC2_F_v3/ZINC2_F_v3.smooth.chrX.rds 
+Reading SNP table for chrX ...
+  228582 SNPs
+Pre-building per-window arrays...
+Running SNP scan (228582 SNPs across 4544 windows)...
+Writing process/ZINC2/ZINC2_F_v3/ZINC2_F_v3.snp_scan.chrX.txt 
+  175729 SNPs
+Writing process/ZINC2/ZINC2_F_v3/ZINC2_F_v3.snp_meansBySample.chrX.txt 
+  5271870 rows
+Done.

@@ -1,0 +1,5 @@
+[mpileup] 1 samples in 1 input files
+[mpileup] maximum number of reads per input file set to -d 2000
+[E::get_intv] Failed to parse TBX_GENERIC: was wrong -p [type] used?
+The offending line was: "CHROM	POS	REF	ALT	REF_AgeSY20_R6_F	ALT_AgeSY20_R6_F"
+counted AgeSY20_R6_F -> process/AGE_SY_v4/counts/AgeSY20_R6_F.tsv.gz

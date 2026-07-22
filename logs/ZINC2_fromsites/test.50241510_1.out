@@ -1,0 +1,5 @@
+Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
+Unable to parse the -T file; expected CHROM\tPOS\tREF,ALT with -C alleles but found instead:
+	chrX	1431	.	C	T	128.009	.	DP=811;VDB=0.937184;SGB=-116.438;RPBZ=-2.54791;MQBZ=1.80389;MQSBZ=6.8835;BQBZ=-0.212821;SCBZ=-0.609897;MQ0F=0.817509;AC=6;AN=16;DP4=152,451,52,122;MQ=3	GT:PL:DP:AD	0/0:0,255,119:447:445,0	0/0:0,96,19:33:32,0	0/0:0,24,20:8:8,0	1/1:74,85,0:129:32,97	0/0:0,175,109:60:58,0	0/0:0,9,9:3:3,0	1/1:48,30,0:17:2,15	1/1:76,42,0:80:23,57
+Failed to read from standard input: unknown file type
+[mpileup] 1 samples in 1 input files

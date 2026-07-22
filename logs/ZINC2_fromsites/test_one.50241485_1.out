@@ -1,0 +1,9 @@
+mkdir: missing operand
+Try 'mkdir --help' for more information.
+/export/spool/slurm/slurmd.spool/job50241485/slurm_script: line 48: /RefAlt..chrX.txt: Permission denied
+/export/spool/slurm/slurmd.spool/job50241485/slurm_script: line 54: /RefAlt..chrX.txt: Permission denied
+Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
+Expected -c or -m option
+[E::hts_open_format] Failed to read from standard input: unknown file type
+Failed to open file "/founder_sites.chrX.vcf.gz" : No such file or directory
+bcftools mpileup: Could not read file "/founder_sites.chrX.vcf.gz"

@@ -1,0 +1,8 @@
+Reading process/ZINC2/R.haps.chrX.out.rds 
+  4544 windows | step 5000 bp | smooth_half 50 windows (+/-250 kb)
+Smoothing frequencies...
+  Masked 80100 / 1090560 founder-window estimates (7.3%) as unresolvable
+Smoothing covariance matrices...
+Writing smoothed RDS: process/ZINC2/ZINC2_F_v3/ZINC2_F_v3.smooth.chrX.rds 
+Writing meansBySample: process/ZINC2/ZINC2_F_v3/ZINC2_F_v3.meansBySample.chrX.txt 
+Done.

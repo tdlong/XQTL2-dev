@@ -1,0 +1,4 @@
+Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
+Expected -c or -m option
+Failed to read from standard input: unknown file type
+[mpileup] 1 samples in 1 input files

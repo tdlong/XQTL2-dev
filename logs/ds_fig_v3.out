@@ -1,0 +1,60 @@
+=== downsampling_server.R ===
+
+Loading scans:
+  Reading process/ZINC2/ZINC2_F_v3_N07/ZINC2_F_v3_N07.scan.txt
+  Reading process/ZINC2/ZINC2_F_v3_N09/ZINC2_F_v3_N09.scan.txt
+  Reading process/ZINC2/ZINC2_F_v3_N11/ZINC2_F_v3_N11.scan.txt
+  Reading process/ZINC2/ZINC2_F_v3_N13/ZINC2_F_v3_N13.scan.txt
+  Reading process/ZINC2/ZINC2_F_v3/ZINC2_F_v3.scan.txt
+Loaded 127870 rows across N = 7, 9, 11, 13, 15
+
+Computing 4-Wald-drop CIs for all 26 female-relevant peaks...
+CI table:
+# A tibble: 26 × 8
+   peak  chr   pos_mb    N7    N9   N11   N13   N15
+   <chr> <chr>  <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+ 1 βB    chr2L   9.66 1.34  1.06  1.03  0.905 0.905
+ 2 βL    chr2L  10.9  0.475 0.45  0.445 0.44  0.28 
+ 3 βM    chr2L  12.4  0.465 0.405 0.385 0.34  0.315
+ 4 βN    chr2L  14.0  0.78  0.665 0.56  0.34  0.315
+ 5 βO    chr2L  15.0  0.78  0.665 0.56  0.34  0.315
+ 6 βP    chr2L  17.2  0.79  0.665 0.56  0.795 1.53 
+ 7 βQ    chr2L  18.3  1.08  0.39  0.35  0.31  0.31 
+ 8 βR    chr2L  19.2  0.31  0.275 0.28  0.26  0.245
+ 9 βS    chr2L  20.7  0.31  0.275 0.28  0.26  0.245
+10 βT    chr2R   7.89 1.66  0.855 0.63  0.61  0.625
+11 βU    chr2R  11.6  1.06  1.47  1.62  1.1   0.985
+12 βV    chr2R  13.7  0.96  0.995 1.63  1.14  1.04 
+13 βW    chr2R  22.8  1.38  1.36  1.33  1.16  1.06 
+14 βX    chr2R  23.5  1.38  1.36  1.33  1.16  1.06 
+15 βY    chr3L   7.76 2.81  0.755 0.585 1.60  0.75 
+16 βD    chr3L   9.2  0.68  0.655 0.7   1.60  0.75 
+17 βZ    chr3L  15.8  0.705 0.695 0.665 0.625 0.595
+18 βAA   chr3L  18.4  0.575 0.555 0.525 0.42  0.435
+19 βAB   chr3L  20.2  0.815 0.82  0.785 0.74  0.68 
+20 βAC   chr3L  21.8  0.815 0.82  0.785 0.74  0.68 
+21 βAD   chr3R   7.45 0.69  0.595 0.5   0.315 0.315
+22 βAE   chr3R  15.5  1     0.925 0.94  1.07  0.995
+23 βAF   chr3R  17.3  0.305 0.265 0.26  0.27  0.23 
+24 βE    chr3R  18.6  0.305 0.265 0.26  0.27  0.23 
+25 βAG   chr3R  19.7  0.305 0.265 0.26  0.27  0.23 
+26 βF    chr3R  23    3.32  3.32  3.28  3.32  3.85 
+
+Saved: /dfs7/adl/tdlong/fly_pool/XQTL2/output/downsampling_v3/downsampling_ci_table.tsv
+
+Building figure...
+Error in `mapply()`:
+! The `legend.position.inside` theme element is not defined in the
+  element hierarchy.
+Backtrace:
+    ▆
+ 1. ├─base::print(p)
+ 2. └─ggplot2:::print.ggplot(p)
+ 3.   ├─ggplot2::ggplot_gtable(data)
+ 4.   └─ggplot2:::ggplot_gtable.ggplot_built(data)
+ 5.     └─ggplot2:::plot_theme(plot)
+ 6.       └─base::mapply(validate_element, theme, names(theme), MoreArgs = list(element_tree = get_element_tree()))
+ 7.         └─ggplot2 (local) `<fn>`(dots[[1L]][[98L]], dots[[2L]][[98L]], element_tree = `<named list>`)
+ 8.           └─cli::cli_abort(...)
+ 9.             └─rlang::abort(...)
+Execution halted

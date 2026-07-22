@@ -1,0 +1,6 @@
+chr2L: matched 8 of 8 founder BAM(s) by SM tag
+Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
+[mpileup] 8 samples in 8 input files
+[mpileup] maximum number of reads per input file set to -d 1000
+Lines   total/split/joined/realigned/removed/skipped:	468424/11072/0/49972/0/0
+chr2L: catalog sites 15209  -> process/AGE_SY_v4/catalog.chr2L.bed (catalog_gather.sh assembles catalog.tsv.gz)

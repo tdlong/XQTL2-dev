@@ -1,0 +1,8 @@
+sh: line 1: bcftools: command not found
+Error in fread(cmd = paste("bcftools query -f'%CHROM\\t%POS\\n'", sites_vcf),  : 
+  External command failed with exit code 127. This can happen when the disk is full in the temporary directory ('/tmp/tdlong/50238696/Rtmpup3akD'). See ?fread for the tmpdir argument.
+Calls: fread -> stopf -> raise_condition -> signal
+In addition: Warning message:
+In (if (.Platform$OS.type == "unix") system else shell)(paste0("(",  :
+  error in running command
+Execution halted

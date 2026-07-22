@@ -1,0 +1,65 @@
+==================================================================
+1) per-chr SNP counts: v3 (QUAL) vs v4 (founder-catalog)
+==================================================================
+  chr               v3           v4    v4/v3
+  chrX          250802       196427     0.78
+  chr2L         326238        46504     0.14
+  chr2R         348347       373017     1.07
+  chr3L         411873       377370     0.92
+  chr3R         406693       429932     1.06
+  (chr2L is the arm under scrutiny — expect it to look ~8x low in v4)
+
+==================================================================
+2) chr2L cause: per-founder mean depth, chr2L vs chr2R
+   (catalog needs EVERY founder covered; a founder that drops out on
+    chr2L would gate out the whole arm. Reads the founder BCFs on disk.)
+==================================================================
+  --- chr2L (mean DP per founder over first 50k sites) ---
+    samples: B1	B2	B3	B4	B5	B6	B7	AB8	
+    meanDP :   246.4    46.5   169.0    45.6     7.3    26.4    80.5   153.7
+  --- chr2R (mean DP per founder over first 50k sites) ---
+    samples: B1	B2	B3	B4	B5	B6	B7	AB8	
+    meanDP :   175.1    36.4   121.4    34.4    15.3    20.7    60.6   118.7
+  -> a founder whose meanDP collapses on chr2L (vs chr2R) is the culprit;
+     if ALL founders drop, it is a chr2L reference/mapping issue, not one BAM.
+
+==================================================================
+3) compare_refalt_calls.R: v3 vs v4 (SNP-site overlap)
+   NOTE phase-1 sample mismatch (36 vs 72) — read the SITE overlap,
+   not the per-sample count agreement (that needs phase 2).
+==================================================================
+Comparing A(current)=process/AGE_SY_v3  vs  B(proposed)=process/AGE_SY_v4
+
+chrX    A=250801  B=66810  shared=66702 (26.6% of A, 99.8% of B)
+        at shared (POS,sample): 0.00% identical counts; mean |freq diff| = 0.3557
+        A-only=184099  B-only=108  (rows written to process/AGE_SY_v4/compare.chrX.*_only.txt)
+
+chr2L   A=326237  B=15208  shared=15197 (4.7% of A, 99.9% of B)
+        at shared (POS,sample): 0.00% identical counts; mean |freq diff| = 0.3736
+        A-only=311040  B-only=11  (rows written to process/AGE_SY_v4/compare.chr2L.*_only.txt)
+
+chr2R   A=348346  B=121464  shared=121251 (34.8% of A, 99.8% of B)
+        at shared (POS,sample): 0.00% identical counts; mean |freq diff| = 0.3473
+        A-only=227095  B-only=213  (rows written to process/AGE_SY_v4/compare.chr2R.*_only.txt)
+
+chr3L   A=411872  B=123118  shared=122889 (29.8% of A, 99.8% of B)
+        at shared (POS,sample): 0.00% identical counts; mean |freq diff| = 0.3381
+        A-only=288983  B-only=229  (rows written to process/AGE_SY_v4/compare.chr3L.*_only.txt)
+
+chr3R   A=406692  B=139949  shared=139681 (34.3% of A, 99.8% of B)
+        at shared (POS,sample): 0.00% identical counts; mean |freq diff| = 0.3283
+        A-only=267011  B-only=268  (rows written to process/AGE_SY_v4/compare.chr3R.*_only.txt)
+
+Warning messages:
+1: In dcast.data.table(m, CHROM + POS + sample ~ refalt, value.var = "count") :
+  'fun.aggregate' is NULL, but found duplicate row/column combinations, so defaulting to length(). That is, the variables [CHROM, POS, sample, refalt] used in 'formula' do not uniquely identify rows in the input 'data'. In such cases, 'fun.aggregate' is used to derive a single representative value for each combination in the output data.table, for example by summing or averaging (fun.aggregate=sum or fun.aggregate=mean, respectively). Check the resulting table for values larger than 1 to see which combinations were not unique. See ?dcast.data.table for more details.
+2: In dcast.data.table(m, CHROM + POS + sample ~ refalt, value.var = "count") :
+  'fun.aggregate' is NULL, but found duplicate row/column combinations, so defaulting to length(). That is, the variables [CHROM, POS, sample, refalt] used in 'formula' do not uniquely identify rows in the input 'data'. In such cases, 'fun.aggregate' is used to derive a single representative value for each combination in the output data.table, for example by summing or averaging (fun.aggregate=sum or fun.aggregate=mean, respectively). Check the resulting table for values larger than 1 to see which combinations were not unique. See ?dcast.data.table for more details.
+3: In dcast.data.table(m, CHROM + POS + sample ~ refalt, value.var = "count") :
+  'fun.aggregate' is NULL, but found duplicate row/column combinations, so defaulting to length(). That is, the variables [CHROM, POS, sample, refalt] used in 'formula' do not uniquely identify rows in the input 'data'. In such cases, 'fun.aggregate' is used to derive a single representative value for each combination in the output data.table, for example by summing or averaging (fun.aggregate=sum or fun.aggregate=mean, respectively). Check the resulting table for values larger than 1 to see which combinations were not unique. See ?dcast.data.table for more details.
+4: In dcast.data.table(m, CHROM + POS + sample ~ refalt, value.var = "count") :
+  'fun.aggregate' is NULL, but found duplicate row/column combinations, so defaulting to length(). That is, the variables [CHROM, POS, sample, refalt] used in 'formula' do not uniquely identify rows in the input 'data'. In such cases, 'fun.aggregate' is used to derive a single representative value for each combination in the output data.table, for example by summing or averaging (fun.aggregate=sum or fun.aggregate=mean, respectively). Check the resulting table for values larger than 1 to see which combinations were not unique. See ?dcast.data.table for more details.
+5: In dcast.data.table(m, CHROM + POS + sample ~ refalt, value.var = "count") :
+  'fun.aggregate' is NULL, but found duplicate row/column combinations, so defaulting to length(). That is, the variables [CHROM, POS, sample, refalt] used in 'formula' do not uniquely identify rows in the input 'data'. In such cases, 'fun.aggregate' is used to derive a single representative value for each combination in the output data.table, for example by summing or averaging (fun.aggregate=sum or fun.aggregate=mean, respectively). Check the resulting table for values larger than 1 to see which combinations were not unique. See ?dcast.data.table for more details.
+
+done.

@@ -1,0 +1,6 @@
+Reading haplotype scans...
+  pA chrX: 4532 windows, max Wald=8.0
+  pB chrX: 4544 windows, max Wald=2.0
+Reading S/S SNPs...
+  S/S SNPs on chrX: 0
+Written: output/chrX_snp_manhattan.png 
