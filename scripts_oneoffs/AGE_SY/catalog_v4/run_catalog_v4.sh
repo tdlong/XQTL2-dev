@@ -50,8 +50,12 @@ JID=$(bash pipeline/scripts/run_refalt.catalog.sh \
         --parfile "$PARFILE" \
         --dir     "$DIR")
 echo "submitted; merge job id: $JID"
+
+# Chain the verification (dup check + per-chr counts vs v3 + compare_refalt_calls.R
+# + B5 depth) to run automatically after the merge succeeds, so this is one kickoff.
+SELFDIR=$(cd "$(dirname "$0")" && pwd)
+VJID=$(sbatch --parsable --dependency=afterok:"$JID" "$SELFDIR/compare_and_diagnose.sh")
+echo "verification chained after merge: job $VJID -> logs/AGE_SY/compare_v3_v4_${VJID}.out"
 echo
-echo "when done, the deliverable is $DIR/RefAlt.<chr>.txt"
-echo "compare against the validated QUAL caller (process/AGE_SY_v3):"
-echo "  module load R"
-echo "  Rscript pipeline/scripts/compare_refalt_calls.R process/AGE_SY_v3 $DIR"
+echo "deliverable: $DIR/RefAlt.<chr>.txt"
+echo "when everything finishes:  bash scripts/cluster_sync.sh"
