@@ -1,0 +1,6 @@
+chrX: matched 8 of 8 founder BAM(s) by SM tag
+Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
+[mpileup] 8 samples in 8 input files
+[mpileup] maximum number of reads per input file set to -d 1000
+Lines   total/split/joined/realigned/removed/skipped:	349625/15533/0/62455/0/0
+chrX: catalog sites 176670  -> process/AGE_SY_v4/catalog.chrX.bed (catalog_gather.sh assembles catalog.tsv.gz)
