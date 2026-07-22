@@ -45,6 +45,34 @@ for f in "$BAMLIST" "$PARFILE" pipeline/scripts/run_refalt.catalog.sh; do
   [[ -e "$f" ]] || { echo "missing: $f" >&2; exit 1; }
 done
 
+# ---------------------------------------------------------------------------
+# PRE-FLIGHT: say out loud what will be REUSED vs COMPUTED, so the final
+# RefAlt.<chr>.txt's provenance is never a mystery. The pipeline silently reuses
+# any output file that already exists in --dir; this makes that visible up front.
+# Run with DRYRUN=1 to print this and stop WITHOUT submitting anything.
+# ---------------------------------------------------------------------------
+echo "== pre-flight: $DIR =="
+npieces=$(ls "$DIR"/catalog.chr*.bed 2>/dev/null | wc -l | tr -d ' ')
+if [[ "${npieces:-0}" -ge 1 ]]; then
+  echo "  catalog build   : REUSE $npieces existing catalog.chr*.bed piece(s) — founders NOT recalled"
+else
+  echo "  catalog build   : COMPUTE from founders (SLOW, ~1.5 h)"
+fi
+if [[ -s "$DIR/catalog.tsv.gz" ]]; then
+  echo "  catalog assemble: REUSE existing catalog.tsv.gz  (first line: $(zcat "$DIR/catalog.tsv.gz" 2>/dev/null | head -1))"
+else
+  echo "  catalog assemble: COMPUTE (assemble from pieces)"
+fi
+nbam=$(grep -cve '^[[:space:]]*$' "$BAMLIST")
+ncount=$(ls "$DIR"/counts/*.tsv.gz 2>/dev/null | wc -l | tr -d ' ')
+echo "  sample counts   : REUSE ${ncount:-0} already-counted, COMPUTE $((nbam - ${ncount:-0})) new (of $nbam BAMs)"
+echo "  -> to force any of these fresh, DELETE the file(s) above first; rerunning alone never recomputes them."
+echo
+if [[ "${DRYRUN:-0}" == "1" ]]; then
+  echo "DRYRUN=1 set — not submitting. Rerun without DRYRUN to launch."
+  exit 0
+fi
+
 JID=$(bash pipeline/scripts/run_refalt.catalog.sh \
         --bamlist "$BAMLIST" \
         --parfile "$PARFILE" \
