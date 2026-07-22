@@ -24,7 +24,6 @@ process/
 # dated/alt output dirs, e.g. process.Dec6/
 process.*/
 output/
-logs/
 configs/
 
 # stray figure images (figures live in figures/, never loose in git)
@@ -44,3 +43,9 @@ pipeline
 
 # cluster state output
 check_cluster_state.out.txt
+
+# logs/ is TRACKED (subdivided by project) so SLURM logs sync via git and Claude
+# can pull + read them instead of the user pasting. This must override the
+# slurm* and *.out patterns above for anything under logs/. Prune old logs freely.
+!logs/
+!logs/**
