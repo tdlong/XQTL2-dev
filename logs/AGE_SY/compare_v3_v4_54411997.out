@@ -1,0 +1,62 @@
+==================================================================
+0) DUPLICATION CHECK (XQTL2 #14): duplicate (CHROM,POS) per chr — expect 0
+==================================================================
+  chrX    duplicate positions: 0
+  chr2L   duplicate positions: 0
+  chr2R   duplicate positions: 0
+  chr3L   duplicate positions: 2
+  chr3R   duplicate positions: 0
+
+==================================================================
+1) per-chr SNP counts: v3 (QUAL) vs v4 (founder-catalog)
+==================================================================
+  chr               v3           v4    v4/v3
+  chrX          250802       176665     0.70
+  chr2L         326238       298805     0.92
+  chr2R         348347       244953     0.70
+  chr3L         411873       306895     0.75
+  chr3R         406693       300000     0.74
+
+==================================================================
+2) catalog.stats.txt — per-rule SNP tally (candidates, dropped, kept)
+==================================================================
+catalog SNP rules (summed over chromosomes):
+  candidate biallelic SNPs : 1775608
+  dropped, founder depth   : 218371
+  dropped, not near-fixed  : 158180
+  dropped, not segregating : 74275
+  KEPT (catalog)           : 1324782
+
+==================================================================
+3) compare_refalt_calls.R: v3 vs v4 — counts agree at shared SNPs?
+   (should run clean now — no dcast duplicate-key warnings)
+   NOTE: if v4 has fewer samples than v3 (phase 1), read SITE overlap,
+   not per-sample count agreement (that needs the full 72 in v4).
+==================================================================
+Comparing A(current)=process/AGE_SY_v3  vs  B(proposed)=process/AGE_SY_v4/Calls
+
+chrX    A=250801  B=176664  shared=175809 (70.1% of A, 99.5% of B)
+        at shared (POS,sample): 16.49% identical counts; mean |freq diff| = 0.0128
+        A-only=74992  B-only=855  (rows written to process/AGE_SY_v4/Calls/compare.chrX.*_only.txt)
+
+chr2L   A=326237  B=298804  shared=264260 (81.0% of A, 88.4% of B)
+        at shared (POS,sample): 11.17% identical counts; mean |freq diff| = 0.0154
+        A-only=61977  B-only=34544  (rows written to process/AGE_SY_v4/Calls/compare.chr2L.*_only.txt)
+
+chr2R   A=348346  B=244952  shared=243981 (70.0% of A, 99.6% of B)
+        at shared (POS,sample): 9.88% identical counts; mean |freq diff| = 0.0156
+        A-only=104365  B-only=971  (rows written to process/AGE_SY_v4/Calls/compare.chr2R.*_only.txt)
+
+chr3L   A=411872  B=304336  shared=302910 (73.5% of A, 99.5% of B)
+        at shared (POS,sample): 0.00% identical counts; mean |freq diff| = 0.3376
+        A-only=108962  B-only=1426  (rows written to process/AGE_SY_v4/Calls/compare.chr3L.*_only.txt)
+
+chr3R   A=406692  B=299999  shared=298825 (73.5% of A, 99.6% of B)
+        at shared (POS,sample): 9.99% identical counts; mean |freq diff| = 0.0157
+        A-only=107867  B-only=1174  (rows written to process/AGE_SY_v4/Calls/compare.chr3R.*_only.txt)
+
+Warning message:
+In dcast.data.table(m, CHROM + POS + sample ~ refalt, value.var = "count") :
+  'fun.aggregate' is NULL, but found duplicate row/column combinations, so defaulting to length(). That is, the variables [CHROM, POS, sample, refalt] used in 'formula' do not uniquely identify rows in the input 'data'. In such cases, 'fun.aggregate' is used to derive a single representative value for each combination in the output data.table, for example by summing or averaging (fun.aggregate=sum or fun.aggregate=mean, respectively). Check the resulting table for values larger than 1 to see which combinations were not unique. See ?dcast.data.table for more details.
+
+done.
