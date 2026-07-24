@@ -211,8 +211,17 @@ good_SNPs pooled founder columns (BAQ-on, QUAL sites) — a judgment call.
 - [x] reported three-way to dev #1 (comment 5074802139). VERDICT: SNP sets close
       enough to use (user). chr2L QUAL_missed spike ~= B5:chr2L exemption + B5's
       reference-subtracted reads polluting the pooled QUAL call (likely, worth confirm).
-- [ ] sample-call verification (count R1-R6 done 54411642; merge+verify post-14:46 sync
-      — need a fresh cluster_sync to see Calls/RefAlt + the chained verification).
+- [x] sample-call verification (compare_v3_v4_54411940). CALLS CLEAN:
+      dup positions 0 on chrX/2L/2R/3R, 2 on chr3L (negligible); per-chr counts match
+      catalog (chr2L 0.92 recovered); catalog.stats confirmed. The #14 saga is closed
+      on real Calls/ output.
+      compare_refalt_calls.R ERRORED (not the data): it uses fread (e98f895), which
+      can't parse v3's tab-header/space-data RefAlt -> melt id.vars invalid. Filed
+      XQTL2 #19 (fix: tr-normalize or read.table). Count comparison needs #19 fixed +
+      phase 2 (72 samples) anyway.
+- [ ] minor: 2 duplicate positions on chr3L Calls — glance (negligible).
+- [ ] call R7-R12 (phase 2, BAMLIST=bam_list.v4_R7-12.txt) -> 72 samples, then the
+      real per-sample count comparison (after #19 fixed).
 
 ## BLOCKER: XQTL2 issue #13 (module htslib clash)
 Phase-1 catalog_build failed immediately (exit 127, 0-byte founders.calls.bcf).
