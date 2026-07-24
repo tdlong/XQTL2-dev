@@ -1,0 +1,35 @@
+founders: B1 B2 B3 B4 B5 B6 B7 AB8 
+
+
+=== A. three-way SNP sets ===
+chr            v3_raw      v3_eff     catalog     cat&eff    cat_only    eff_only 
+chrX           250801      201824      176670      162429       14235       39395 
+chr2L          326237      297393      298812      250753       48051       46640 
+chr2R          348346      273505      244953      226817       18135       46688 
+chr3L          411872      351242      304342      281297       23039       69945 
+chr3R          406692      335918      300005      278214       21785       57704 
+TOTAL         1743948     1459882     1324782     1199510      125245      260372 
+
+=== B. cat_only breakdown (catalog SNPs not in v3-effective) ===
+chr          cat_only QUAL_missedfoundr_disag 
+chrX            14235         855       13380 
+chr2L           48051       34544       13507 
+chr2R           18135         971       17164 
+chr3L           23039        1426       21613 
+chr3R           21785        1174       20611 
+TOTAL          125245       38970       86275 
+
+=== C. eff_only breakdown (good_SNPs the catalog dropped) ===
+chr          eff_only monomorphic segregating 
+chrX            39395        9858       29537 
+chr2L           46640       16014       30626 
+chr2R           46688       20458       26230 
+chr3L           69945       29799       40146 
+chr3R           57704       28297       29407 
+TOTAL          260372      104426      155946 
+
+read:
+  B QUAL_missed = catalog SNPs QUAL>59 never called (the gain); foundr_disag = pooled(v3) vs direct(catalog) founder-call disagreement.
+  C monomorphic = all founders fixed same allele (catalog drops as non-segregating; useless for haps anyway).
+  C segregating = real founder-segregating SNPs the catalog still dropped -> near-indel (snpgap) or measurement; the ones to inspect.
+done.
