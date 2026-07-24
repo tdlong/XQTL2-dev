@@ -179,6 +179,20 @@ vs QUAL>59; resolve whether v3-only sites are junk-or-real via compare's v3-only
 output AFTER calling. VERDICT: catalog good -> proceed to call R1-R6.
 - [ ] call R1-R6 + verify (dup 0, counts vs v3, v3-only sites junk?).
 
+## KEY INSIGHT (reported to dev #1): catalog == v3's downstream good_SNPs filter
+The catalog's ascertainment rules ARE the `good_SNPs` filter the current pipeline
+already applies DOWNSTREAM in REFALT2haps.code.R:169-175:
+  zeros==0        = every founder covered      = catalog min-dp
+  notfixed==0 @0.03/0.97 = near-fixed per founder = catalog maxaf 0.03
+  informative     = segregating                = catalog polymorphic/segregating
+So v3 RefAlt = RAW (QUAL>59); the SNPs actually USED = v3-AFTER-good_SNPs. The catalog
+IS that filtered set, ascertained early (no QUAL). => v4 keeping 70-92% of RAW v3 is
+EXPECTED; the fair comparison is v4 vs v3-AFTER-good_SNPs.
+PROPOSED TEST (next analysis): apply good_SNPs to v3's RefAlt (has founder cols),
+compare to v4 catalog. Match => catalog reproduces the pipeline's founder-clean set
+(the goal). Differ => that delta is exactly what QUAL was adding/removing.
+Reported: https://github.com/tdlong/XQTL2-dev/issues/1#issuecomment-5074550560
+
 ## BLOCKER: XQTL2 issue #13 (module htslib clash)
 Phase-1 catalog_build failed immediately (exit 127, 0-byte founders.calls.bcf).
 Root cause: `catalog_build.sh` (and `catalog_count.sh`) load BOTH `bcftools/1.21`
