@@ -1,0 +1,4 @@
+Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
+[mpileup] 1 samples in 1 input files
+[mpileup] maximum number of reads per input file set to -d 2000
+[2026-07-22T16:02:03.085] error: *** JOB 54380390 ON hpc3-14-01 CANCELLED AT 2026-07-22T16:02:03 DUE to SIGNAL Terminated ***

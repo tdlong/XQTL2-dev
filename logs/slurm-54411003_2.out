@@ -1,0 +1,6 @@
+Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
+[mpileup] 8 samples in 8 input files
+[mpileup] maximum number of reads per input file set to -d 1000
+Lines   total/split/joined/realigned/removed/skipped:	468418/11073/0/49972/0/0
+chr2L: exempting founder field(s) 10 (B5:chr2L)
+chr2L: candidates=375828 depth_fail=31124 notfixed_fail=14682 notseg_fail=31210 kept=298812  -> process/AGE_SY_v4/Catalog/work/catalog.chr2L.bed

@@ -1,0 +1,5 @@
+Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
+[mpileup] 8 samples in 8 input files
+[mpileup] maximum number of reads per input file set to -d 1000
+Lines   total/split/joined/realigned/removed/skipped:	431584/11826/0/47951/0/0
+chr2R: candidates=345146 depth_fail=42778 notfixed_fail=46455 notseg_fail=10960 kept=244953  -> process/AGE_SY_v4/Catalog/work/catalog.chr2R.bed

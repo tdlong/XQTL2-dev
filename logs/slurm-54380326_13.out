@@ -1,0 +1,6 @@
+Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
+[mpileup] 1 samples in 1 input files
+[mpileup] maximum number of reads per input file set to -d 2000
+[E::get_intv] Failed to parse TBX_GENERIC: was wrong -p [type] used?
+The offending line was: "CHROM	POS	REF_AgeSY20_R1_F	ALT_AgeSY20_R1_F"
+counted AgeSY20_R1_F -> process/AGE_SY_v4/counts/AgeSY20_R1_F.tsv.gz

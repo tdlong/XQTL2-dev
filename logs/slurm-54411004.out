@@ -1,0 +1,7 @@
+catalog: 1324782 sites -> process/AGE_SY_v4/Catalog/catalog.tsv.gz
+catalog SNP rules (summed over chromosomes):
+  candidate biallelic SNPs : 1775608
+  dropped, founder depth   : 218371
+  dropped, not near-fixed  : 158180
+  dropped, not segregating : 74275
+  KEPT (catalog)           : 1324782

@@ -1,0 +1,23 @@
+=== catalog.stats.txt (per-rule SNP tally) ===
+catalog SNP rules (summed over chromosomes):
+  candidate biallelic SNPs : 1775608
+  dropped, founder depth   : 218371
+  dropped, not near-fixed  : 158180
+  dropped, not segregating : 74275
+  KEPT (catalog)           : 1324782
+
+=== format check: first 3 lines of catalog.tsv.gz (want CHROM POS REF,ALT) ===
+chr2L	9204	T,C
+chr2L	9533	A,C
+chr2L	9998	A,C
+
+=== catalog SNPs per chromosome vs v3 RefAlt (was chr2L: 15,208 broken) ===
+  chr          catalog           v3   cat/v3
+  chrX          176670       250802     0.70
+  chr2L         298812       326238     0.92
+  chr2R         244953       348347     0.70
+  chr3L         304342       411873     0.74
+  chr3R         300005       406693     0.74
+
+total catalog SNPs: 1324782
+done.
