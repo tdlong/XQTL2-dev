@@ -1,0 +1,49 @@
+=== per-(SNP,sample) count agreement, v3 vs v4 (shared SNPs & samples) ===
+  delta == 0 (exact) :        6311280   11.14% 
+  delta == 1         :       10035705   17.71% 
+  delta == 2         :        9457904   16.69% 
+  delta  > 2  (KEPT) :       30859719   54.46% 
+  total pairs        :       56664608 
+
+=== per chromosome (pairs / d=0 / d=1 / d=2 / d>2) ===
+chr             pairs           d0           d1           d2          d>2
+chrX          7735596      1275387      1707868      1373880      3378461
+chr2L        11627440      1298219      1961312      1897036      6470873
+chr2R        10735164      1060175      1816419      1765299      6093271
+chr3L        13418108      1364435      2303838      2230001      7519834
+chr3R        13148300      1313064      2246268      2191688      7397280
+
+=== the delta>2 tail, by size ===
+  delta 3-5        16765025   54.33% of the >2 tail
+  delta 6-10        8946631   28.99% of the >2 tail
+  delta 11-20       3936648   12.76% of the >2 tail
+  delta >20         1211415    3.93% of the >2 tail
+
+=== 20 largest deltas (what big discrepancies look like) ===
+       chr      pos       sample total delta ref_v3 alt_v3 ref_v4 alt_v4
+    <char>    <int>       <char> <int> <int>  <int>  <int>  <int>  <int>
+ 1:  chr3L 15753377 AgeSY20_R3_M   986  1010    951     35   1926      0
+ 2:  chr3L  8724756     Con_R5_F   936   994    872     64   1802      0
+ 3:  chr3L  8729240     Con_R5_F   970   985    812    158   1639      0
+ 4:  chr2R  5108974     Con_R5_F   902   983    897      5   1875      0
+ 5:  chr2R  5107295     Con_R5_F   942   975    936      6   1905      0
+ 6:  chr3L  8729239     Con_R5_F   966   968    807    159   1616      0
+ 7:  chr2R  5106966     Con_R5_F   913   961    889     24   1826      0
+ 8:  chr3L  8729243     Con_R5_F   965   960    806    159   1607      0
+ 9:  chr2R  5108523     Con_R5_F   872   959     35    837     61   1770
+10:  chr2R  5107895     Con_R5_F   948   951    947      1   1897      0
+11:  chr3L  8731230     Con_R5_F   962   943    823    139   1627      0
+12:  chr3L  8724205 AgeSY20_R4_F   951   940    926     25   1841      0
+13:  chr3L  8731251     Con_R5_F   958   940    847    111   1676      0
+14:  chr3L  8729490     Con_R5_F   968   932    867    101   1698      0
+15:  chr3L  8732643     Con_R5_F   940   932    897     43   1786      0
+16:  chr3L  8722557     Con_R5_F   954   931    934     20   1845      0
+17:  chr3L  8729507     Con_R5_F   966   927    875     91   1711      0
+18:  chr2R  5106401     Con_R5_F   951   926    949      2   1873      0
+19:  chr3L  8729185     Con_R5_F   836   926    704    132   1498      0
+20:  chr3L  8728618     Con_R5_F   948   923    292    656    494   1377
+       chr      pos       sample total delta ref_v3 alt_v3 ref_v4 alt_v4
+    <char>    <int>       <char> <int> <int>  <int>  <int>  <int>  <int>
+
+kept table: process/AGE_SY_v4/Calls/delta_gt2.<chr>.tsv.gz  (query this, no rebuild)
+done.
