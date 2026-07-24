@@ -2,9 +2,12 @@
 #SBATCH --job-name=cat_v4_compare
 #SBATCH -A tdlong_lab
 #SBATCH -p standard
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=4
 #SBATCH --mem-per-cpu=6G
 #SBATCH --time=00:40:00
+# NB: 4 cores is for MEMORY, not compute — compare_refalt_calls.R melts the whole
+# RefAlt to long format (memory-hungry) and OOM-killed at 6G. Standard partition
+# caps at 6G/core, so 4 cores = 24G total (the sanctioned way to get more RAM).
 #SBATCH -o logs/AGE_SY/compare_v3_v4_%j.out
 ###############################################################################
 # compare_and_diagnose.sh — verify the founder-catalog v4 callset vs v3.
