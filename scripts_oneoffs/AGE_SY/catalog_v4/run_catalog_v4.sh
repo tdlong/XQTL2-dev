@@ -1,89 +1,50 @@
 #!/usr/bin/env bash
-# run_catalog_v4.sh — evaluate the proposed founder-catalog REFALT caller on AGE_SY.
+# run_catalog_v4.sh — CALL AGE_SY samples against the founder catalog, then verify.
 #
-# Runs the XQTL2 candidate caller (pipeline/scripts/run_refalt.catalog.sh, README
-# appendix "Proposed founder-catalog REFALT pipeline") into process/AGE_SY_v4,
-# then we compare it against the validated QUAL-based calls in process/AGE_SY_v3.
+# New XQTL2 two-command design (main @ d40e279): building the catalog is a
+# separate, deliberate one-time act; this script is the CALL step only.
 #
-# The candidate defines the SNP set ONCE from the 8 B-founders (built into the
-# --dir on first run) and counts every BAM against that fixed catalog with -B
-# (BAQ off) at fixed -T positions — deterministic, interval-independent, and
-# incremental (adding a sample = one more count job, nothing recalled).
+# BUILD THE CATALOG FIRST (once per population; ~1.5 h; OVERWRITES --out):
+#   bash pipeline/scripts/build_catalog.sh \
+#       --founders pipeline/helpfiles/B_founders.bams.txt \
+#       --out      process/AGE_SY_v4/Catalog
 #
-# Two phases (the point of the test is the incremental machinery):
-#   PHASE 1 (this script, default): 6 temporal replicates R1-R6
-#           = 3 treatments x 2 sexes x 6 = 36 samples + 8 founders (44 BAMs).
-#           Builds catalog, counts 44 BAMs, merges RefAlt.<chr>.txt.
-#   PHASE 2 (PHASE=2): add replicates R7-R12 -> all 72 samples. Point --bamlist
-#           at the full AGE_SY.bams (80 BAMs) with the SAME --dir; the catalog and
-#           the 44 already-counted BAMs are reused, only the 36 new are counted.
-#           process/AGE_SY_v4 then matches AGE_SY_v3's 72 samples for a clean compare.
+# THEN run this to count the samples (+ founders as columns) and auto-verify:
+#   bash scripts_oneoffs/AGE_SY/catalog_v4/run_catalog_v4.sh
 #
-# run_refalt.catalog.sh self-submits its SLURM array + merge and prints the merge
-# JID, so this is a login-node orchestrator (bash it, do NOT sbatch it).
+# To ADD samples later, point BAMLIST at a list of JUST the new BAMs and rerun —
+# call_samples has no skip guard; new counts land next to the existing ones and
+# RefAlt is re-merged. (Founders are already counted, so don't re-list them.)
 #
-# Run from repo root:
-#   bash scripts_oneoffs/AGE_SY/catalog_v4/run_catalog_v4.sh          # phase 1
-#   PHASE=2 bash scripts_oneoffs/AGE_SY/catalog_v4/run_catalog_v4.sh  # phase 2 (after phase 1 done)
+# call_samples.sh submits its own SLURM array + merge and prints the merge JID; we
+# chain the verification (compare_and_diagnose.sh) after it. Run from repo root.
 set -uo pipefail
 
-PARFILE=helpfiles/AGE_SY/AGE_SY_haplotype_parameters.R   # founders=c("B1"..."AB8")
+CATDIR=process/AGE_SY_v4/Catalog
 DIR=process/AGE_SY_v4
-PHASE=${PHASE:-1}
+BAMLIST=${BAMLIST:-helpfiles/AGE_SY/bam_list.v4.txt}   # 36 samples (R1-R6) + 8 founders
 
-if [[ "$PHASE" == "1" ]]; then
-  BAMLIST=helpfiles/AGE_SY/bam_list.v4.txt               # 36 samples (R1-R6) + 8 founders
-  echo "PHASE 1: catalog build + count 44 BAMs (R1-R6 + founders) -> $DIR"
-elif [[ "$PHASE" == "2" ]]; then
-  BAMLIST=helpfiles/AGE_SY/AGE_SY.bams                   # all 72 samples + 8 founders
-  echo "PHASE 2: incremental — add R7-R12 (36 new counts), reuse catalog + 44 prior -> $DIR"
-else
-  echo "unknown PHASE='$PHASE' (use 1 or 2)" >&2; exit 1
-fi
-
-for f in "$BAMLIST" "$PARFILE" pipeline/scripts/run_refalt.catalog.sh; do
+for f in "$BAMLIST" pipeline/scripts/call_samples.sh; do
   [[ -e "$f" ]] || { echo "missing: $f" >&2; exit 1; }
 done
-
-# ---------------------------------------------------------------------------
-# PRE-FLIGHT: say out loud what will be REUSED vs COMPUTED, so the final
-# RefAlt.<chr>.txt's provenance is never a mystery. The pipeline silently reuses
-# any output file that already exists in --dir; this makes that visible up front.
-# Run with DRYRUN=1 to print this and stop WITHOUT submitting anything.
-# ---------------------------------------------------------------------------
-echo "== pre-flight: $DIR =="
-npieces=$(ls "$DIR"/catalog.chr*.bed 2>/dev/null | wc -l | tr -d ' ')
-if [[ "${npieces:-0}" -ge 1 ]]; then
-  echo "  catalog build   : REUSE $npieces existing catalog.chr*.bed piece(s) — founders NOT recalled"
-else
-  echo "  catalog build   : COMPUTE from founders (SLOW, ~1.5 h)"
-fi
-if [[ -s "$DIR/catalog.tsv.gz" ]]; then
-  echo "  catalog assemble: REUSE existing catalog.tsv.gz  (first line: $(zcat "$DIR/catalog.tsv.gz" 2>/dev/null | head -1))"
-else
-  echo "  catalog assemble: COMPUTE (assemble from pieces)"
-fi
-nbam=$(grep -cve '^[[:space:]]*$' "$BAMLIST")
-ncount=$(ls "$DIR"/counts/*.tsv.gz 2>/dev/null | wc -l | tr -d ' ')
-echo "  sample counts   : REUSE ${ncount:-0} already-counted, COMPUTE $((nbam - ${ncount:-0})) new (of $nbam BAMs)"
-echo "  -> to force any of these fresh, DELETE the file(s) above first; rerunning alone never recomputes them."
-echo
-if [[ "${DRYRUN:-0}" == "1" ]]; then
-  echo "DRYRUN=1 set — not submitting. Rerun without DRYRUN to launch."
-  exit 0
+# The catalog must be built first — this step never builds it.
+if [[ ! -s "$CATDIR/catalog.tsv.gz" ]]; then
+  echo "ERROR: no catalog at $CATDIR/catalog.tsv.gz — build it first:" >&2
+  echo "  bash pipeline/scripts/build_catalog.sh --founders pipeline/helpfiles/B_founders.bams.txt --out $CATDIR" >&2
+  exit 1
 fi
 
-JID=$(bash pipeline/scripts/run_refalt.catalog.sh \
+echo "calling $(grep -cve '^[[:space:]]*$' "$BAMLIST") BAMs from $BAMLIST against $CATDIR -> $DIR/Calls"
+JID=$(bash pipeline/scripts/call_samples.sh \
+        --catalog "$CATDIR" \
         --bamlist "$BAMLIST" \
-        --parfile "$PARFILE" \
         --dir     "$DIR")
-echo "submitted; merge job id: $JID"
+echo "call_samples submitted; merge job id: $JID"
 
-# Chain the verification (dup check + per-chr counts vs v3 + compare_refalt_calls.R
-# + B5 depth) to run automatically after the merge succeeds, so this is one kickoff.
+# chain the verification after the merge succeeds
 SELFDIR=$(cd "$(dirname "$0")" && pwd)
 VJID=$(sbatch --parsable --dependency=afterok:"$JID" "$SELFDIR/compare_and_diagnose.sh")
 echo "verification chained after merge: job $VJID -> logs/AGE_SY/compare_v3_v4_${VJID}.out"
 echo
-echo "deliverable: $DIR/RefAlt.<chr>.txt"
+echo "deliverable: $DIR/Calls/RefAlt.<chr>.txt"
 echo "when everything finishes:  bash scripts/cluster_sync.sh"

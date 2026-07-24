@@ -142,6 +142,31 @@ Open XQTL2 issues from this evaluation: #16 (tabix log), #17 (provenance), #18 (
 OPEN (my offer): make run_catalog_v4.sh run COUNT-ONLY when the catalog exists
 (catalog_count.sh array + merge), so the build never re-queues. Awaiting user call.
 
+## REWORKED WORKFLOW 2026-07-24 (XQTL2 main @ d40e279) — two explicit commands
+XQTL2 split the caller into build vs call, with an organized output tree. Fixes
+along the way: #14 (comma catalog), #16 (dropped vestigial count tabix), #18 (count
+1 core). run_refalt.catalog.sh RETIRED. New layout:
+  process/AGE_SY_v4/Catalog/  catalog.tsv.gz (+ catalog.stats.txt per-rule tally)
+  process/AGE_SY_v4/Calls/    RefAlt.<chr>.txt (+ counts/)
+
+Two commands (build once, then call/add samples):
+  # 1. build catalog from B-pop founders (ONE-TIME, ~1.5 h, OVERWRITES --out)
+  bash pipeline/scripts/build_catalog.sh \
+      --founders pipeline/helpfiles/B_founders.bams.txt --out process/AGE_SY_v4/Catalog
+  # 2. call samples (+ founders as columns) and auto-verify (our wrapper)
+  bash scripts_oneoffs/AGE_SY/catalog_v4/run_catalog_v4.sh
+  # 3. push logs
+  bash scripts/cluster_sync.sh
+
+- B_founders.bams.txt == our 8 founders incl B5.RG.bam (matches bam_list.v4.txt).
+- call_samples counts EXACTLY --bamlist (no skip); founders in the list => columns
+  (matches v3). Add samples later: rerun run_catalog_v4.sh with BAMLIST=just-new-BAMs.
+- Our scripts updated for the new layout: run_catalog_v4.sh now wraps call_samples
+  (+errors if catalog not built) and chains compare_and_diagnose; compare_and_diagnose
+  reads Calls/ + Catalog/catalog.stats.txt.
+- User already rm -rf process/AGE_SY_v4 (fresh start).
+- [ ] build catalog / call samples / verify (duplication 0, counts vs v3, stats).
+
 ## BLOCKER: XQTL2 issue #13 (module htslib clash)
 Phase-1 catalog_build failed immediately (exit 127, 0-byte founders.calls.bcf).
 Root cause: `catalog_build.sh` (and `catalog_count.sh`) load BOTH `bcftools/1.21`
