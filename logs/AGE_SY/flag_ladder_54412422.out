@@ -1,0 +1,8 @@
+sample Con_R5_F  chrX  -> process/AGE_SY_v4/flag_ladder.Con_R5_F.chrX.tsv.gz
+Error: no such tag defined in the VCF header: INFO/AD. FORMAT fields must be enclosed in square brackets, e.g. "[ %AD]"
+Error: no such tag defined in the VCF header: INFO/AD. FORMAT fields must be enclosed in square brackets, e.g. "[ %AD]"
+Error: no such tag defined in the VCF header: INFO/AD. FORMAT fields must be enclosed in square brackets, e.g. "[ %AD]"
+Error: no such tag defined in the VCF header: INFO/AD. FORMAT fields must be enclosed in square brackets, e.g. "[ %AD]"
+rows: 176665   wrote process/AGE_SY_v4/flag_ladder.Con_R5_F.chrX.tsv.gz
+summed ALT% per setting (quick check):
+awk: cmd. line:3: (FILENAME=- FNR=176665) fatal: division by zero attempted
