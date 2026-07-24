@@ -223,6 +223,27 @@ good_SNPs pooled founder columns (BAQ-on, QUAL sites) — a judgment call.
 - [ ] call R7-R12 (phase 2, BAMLIST=bam_list.v4_R7-12.txt) -> 72 samples, then the
       real per-sample count comparison (after #19 fixed).
 
+## COUNT-AGREEMENT DEEP DIVE (chrX, delta_gt2 local analysis) — TWO problems
+Built delta_gt2.<chr>.tsv.gz (per-(SNP,sample) rows where |dREF|+|dALT|>2). Pulled
+chrX local, analyzed with R (~/Desktop/*.png):
+- chrX: 11% exact, 45% delta<=2, 54% delta>2. NOT clustered (all ~176k SNPs, ~19/44
+  samples each) — systematic filter effect, not bad SNPs. 0% high-cov (chrX no -d cap).
+- Of the >2 at 50<cov<1000: 514,226 have |freq diff|>4% (median 7.3%, up to 96%).
+- Direction: 92% are v4-more-REF (v4 drops ALT). These are rare-alt sites (median alt
+  7.6%); v4 zeros the alt in 91%.
+PROBLEM 1 (under investigation): v4's -q20/-Q20 strip ALT reference-ward. Mechanism
+debated: reference mapping bias (real alt reads carry the ref mismatch -> lower MAPQ ->
+-q20 drops them = v4 WRONG) vs paralog/MQ0 false-alt (v4 RIGHT). fq2bam has NO -q filter
+and NO dedup, so -q20 is live. Deciding via flag_ladder.chrX.sh (2x2 of -q/-Q, per-site,
+BAQ off; compare pivot to real v3 for BAQ). Base quality is allele-blind so can't alone
+explain the 92% -> points at mapping (-q) / reference bias. RUN flag_ladder + rsync table.
+  (Also: no dedup is CORRECT for pooled high-cov data — dedup saturates and biases; I
+   retracted the earlier "no dedup is a defect" flag.)
+PROBLEM 2 (filed XQTL2 #21): catalog schema — store per-SNP annotations (indel distance,
+per-founder depth, MQ0F, allele pattern) so snpgap/min-dp/etc are downstream filters not
+rebuilds; and snpgap 5 likely too tight (BAQ reach ~50bp) — MEASURE the width from
+indel-distance decay. https://github.com/tdlong/XQTL2/issues/21
+
 ## BLOCKER: XQTL2 issue #13 (module htslib clash)
 Phase-1 catalog_build failed immediately (exit 127, 0-byte founders.calls.bcf).
 Root cause: `catalog_build.sh` (and `catalog_count.sh`) load BOTH `bcftools/1.21`
