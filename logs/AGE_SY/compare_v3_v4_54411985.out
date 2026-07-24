@@ -1,0 +1,46 @@
+==================================================================
+0) DUPLICATION CHECK (XQTL2 #14): duplicate (CHROM,POS) per chr — expect 0
+==================================================================
+  chrX    duplicate positions: 0
+  chr2L   duplicate positions: 0
+  chr2R   duplicate positions: 0
+  chr3L   duplicate positions: 2
+  chr3R   duplicate positions: 0
+
+==================================================================
+1) per-chr SNP counts: v3 (QUAL) vs v4 (founder-catalog)
+==================================================================
+  chr               v3           v4    v4/v3
+  chrX          250802       176665     0.70
+  chr2L         326238       298805     0.92
+  chr2R         348347       244953     0.70
+  chr3L         411873       306895     0.75
+  chr3R         406693       300000     0.74
+
+==================================================================
+2) catalog.stats.txt — per-rule SNP tally (candidates, dropped, kept)
+==================================================================
+catalog SNP rules (summed over chromosomes):
+  candidate biallelic SNPs : 1775608
+  dropped, founder depth   : 218371
+  dropped, not near-fixed  : 158180
+  dropped, not segregating : 74275
+  KEPT (catalog)           : 1324782
+
+==================================================================
+3) compare_refalt_calls.R: v3 vs v4 — counts agree at shared SNPs?
+   (should run clean now — no dcast duplicate-key warnings)
+   NOTE: if v4 has fewer samples than v3 (phase 1), read SITE overlap,
+   not per-sample count agreement (that needs the full 72 in v4).
+==================================================================
+Comparing A(current)=process/AGE_SY_v3  vs  B(proposed)=process/AGE_SY_v4/Calls
+
+chrX    A=250801  B=176664  shared=175809 (70.1% of A, 99.5% of B)
+        at shared (POS,sample): 16.49% identical counts; mean |freq diff| = 0.0128
+        A-only=74992  B-only=855  (rows written to process/AGE_SY_v4/Calls/compare.chrX.*_only.txt)
+
+/export/spool/slurm/slurmd.spool/job54411985/slurm_script: line 67: 3061421 Killed                  Rscript pipeline/scripts/compare_refalt_calls.R "$V3" "$V4"
+  (compare_refalt_calls.R exited nonzero)
+
+done.
+[2026-07-24T15:12:54.345] error: Detected 1 oom_kill event in StepId=54411985.batch. Some of the step tasks have been OOM Killed.
