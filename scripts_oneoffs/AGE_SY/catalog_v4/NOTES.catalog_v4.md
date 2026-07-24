@@ -208,8 +208,11 @@ FINDINGS to report to dev #1: (1) catalog recovers ~34k real chr2L SNPs QUAL mis
 (2) good_SNPs keeps ~104k monomorphic (uninformative) SNPs the catalog correctly drops.
 The ~240k "measurement" tail = catalog direct founder calls (BAQ-off, genome-wide) vs
 good_SNPs pooled founder columns (BAQ-on, QUAL sites) — a judgment call.
-- [ ] report three-way to dev #1.
-- [ ] sample-call verification (count R1-R6 done 54411642; merge+verify post-14:46 sync).
+- [x] reported three-way to dev #1 (comment 5074802139). VERDICT: SNP sets close
+      enough to use (user). chr2L QUAL_missed spike ~= B5:chr2L exemption + B5's
+      reference-subtracted reads polluting the pooled QUAL call (likely, worth confirm).
+- [ ] sample-call verification (count R1-R6 done 54411642; merge+verify post-14:46 sync
+      — need a fresh cluster_sync to see Calls/RefAlt + the chained verification).
 
 ## BLOCKER: XQTL2 issue #13 (module htslib clash)
 Phase-1 catalog_build failed immediately (exit 127, 0-byte founders.calls.bcf).
