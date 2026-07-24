@@ -193,6 +193,24 @@ compare to v4 catalog. Match => catalog reproduces the pipeline's founder-clean 
 (the goal). Differ => that delta is exactly what QUAL was adding/removing.
 Reported: https://github.com/tdlong/XQTL2-dev/issues/1#issuecomment-5074550560
 
+## THREE-WAY SNP-SET RESULT (v3_effective_compare_54411788) — catalog vs good_SNPs
+A. TOTAL: v3_raw 1,743,948 | v3_eff 1,459,882 | catalog 1,324,782 | overlap 1,199,510
+   | cat_only 125,245 | eff_only 260,372. (per-chr in log)
+B. cat_only = QUAL_missed 38,970 + foundr_disag 86,275.
+   QUAL_missed is ~all chr2L (34,544 of 38,970!) — catalog recovers a whole arm QUAL
+   dropped (B5 inversion). The catalog's gain over QUAL is concentrated on chr2L.
+C. eff_only = monomorphic 104,426 + segregating 155,946.
+   monomorphic: all founders same fixed allele — catalog rightly drops (non-seg,
+   useless for haps); good_SNPs KEEPS them (its 'informative' test is a no-op = real
+   inefficiency in the current downstream filter). segregating 156k = direct-vs-pooled
+   founder measurement + snpgap near-indel.
+FINDINGS to report to dev #1: (1) catalog recovers ~34k real chr2L SNPs QUAL missed;
+(2) good_SNPs keeps ~104k monomorphic (uninformative) SNPs the catalog correctly drops.
+The ~240k "measurement" tail = catalog direct founder calls (BAQ-off, genome-wide) vs
+good_SNPs pooled founder columns (BAQ-on, QUAL sites) — a judgment call.
+- [ ] report three-way to dev #1.
+- [ ] sample-call verification (count R1-R6 done 54411642; merge+verify post-14:46 sync).
+
 ## BLOCKER: XQTL2 issue #13 (module htslib clash)
 Phase-1 catalog_build failed immediately (exit 127, 0-byte founders.calls.bcf).
 Root cause: `catalog_build.sh` (and `catalog_count.sh`) load BOTH `bcftools/1.21`
