@@ -1,0 +1,13 @@
+founders: B1 B2 B3 B4 B5 B6 B7 AB8 
+
+chr         v3_raw     v3_eff    catalog |   cat&eff  cat_only  eff_only
+chrX        250801     201824     176670 |    162429     14235     39395
+chr2L       326237     297393     298812 |    250753     48051     46640
+chr2R       348346     273505     244953 |    226817     18135     46688
+chr3L       411872     351242     304342 |    281297     23039     69945
+chr3R       406692     335918     300005 |    278214     21785     57704
+TOTAL      1743948    1459882    1324782 |   1199510    125245    260372
+
+read: cat_only = catalog SNPs NOT in v3-effective; eff_only = good_SNPs the catalog dropped.
+prediction: catalog ~subset of v3_eff (cat_only small); eff_only = founder-monomorphic SNPs good_SNPs keeps but catalog drops as non-segregating.
+done.
