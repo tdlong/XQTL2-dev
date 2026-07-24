@@ -1,0 +1,114 @@
+### sacct (since yesterday)  20260724_143540
+JobID                     JobName      State ExitCode    Elapsed               Start                 End 
+------------ -------------------- ---------- -------- ---------- ------------------- ------------------- 
+54390761     prepare_species_pro+  COMPLETED      0:0   00:00:23 2026-07-23T06:58:18 2026-07-23T06:58:41 
+54390762     prepare_species_pro+  COMPLETED      0:0   00:00:21 2026-07-23T06:58:18 2026-07-23T06:58:39 
+54390763         full_genome_rbbh  COMPLETED      0:0   00:49:45 2026-07-23T06:58:42 2026-07-23T07:48:27 
+54390764         full_genome_rbbh  COMPLETED      0:0   00:49:02 2026-07-23T06:58:42 2026-07-23T07:47:44 
+54390765      chain_sweep_watcher  COMPLETED      0:0   00:51:08 2026-07-23T06:58:18 2026-07-23T07:49:26 
+54395800     compose_fibroblast_+  COMPLETED      0:0   00:02:41 2026-07-23T08:20:34 2026-07-23T08:23:15 
+54396042                git_sweep  COMPLETED      0:0   00:00:02 2026-07-23T08:32:31 2026-07-23T08:32:33 
+54396699     check_leiden_resolu+  COMPLETED      0:0   00:03:09 2026-07-23T09:09:04 2026-07-23T09:12:13 
+54397302     compose_fibroblast_+     FAILED      1:0   00:03:30 2026-07-23T09:53:43 2026-07-23T09:57:13 
+54397303      chain_sweep_watcher  COMPLETED      0:0   00:04:03 2026-07-23T09:53:43 2026-07-23T09:57:46 
+54397376     compose_fibroblast_+  COMPLETED      0:0   00:04:30 2026-07-23T10:09:54 2026-07-23T10:14:24 
+54397377      chain_sweep_watcher  COMPLETED      0:0   00:05:03 2026-07-23T10:09:54 2026-07-23T10:14:57 
+54397529     compose_fibroblast_+  COMPLETED      0:0   00:03:15 2026-07-23T10:44:00 2026-07-23T10:47:15 
+54397530      chain_sweep_watcher  COMPLETED      0:0   00:04:02 2026-07-23T10:44:00 2026-07-23T10:48:02 
+54397958     compose_fibroblast_+  COMPLETED      0:0   00:03:11 2026-07-23T11:06:34 2026-07-23T11:09:45 
+54397959      chain_sweep_watcher  COMPLETED      0:0   00:04:02 2026-07-23T11:06:34 2026-07-23T11:10:36 
+54398877     compose_fibroblast_+  COMPLETED      0:0   00:02:40 2026-07-23T11:24:51 2026-07-23T11:27:31 
+54398878      chain_sweep_watcher  COMPLETED      0:0   00:03:02 2026-07-23T11:24:51 2026-07-23T11:27:53 
+54399081      add_cosg_to_uce_env     FAILED      1:0   00:00:48 2026-07-23T11:40:49 2026-07-23T11:41:37 
+54399146     compose_fibroblast_+  COMPLETED      0:0   00:05:57 2026-07-23T11:43:46 2026-07-23T11:49:43 
+54399147      chain_sweep_watcher  COMPLETED      0:0   00:07:13 2026-07-23T11:43:43 2026-07-23T11:50:56 
+54399327     compose_fibroblast_+  COMPLETED      0:0   00:03:46 2026-07-23T11:54:29 2026-07-23T11:58:15 
+54399328      chain_sweep_watcher  COMPLETED      0:0   00:04:15 2026-07-23T11:54:29 2026-07-23T11:58:44 
+54399687     plot_fibroblast_gen+  COMPLETED      0:0   00:04:41 2026-07-23T12:19:14 2026-07-23T12:23:55 
+54399688      chain_sweep_watcher  COMPLETED      0:0   00:04:57 2026-07-23T12:19:14 2026-07-23T12:24:11 
+54400059     plot_fibroblast_gen+  COMPLETED      0:0   00:11:46 2026-07-23T12:37:59 2026-07-23T12:49:45 
+54400060      chain_sweep_watcher  COMPLETED      0:0   00:12:02 2026-07-23T12:37:59 2026-07-23T12:50:01 
+54400563     export_fibroblast_u+  COMPLETED      0:0   00:17:56 2026-07-23T13:14:30 2026-07-23T13:32:26 
+54400564      chain_sweep_watcher  COMPLETED      0:0   00:18:18 2026-07-23T13:14:30 2026-07-23T13:32:48 
+54401954     compose_fibroblast_+  COMPLETED      0:0   00:03:13 2026-07-23T15:15:58 2026-07-23T15:19:11 
+54401955      chain_sweep_watcher  COMPLETED      0:0   00:03:27 2026-07-23T15:15:58 2026-07-23T15:19:25 
+54402394     compose_fibroblast_+  COMPLETED      0:0   00:05:55 2026-07-23T15:43:01 2026-07-23T15:48:56 
+54402395      chain_sweep_watcher  COMPLETED      0:0   00:06:15 2026-07-23T15:43:01 2026-07-23T15:49:16 
+54402688     compose_fibroblast_+  COMPLETED      0:0   00:02:35 2026-07-23T16:08:46 2026-07-23T16:11:21 
+54402689      chain_sweep_watcher  COMPLETED      0:0   00:02:58 2026-07-23T16:08:46 2026-07-23T16:11:44 
+54402777     compose_fibroblast_+     FAILED      1:0   00:00:47 2026-07-23T16:18:13 2026-07-23T16:19:00 
+54402778      chain_sweep_watcher  COMPLETED      0:0   00:01:13 2026-07-23T16:18:13 2026-07-23T16:19:26 
+54402797     compose_fibroblast_+  COMPLETED      0:0   00:02:35 2026-07-23T16:22:31 2026-07-23T16:25:06 
+54402798      chain_sweep_watcher  COMPLETED      0:0   00:02:28 2026-07-23T16:23:01 2026-07-23T16:25:29 
+54402986     compose_fibroblast_+  COMPLETED      0:0   00:02:37 2026-07-23T16:47:16 2026-07-23T16:49:53 
+54402987      chain_sweep_watcher  COMPLETED      0:0   00:02:56 2026-07-23T16:47:16 2026-07-23T16:50:12 
+54411004           catalog_gather  COMPLETED      0:0   00:00:18 2026-07-24T13:54:04 2026-07-24T13:54:22 
+54411005                     wrap  COMPLETED      0:0   00:00:00 2026-07-24T13:54:34 2026-07-24T13:54:34 
+54411003_1          catalog_build  COMPLETED      0:0   01:26:23 2026-07-24T12:11:28 2026-07-24T13:37:51 
+54411003_2          catalog_build  COMPLETED      0:0   01:09:55 2026-07-24T12:11:28 2026-07-24T13:21:23 
+54411003_3          catalog_build  COMPLETED      0:0   01:18:31 2026-07-24T12:11:59 2026-07-24T13:30:30 
+54411003_4          catalog_build  COMPLETED      0:0   01:29:49 2026-07-24T12:11:59 2026-07-24T13:41:48 
+54411003_5          catalog_build  COMPLETED      0:0   01:41:40 2026-07-24T12:11:59 2026-07-24T13:53:39 
+54411533          cat_v4_catcheck  COMPLETED      0:0   00:00:05 2026-07-24T14:04:08 2026-07-24T14:04:13 
+54411642_1          catalog_count  COMPLETED      0:0   00:03:46 2026-07-24T14:21:39 2026-07-24T14:25:25 
+54411642_2          catalog_count  COMPLETED      0:0   00:03:37 2026-07-24T14:21:39 2026-07-24T14:25:16 
+54411642_3          catalog_count  COMPLETED      0:0   00:08:52 2026-07-24T14:21:39 2026-07-24T14:30:31 
+54411642_4          catalog_count  COMPLETED      0:0   00:06:49 2026-07-24T14:21:39 2026-07-24T14:28:28 
+54411642_5          catalog_count  COMPLETED      0:0   00:11:20 2026-07-24T14:21:39 2026-07-24T14:32:59 
+54411642_6          catalog_count  COMPLETED      0:0   00:07:07 2026-07-24T14:21:39 2026-07-24T14:28:46 
+54411642_7          catalog_count  COMPLETED      0:0   00:03:31 2026-07-24T14:21:39 2026-07-24T14:25:10 
+54411642_8          catalog_count  COMPLETED      0:0   00:03:56 2026-07-24T14:21:39 2026-07-24T14:25:35 
+54411642_9          catalog_count  COMPLETED      0:0   00:09:18 2026-07-24T14:21:39 2026-07-24T14:30:57 
+54411642_10         catalog_count  COMPLETED      0:0   00:03:47 2026-07-24T14:21:39 2026-07-24T14:25:26 
+54411642_11         catalog_count  COMPLETED      0:0   00:09:19 2026-07-24T14:21:39 2026-07-24T14:30:58 
+54411642_12         catalog_count  COMPLETED      0:0   00:06:36 2026-07-24T14:23:09 2026-07-24T14:29:45 
+54411642_13         catalog_count  COMPLETED      0:0   00:03:27 2026-07-24T14:23:09 2026-07-24T14:26:36 
+54411642_14         catalog_count  COMPLETED      0:0   00:03:57 2026-07-24T14:23:09 2026-07-24T14:27:06 
+54411642_15         catalog_count  COMPLETED      0:0   00:06:37 2026-07-24T14:23:09 2026-07-24T14:29:46 
+54411642_16         catalog_count  COMPLETED      0:0   00:08:45 2026-07-24T14:23:09 2026-07-24T14:31:54 
+54411642_17         catalog_count  COMPLETED      0:0   00:06:20 2026-07-24T14:23:09 2026-07-24T14:29:29 
+54411642_18         catalog_count  COMPLETED      0:0   00:07:59 2026-07-24T14:25:10 2026-07-24T14:33:09 
+54411642_19         catalog_count  COMPLETED      0:0   00:03:29 2026-07-24T14:25:41 2026-07-24T14:29:10 
+54411642_20         catalog_count  COMPLETED      0:0   00:05:07 2026-07-24T14:25:41 2026-07-24T14:30:48 
+54411642_21         catalog_count  COMPLETED      0:0   00:07:14 2026-07-24T14:25:41 2026-07-24T14:32:55 
+54411642_22         catalog_count  COMPLETED      0:0   00:09:42 2026-07-24T14:25:41 2026-07-24T14:35:23 
+54411642_23         catalog_count  COMPLETED      0:0   00:07:08 2026-07-24T14:26:54 2026-07-24T14:34:02 
+54411642_24         catalog_count  COMPLETED      0:0   00:07:00 2026-07-24T14:28:23 2026-07-24T14:35:23 
+54411642_25         catalog_count  COMPLETED      0:0   00:03:58 2026-07-24T14:28:53 2026-07-24T14:32:51 
+54411642_26         catalog_count  COMPLETED      0:0   00:03:32 2026-07-24T14:28:53 2026-07-24T14:32:25 
+54411642_27         catalog_count  COMPLETED      0:0   00:06:05 2026-07-24T14:29:24 2026-07-24T14:35:29 
+54411642_28         catalog_count    RUNNING      0:0   00:05:46 2026-07-24T14:29:54             Unknown 
+54411642_29         catalog_count    RUNNING      0:0   00:04:46 2026-07-24T14:30:54             Unknown 
+54411642_30         catalog_count    RUNNING      0:0   00:04:46 2026-07-24T14:30:54             Unknown 
+54411642_31         catalog_count  COMPLETED      0:0   00:03:52 2026-07-24T14:31:29 2026-07-24T14:35:21 
+54411642_32         catalog_count  COMPLETED      0:0   00:03:29 2026-07-24T14:31:29 2026-07-24T14:34:58 
+54411642_33         catalog_count    RUNNING      0:0   00:03:41 2026-07-24T14:31:59             Unknown 
+54411642_34         catalog_count    RUNNING      0:0   00:03:41 2026-07-24T14:31:59             Unknown 
+54411642_35         catalog_count    RUNNING      0:0   00:03:41 2026-07-24T14:31:59             Unknown 
+54411642_36         catalog_count    RUNNING      0:0   00:03:11 2026-07-24T14:32:29             Unknown 
+54411642_37         catalog_count    RUNNING      0:0   00:02:40 2026-07-24T14:33:00             Unknown 
+54411642_38         catalog_count    RUNNING      0:0   00:02:40 2026-07-24T14:33:00             Unknown 
+54411642_39         catalog_count    RUNNING      0:0   00:02:40 2026-07-24T14:33:00             Unknown 
+54411642_40         catalog_count  COMPLETED      0:0   00:01:48 2026-07-24T14:33:31 2026-07-24T14:35:19 
+54411642_41         catalog_count  COMPLETED      0:0   00:01:21 2026-07-24T14:33:31 2026-07-24T14:34:52 
+54411642_42         catalog_count    RUNNING      0:0   00:01:09 2026-07-24T14:34:31             Unknown 
+54411642_43         catalog_count    RUNNING      0:0   00:00:39 2026-07-24T14:35:01             Unknown 
+54411642_44         catalog_count    RUNNING      0:0   00:00:39 2026-07-24T14:35:01             Unknown 
+54411712           v3_eff_compare  COMPLETED      0:0   00:00:02 2026-07-24T14:35:31 2026-07-24T14:35:33 
+
+### squeue -u tdlong
+JOBID           PARTITION     NAME     USER    ACCOUNT ST        TIME  CPUS NODE NODELIST(REASON)
+54411643        standard      wrap   tdlong tdlong_lab PD        0:00     2    1 (Dependency)
+54411642_43     standard  catalog_   tdlong tdlong_lab  R        0:39     1    1 hpc3-14-26
+54411642_44     standard  catalog_   tdlong tdlong_lab  R        0:39     1    1 hpc3-14-03
+54411642_42     standard  catalog_   tdlong tdlong_lab  R        1:09     1    1 hpc3-20-01
+54411642_37     standard  catalog_   tdlong tdlong_lab  R        2:40     1    1 hpc3-20-01
+54411642_38     standard  catalog_   tdlong tdlong_lab  R        2:40     1    1 hpc3-17-09
+54411642_39     standard  catalog_   tdlong tdlong_lab  R        2:40     1    1 hpc3-14-25
+54411642_36     standard  catalog_   tdlong tdlong_lab  R        3:11     1    1 hpc3-15-01
+54411642_33     standard  catalog_   tdlong tdlong_lab  R        3:41     1    1 hpc3-20-01
+54411642_34     standard  catalog_   tdlong tdlong_lab  R        3:41     1    1 hpc3-14-14
+54411642_35     standard  catalog_   tdlong tdlong_lab  R        3:41     1    1 hpc3-14-14
+54411642_29     standard  catalog_   tdlong tdlong_lab  R        4:46     1    1 hpc3-21-20
+54411642_30     standard  catalog_   tdlong tdlong_lab  R        4:46     1    1 hpc3-21-20
+54411642_28     standard  catalog_   tdlong tdlong_lab  R        5:46     1    1 hpc3-20-01

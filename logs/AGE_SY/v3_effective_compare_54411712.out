@@ -1,0 +1,6 @@
+founders: B1 B2 B3 B4 B5 B6 B7 AB8 
+
+chr         v3_raw     v3_eff    catalog |   cat&eff  cat_only  eff_only
+Error: missing founder column for B1 in process/AGE_SY_v3/RefAlt.chrX.txt
+Execution halted
+done.
