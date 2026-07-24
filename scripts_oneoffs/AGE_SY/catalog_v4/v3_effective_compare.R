@@ -29,7 +29,9 @@ tot <- c(raw = 0, eff = 0, cat = 0, inter = 0, conly = 0, eonly = 0)
 for (chr in chrs) {
   f <- file.path(v3dir, paste0("RefAlt.", chr, ".txt"))
   if (!file.exists(f)) { cat(sprintf("%-7s (missing %s)\n", chr, f)); next }
-  dt <- fread(f, header = TRUE)      # CHROM POS REF_<name> ALT_<name> ...
+  # v3 RefAlt has a TAB-separated header but SPACE-separated data rows (a quirk
+  # of bam2bcf2REFALT.sh). fread needs one separator, so normalize tabs->spaces.
+  dt <- fread(cmd = paste("tr '\\t' ' ' <", shQuote(f)), header = TRUE, sep = " ")  # CHROM POS REF_<name> ALT_<name> ...
 
   zeros <- integer(nrow(dt)); notfixed <- integer(nrow(dt))
   for (fd in founders) {
