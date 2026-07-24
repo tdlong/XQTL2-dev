@@ -165,7 +165,19 @@ Two commands (build once, then call/add samples):
   (+errors if catalog not built) and chains compare_and_diagnose; compare_and_diagnose
   reads Calls/ + Catalog/catalog.stats.txt.
 - User already rm -rf process/AGE_SY_v4 (fresh start).
-- [ ] build catalog / call samples / verify (duplication 0, counts vs v3, stats).
+- [x] catalog built + checked (catalog_check_54411533.out).
+
+## CATALOG CHECK (54411533) — HEALTHY, chr2L recovered
+Rules: 1,775,608 candidates -> 1,324,782 KEPT (75%). Drops: founder-depth 218k
+(12%), not-near-fixed 158k (9%), not-segregating 74k (4%). Format: chr2L 9204 T,C
+(comma-joined, #14 baked in). Per-chr catalog vs v3 RefAlt:
+  chrX 176,670/250,802 (0.70); chr2L 298,812/326,238 (0.92 — RECOVERED from 15k);
+  chr2R 244,953/348,347 (0.70); chr3L 304,342/411,873 (0.74); chr3R 300,005/406,693 (0.74).
+chr2L fixed by B5:chr2L exemption + min-dp 10. Catalog keeps 70-92% of v3 sites
+(FEWER than v3, vs README "keeps >= as many") — expected for founder-segregating
+vs QUAL>59; resolve whether v3-only sites are junk-or-real via compare's v3-only
+output AFTER calling. VERDICT: catalog good -> proceed to call R1-R6.
+- [ ] call R1-R6 + verify (dup 0, counts vs v3, v3-only sites junk?).
 
 ## BLOCKER: XQTL2 issue #13 (module htslib clash)
 Phase-1 catalog_build failed immediately (exit 127, 0-byte founders.calls.bcf).
