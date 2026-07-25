@@ -1,0 +1,4 @@
+sample Con_R5_F  chrX  -> process/AGE_SY_v4/flag_ladder.Con_R5_F.chrX.tsv.gz
+rows: 176665   wrote process/AGE_SY_v4/flag_ladder.Con_R5_F.chrX.tsv.gz
+summed ALT% per setting (quick check):
+  v4(-q20-Q20)=32.146  -qoff(-q0-Q20)=32.145  -Qoff(-q20-Q13)=32.146  pivot(-q0-Q13)=32.146  (ALT%)
