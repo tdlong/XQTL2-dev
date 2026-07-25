@@ -28,4 +28,12 @@ v4's ALT loss vs v3). The two are orthogonal and run in parallel.
 ## Log
 - 2026-07-24: confirmed cluster pipeline at 5843d33, catalog_filter.sh present.
   Built `submit.build_v5.sh` (pull --ff-only + build_catalog with new defaults).
-  baq_caller array (54412588) + merge (54412589) running in parallel on v4.
+- 2026-07-24 eve: SUBMITTED, running overnight.
+  - baq_caller (v4 counting-recipe diagnosis): array `54412588_[1-4]` + merge `54412589`.
+    -> logs/AGE_SY/baq_caller_merge.out ; process/AGE_SY_v4/baq_caller.Con_R5_F.chrX.tsv.gz
+  - v5 catalog build: array `54412606_[1-5]` (per-chr) -> gather `54412607` -> filter
+    `54412608` -> cleanup `54412609`. -> process/AGE_SY_v5/Catalog/ (catalog.annot.tsv.gz,
+    catalog.tsv.gz, catalog.stats.txt).
+  NEXT (when back): `bash scripts/cluster_sync.sh`, then read baq_caller_merge.out
+  (BAQ vs -C alleles verdict) and catalog.stats.txt (min-dp10/snpgap25 SNP counts vs v4).
+  Do NOT resubmit either chain — both are already queued/running.
