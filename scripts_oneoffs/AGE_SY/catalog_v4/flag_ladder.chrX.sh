@@ -37,7 +37,7 @@ call() {  # $1=outfile  $2..=mpileup flags
   local out="$1"; shift
   bcftools mpileup "$@" -r chrX -T "$CAT" -a FORMAT/AD -f "$REF" "$BAM" 2>/dev/null \
     | bcftools call -m -C alleles -T "$CAT" 2>/dev/null \
-    | bcftools query -f '%POS\t%AD\n' \
+    | bcftools query -f '%POS\t[%AD]\n' \
     | awk -F'\t' '{split($2,a,","); print (a[1]==""||a[1]=="."?0:a[1])"\t"(a[2]==""||a[2]=="."?0:a[2])}' > "$out"
 }
 bcftools mpileup -B -q0 -Q13 -r chrX -T "$CAT" -a FORMAT/AD -f "$REF" "$BAM" 2>/dev/null \
