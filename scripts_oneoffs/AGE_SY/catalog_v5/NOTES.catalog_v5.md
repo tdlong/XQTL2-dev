@@ -37,3 +37,29 @@ v4's ALT loss vs v3). The two are orthogonal and run in parallel.
   NEXT (when back): `bash scripts/cluster_sync.sh`, then read baq_caller_merge.out
   (BAQ vs -C alleles verdict) and catalog.stats.txt (min-dp10/snpgap25 SNP counts vs v4).
   Do NOT resubmit either chain — both are already queued/running.
+
+## 2026-07-27 RESULTS
+
+### baq_caller (v4 counting-recipe diagnosis) — recipe is NOT the cause
+All 4 tasks agree (array ran redundantly; merge crashed on a --basename wrinkle,
+irrelevant — each task printed the full summary):
+  catalog(-B,-C)=32.070  +BAQ(-C)=31.549  +free(-B,-m)=32.069  v3ish(-m)=31.549  (ALT%)
+- -C alleles constraint: ZERO effect (32.070 vs 32.069).
+- -q/-Q: zero (already shown).
+- BAQ: the ONLY lever, and only 0.5pp (~1.6%), BAQ-ON (=v3) *removes* alt.
+Direction+size are OPPOSITE and ~4x smaller than the ~6.5% "v4 drops alt" gap.
+=> Re-counting the SAME bam at the SAME positions v3-flags vs v4-flags gives ~identical
+counts. The counting recipe does NOT explain the v3-vs-v4 disagreement.
+=> Prime suspect is the CONFIRMED #14 dup-position bug in v4's RefAlt (delta_gt2 was
+built on that table). #14 is fixed in the pipeline v5 is built on. DECISIVE TEST =
+call v5 clean, redo v3-vs-v5 count compare; if the gap vanishes, it was #14.
+
+### v5 catalog build — clean
+candidate 2,000,582 | near-indel(snpgap25) -426,704 | depth(min-dp10) -187,052 |
+not-near-fixed -134,337 | not-segregating -67,553 | KEPT 1,184,936.
+min-dp10 no longer the throttle; snpgap=25 is now the biggest single cut (427k) ->
+MEASURE it from the dist-to-indel annotation (catalog.annot.tsv.gz, re-cut in seconds).
+
+### NEXT: v5 call step
+`bash scripts_oneoffs/AGE_SY/catalog_v5/submit.call_v5.sh` — 36 samples (same v4 bam
+list) against v5 catalog; then v3-vs-v5 count compare.
