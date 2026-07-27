@@ -47,9 +47,13 @@ echo "captured state + manifest ($STAMP)"
 #    alone — prune those by hand when you want. Deletions get committed below.
 find logs -type f \( -name 'state_*.txt' -o -name 'manifest_*.txt' \) -mtime +14 -delete 2>/dev/null || true
 
-# 5. commit + push (rebase first: the Mac side also pushes to this origin)
+# 5. reconcile BOTH ways, always. Commit only logs/ (a re-run job rewrites tracked
+#    logs -> a dirty tree, which is what makes a plain `git pull` fail; committing
+#    logs/ clears it). Untracked junk elsewhere is left for you to deal with, not
+#    swept into a commit. Then ALWAYS rebase to bring Claude's scripts DOWN, push UP.
+#    ==> Run THIS, never `git pull` by hand. It is the only sync command.
 git add -A logs/
-if git diff --cached --quiet; then echo "nothing new to sync"; exit 0; fi
-git commit -q -m "cluster sync $STAMP"
-git pull --rebase -q origin main 2>/dev/null || true
-git push -q origin main && echo "synced -> git.  Claude: git pull && read logs/"
+git commit -q -m "cluster sync $STAMP" 2>/dev/null || true
+git pull --rebase -q origin main && echo "pulled latest (Claude's scripts are now here)"
+git push -q origin main 2>/dev/null && echo "pushed logs -> git" || true
+echo "synced both ways."
