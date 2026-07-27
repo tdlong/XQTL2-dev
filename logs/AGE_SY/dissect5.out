@@ -1,130 +1,731 @@
 
 ===================================================================
-ERROR: Unable to locate a modulefile for 'samtools/1.21'
 ########## DISSECT chrX:6471332   sample Con_R5_F ##########
-scripts_oneoffs/AGE_SY/catalog_v5/dissect_snp.sh: line 42: samtools: command not found
-A. REF base (dm6)   : 
+A. REF base (dm6)   : A
    catalog REF,ALT  : A,G
    observed bases (raw pileup, base:count):
+     REF(A)=246  T=1  G=57  
 
 B. FLAG LADDER — unconstrained mpileup FORMAT/AD (REF ALT AD):
-   raw    -B -q0  -Q0         A	G,T,<*>	220,49,1,0
-   v3flag  BAQ -q0 -Q13       A	G,<*>	203,45,0
-           -B -q0  -Q13       A	G,<*>	203,46,0
-   isolate -Q20 (BAQ off)     A	G,<*>	203,46,0
-   isolate -q20 (BAQ off)     A	G,<*>	212,33,0
-   v4flag  -B -q20 -Q20       A	G,<*>	212,33,0
+   raw    -B -q0  -Q0         
+   v3flag  BAQ -q0 -Q13       
+           -B -q0  -Q13       
+   isolate -Q20 (BAQ off)     
+   isolate -q20 (BAQ off)     
+   v4flag  -B -q20 -Q20       
 
 C. REAL callers (the actual recipes):
-   v4 FULL (-C alleles)       A	.	227
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: symbol lookup error: bcftools: undefined symbol: bcf_has_variant_types, version HTSLIB_1.16
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: symbol lookup error: bcftools: undefined symbol: bcf_has_variant_types, version HTSLIB_1.16
+   v4 FULL (-C alleles)       <no record>
    v3 FULL (call -mv)         <no variant record>
    -> if v4flag(B) already zeroes ALT: a quality filter. If only v4 FULL zeroes it: -C alleles.
 
 D. PER-READ (no filters): base  baseQ  MAPQ   [split REF vs ALT below]
+   ALT  base=G baseQ=80 MAPQ=33
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=12 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=24 MAPQ= 0
+   ALT  base=G baseQ=40 MAPQ= 0
+   ALT  base=G baseQ=40 MAPQ= 0
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ= 0
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=24 MAPQ=40
+   ALT  base=T baseQ=12 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ= 0
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ= 0 MAPQ=33
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=24 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=24 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=24 MAPQ=40
+   ALT  base=G baseQ=24 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ= 0
+   ALT  base=G baseQ=40 MAPQ= 0
+   ALT  base=G baseQ=40 MAPQ= 0
+   ALT  base=G baseQ=40 MAPQ= 0
+   ALT  base=G baseQ=40 MAPQ= 0
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=12 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ= 0
+   ALT  base=G baseQ=24 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ= 0
+   ALT  base=G baseQ=40 MAPQ= 0
+   ALT  base=G baseQ=40 MAPQ= 0
+   ALT  base=G baseQ=40 MAPQ= 0
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=40 MAPQ=40
+   ALT  base=G baseQ=12 MAPQ=33
+   ALT  base=G baseQ=40 MAPQ=15
+
+   SPLIT REF-base reads: 246  meanBaseQ=37.9 meanMAPQ=41.7  (MAPQ<20: 0)
+   SPLIT ALT-base reads: 58  meanBaseQ=36.1 meanMAPQ=28.9  (MAPQ<20: 16)
 
 E. samtools tview:
+         6471341   6471351   6471361   6471371   6471381   6471391   6471401   6471411        6471421   6471431   6471441   6471451   6471461     6471471     6471481   6471491     
+ATCAAGCAGCAATGGCTGAGTGGGCAATGTGGATTCCTTCCCTTCCACATTCTCTGTCTCGTTTTAATTACAGATTACACG**C**AAAA*AAAAAATGTTTTATACAGAGTACACTAATTGAATTTAATACAAAC**GAGAGAGAGAG**TTCCCCCGCAAGCAGCATAGGTTCACCTG
+.................................................................................  .  .... .............................................  ...........  .............................
+,,,,,,,,,,gg,,,,,,,,,t,,,,g,,g,,,,,,t,,,,,,,,,g,,,,,g,,,c,,,,,,g,,,,,,,g,g,,,,,,,**,**,,,,*,,,,,  ......................................**...........**.............................
+. ,,,,,,,a,,,,,,g,,,,,,,,,,,,,,,,,,,,,,,,t,,,,,,,,,,,,g,,,,g,,,,g,g,g,,g,g,g,a,g,**a**,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,, .............**...........**.............................
+. ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,g,,,,,,,,,,,,,,,g,,,,,,,,,,,,,,,,**a**,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,,,,,,,,,,**,,,,,,,,  ,,,,,,,,,,,,,,,,,g,
+.   .............................................................................**.**....*.............................................**...........**............. ...............
+.   ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,**,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,,,,,,,,,,**,,,,,,,,,,,,,     .N.........
+.    ,,,,,,,,,,,,,g,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,a*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,,,,,,,,,,**,,,,,,,,,,,,,     ...........
+.    ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,a*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,,,,,,,,,,**,,,,,,,,,,,,,     ...........
+.     ,,,,,,,,,,,,,,,,,,,,,g,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,aa,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,,,,,,,,,,**,,,,,,,,,,,,,     ...........
+.     ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,aa,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,,,,,,,,,,**,,,,,,,,,,,,,     G..........
+G.     ....C.T.......................................................C...........CA.**....*.............C....CA......CC....C......C...C.**.C.........**.C............    G..........
+,,,,,,, .........................................................................**.***...*.............................................**...........**.................. ..........
+,,,,,,, .........................................................................**.**....*.............................................**...........**................. ...........
+g,,,,,,,,  .................................................A....................**.**....*.............................................**...........**....................   ......
+g,,,,,,,,  ......................................................................**.**....*.............................................**...........**....................   ......
+g,,,,,,,,,,, ....................................................................**.**....*.............................................**...........**...................... ......
+g,,     .........................................................................**.**....*......G........A......A..C..C..........G.....**..A........**...........  ,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,**,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,,,,,,,,,,**,,,,,,,,,,,,,,,,,,,,,,,,,,,  
+,,,,,,,,,,,,,,,,  ,,,,,,,,,,,,,,g,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,**,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,g,,,,,,,,,,,**,,,,,,,,,,,**,,t,,,,,,,,,,,,,,,,,,,,,,,,  
+,,,,,,,,,,,,,,,,  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,**,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,,,,,,,,,,**,,t,,,,,,,,,,,,,,,,,,,,,,,,  
+,,,,,,,,,,,,,,,,,, ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,a*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,,,,,,,,,,**,,,,,,,,,,,,,,,,,,,,,,,,,,,  
+,,,,,,,,,,,,,,,,,, ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,**,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,,,,,,,,,,**,,,,,,,,,,,,,,,,,,,,,,,,,,,, 
+,,,,,,,,,,,,,,,,,,,, ............................................................**.**....*.............................................**...........**.............................
+,,,,,,,,,,,,,,,,,,,, ............................................................**.**....*.............................................**...........**.............................
+,,,,,,,,,,,,,,,,,,,,,  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,**,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,,,,,,,,,,**,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,, ,,,,,,,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,g,,g,,**,**g,,,*g,,,,,g,,,g,,,,,,,,,,,,,,g,,,g,,,,,,,,,,,,,,,**,,,,,,,,,,,**,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,   .......................................................**.**....*.............................................**...........**.............................
+,,,,,,,,,,,,,,,,,,,,,,,,, .......................................................**.**....*.............................................**...........**.............................
+,,,,,,,,,,,,,,,,,,,,,,,,,  ......................................................**.**....*.............................................**...........**.........................A...
+g,,,,,,,,,,,,,,,,,,,,,,,,  ......................................................**.**....*.............................................**...........**.............................
+g,,,,,,,,,,,,,,,,,,,,,,,,  ......................................................**.**....*.............................................**...........**.............................
+g,,,,,,,,,,,,,,,,,,,,,,,,  ......................................................**.**....*.............................................**...........**........................C....
+........................... .....................................................**.***...*.............................................**...........**...............T.............
+........................... ....G................................................**.**....*.............................................**...........**.............................
+........................... ,,,,,,g,,,,,,,,,,,,,,,,,,,,,,,,,,,c,,,cg,,,,,,,,,,,,,**,**,,,,*,,,,,,,,,,c,,,,,,,,,c,,,,,,,,,,,,,,,,,,,,,,,,**,,,,,,,,,,,**,,,,,,,,,,,,,,a,,,,,,,,,,,,,,
+........................... ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,**,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,,,,,,,,,,**,,,t,,,,,,,,,,,,,,,,,,,,,,,,,
+.................................................................................**.**....*.............................................**...........**.............................
+........................... .....................................................**.**....*.............................................**...........**.............................
 ########## END ##########
 
 ===================================================================
-ERROR: Unable to locate a modulefile for 'samtools/1.21'
 ########## DISSECT chrX:12335553   sample Con_R5_F ##########
-scripts_oneoffs/AGE_SY/catalog_v5/dissect_snp.sh: line 42: samtools: command not found
-A. REF base (dm6)   : 
+A. REF base (dm6)   : A
    catalog REF,ALT  : A,T
    observed bases (raw pileup, base:count):
+     REF(A)=255  C=3  T=55  G=1  
 
 B. FLAG LADDER — unconstrained mpileup FORMAT/AD (REF ALT AD):
-   raw    -B -q0  -Q0         A	T,C,G	228,34,3,1
-   v3flag  BAQ -q0 -Q13       A	T,<*>	213,25,0
-           -B -q0  -Q13       A	T,<*>	213,26,0
-   isolate -Q20 (BAQ off)     A	T,<*>	213,26,0
-   isolate -q20 (BAQ off)     A	T,<*>	213,26,0
-   v4flag  -B -q20 -Q20       A	T,<*>	213,26,0
+   raw    -B -q0  -Q0         
+   v3flag  BAQ -q0 -Q13       
+           -B -q0  -Q13       
+   isolate -Q20 (BAQ off)     
+   isolate -q20 (BAQ off)     
+   v4flag  -B -q20 -Q20       
 
 C. REAL callers (the actual recipes):
-   v4 FULL (-C alleles)       A	.	238
-   v3 FULL (call -mv)         A	T	243,54
-   -> if v4flag(B) already zeroes ALT: a quality filter. If only v4 FULL zeroes it: -C alleles.
-
-D. PER-READ (no filters): base  baseQ  MAPQ   [split REF vs ALT below]
-
-E. samtools tview:
-########## END ##########
-
-===================================================================
-ERROR: Unable to locate a modulefile for 'samtools/1.21'
-########## DISSECT chrX:10242268   sample Con_R5_F ##########
-scripts_oneoffs/AGE_SY/catalog_v5/dissect_snp.sh: line 42: samtools: command not found
-A. REF base (dm6)   : 
-   catalog REF,ALT  : A,C
-   observed bases (raw pileup, base:count):
-
-B. FLAG LADDER — unconstrained mpileup FORMAT/AD (REF ALT AD):
-   raw    -B -q0  -Q0         A	C,<*>	220,46,0
-   v3flag  BAQ -q0 -Q13       A	C,<*>	210,36,0
-           -B -q0  -Q13       A	C,<*>	210,37,0
-   isolate -Q20 (BAQ off)     A	C,<*>	210,37,0
-   isolate -q20 (BAQ off)     A	C,<*>	210,37,0
-   v4flag  -B -q20 -Q20       A	C,<*>	210,37,0
-
-C. REAL callers (the actual recipes):
-   v4 FULL (-C alleles)       A	.	228
-   v3 FULL (call -mv)         A	C	235,52
-   -> if v4flag(B) already zeroes ALT: a quality filter. If only v4 FULL zeroes it: -C alleles.
-
-D. PER-READ (no filters): base  baseQ  MAPQ   [split REF vs ALT below]
-
-E. samtools tview:
-########## END ##########
-
-===================================================================
-ERROR: Unable to locate a modulefile for 'samtools/1.21'
-########## DISSECT chrX:10928272   sample Con_R5_F ##########
-scripts_oneoffs/AGE_SY/catalog_v5/dissect_snp.sh: line 42: samtools: command not found
-A. REF base (dm6)   : 
-   catalog REF,ALT  : C,G
-   observed bases (raw pileup, base:count):
-
-B. FLAG LADDER — unconstrained mpileup FORMAT/AD (REF ALT AD):
-   raw    -B -q0  -Q0         C	G,<*>	171,35,0
-   v3flag  BAQ -q0 -Q13       C	G,<*>	157,35,0
-           -B -q0  -Q13       C	G,<*>	157,35,0
-   isolate -Q20 (BAQ off)     C	G,<*>	157,35,0
-   isolate -q20 (BAQ off)     C	G,<*>	157,35,0
-   v4flag  -B -q20 -Q20       C	G,<*>	157,35,0
-
-C. REAL callers (the actual recipes):
-   v4 FULL (-C alleles)       C	.	157
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: symbol lookup error: bcftools: undefined symbol: bcf_has_variant_types, version HTSLIB_1.16
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: symbol lookup error: bcftools: undefined symbol: bcf_has_variant_types, version HTSLIB_1.16
+   v4 FULL (-C alleles)       <no record>
    v3 FULL (call -mv)         <no variant record>
    -> if v4flag(B) already zeroes ALT: a quality filter. If only v4 FULL zeroes it: -C alleles.
 
 D. PER-READ (no filters): base  baseQ  MAPQ   [split REF vs ALT below]
+   ALT  base=G baseQ=12 MAPQ=60
+   ALT  base=T baseQ=24 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=24 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=12 MAPQ=60
+   ALT  base=T baseQ=12 MAPQ=60
+   ALT  base=T baseQ=24 MAPQ=60
+   ALT  base=T baseQ=12 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=24 MAPQ=60
+   ALT  base=T baseQ=24 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=12 MAPQ=60
+   ALT  base=C baseQ=12 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=12 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=24 MAPQ=60
+   ALT  base=C baseQ=12 MAPQ=60
+   ALT  base=T baseQ=24 MAPQ=60
+   ALT  base=T baseQ=12 MAPQ=60
+   ALT  base=T baseQ=12 MAPQ=60
+   ALT  base=C baseQ=12 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=12 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=24 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=24 MAPQ=60
+   ALT  base=T baseQ=24 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=24 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+   ALT  base=T baseQ=40 MAPQ=60
+
+   SPLIT REF-base reads: 255  meanBaseQ=38.3 meanMAPQ=60.0  (MAPQ<20: 0)
+   SPLIT ALT-base reads: 59  meanBaseQ=31.3 meanMAPQ=60.0  (MAPQ<20: 0)
 
 E. samtools tview:
+        12335561  12335571  12335581  12335591  12335601  12335611  12335621  12335631  12335641  12335651  12335661  12335671  12335681  12335691  12335701  12335711  12335721    
+ATAATCAACTCAGTTGGTGTTGCTACTGTTTTGGCCAGAGCGTTGACACACATGCATGCCAAATGCGTTTTGAGGGGGCTGAGGTGTGGGTCGCTCCGGCTTTTGCCAAAAGATTTGGCCACGCCACGTTGCCGGAGCCGCCAGCAGCTGTACTAGATTTGAGTGAAATGTTGCTACTTG
+.W..................................................................................................................................................................................
+, ..................................................................................................................................................    ............................
+, .......................................................................................................................................................   ,,,,,,,,,,,,,,,,,,,,,,,,
+, .......................................................................................................................................................       ....................
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,    .....
+,,,,.......................................................................................................................................................     ....................
+,,,,,  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,   ,,,,,,g,,,,,,,,,,,,
+,,,,,  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,   ,,,,,,,,,,,,,,,,,,,
+,,,,,  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,   ,,,,,,,,,,,,,,,,,,,
+,,,,,...........T.....................GAG....C..................A..G..........G............A   t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,.......................................................................................................................................................      ..................
+,,,,,.......................................................................................................................................................      ..................
+,,,,,  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,    ,,,,,,,,,,,,,,,,,,
+,,,,,  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,    ,,,,,,,,,,,,,,,,,,
+,,,,,, ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,    ,,,,,,,,,,,,,,,,,,
+,,,,,,  .......................................................................................................................................................   ,,,,,,,,,,,,,,,,,,
+,,,,,,  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,     ,,,,,,,,,,,,,,,,
+,,,,,, ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,           ...........
+,,,,,, ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,           ...........
+,,,,,, ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,           ,,,,,,,,,,,
+,,,,,, ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,             .........
+,,,,,, ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,g,,,,             ,,,,,,,,,
+,,,,,,,,, .......................................................................................................................................................          ,,,,,,,,,
+..........  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,a,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,        ,,,,,,,,,
+..........  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,        ,,,,,,,,,
+..........  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,        ,,,,,,,,,
+..........  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,         ,,,,,,,,
+..........  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,            .....
+..........  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,g,,,,,,,,,,,a,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,            .....
+..........   ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,            ....
+..........   ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,            ....
+..........   ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,            ....
+..........    .....G.............................................................................................................................................               ,,,,
+.......C..     .......................................................................................................................................................          ,,,,
+........A.         .......................................................................................................................................................      ,,,,
+..........          ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,     ,,,,
+..........          ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,     ,,,,
+..........          ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,     ,,,,
 ########## END ##########
 
 ===================================================================
-ERROR: Unable to locate a modulefile for 'samtools/1.21'
-########## DISSECT chrX:5332918   sample Con_R5_F ##########
-scripts_oneoffs/AGE_SY/catalog_v5/dissect_snp.sh: line 42: samtools: command not found
-A. REF base (dm6)   : 
-   catalog REF,ALT  : C,A
+########## DISSECT chrX:10242268   sample Con_R5_F ##########
+A. REF base (dm6)   : A
+   catalog REF,ALT  : A,C
    observed bases (raw pileup, base:count):
+     REF(A)=239  C=55  G=1  
 
 B. FLAG LADDER — unconstrained mpileup FORMAT/AD (REF ALT AD):
-   raw    -B -q0  -Q0         C	A,<*>	216,48,0
-   v3flag  BAQ -q0 -Q13       C	A,<*>	205,45,0
-           -B -q0  -Q13       C	A,<*>	205,45,0
-   isolate -Q20 (BAQ off)     C	A,<*>	205,45,0
-   isolate -q20 (BAQ off)     C	A,<*>	205,45,0
-   v4flag  -B -q20 -Q20       C	A,<*>	205,45,0
+   raw    -B -q0  -Q0         
+   v3flag  BAQ -q0 -Q13       
+           -B -q0  -Q13       
+   isolate -Q20 (BAQ off)     
+   isolate -q20 (BAQ off)     
+   v4flag  -B -q20 -Q20       
 
 C. REAL callers (the actual recipes):
-   v4 FULL (-C alleles)       C	A	239,48
-   v3 FULL (call -mv)         C	A	242,52
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: symbol lookup error: bcftools: undefined symbol: bcf_has_variant_types, version HTSLIB_1.16
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: symbol lookup error: bcftools: undefined symbol: bcf_has_variant_types, version HTSLIB_1.16
+   v4 FULL (-C alleles)       <no record>
+   v3 FULL (call -mv)         <no variant record>
    -> if v4flag(B) already zeroes ALT: a quality filter. If only v4 FULL zeroes it: -C alleles.
 
 D. PER-READ (no filters): base  baseQ  MAPQ   [split REF vs ALT below]
+   ALT  base=C baseQ=64 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=80 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=24 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=12 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=12 MAPQ=60
+   ALT  base=C baseQ=12 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=12 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=24 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=24 MAPQ=60
+   ALT  base=C baseQ=12 MAPQ=60
+   ALT  base=C baseQ=12 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ= 0 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=G baseQ=12 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=24 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ= 0 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=12 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+   ALT  base=C baseQ=40 MAPQ=60
+
+   SPLIT REF-base reads: 239  meanBaseQ=38.2 meanMAPQ=60.0  (MAPQ<20: 0)
+   SPLIT ALT-base reads: 56  meanBaseQ=34.6 meanMAPQ=60.0  (MAPQ<20: 0)
 
 E. samtools tview:
+   10242271  10242281  10242291  10242301  10242311   10242321   10242331  10242341  10242351  10242361      10242371       10242381   10242391   10242401  10242411  10242421      
+AAAGTGACATTTTTCCGTTGGTTTTTCCGTTTTTCTCCCGGTTTTCCACCAT*CCCC*CTCATAAAAAAGTGCGTGCGTCCGGTGCGTGttttctttt**gc*tttc*tttttt**ttt**tg*ttttg*tttttttttg*ttttttttGATTGCGTGATTGTGACAGGTGGTTCGTGTG
+M................................................... .... ........................................  .. .... ......  ...  .. ..... .......... .......................................
+....................................................*....*........................................**..*....*......**...**..*.....*..........*........................  .............
+C..,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,*,,,,*,,,,,,**,,,**,,*,,,,,t,,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+C...  ..............................................*....*........................................**..*....*......**...**..*.....*.........T*........    ...........................
+C...  ..............................................*....*.............................G..........**..*....*......**...**..*.....*..........*.............................  ,,,,,,,,
+C...,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,*,,,,*,,,,,,**,,,**,,*,,,,,**,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,  .........
+C...,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,*,,,,*,,,,,,**,,,**,,*,,,,,**,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,  .........
+C...,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,*,,,,*,,,,,,**,,,**,,*,,,,,**,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,  ,,,,,,,,,
+....,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,*,,,,*,,,,,,**,,,**,,*,,,,,**,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,  ,,,,,,,,,
+....    ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,a,,,,,,c,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,*,,,,*,,,,g,**,,,**,*******************,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+C.....  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,,,,,,,,,**,,*,,,,*,,,,,,**,,,**,,*,,,,,*,,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,  ......
+....    g,,,,,,t,,,,t,,,,,,,,,,,,c,,,,,,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,t,t,,t,,,,,,,,,,,t,,,,,,,,,**,t*,,,t*,,,,,,**,,,**,,*,,,,,*,,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,    ,,,,
+....    ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,*,,,,*,,,,,,**,,,**,,*,,,,,*,,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,    ,,,,
+....    ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,**,,*,,,,*,,,,,,**,,,**,,*,,,,,*,,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,    ,,,,
+....    ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,,,,,,,,,**,,*,,,,*,,,,,,**,,,**,,*,,,,,*,,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,    ,,,,
+,,,,     ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,a,,,,,,c,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,*,,,,*****************,,,,,*,,,,,,*****,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+c ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,t,,,,t,,,,**,,*,,,,*,,,,,,**,,,**,,*,,,,,*,,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,  ............
+......................  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,*,,,,*,,,,,,**,,,**,,*,,,,,*,,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+....................................   ,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,*,,,,*,,,,,,**,,,**,,*,,,,,*,,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+.....................................  ,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,*,,,,*,,,,,,**,,,**,,*,,,,,*,,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,    .......
+.....................................  ,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,*,,,,*,,,,,,**,,,**,,*,,,,,*,,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+.....................................  ,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,*,,,,*,,,,,,**,,,**,,*,,,,,*,,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+.....................................  t,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,*,,,,*,,,,,,**,,,**,,*,,,,,*,,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+C......................................,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,,,,,,,,,**,,*c,,,*,,,,,,**,,,**,,*,,,,,*,,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+.....................................   ............*....*........................................**..*....*......**...**..*.....*..........*.......................................
+.....................................   ............*....*........................................**..*....*......**...**..*.....*.........T*.......................................
+.....................................   .....A......C....*........................................**..*....*....G.**...**.*******************.......................................
+.....................................   ............*....*........................................**..*....*......**...**..*.....*..........*.......................................
+.....................................   ............*A...*........................................**..*....*......**...**..*.....*..........*.......................................
+C...................................... .....A......C....*........................................**..*....*....G.**...**.*******************.......................................
+C...................................... .....A......C....*........................................**..*....*....G.**...**.*******************.......................................
+C...................................... .....A......C....*......C.C.............................C.**..*....*......**...**.*******************..........................A...........T
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,, ,,,,,,,,,a,,,,,,c,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,*,,,,*,,,,g,**,,,**,*******************,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+......................................  ............*....*........................................**..*....*......**...**..*.....T..........*.......................................
+......................................  ............*....*........................................**..*....*......**...**..*.....T..........*.......................................
+......................................  .....A......C....*........................................**..*....*....G.**...**.*******************.......................................
+................................... ,,,,,,,,,,,,,,,,*,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,**,,t,,,t*,,,,,,**,,,**,,*,,,,,*,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+C............................................A......C....*........................................**..*....*....G.**...**.*******************.........G..T..........................
+########## END ##########
+
+===================================================================
+########## DISSECT chrX:10928272   sample Con_R5_F ##########
+A. REF base (dm6)   : C
+   catalog REF,ALT  : C,G
+   observed bases (raw pileup, base:count):
+     REF(C)=171  G=35  
+
+B. FLAG LADDER — unconstrained mpileup FORMAT/AD (REF ALT AD):
+   raw    -B -q0  -Q0         
+   v3flag  BAQ -q0 -Q13       
+           -B -q0  -Q13       
+   isolate -Q20 (BAQ off)     
+   isolate -q20 (BAQ off)     
+   v4flag  -B -q20 -Q20       
+
+C. REAL callers (the actual recipes):
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: symbol lookup error: bcftools: undefined symbol: bcf_has_variant_types, version HTSLIB_1.16
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: symbol lookup error: bcftools: undefined symbol: bcf_has_variant_types, version HTSLIB_1.16
+   v4 FULL (-C alleles)       <no record>
+   v3 FULL (call -mv)         <no variant record>
+   -> if v4flag(B) already zeroes ALT: a quality filter. If only v4 FULL zeroes it: -C alleles.
+
+D. PER-READ (no filters): base  baseQ  MAPQ   [split REF vs ALT below]
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=24 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+   ALT  base=G baseQ=40 MAPQ=60
+
+   SPLIT REF-base reads: 171  meanBaseQ=38.4 meanMAPQ=60.0  (MAPQ<20: 0)
+   SPLIT ALT-base reads: 35  meanBaseQ=39.5 meanMAPQ=60.0  (MAPQ<20: 0)
+
+E. samtools tview:
+         10928281  10928291  10928301  10928311  10928321  10928331  10928341  10928351  10928361  10928371  10928381  10928391  10928401  10928411  10928421  10928431  10928441   
+CCGCAGCAGAAGGAGGATTTCCCGGCACTGCCAGGACCTCGGCGGCCGTCCCAAAAAGAGGACTTCCCAGCTCTGCCCGCGCCCAAAACTCCACCAGGCTCGCCAACGCCTACACCGGGATCTCCTTCGGCTTGGCAATCACCGTTGCCAACGCCCCAGCATCCTGTGCATCCGCCCACT
+..........................R.....R.......................................Y...................................Y.Y.................................................................M...
+..........................G.....G.....................C.................T........................................C.....................................  .......................A...
+..........................G.....G.......................................T..............................................................................  .......................A...
+..........................G.....G.......................................T..............................................................................  .......................A...
+,,,,    .......................................................................................................................................................   ..................
+,,,,    ................................................................T...................................T.C................................................    ,,,,,,,,,,,,,a,,,
+G............. a,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,c,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,  ,,,,,,,,a,,,
+..............   .........G.....G.......................................T...............................................................................................  ......A...
+,,,,,,,,,,,,,,    ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,  ,,,,,a,,,
+,,,,,,,,,,,,,,    ,,,,,,,,g,,,,,g,,,,,,,,,,,,,,,,,,,*,,,,,,,,,,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,      ....
+,,,,,,,,,,,,,,    ,,,,,,,,g,,,,,g,,,,,,,,,,,,,,,,,,,*,,,,,,,,,,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,        ..
+,,,,,,,,,,,,,,,,, ,,,,,,,,g,,,,,g,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,  ,,,,,,,,,
+..................  ,,,,,,g,,,,,g,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,       ..
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,c,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,  ,,,,,a,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,g,,,,,g,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,t,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,  ,,,,,,,,,
+,,,,,,,,,,,,,,,,,,   ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,        
+...................   ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,       
+....................    ................................................T...................................T.C................................................................     
+....................         ...G.......................................T.......................................................................................................A...
+....................         .........A..C......................................T.............................C.....................................................................
+........................     ...G.......................................T.......................................................................................................A...
+........................     ...G.......................................T.......................................................................................................A...
+........................     .........A..C......................................T.............................C.....................................................................
+........................     .........A..C......................................T.............................C.....................................................................
+........................     .........A..C......................................T.............................C.....................................................................
+........................     .........A..C......................................T.............................C.....................................................................
+........................     .........A..C......................................T.............................C.....................................................................
+........................     .........A..C......................................T.............................C................T....................................................
+........................     .......................................................................................................................................................
+..........................G...........A..C......................................T.............................C....................................................  ,,,,,,,,,,,a,,,
+..........................G.....G.      ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,a,,,
+..........................G.....G.             .................................................................................................................................A...
+..........................G.....G.               .......................T.......................................................................................................A...
+..........................G.....G.               ...................................................................................................................................
+..........................G.....G.               .....................................CC................................C.............................C.............................
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,            .......................T...................................T.C.................................................................A...
+.......................................................................................................................................................  .......................A...
+..........................G...........              ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+########## END ##########
+
+===================================================================
+########## DISSECT chrX:5332918   sample Con_R5_F ##########
+A. REF base (dm6)   : C
+   catalog REF,ALT  : C,A
+   observed bases (raw pileup, base:count):
+     REF(C)=256  A=53  
+
+B. FLAG LADDER — unconstrained mpileup FORMAT/AD (REF ALT AD):
+   raw    -B -q0  -Q0         
+   v3flag  BAQ -q0 -Q13       
+           -B -q0  -Q13       
+   isolate -Q20 (BAQ off)     
+   isolate -q20 (BAQ off)     
+   v4flag  -B -q20 -Q20       
+
+C. REAL callers (the actual recipes):
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: symbol lookup error: bcftools: undefined symbol: bcf_has_variant_types, version HTSLIB_1.16
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: /opt/apps/htslib/1.10.2/lib/libhts.so.3: no version information available (required by bcftools)
+bcftools: symbol lookup error: bcftools: undefined symbol: bcf_has_variant_types, version HTSLIB_1.16
+   v4 FULL (-C alleles)       <no record>
+   v3 FULL (call -mv)         <no variant record>
+   -> if v4flag(B) already zeroes ALT: a quality filter. If only v4 FULL zeroes it: -C alleles.
+
+D. PER-READ (no filters): base  baseQ  MAPQ   [split REF vs ALT below]
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=24 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=80 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=24 MAPQ=60
+   ALT  base=A baseQ=12 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ= 0 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=12 MAPQ=60
+   ALT  base=A baseQ=12 MAPQ=60
+   ALT  base=A baseQ=40 MAPQ=60
+   ALT  base=A baseQ=12 MAPQ=60
+
+   SPLIT REF-base reads: 256  meanBaseQ=38.8 meanMAPQ=60.0  (MAPQ<20: 0)
+   SPLIT ALT-base reads: 53  meanBaseQ=37.3 meanMAPQ=60.0  (MAPQ<20: 0)
+
+E. samtools tview:
+   5332921   5332931   5332941   5332951   5332961   5332971   5332981   5332991   5333001   5333011   5333021   5333031         5333041   5333051   5333061   5333071   5333081    
+CAGAGATTCCACTCCAACCTTGCTGAAGCGAAAACGAGTGGTGAAAAGTTGTGGAATTTGGAAAAATCGATACGATTGAGCCATAATTAAAAGTATGCTGCTAACTTGCACTTCA*CCCCC**C*C*T*TTTTTTTTTTAGAGCGTGCCAGTCGTTGAAAAATTGAGTTATTAACAACAA
+.......................................C........................................................................... .....  . . . ...................................................
+..  ...................................C...........................................................................*.....CT.*T*.*..............................    ...........A.....
+A.  ...................................C...........................................................................*.....**.T.*.*..............G.........A......   ,,,,,,,,,,,,,,,,,
+A.  ...................................C...........................................................................*.....**.T.*.*..........C.........CA.........    ,,,,,,,,,,,,,,,,
+,,, ...................................C...........................................................................*.....**.T.*.*...............................    ,,,,,,,,,,,,,,,,
+,,, ...................................C..................................................................   ,,,,,,*,,,,,**,t,*,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,   ,,,,,,*,,,,,**,t,*,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,  ..................................C...........................................................................*.....**.*.*.*....................G......A.....  ,,,,,,,,,,,,,,,,
+....    ...............................C...........................................................................*.....**.*.*.*..........   ......................................
+....    ...............................C...........................................................................*.....**.*.***..................................... ,,,,,,,,,,,,,
+....    ...............................C......................................G....................................*.....**A*.*.*.........    ......................................
+....    ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,,ct,*t*,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,, ,,,,,,,,,,,,,,,,
+....     .......C..C...................A.....G.......A.............................................................*.....**.T.*.*..........C......................... ,,,,,,,,,,,,,,
+....      .............................C...........................................................................*.....**.*T*C*......................................  ...........
+....      .............................C...........................................................................*.....**.*T*C*......................................            ,
+....      .............................C...........................................................................*.....**.*T*C*......................................            ,
+a,,,,     .............................C...........................................................................*.....**.*.*.*......................................            ,
+a,,,,      ............................C...........................................................................*.....**.*.*.*.......................................           ,
+A.....       ..........................C...........................................................................*.....**.T.*.*......................................C.           
+,,,,,,       ..........................C...........................................................................*.....**.T.*.*........................................           
+,,,          ..........................C......................................................C....................*.....**.T.*.*...................A....................           
+,,,,,,         ,,,,,,,,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,,**,*,***,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,       
+,,,,,,         ,,,,,,,,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,g,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,,**,*,***,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,       
+,,,,,,         ,,,,,,,,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,,**,*,***,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,       
+,,,,,,         ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,,**,*****,c,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,     
+,,,,,,          .......................C...........................................................................*.....**.*.*.*............................................       
+,,,,,,          .......................C...........................................................................*.....**.*.*.*............................................       
+.........       .......................C...........................................................................*.....**.*.*.*............................................       
+.........       ,,,,,,,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,,**,*,*,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,       
+,,,,,,,,,        ,,,,,,,,,,,a,,,,,,,,,,c,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,g,,,*,,,,,**,t,*,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,       
+,,,,,,,,,         ,,,,,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,,**,*,*,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,     
+,,,,,,,,,         ,,,,,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,,**,*t*c*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,     
+,,,,,,,,,         ,,,,,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,,**,*t*c*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,     
+a,,,,,,,,,        ,,,,,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,,**,*,*,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,     
+...........       ,c,,,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,,**,*,*,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,     
+,,,,,,,,,,,,       ,,,,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,,**,t,*,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,     
+,,,,,,             ,,,,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*,,,,,**,t,*,*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,     
+,,,,,,,,,,,,,,,              ..........C...........................................................................*.....**.T.*.*...................................................
 ########## END ##########
