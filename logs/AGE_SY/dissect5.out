@@ -1,0 +1,130 @@
+
+===================================================================
+ERROR: Unable to locate a modulefile for 'samtools/1.21'
+########## DISSECT chrX:6471332   sample Con_R5_F ##########
+scripts_oneoffs/AGE_SY/catalog_v5/dissect_snp.sh: line 42: samtools: command not found
+A. REF base (dm6)   : 
+   catalog REF,ALT  : A,G
+   observed bases (raw pileup, base:count):
+
+B. FLAG LADDER — unconstrained mpileup FORMAT/AD (REF ALT AD):
+   raw    -B -q0  -Q0         A	G,T,<*>	220,49,1,0
+   v3flag  BAQ -q0 -Q13       A	G,<*>	203,45,0
+           -B -q0  -Q13       A	G,<*>	203,46,0
+   isolate -Q20 (BAQ off)     A	G,<*>	203,46,0
+   isolate -q20 (BAQ off)     A	G,<*>	212,33,0
+   v4flag  -B -q20 -Q20       A	G,<*>	212,33,0
+
+C. REAL callers (the actual recipes):
+   v4 FULL (-C alleles)       A	.	227
+   v3 FULL (call -mv)         <no variant record>
+   -> if v4flag(B) already zeroes ALT: a quality filter. If only v4 FULL zeroes it: -C alleles.
+
+D. PER-READ (no filters): base  baseQ  MAPQ   [split REF vs ALT below]
+
+E. samtools tview:
+########## END ##########
+
+===================================================================
+ERROR: Unable to locate a modulefile for 'samtools/1.21'
+########## DISSECT chrX:12335553   sample Con_R5_F ##########
+scripts_oneoffs/AGE_SY/catalog_v5/dissect_snp.sh: line 42: samtools: command not found
+A. REF base (dm6)   : 
+   catalog REF,ALT  : A,T
+   observed bases (raw pileup, base:count):
+
+B. FLAG LADDER — unconstrained mpileup FORMAT/AD (REF ALT AD):
+   raw    -B -q0  -Q0         A	T,C,G	228,34,3,1
+   v3flag  BAQ -q0 -Q13       A	T,<*>	213,25,0
+           -B -q0  -Q13       A	T,<*>	213,26,0
+   isolate -Q20 (BAQ off)     A	T,<*>	213,26,0
+   isolate -q20 (BAQ off)     A	T,<*>	213,26,0
+   v4flag  -B -q20 -Q20       A	T,<*>	213,26,0
+
+C. REAL callers (the actual recipes):
+   v4 FULL (-C alleles)       A	.	238
+   v3 FULL (call -mv)         A	T	243,54
+   -> if v4flag(B) already zeroes ALT: a quality filter. If only v4 FULL zeroes it: -C alleles.
+
+D. PER-READ (no filters): base  baseQ  MAPQ   [split REF vs ALT below]
+
+E. samtools tview:
+########## END ##########
+
+===================================================================
+ERROR: Unable to locate a modulefile for 'samtools/1.21'
+########## DISSECT chrX:10242268   sample Con_R5_F ##########
+scripts_oneoffs/AGE_SY/catalog_v5/dissect_snp.sh: line 42: samtools: command not found
+A. REF base (dm6)   : 
+   catalog REF,ALT  : A,C
+   observed bases (raw pileup, base:count):
+
+B. FLAG LADDER — unconstrained mpileup FORMAT/AD (REF ALT AD):
+   raw    -B -q0  -Q0         A	C,<*>	220,46,0
+   v3flag  BAQ -q0 -Q13       A	C,<*>	210,36,0
+           -B -q0  -Q13       A	C,<*>	210,37,0
+   isolate -Q20 (BAQ off)     A	C,<*>	210,37,0
+   isolate -q20 (BAQ off)     A	C,<*>	210,37,0
+   v4flag  -B -q20 -Q20       A	C,<*>	210,37,0
+
+C. REAL callers (the actual recipes):
+   v4 FULL (-C alleles)       A	.	228
+   v3 FULL (call -mv)         A	C	235,52
+   -> if v4flag(B) already zeroes ALT: a quality filter. If only v4 FULL zeroes it: -C alleles.
+
+D. PER-READ (no filters): base  baseQ  MAPQ   [split REF vs ALT below]
+
+E. samtools tview:
+########## END ##########
+
+===================================================================
+ERROR: Unable to locate a modulefile for 'samtools/1.21'
+########## DISSECT chrX:10928272   sample Con_R5_F ##########
+scripts_oneoffs/AGE_SY/catalog_v5/dissect_snp.sh: line 42: samtools: command not found
+A. REF base (dm6)   : 
+   catalog REF,ALT  : C,G
+   observed bases (raw pileup, base:count):
+
+B. FLAG LADDER — unconstrained mpileup FORMAT/AD (REF ALT AD):
+   raw    -B -q0  -Q0         C	G,<*>	171,35,0
+   v3flag  BAQ -q0 -Q13       C	G,<*>	157,35,0
+           -B -q0  -Q13       C	G,<*>	157,35,0
+   isolate -Q20 (BAQ off)     C	G,<*>	157,35,0
+   isolate -q20 (BAQ off)     C	G,<*>	157,35,0
+   v4flag  -B -q20 -Q20       C	G,<*>	157,35,0
+
+C. REAL callers (the actual recipes):
+   v4 FULL (-C alleles)       C	.	157
+   v3 FULL (call -mv)         <no variant record>
+   -> if v4flag(B) already zeroes ALT: a quality filter. If only v4 FULL zeroes it: -C alleles.
+
+D. PER-READ (no filters): base  baseQ  MAPQ   [split REF vs ALT below]
+
+E. samtools tview:
+########## END ##########
+
+===================================================================
+ERROR: Unable to locate a modulefile for 'samtools/1.21'
+########## DISSECT chrX:5332918   sample Con_R5_F ##########
+scripts_oneoffs/AGE_SY/catalog_v5/dissect_snp.sh: line 42: samtools: command not found
+A. REF base (dm6)   : 
+   catalog REF,ALT  : C,A
+   observed bases (raw pileup, base:count):
+
+B. FLAG LADDER — unconstrained mpileup FORMAT/AD (REF ALT AD):
+   raw    -B -q0  -Q0         C	A,<*>	216,48,0
+   v3flag  BAQ -q0 -Q13       C	A,<*>	205,45,0
+           -B -q0  -Q13       C	A,<*>	205,45,0
+   isolate -Q20 (BAQ off)     C	A,<*>	205,45,0
+   isolate -q20 (BAQ off)     C	A,<*>	205,45,0
+   v4flag  -B -q20 -Q20       C	A,<*>	205,45,0
+
+C. REAL callers (the actual recipes):
+   v4 FULL (-C alleles)       C	A	239,48
+   v3 FULL (call -mv)         C	A	242,52
+   -> if v4flag(B) already zeroes ALT: a quality filter. If only v4 FULL zeroes it: -C alleles.
+
+D. PER-READ (no filters): base  baseQ  MAPQ   [split REF vs ALT below]
+
+E. samtools tview:
+########## END ##########
