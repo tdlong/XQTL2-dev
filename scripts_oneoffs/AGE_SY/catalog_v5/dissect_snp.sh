@@ -28,7 +28,7 @@
 ###############################################################################
 set -uo pipefail
 module load bcftools/1.21 2>/dev/null || true
-module load samtools/1.21 2>/dev/null || true
+module load samtools/1.10 2>/dev/null || true
 REF=pipeline/ref/dm6.fa
 CHR=${CHR:-chrX}
 POS=${POS:-6471332}
@@ -73,7 +73,7 @@ echo "   -> if v4flag(B) already zeroes ALT: a quality filter. If only v4 FULL z
 echo
 
 echo "D. PER-READ (no filters): base  baseQ  MAPQ   [split REF vs ALT below]"
-samtools mpileup -B -q0 -Q0 -f "$REF" -r "$R" -s --output-QNAME "$BAM" 2>/dev/null \
+samtools mpileup -B -q0 -Q0 -f "$REF" -r "$R" -s "$BAM" 2>/dev/null \
 | awk -v RB="$RB" '
   BEGIN{for(i=0;i<256;i++) O[sprintf("%c",i)]=i}
   {

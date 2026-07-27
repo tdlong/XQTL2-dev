@@ -63,3 +63,25 @@ MEASURE it from the dist-to-indel annotation (catalog.annot.tsv.gz, re-cut in se
 ### NEXT: v5 call step
 `bash scripts_oneoffs/AGE_SY/catalog_v5/submit.call_v5.sh` — 36 samples (same v4 bam
 list) against v5 catalog; then v3-vs-v5 count compare.
+
+## 2026-07-27 THE ANSWER — v4 loses ALT because `call -m -C alleles` genotypes it away
+
+Dissection path (one sample, one chr, real reads — not statistics):
+- Con_R5_F chrX, filtered mid-arm 5-18Mb + cov 50-300x + gap>10% = **3,537** disagreeing SNPs.
+- Founder triage: 493 (14%) near-indel (filter them, separate issue); **3,044 (86%) clean**,
+  of which **2,961 are v4-loses-ALT** — the dominant phenomenon.
+- Dissected 5 clean v4-loses-ALT SNPs (dissect_snp.sh flag ladder). Decisive:
+  the ALT reads survive ALL quality filters (mpileup `-B -q20 -Q20` keeps 33/26/37/35 ALT),
+  then `| bcftools call -m -C alleles` sets ALT="." and AD collapses to REF-only (0 ALT).
+  Only diff between the two = the `call` step. Example chrX:6471332 A,G: mpileup 212,33 ->
+  post-call 227,0. (5th SNP 5332918 ~18% ALT cleared the caller threshold, kept.)
+
+MECHANISM: per-sample **diploid genotype model** in `call -m` calls hom-REF at a
+low-but-real pooled ALT fraction (~13%) and deletes the allele. v3 escapes it by calling
+JOINTLY across all 36 samples (cohort-confident). This is the misapplied prior TL flagged
+from the start: at a KNOWN pooled SNP we want to COUNT ref vs alt, not genotype.
+
+FIX (filed): count AD straight from `bcftools mpileup -a FORMAT/AD`, never route through
+`call -m -C alleles`. Draft issue in-repo: `issue_catalog_count_call.md` (file with gh).
+This is THE cause of the v4/catalog undercount at clean SNPs, distinct from the near-indel
+(BAQ, v3-side) tail.
