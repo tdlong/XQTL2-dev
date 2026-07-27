@@ -1,0 +1,22 @@
+###### STEP 2: founder triage — ONE sample (Con_R5_F), chrX ######
+FILTERS: mid-arm 5-18Mb | coverage 50-300x BOTH callers | ALT-freq gap >0.10
+red flags: near_indel(dist<25) | low_founder_depth(min<10) | intermediate_founder | not_segregating
+
+BIG disagreements: 3537 (SNP,sample) pairs over 3537 unique SNPs
+
+Founder triage of the unique SNPs:
+  near_indel(<25)        :     493
+  low_founder_depth(<10) :       0
+  intermediate_founder   :       0
+  not_segregating        :       0
+  ------------------------------------
+  ANY red flag           :     493 ( 13.9% of unique)
+  CLEAN (no red flag)    :    3044 ( 86.1% of unique)
+  not in v5 annot        :       0
+
+Direction x founder status (PAIRS):
+  CLEAN    : v4-drops-alt=83  v3-drops-alt=2961
+  RED-FLAG : v4-drops-alt=127  v3-drops-alt=366
+
+clean remainder list -> logs/AGE_SY/big_disagree_clean.chrX.Con_R5_F.tsv (sort -k12 -rn for worst-first)
+###### END STEP 2 ######
