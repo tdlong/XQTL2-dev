@@ -1,0 +1,4 @@
+sample Con_R5_F  chrX  --max-depth 2000  -q0 -Q13 -> process/AGE_SY_v4/baq_caller.Con_R5_F.chrX.tsv.gz
+rows: 176673   wrote process/AGE_SY_v4/baq_caller.Con_R5_F.chrX.tsv.gz
+ALT%  catalog(-B,-C)=32.070  +BAQ(-C)=31.549  +free(-B,-m)=32.069  v3ish(-m)=31.549
+read: catalog->+BAQ = BAQ effect; catalog->+free = the -C alleles constraint; v3ish should ~ real v3

@@ -1,0 +1,6 @@
+### sacct (since yesterday)  20260727_092040
+JobID                     JobName      State ExitCode    Elapsed               Start                 End 
+------------ -------------------- ---------- -------- ---------- ------------------- ------------------- 
+
+### squeue -u tdlong
+JOBID           PARTITION     NAME     USER    ACCOUNT ST        TIME  CPUS NODE NODELIST(REASON)
