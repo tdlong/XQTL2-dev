@@ -25,14 +25,18 @@
 set -uo pipefail
 ANNOT=process/AGE_SY_v5/Catalog/catalog.annot.tsv.gz
 DELTA=process/AGE_SY_v4/Calls/delta_gt2.chrX.tsv.gz
-CLEAN=logs/AGE_SY/big_disagree_clean.chrX.tsv
+SAMPLE=${SAMPLE:-Con_R5_F}
+CLEAN=logs/AGE_SY/big_disagree_clean.chrX.${SAMPLE}.tsv
 for f in "$ANNOT" "$DELTA"; do [[ -s "$f" ]] || { echo "missing: $f" >&2; exit 1; }; done
 
-echo "###### STEP 2: founder triage of chrX big disagreements (|ALT-freq gap|>0.10) ######"
+echo "###### STEP 2: founder triage — ONE sample ($SAMPLE), chrX ######"
+echo "FILTERS: mid-arm 5-18Mb | coverage 50-300x BOTH callers | ALT-freq gap >0.10"
 echo "red flags: near_indel(dist<25) | low_founder_depth(min<10) | intermediate_founder | not_segregating"
 echo
 
-{ zcat "$ANNOT"; echo "@@@DELTA@@@"; zcat "$DELTA"; } | awk -F'\t' -v CLEAN="$CLEAN" '
+{ zcat "$ANNOT"; echo "@@@DELTA@@@"; zcat "$DELTA"; } \
+| awk -F'\t' -v CLEAN="$CLEAN" -v S="$SAMPLE" \
+      -v ARMLO=5000000 -v ARMHI=18000000 -v COVLO=50 -v COVHI=300 -v GAP=0.10 '
   BEGIN{ mode=0 }
   $0=="@@@DELTA@@@" { mode=1; next }
   # ---- annot pass: per-pos founder flags ----
@@ -44,12 +48,15 @@ echo
     D[$2]=d; MIND[$2]=mind; NINT[$2]=nint; NREF[$2]=nref; NALT[$2]=nalt; A[$2]=1;
     next
   }
-  # ---- delta pass: keep big pairs, track worst sample per pos ----
+  # ---- delta pass: ONE sample, apply the filters, keep big SNPs ----
   $1=="chr" { next }
+  $3!=S { next }                                       # one sample only
   {
     t3=$6+$7; t4=$8+$9; if(t3<=0||t4<=0) next;
+    if($2<ARMLO || $2>ARMHI) next;                     # mid-arm
+    if(t3<COVLO||t3>COVHI||t4<COVLO||t4>COVHI) next;   # coverage 50-300x both
     f3=$7/t3; f4=$9/t4; dd=f4-f3; ad=(dd<0?-dd:dd);
-    if(ad<=0.10) next;
+    if(ad<=GAP) next;                                  # big gap only
     p=$2; bigpair++;
     if(!(p in BIG)){ BIG[p]=1; uniq++ }
     if(dd>0) v4hi[p]++; else v3hi[p]++;                # v4>v3 => v3 dropped alt
