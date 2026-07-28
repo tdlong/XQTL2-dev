@@ -10,6 +10,6 @@
 # (+ a hexbin plot). Reads the clean RefAlt already on disk.
 #   sbatch scripts_oneoffs/AGE_SY/catalog_v6/submit.compare_summary.sh
 set -uo pipefail
-module load R/4.2.2 2>/dev/null || true
+module load R/4.4.2 2>/dev/null || true
 Rscript scripts_oneoffs/AGE_SY/catalog_v6/compare_summary.R process/AGE_SY_v3 process/AGE_SY_v6/Calls
 echo "done."

@@ -28,7 +28,9 @@ for (ci in seq_along(chrs)) { chr <- chrs[ci]
     r6<-m[[paste0("REF_",s,".v6")]]; a6<-m[[paste0("ALT_",s,".v6")]]
     if (is.null(r3)||is.null(r6)) next
     N3<-r3+a3; N6<-r6+a6; ok<-N3>0 & N6>0
-    L[[i]] <- data.table(cov = pmin(N3,N6)[ok], d = abs(a6/N6 - a3/N3)[ok], p = (a6/N6)[ok])
+    f3<-(a3/N3)[ok]; f6<-(a6/N6)[ok]; pm<-(f3+f6)/2
+    L[[i]] <- data.table(cov = pmin(N3,N6)[ok], d = abs(f6-f3), sd = f6-f3,
+                         p = f6, maf = pmin(pm, 1-pm))
   }
   D[[ci]] <- rbindlist(L); rm(m); gc()
 }
@@ -50,10 +52,23 @@ print(tab)
 cat("\nbinom_exp = mean sqrt(2p(1-p)/cov) — the |diff| expected from sampling alone.\n")
 cat("If median tracks binom_exp, the two callers agree within counting noise.\n")
 
+# signed diff by minor-allele-freq bin (is any freq range biased? esp. rare alleles / #22)
+DT[, mbin := cut(maf, c(0,.05,.1,.2,.35,.5), include.lowest=TRUE,
+   labels=c("MAF 0-.05",".05-.1",".1-.2",".2-.35",".35-.5"))]
+cat("\n=== signed diff (freq_v6 - freq_v3) by minor-allele-freq bin ===\n")
+print(DT[, .(n=.N, mean_sd=round(mean(sd),4), median_sd=round(median(sd),4),
+             p05=round(quantile(sd,.05),4), p95=round(quantile(sd,.95),4),
+             pct_gt2=round(100*mean(d>.02),2)), by=mbin][order(mbin)])
+
 dir.create("figures", showWarnings = FALSE)
-g <- ggplot(DT[sample(.N, min(.N, 3e5))], aes(cov, d)) +
-  geom_hex(bins = 60) + scale_x_log10() + scale_y_sqrt() +
-  labs(x="coverage min(N3,N6)", y="|ALT-freq v6 - v3|", title="v3 vs v6: freq diff vs coverage") +
-  theme_minimal()
-ggsave("figures/compare_v3_v6_freqdiff_vs_cov.png", g, width=7, height=5, dpi=120)
-cat("\nplot -> figures/compare_v3_v6_freqdiff_vs_cov.png\n")
+ggsave("figures/compare_v3_v6_freqdiff_vs_cov.png", width=7, height=5, dpi=120,
+  ggplot(DT[sample(.N, min(.N,3e5))], aes(cov, d)) + geom_hex(bins=60) +
+    scale_x_log10() + scale_y_sqrt() + theme_minimal() +
+    labs(x="coverage min(N3,N6)", y="|freq_v6 - freq_v3|", title="freq diff vs coverage"))
+
+# THE density-by-frequency-bin plot: 5 normalized curves, common bin can't dominate
+ggsave("figures/compare_v3_v6_freqdiff_density_by_maf.png", width=7, height=5, dpi=120,
+  ggplot(DT, aes(sd, colour=mbin)) + geom_density() + coord_cartesian(xlim=c(-.1,.1)) +
+    theme_minimal() + labs(x="freq_v6 - freq_v3", y="density", colour="minor-allele freq",
+    title="v3 vs v6: signed freq-diff density by MAF bin"))
+cat("\nplots -> figures/compare_v3_v6_freqdiff_vs_cov.png  and  ..._density_by_maf.png\n")
