@@ -1,0 +1,32 @@
+=== dedup-merge v6 counts -> RefAlt ===
+chrX: 183586 SNPs written, 444 multiallelic positions dropped
+chr2L: 311121 SNPs written, 597 multiallelic positions dropped
+chr2R: 256296 SNPs written, 598 multiallelic positions dropped
+chr3L: 315064 SNPs written, 753 multiallelic positions dropped
+chr3R: 310676 SNPs written, 659 multiallelic positions dropped
+=== concordance v6 vs v3 (12 combos) ===
+=== CONCORDANCE v6(BAQ-on catalog) vs v3, per filter combo ===
+fraction of (SNP,sample) pairs whose ALT freq differs from v3 by >2%  /  >5%
+
+--- maxaf 3% ---
+  indel>=         pairs          >2%          >5%
+  0            57843425        4.81%        0.74%
+  10           55052187        4.24%        0.40%
+  20           51973009        4.03%        0.32%
+  50           44488429        3.81%        0.28%
+
+--- maxaf 5% ---
+  indel>=         pairs          >2%          >5%
+  0            58478917        4.89%        0.79%
+  10           55587783        4.28%        0.42%
+  20           52462190        4.07%        0.33%
+  50           44897063        3.84%        0.29%
+
+--- maxaf 7% ---
+  indel>=         pairs          >2%          >5%
+  0            58732944        4.94%        0.81%
+  10           55790873        4.31%        0.43%
+  20           52644874        4.09%        0.34%
+  50           45047321        3.86%        0.30%
+
+done.
