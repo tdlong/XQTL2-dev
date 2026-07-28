@@ -33,14 +33,12 @@ n=0; for f in slurm-*.out; do mv "$f" "logs/"; n=$((n+1)); done
   squeue -u "$USER" 2>/dev/null
 } > "logs/state_$STAMP.txt"
 
-# 3. manifest of process/ output (names + sizes, not the bulk data)
-{
-  for d in process/*/; do
-    [[ -d "$d" ]] || continue
-    echo "### $d"; ls -la "$d" 2>/dev/null | head -80; echo
-  done
-} > "logs/manifest_$STAMP.txt"
-echo "captured state + manifest ($STAMP)"
+# 3. manifest of process/ output: a REAL file inventory (type, size, mtime, path) 4
+#    levels deep, so Claude KNOWS what completed where — which catalogs exist,
+#    whether Calls/RefAlt and Calls/counts/* are there — without anyone ls-ing by hand.
+find process -maxdepth 4 -printf '%y %12s  %TY-%Tm-%Td %TH:%TM  %p\n' 2>/dev/null \
+  | sort -k5 > "logs/manifest_$STAMP.txt"
+echo "captured file inventory ($STAMP): $(wc -l < "logs/manifest_$STAMP.txt") entries"
 
 # 4. housekeeping: prune the ephemeral snapshots this script writes every run
 #    (state_/manifest_) once they are >14 days old. Real job -o logs are left
