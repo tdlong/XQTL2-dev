@@ -1,0 +1,22 @@
+Comparing A(current)=process/AGE_SY_v3  vs  B(proposed)=process/AGE_SY_v6/Calls
+
+chrX    A=250801  B=159398  shared=159257 (63.5% of A, 99.9% of B)
+        at shared (POS,sample): 19.33% identical counts; mean |freq diff| = 0.0052
+        A-only=91544  B-only=141  (rows written to process/AGE_SY_v6/Calls/compare.chrX.*_only.txt)
+
+chr2L   A=326237  B=271375  shared=246260 (75.5% of A, 90.7% of B)
+        at shared (POS,sample): 13.89% identical counts; mean |freq diff| = 0.0044
+        A-only=79977  B-only=25115  (rows written to process/AGE_SY_v6/Calls/compare.chr2L.*_only.txt)
+
+chr2R   A=348346  B=224303  shared=224108 (64.3% of A, 99.9% of B)
+        at shared (POS,sample): 12.23% identical counts; mean |freq diff| = 0.0047
+        A-only=124238  B-only=195  (rows written to process/AGE_SY_v6/Calls/compare.chr2R.*_only.txt)
+
+chr3L   A=411872  B=276050  shared=275768 (67.0% of A, 99.9% of B)
+        at shared (POS,sample): 12.63% identical counts; mean |freq diff| = 0.0048
+        A-only=136104  B-only=282  (rows written to process/AGE_SY_v6/Calls/compare.chr3L.*_only.txt)
+
+chr3R   A=406692  B=276310  shared=276040 (67.9% of A, 99.9% of B)
+        at shared (POS,sample): 12.27% identical counts; mean |freq diff| = 0.0050
+        A-only=130652  B-only=270  (rows written to process/AGE_SY_v6/Calls/compare.chr3R.*_only.txt)
+
