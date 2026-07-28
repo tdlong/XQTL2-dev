@@ -1,5 +1,0 @@
-Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
-[mpileup] 8 samples in 8 input files
-[mpileup] maximum number of reads per input file set to -d 1000
-Lines   total/split/joined/realigned/removed/skipped:	450654/10477/0/50318/0/0
-chr2L: 401687 candidate SNPs annotated -> process/AGE_SY_v6/Catalog/work/annot.chr2L.txt

@@ -1,8 +1,0 @@
-catalog: 1376802 sites -> process/AGE_SY_v6/Catalog/catalog.tsv.gz
-catalog filter: min-dp=10 maxaf=0.07 snpgap=0 exempt=B5:chr2L
-  candidate SNPs           : 1903062
-  dropped, near indel      : 0
-  dropped, founder depth   : 313112
-  dropped, not near-fixed  : 137526
-  dropped, not segregating : 75622
-  KEPT (catalog)           : 1376802

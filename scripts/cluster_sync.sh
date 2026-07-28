@@ -40,10 +40,12 @@ find process -maxdepth 4 -printf '%y %12s  %TY-%Tm-%Td %TH:%TM  %p\n' 2>/dev/nul
   | sort -k5 > "logs/manifest_$STAMP.txt"
 echo "captured file inventory ($STAMP): $(wc -l < "logs/manifest_$STAMP.txt") entries"
 
-# 4. housekeeping: prune the ephemeral snapshots this script writes every run
-#    (state_/manifest_) once they are >14 days old. Real job -o logs are left
-#    alone — prune those by hand when you want. Deletions get committed below.
-find logs -type f \( -name 'state_*.txt' -o -name 'manifest_*.txt' \) -mtime +14 -delete 2>/dev/null || true
+# 4. housekeeping: keep logs/ lean. Retain the newest few ephemeral snapshots this
+#    script writes (state_/manifest_) and cap the raw slurm-*.out it sweeps in; the
+#    named job logs (logs/**/<name>.out) are the record and are left alone.
+ls -t logs/state_*.txt    2>/dev/null | tail -n +6  | xargs -r rm -f
+ls -t logs/manifest_*.txt 2>/dev/null | tail -n +6  | xargs -r rm -f
+ls -t logs/slurm-*.out    2>/dev/null | tail -n +21 | xargs -r rm -f
 
 # 5. reconcile BOTH ways, always. Commit only logs/ (a re-run job rewrites tracked
 #    logs -> a dirty tree, which is what makes a plain `git pull` fail; committing

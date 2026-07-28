@@ -1,4 +1,0 @@
-Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
-Unable to parse the -T file; expected CHROM\tPOS\tREF,ALT with -C alleles but found instead:
-	chr2L	9204	T	C
-[mpileup] 1 samples in 1 input files

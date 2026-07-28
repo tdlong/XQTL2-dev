@@ -1,4 +1,0 @@
-Error in vecseq(f__, len__, limit) : 
-  Join results in 4272909 rows; more than 4247165 = nrow(x)+nrow(i). Check for duplicate key values in i each of which join to the same group in x over and over again. If that's ok, try by=.EACHI to run j for each group to avoid the large allocation. If you are sure you wish to proceed, rerun with allow.cartesian=TRUE. Otherwise, please search for this error message in the FAQ, Wiki, Stack Overflow and data.table issue tracker for advice.
-Calls: merge -> merge.data.table -> [ -> [.data.table -> vecseq
-Execution halted
