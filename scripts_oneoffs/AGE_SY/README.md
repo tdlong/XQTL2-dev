@@ -1,49 +1,49 @@
 # AGE_SY — founder-catalog caller evaluation
 
 Master record for the evaluation of XQTL2's founder-catalog SNP caller against the
-validated QUAL caller, on AGE_SY. One place; the per-phase `NOTES.*.md` hold detail.
+validated QUAL caller, on AGE_SY. Detail in `catalog_v6/NOTES.md`.
 
 ## Goal
 Decide whether the founder-catalog caller is trustworthy for pooled REF/ALT counting,
-and pick the catalog filters. Baseline for comparison = the validated QUAL caller.
+and pick the catalog filters. Baseline = the validated QUAL caller.
+
+## Result (validated)
+The founder-catalog caller reproduces the validated caller to **~0.2% median frequency
+difference** at usable depth (≥100×), **no rare-allele bias** (the old genotype-collapse
+bug is gone), the only systematic being a ≤0.35% BAQ effect at common alleles — and it
+additionally **recovers ~25K chr2L SNPs** the QUAL caller missed. Filters:
+**min-dp 10, maxaf 3%, snpgap 20** (indel distance is the lever, knee at 20; maxaf a
+non-lever). See `catalog_v6/NOTES.md` for the 12-combo table and the comparison.
 
 ## Directories (process/)
 | dir | what it is | status |
 |-----|------------|--------|
 | `AGE_SY_v3` | validated QUAL caller output (`RefAlt.*`, `calls.*.bcf`, `R.haps`) | **BASELINE — keep** |
-| `AGE_SY_v6` | BAQ-on catalog (annot) + 44-sample counts + `snp_pass` + `merge_dedup` RefAlt | **LIVE — keep** |
-| ~~`v4`~~ | first eval (buggy #14 counts) + `baq_caller`/`flag_ladder`/`delta_gt2` diagnostics | deleted |
-| ~~`v5`~~ | BAQ-off catalog build, never counted | deleted |
-| ~~`v7`~~ | wasteful final-rerun stub (cancelled) | deleted |
+| `AGE_SY_v6` | BAQ-on catalog + 44-sample counts + RefAlt (standard pipeline, clean) | **LIVE — keep** |
+| ~~`v2/v4/v5/v7`~~ | superseded eval iterations | deleted |
 
-## Script folders (this dir; `common`/`getdata`/`round*` are the experiment proper, not this eval)
-| folder | role | status |
-|--------|------|--------|
-| `catalog_v6/` | filter-analysis pipeline (snp_loss + concordance) + `merge_dedup` **hack** | live |
-| `catalog_v7/` | subset-existing-counts + compare_refalt_calls | live |
-| ~~`catalog_v4`~~ | the diagnosis (agreement_delta, flag_ladder, baq_caller, dissect → #22) | deleted; in git history |
-| ~~`catalog_v5`~~ | build tooling, founder_triage, filter_grid, dissect_snp | deleted; in git history |
+## Script folder — `catalog_v6/` (single, live)
+(`common`/`getdata`/`round*` are the experiment proper, not this eval.)
+- `submit.filter_pipeline.sh` + `snp_loss_grid.sh` + `concordance_grid.*` +
+  `launch_count_concordance.sh` — build the BAQ-on catalog and sweep filters (the decision).
+- `submit.clean_v6.sh` + `launch_count_compare.sh` — the clean final call: `catalog_filter`
+  re-cut of the annot → standard count + merge → compare vs v3. No hacks.
+- `compare_summary.R` + `submit.compare_summary.sh` — overlap counts + |freq diff| vs
+  coverage/MAF (ECDF plots to `logs/figures/`).
+- `NOTES.md` — the lab notebook.
+- Earlier `catalog_v4`/`v5`/`v7` folders and the `merge_dedup`/`subset` hacks were deleted
+  once the pipeline fixes made the standard path work; they live in git history.
 
-When #26 lands and the clean run replaces the `merge_dedup` hack, `catalog_v6` + `catalog_v7`
-collapse into a single `catalog/` folder.
+## What we found (→ XQTL2 issues, all fixed)
+- **#14** RefAlt duplicate positions · **#15** min-dp too aggressive · **#16–19** misc ·
+  **#20** good_SNPs no-op · **#21** annotate-once / filter-downstream.
+- **#22** `catalog_count` ran `call -m -C alleles` — its diploid genotype model **deleted
+  real minor-allele reads** in pooled samples (the core bug). Fixed: count AD from mpileup.
+- **#23** BAQ off during founder discovery (should be on) · **#25** catalog_build CPU.
+- **#24** `catalog_merge` cartesian-explodes on multiallelic catalog positions ·
+  **#26** moved that drop downstream (no founder recall to re-cut) ·
+  **#27** `catalog_count` missing `-I` → SNP+indel double-rows crashed the merge.
 
-## What we found (→ XQTL2 issues)
-- Counts were being corrupted / deflated, traced to specific causes, each filed:
-  - **#14** RefAlt duplicate positions (fixed) · **#15** min-dp too aggressive · **#16–19** misc.
-  - **#20** good_SNPs no-op · **#21** annotate-once / filter-downstream design.
-  - **#22** `catalog_count` ran `call -m -C alleles`, whose diploid genotype model **deletes
-    real minor-allele reads** in pooled samples — the core bug. Fixed: count AD from mpileup.
-  - **#23** BAQ was off during founder discovery (should be on); fixed.
-  - **#24** `catalog_merge` cartesian-explodes on multiallelic positions (hard blocker); fixed
-    at build. **#26** = move that drop downstream so it doesn't force a founder recall + document
-    rerun impact. **#25** catalog_build CPU over-allocation.
-
-## Decision (see `catalog_v6/NOTES.catalog_v6.md` for the 12-combo table)
-**min-dp 10, maxaf 3%, snpgap 20.** Indel distance is the lever (knee at 20); maxaf is a
-non-lever; BAQ-on discovery already removed most near-indel junk.
-
-## Current state / next step
-Waiting on **#26** (multiallelic drop as a downstream filter). Once it lands, do the clean
-final run **in `v6`, in place** (no new `vN`): `catalog_filter` re-cut of the existing annot
-(no founder recall) → standard `catalog_count` + `catalog_merge` → `compare_refalt_calls.R`
-vs v3. Then the `merge_dedup` hack is deleted and `catalog_v6`/`catalog_v7` collapse into one.
+## State
+**Done.** Investigation complete, caller validated, tree tidied. `v3` (baseline) + `v6`
+(live) are the only AGE_SY eval dirs; `catalog_v6/` is the only script folder.
