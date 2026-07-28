@@ -1,0 +1,39 @@
+=== SNP-set overlap (positions) ===
+      chr v3_only  shared v6_only
+   <char>   <int>   <int>   <int>
+1:   chrX   91544  159257     141
+2:  chr2L   79977  246260   25115
+3:  chr2R  124238  224108     195
+4:  chr3L  136104  275768     282
+5:  chr3R  130652  276040     270
+6:  TOTAL  562515 1181433   26003
+
+=== |ALT-freq diff| vs coverage at shared (SNP,sample) ===
+      cbin        n median    p90    p99 pct_gt2 pct_gt5 binom_exp
+    <fctr>    <int>  <num>  <num>  <num>   <num>   <num>     <num>
+1:     1-9   147067 0.0000 0.0000 0.0000    0.46    0.31    0.0020
+2:   10-24  1666828 0.0000 0.0000 0.0625    5.57    1.81    0.0134
+3:   25-49  5755192 0.0000 0.0200 0.0457    9.90    0.77    0.0418
+4:   50-99 18647285 0.0025 0.0154 0.0345    5.15    0.30    0.0492
+5: 100-199 20961398 0.0023 0.0106 0.0253    2.05    0.15    0.0353
+6: 200-399  4682000 0.0018 0.0081 0.0198    0.97    0.08    0.0223
+7:    400+   122997 0.0017 0.0069 0.0209    1.10    0.17    0.0169
+
+binom_exp = mean sqrt(2p(1-p)/cov) — the |diff| expected from sampling alone.
+If median tracks binom_exp, the two callers agree within counting noise.
+
+=== signed diff (freq_v6 - freq_v3) by minor-allele-freq bin ===
+        mbin        n mean_sd median_sd     p05    p95 pct_gt2
+      <fctr>    <int>   <num>     <num>   <num>  <num>   <num>
+1: MAF 0-.05 19976069 -0.0002    0.0000 -0.0071 0.0034    1.66
+2:    .05-.1  5174888  0.0005    0.0009 -0.0112 0.0102    2.59
+3:     .1-.2  8425557  0.0015    0.0014 -0.0116 0.0147    3.93
+4:    .2-.35 10173175  0.0027    0.0019 -0.0122 0.0192    6.16
+5:    .35-.5  8233078  0.0035    0.0021 -0.0128 0.0223    8.18
+Warning message:
+Computation failed in `stat_binhex()`.
+Caused by error in `compute_group()`:
+! The package "hexbin" is required for `stat_bin_hex()`. 
+
+plots -> figures/compare_v3_v6_freqdiff_vs_cov.png  and  ..._density_by_maf.png
+done.
