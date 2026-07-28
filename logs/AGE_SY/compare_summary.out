@@ -35,5 +35,5 @@ Computation failed in `stat_binhex()`.
 Caused by error in `compute_group()`:
 ! The package "hexbin" is required for `stat_bin_hex()`. 
 
-plots -> figures/compare_v3_v6_freqdiff_vs_cov.png  and  ..._density_by_maf.png
+plots -> logs/figures/  (sync brings them over)
 done.
