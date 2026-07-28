@@ -1,0 +1,9 @@
+catalog: 1207436 sites -> process/AGE_SY_v6/Catalog/catalog.tsv.gz
+catalog filter: min-dp=10 maxaf=0.03 snpgap=20 exempt=B5:chr2L
+  candidate positions      : 1887667
+  dropped, multiallelic    : 15391
+  dropped, near indel      : 293871
+  dropped, founder depth   : 174763
+  dropped, not near-fixed  : 127552
+  dropped, not segregating : 68654
+  KEPT (catalog)           : 1207436

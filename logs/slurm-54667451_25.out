@@ -1,0 +1,3 @@
+[mpileup] 1 samples in 1 input files
+[mpileup] maximum number of reads per input file set to -d 2000
+counted Con_R1_F -> process/AGE_SY_v6/Calls/counts/Con_R1_F.tsv.gz
