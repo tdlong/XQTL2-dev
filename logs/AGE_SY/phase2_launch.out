@@ -1,0 +1,3 @@
+count merge job: counting 44 BAM(s) against process/AGE_SY_v6/Catalog/catalog.tsv.gz -> process/AGE_SY_v6/Calls
+54639875
+sbatch: error: Batch job submission failed: Job dependency problem

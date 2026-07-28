@@ -1,0 +1,10 @@
+candidate SNPs (biallelic in founders, BAQ-on build): 1903062
+
+SNPs kept (rows = >= bp from indel, cols = maxaf; >=10 reads + polymorphic held)
+indel>=         af0.03      af0.05      af0.07
+0              1355018     1370502     1376802
+10             1283110     1295786     1300606
+20             1207616     1219120     1223424
+50             1028252     1037812     1041344
+
+per-SNP pass table -> process/AGE_SY_v6/Catalog/snp_pass.tsv.gz
