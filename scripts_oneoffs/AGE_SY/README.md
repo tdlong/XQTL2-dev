@@ -16,13 +16,16 @@ and pick the catalog filters. Baseline for comparison = the validated QUAL calle
 | ~~`v5`~~ | BAQ-off catalog build, never counted | deleted |
 | ~~`v7`~~ | wasteful final-rerun stub (cancelled) | deleted |
 
-## Script folders (this dir)
+## Script folders (this dir; `common`/`getdata`/`round*` are the experiment proper, not this eval)
 | folder | role | status |
 |--------|------|--------|
-| `catalog_v4/` | the diagnosis: agreement_delta, flag_ladder, baq_caller, dissect | archived |
-| `catalog_v5/` | build tooling, founder_triage, filter_grid, dissect_snp | archived |
 | `catalog_v6/` | filter-analysis pipeline (snp_loss + concordance) + `merge_dedup` **hack** | live |
 | `catalog_v7/` | subset-existing-counts + compare_refalt_calls | live |
+| ~~`catalog_v4`~~ | the diagnosis (agreement_delta, flag_ladder, baq_caller, dissect → #22) | deleted; in git history |
+| ~~`catalog_v5`~~ | build tooling, founder_triage, filter_grid, dissect_snp | deleted; in git history |
+
+When #26 lands and the clean run replaces the `merge_dedup` hack, `catalog_v6` + `catalog_v7`
+collapse into a single `catalog/` folder.
 
 ## What we found (→ XQTL2 issues)
 - Counts were being corrupted / deflated, traced to specific causes, each filed:
