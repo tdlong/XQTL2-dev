@@ -65,12 +65,15 @@ print(DT[, .(n=.N, mean_sd=round(mean(sd),4), median_sd=round(median(sd),4),
 # compared by shape, not count. Plot |diff| (signed dists are ~symmetric; magnitude is the
 # question — the small signed bias is in the table above).
 FIG <- "logs/figures"; dir.create(FIG, recursive = TRUE, showWarnings = FALSE)
-ggsave(file.path(FIG,"absdiff_density_by_maf.png"), width=7, height=5, dpi=120,
-  ggplot(DT, aes(d, colour=mbin)) + geom_density() + coord_cartesian(xlim=c(0,0.06)) +
-    theme_minimal() + labs(x="|freq_v6 - freq_v3|", y="density (each integrates to 1)",
-    colour="minor-allele freq", title="v3 vs v6: |freq diff| density by MAF bin"))
-ggsave(file.path(FIG,"absdiff_density_by_cov.png"), width=7, height=5, dpi=120,
-  ggplot(DT, aes(d, colour=cbin)) + geom_density() + coord_cartesian(xlim=c(0,0.06)) +
-    theme_minimal() + labs(x="|freq_v6 - freq_v3|", y="density (each integrates to 1)",
-    colour="coverage", title="v3 vs v6: |freq diff| density by coverage bin"))
+# ECDF, not density: some bins (rare MAF) are so concentrated at 0 that a normalized
+# density spikes off-scale and hides the rest. An ECDF runs 0->1 for every bin, so none
+# dominates, and reads directly as "fraction of (SNP,sample) agreeing within x".
+ggsave(file.path(FIG,"absdiff_ecdf_by_maf.png"), width=7, height=5, dpi=120,
+  ggplot(DT, aes(d, colour=mbin)) + stat_ecdf() + coord_cartesian(xlim=c(0,0.04)) +
+    theme_minimal() + labs(x="|freq_v6 - freq_v3|", y="fraction of (SNP,sample) <= x",
+    colour="minor-allele freq", title="v3 vs v6: |freq diff| ECDF by MAF bin"))
+ggsave(file.path(FIG,"absdiff_ecdf_by_cov.png"), width=7, height=5, dpi=120,
+  ggplot(DT, aes(d, colour=cbin)) + stat_ecdf() + coord_cartesian(xlim=c(0,0.04)) +
+    theme_minimal() + labs(x="|freq_v6 - freq_v3|", y="fraction of (SNP,sample) <= x",
+    colour="coverage", title="v3 vs v6: |freq diff| ECDF by coverage bin"))
 cat("\nplots -> logs/figures/  (sync brings them over)\n")
