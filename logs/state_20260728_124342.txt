@@ -1,4 +1,4 @@
-### sacct (since yesterday)  20260728_120733
+### sacct (since yesterday)  20260728_124342
 JobID                     JobName      State ExitCode    Elapsed               Start                 End 
 ------------ -------------------- ---------- -------- ---------- ------------------- ------------------- 
 54617506           founder_triage  COMPLETED      0:0   00:00:18 2026-07-27T10:45:42 2026-07-27T10:46:00 
@@ -158,6 +158,9 @@ JobID                     JobName      State ExitCode    Elapsed               S
 54674050_42         catalog_count  COMPLETED      0:0   00:01:34 2026-07-28T11:40:38 2026-07-28T11:42:12 
 54674050_43         catalog_count  COMPLETED      0:0   00:04:03 2026-07-28T11:40:38 2026-07-28T11:44:41 
 54674050_44         catalog_count  COMPLETED      0:0   00:07:49 2026-07-28T11:40:38 2026-07-28T11:48:27 
+54675520          compare_summary  COMPLETED      0:0   00:01:10 2026-07-28T12:20:36 2026-07-28T12:21:46 
+54675538          compare_summary  COMPLETED      0:0   00:01:05 2026-07-28T12:24:27 2026-07-28T12:25:32 
 
 ### squeue -u tdlong
 JOBID           PARTITION     NAME     USER    ACCOUNT ST        TIME  CPUS NODE NODELIST(REASON)
+54675846        standard  compare_   tdlong tdlong_lab PD        0:00     4    1 (None)
