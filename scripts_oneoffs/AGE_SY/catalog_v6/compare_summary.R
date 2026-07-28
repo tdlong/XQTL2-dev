@@ -60,15 +60,16 @@ print(DT[, .(n=.N, mean_sd=round(mean(sd),4), median_sd=round(median(sd),4),
              p05=round(quantile(sd,.05),4), p95=round(quantile(sd,.95),4),
              pct_gt2=round(100*mean(d>.02),2)), by=mbin][order(mbin)])
 
-dir.create("figures", showWarnings = FALSE)
-ggsave("figures/compare_v3_v6_freqdiff_vs_cov.png", width=7, height=5, dpi=120,
+# write to logs/figures/ — logs/ already syncs, so the plots come back with cluster_sync
+FIG <- "logs/figures"; dir.create(FIG, recursive = TRUE, showWarnings = FALSE)
+ggsave(file.path(FIG,"compare_v3_v6_freqdiff_vs_cov.png"), width=7, height=5, dpi=120,
   ggplot(DT[sample(.N, min(.N,3e5))], aes(cov, d)) + geom_hex(bins=60) +
     scale_x_log10() + scale_y_sqrt() + theme_minimal() +
     labs(x="coverage min(N3,N6)", y="|freq_v6 - freq_v3|", title="freq diff vs coverage"))
 
 # THE density-by-frequency-bin plot: 5 normalized curves, common bin can't dominate
-ggsave("figures/compare_v3_v6_freqdiff_density_by_maf.png", width=7, height=5, dpi=120,
+ggsave(file.path(FIG,"compare_v3_v6_freqdiff_density_by_maf.png"), width=7, height=5, dpi=120,
   ggplot(DT, aes(sd, colour=mbin)) + geom_density() + coord_cartesian(xlim=c(-.1,.1)) +
     theme_minimal() + labs(x="freq_v6 - freq_v3", y="density", colour="minor-allele freq",
     title="v3 vs v6: signed freq-diff density by MAF bin"))
-cat("\nplots -> figures/compare_v3_v6_freqdiff_vs_cov.png  and  ..._density_by_maf.png\n")
+cat("\nplots -> logs/figures/  (sync brings them over)\n")
