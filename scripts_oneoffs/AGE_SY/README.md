@@ -15,6 +15,12 @@ additionally **recovers ~25K chr2L SNPs** the QUAL caller missed. Filters:
 **min-dp 10, maxaf 3%, snpgap 20** (indel distance is the lever, knee at 20; maxaf a
 non-lever). See `catalog_v6/NOTES.md` for the 12-combo table and the comparison.
 
+**End-to-end (plug-and-play):** called reps 7–12, then ran the existing haplotype+scan
+pipeline UNCHANGED on the v6 RefAlt — the size75k genome scan
+(`AGE_SY_v6_size75k_4scan.png`) reproduces the July-15 v3 scan essentially exactly (same
+QTL peaks/heights, incl. the chr3L ~200 peak), with marginally more chrX signal. The caller
+is a drop-in from counts through QTL. → Recommend it become the XQTL2 default.
+
 ## Directories (process/)
 | dir | what it is | status |
 |-----|------------|--------|

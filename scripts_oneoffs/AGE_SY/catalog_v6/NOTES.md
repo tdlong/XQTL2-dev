@@ -47,3 +47,16 @@ min-dp10/maxaf3/snpgap20 → 1,207,436 sites → count 44 BAMs (`-I`) → merge 
   growing to +0.35% at common alleles. Plots: logs/figures/absdiff_ecdf_by_{maf,cov}.png.
 - **Conclusion: founder-catalog caller validated — matches the QUAL caller to ~0.2% with no
   rare-allele bias, and recovers chr2L.**
+
+## Capstone — scan-level validation (plug-and-play), 2026-07-28
+Called reps 7-12 into v6 (72 samples) via standard `call_samples`, then ran the EXISTING
+haplotype+scan pipeline UNCHANGED on the v6 RefAlt (`REFALT2haps` size75k -> smooth100 ->
+4 scans -> figure) — the catalog caller's `RefAlt` is a drop-in, no downstream edits.
+Result: `figures/AGE_SY_v6_size75k_4scan.png` reproduces the July-15 v3 scan
+(`AGE_SY_v3_size75k_4scan.png`) essentially exactly across all 5 chromosomes and 4 traces
+(SY10/SY20 x F/M): same QTL peaks and heights, incl. the chr3L ~9 Mb peak at -log10P ~200.
+Only difference: chrX signal marginally HIGHER in v6 (~10 Mb peak ~16 vs ~13) — the right
+direction, consistent with cleaner/recovered SNPs (chr2L recovery, no rare-allele deletion).
+=> **Validated end to end: raw counts -> per-SNP freq (~0.2%) -> haplotype freq -> genome
+scan, reproducing the validated pipeline's biology with a hair more power. Plug-and-play
+through the whole pipeline.** Recommend it become the XQTL2 default caller.
