@@ -1,7 +1,7 @@
 # AGE_SY — founder-catalog caller evaluation
 
 Master record for the evaluation of XQTL2's founder-catalog SNP caller against the
-validated QUAL caller, on AGE_SY. Detail in `catalog_v6/NOTES.md`.
+validated QUAL caller, on AGE_SY. Detail in `catalog_eval/NOTES.md`.
 
 ## Data lineage (process/ folders) — history, then the final two
 - `AGE_Aug13_24` — early **pilot, different raw data** (not an AGE_SY version; stands alone). **KEPT.**
@@ -14,8 +14,8 @@ validated QUAL caller, on AGE_SY. Detail in `catalog_v6/NOTES.md`.
 
 **Final state: two folders — `AGE_Aug13_24` (pilot) and `AGE_SY` (the new catalog caller).**
 The removed QUAL data is regenerable from BAMs, and its validation record lives in git
-(`logs/AGE_SY/compare_v3_v6.out`, `logs/figures/`, `catalog_v6/NOTES.md`). Note: figure files
-and `catalog_v6/NOTES.md` still say `AGE_SY_v6_size75k` — that folder is now `AGE_SY`.
+(`logs/AGE_SY/compare_v3_v6.out`, `logs/figures/`, `catalog_eval/NOTES.md`). Note: figure files
+and `catalog_eval/NOTES.md` still say `AGE_SY_v6_size75k` — that folder is now `AGE_SY`.
 
 ## Goal
 Decide whether the founder-catalog caller is trustworthy for pooled REF/ALT counting,
@@ -27,7 +27,7 @@ difference** at usable depth (≥100×), **no rare-allele bias** (the old genoty
 bug is gone), the only systematic being a ≤0.35% BAQ effect at common alleles — and it
 additionally **recovers ~25K chr2L SNPs** the QUAL caller missed. Filters:
 **min-dp 10, maxaf 3%, snpgap 20** (indel distance is the lever, knee at 20; maxaf a
-non-lever). See `catalog_v6/NOTES.md` for the 12-combo table and the comparison.
+non-lever). See `catalog_eval/NOTES.md` for the 12-combo table and the comparison.
 
 **End-to-end (plug-and-play):** called reps 7–12, then ran the existing haplotype+scan
 pipeline UNCHANGED on the v6 RefAlt — the size75k genome scan
@@ -42,17 +42,14 @@ is a drop-in from counts through QTL. → Recommend it become the XQTL2 default.
 | `AGE_SY` | the **new catalog caller** — full R1–R12 catalog + counts + 75 kb haps + scans (was `AGE_SY_v6_size75k`) | **LIVE** |
 | ~~`AGE_SY`(old), `_v2`, `_v3`, `_v3_size75k`, `_v4/5/6/7`~~ | superseded QUAL partials + eval iterations | deleted (regenerable; validation in git) |
 
-## Script folder — `catalog_v6/` (single, live)
+## Script folder — `catalog_eval/` (completed evaluation record)
 (`common`/`getdata`/`round*` are the experiment proper, not this eval.)
-- `submit.filter_pipeline.sh` + `snp_loss_grid.sh` + `concordance_grid.*` +
-  `launch_count_concordance.sh` — build the BAQ-on catalog and sweep filters (the decision).
-- `submit.clean_v6.sh` + `launch_count_compare.sh` — the clean final call: `catalog_filter`
-  re-cut of the annot → standard count + merge → compare vs v3. No hacks.
-- `compare_summary.R` + `submit.compare_summary.sh` — overlap counts + |freq diff| vs
-  coverage/MAF (ECDF plots to `logs/figures/`).
-- `NOTES.md` — the lab notebook.
-- Earlier `catalog_v4`/`v5`/`v7` folders and the `merge_dedup`/`subset` hacks were deleted
-  once the pipeline fixes made the standard path work; they live in git history.
+- `NOTES.md` — the lab notebook: the filter decision (12-combo table), the v3-vs-v6
+  comparison, and the end-to-end validation. **This is the durable record.**
+- The evaluation scripts (catalog build + filter sweep, v3-vs-v6 concordance / `compare_summary`,
+  the clean-run and haps/scan wrappers) did their job and are **removed from the working tree —
+  they live in git history**. The caller now lives in the XQTL2 pipeline (default candidate,
+  #28); future AGE_SY runs use the pipeline + the `round*` scan tooling, not these one-offs.
 
 ## What we found (→ XQTL2 issues, all fixed)
 - **#14** RefAlt duplicate positions · **#15** min-dp too aggressive · **#16–19** misc ·
@@ -65,5 +62,6 @@ is a drop-in from counts through QTL. → Recommend it become the XQTL2 default.
   **#27** `catalog_count` missing `-I` → SNP+indel double-rows crashed the merge.
 
 ## State
-**Done.** Investigation complete, caller validated, tree tidied. `v3` (baseline) + `v6`
-(live) are the only AGE_SY eval dirs; `catalog_v6/` is the only script folder.
+**Done.** Caller validated end-to-end and recommended to XQTL2 as the default (#28). Tree
+tidied: `process/` holds `AGE_Aug13_24` (pilot) + `AGE_SY` (the new caller); scripts hold
+`catalog_eval/NOTES.md` (the record) alongside the experiment's own `common`/`getdata`/`round*`.
