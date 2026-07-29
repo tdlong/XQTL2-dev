@@ -1,0 +1,60 @@
+################ process/ZINC2 ################
+  newest mtime : 2026-05-20 12:44
+  calls.bcf    : 5
+  RefAlt whole : 5  (real=5 symlink=0)
+  RefAlt /founder (fromsites): 0
+  R.haps       : 10
+  scan dirs    : ZINC2_F ZINC2_M ZINC2_F_freqs100 ZINC2_M_freqs100 ZINC2_F_v3 ZINC2_M_v3 ZINC2_F_v3_N07 ZINC2_F_v3_N09 ZINC2_F_v3_N11 ZINC2_F_v3_N13 ZINC2_F_v4 ZINC2_M_v4 ZINC2_F_unsmoothed 
+  other files  : scan_comparison_chr2L.png ZINC2_F_freqs100/ ZINC2_F_unsmoothed/ ZINC2_F_v3/ ZINC2_F_v3_N07/ ZINC2_F_v3_N09/ ZINC2_F_v3_N11/ ZINC2_F_v3_N13/ ZINC2_F_v4/ ZINC2_M_freqs100/ ZINC2_M_v3/ ZINC2_M_v4/ 
+  samples (68) : Rep06_Z_M Rep05_W_M Rep05_Z_M Rep15_Z_M Rep06_Z_F Rep05_W_F ...
+  => B-lines / ZINC2 (samples RepNN_W/Z_M/F)
+
+################ process/ZINC2_v2 ################
+  newest mtime : 2026-03-01 08:17
+  calls.bcf    : 0
+  RefAlt whole : 5  (real=0 symlink=5)
+  RefAlt /founder (fromsites): 0
+  R.haps       : 10
+  scan dirs    : ZINC2_M_N09 ZINC2_F_N07 ZINC2_F ZINC2_M ZINC2_M_N07 ZINC2_F_N11 ZINC2_F_N09 ZINC2_F_N13 ZINC2_M_N11 ZINC2_M_N13 ZINC2_M_stable_N13 ZINC2_F_stable ZINC2_M_stable ZINC2_F_stable_N07 ZINC2_M_stable_N07 ZINC2_F_stable_N09 ZINC2_M_stable_N09 ZINC2_F_stable_N11 ZINC2_F_stable_N13 ZINC2_M_stable_N11 ZINC2_M_freqs250 ZINC2_F_freqs250 ZINC2_F_freqs100 ZINC2_M_freqs100 ZINC2_F_freqs250_N11 ZINC2_M_freqs250_N07 ZINC2_F_freqs250_N07 ZINC2_F_freqs250_N09 ZINC2_M_freqs250_N09 ZINC2_M_freqs250_N13 ZINC2_M_freqs250_N11 ZINC2_F_freqs250_N13 
+  other files  : downsample_pseudoscans.tsv.gz freqsmooth_diag.png ZINC2_F_freqs100/ ZINC2_F_freqs250/ ZINC2_F_freqs250_N07/ ZINC2_F_freqs250_N09/ ZINC2_F_freqs250_N11/ ZINC2_F_freqs250_N13/ ZINC2_F_N07/ ZINC2_F_N09/ ZINC2_F_N11/ ZINC2_F_N13/ ZINC2_F_stable/ ZINC2_F_stable_N07/ ZINC2_F_stable_N09/ ZINC2_F_stable_N11/ ZINC2_F_stable_N13/ ZINC2_M_freqs100/ ZINC2_M_freqs250/ ZINC2_M_freqs250_N07/ ZINC2_M_freqs250_N09/ ZINC2_M_freqs250_N11/ ZINC2_M_freqs250_N13/ ZINC2_M_N07/ ZINC2_M_N09/ ZINC2_M_N11/ ZINC2_M_N13/ ZINC2_M_stable/ ZINC2_M_stable_N07/ ZINC2_M_stable_N09/ ZINC2_M_stable_N11/ ZINC2_M_stable_N13/ 
+
+################ process/ZINC2_fromsites ################
+  newest mtime : 2026-03-26 17:17
+  calls.bcf    : 0
+  RefAlt whole : 5  (real=5 symlink=0)
+  RefAlt /founder (fromsites): 340
+  R.haps       : 0
+  scan dirs    : 
+  other files  : 
+  samples (60) : Rep01_W_F Rep01_W_M Rep01_Z_F Rep01_Z_M Rep02_W_F Rep02_W_M ...
+  => B-lines / ZINC2 (samples RepNN_W/Z_M/F)
+
+################ process/ZINC2_fromsites_test ################
+  newest mtime : 2026-03-26 17:40
+  calls.bcf    : 0
+  RefAlt whole : 0  (real=0 symlink=0)
+  RefAlt /founder (fromsites): 1
+  R.haps       : 0
+  scan dirs    : 
+  other files  : 
+
+################ process/ZINC_Hanson ################
+  newest mtime : 2026-03-28 09:19
+  calls.bcf    : 5
+  RefAlt whole : 5  (real=5 symlink=0)
+  RefAlt /founder (fromsites): 0
+  R.haps       : 11
+  scan dirs    : 
+  other files  : ZINC_Hanson/ ZINC_Hanson_v3/ 
+  samples (37) : C_5_2 C_6_1 C_4_1 C_6_2 C_12_1 C_5_1 ...
+  => A-lines / Hanson (samples C_x_y)
+
+################ process/ZINC_Hanson_v2 ################
+  newest mtime : 2026-03-01 08:08
+  calls.bcf    : 0
+  RefAlt whole : 5  (real=0 symlink=5)
+  RefAlt /founder (fromsites): 0
+  R.haps       : 10
+  scan dirs    : 
+  other files  : ZINC_Hanson/ ZINC_Hanson_freqs250/ ZINC_Hanson_stable/ 
+
