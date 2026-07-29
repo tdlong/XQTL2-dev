@@ -3,6 +3,19 @@
 Master record for the evaluation of XQTL2's founder-catalog SNP caller against the
 validated QUAL caller, on AGE_SY. Detail in `catalog_v6/NOTES.md`.
 
+## Data lineage (process/ folders)
+- `AGE_Aug13_24` — early **pilot, different raw data** (not an AGE_SY version; stands alone).
+- `AGE_SY` (50 samp) → `AGE_SY_v2` (74) → `AGE_SY_v3` (80 = 72 samples + 8 founders) — the
+  *same* experiment re-analyzed as replicates arrived (R1–R6 … → R7–R12). `v3` = the complete
+  **QUAL-caller baseline**; the earlier two are strictly superseded partials.
+- `AGE_SY_v3_size75k` — `v3` at a 75 kb haplotype window (symlinked v3 counts) — the finer scan.
+- `AGE_SY_v6_size75k` — same full dataset, the **new catalog caller** (validated to reproduce
+  v3; see the capstone below). The go-forward result.
+
+Go-forward: `AGE_SY_v6_size75k` (the new caller) + `AGE_Aug13_24` (pilot). The QUAL data
+(`v3`/`v3_size75k`) is regenerable from BAMs, and the validation record lives in git
+(`logs/AGE_SY/compare_v3_v6.out`, `logs/figures/`, `catalog_v6/NOTES.md`).
+
 ## Goal
 Decide whether the founder-catalog caller is trustworthy for pooled REF/ALT counting,
 and pick the catalog filters. Baseline = the validated QUAL caller.
