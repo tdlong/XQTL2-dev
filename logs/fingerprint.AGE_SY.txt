@@ -1,0 +1,55 @@
+################ process/AGE_SY ################
+  newest mtime : 2026-03-14 11:37
+  calls.bcf    : 5
+  RefAlt (top) : 5  (real=5 symlink=0)
+  RefAlt/founder (fromsites): 0
+  catalog layout: Catalog/=no  Calls/RefAlt=0
+  R.haps       : 10
+  scan dirs    : AGE_SY10_F AGE_SY10_M AGE_SY20_F AGE_SY20_M AGE_SY20_M_freqs250 AGE_SY20_M_freqs100 
+  other        : AGE_SY20_M_freqs100/ AGE_SY20_M_freqs250/ 
+  samples (50): AgeSY10_R1_M AgeSY20_R6_M AgeSY10_R6_M AgeSY10_R2_F AgeSY20_R2_F AgeSY20_R3_M Con_R4_M AgeSY20_R4_M ...
+
+################ process/AGE_SY_v2 ################
+  newest mtime : 2026-05-30 11:46
+  calls.bcf    : 5
+  RefAlt (top) : 5  (real=5 symlink=0)
+  RefAlt/founder (fromsites): 0
+  catalog layout: Catalog/=no  Calls/RefAlt=0
+  R.haps       : 10
+  scan dirs    : AGE_SY10_F AGE_SY10_M AGE_SY20_F AGE_SY20_M 
+  other        : 
+  samples (74): AgeSY10_R1_F AgeSY20_R1_F Con_R1_F AgeSY10_R1_M AgeSY20_R1_M Con_R1_M AgeSY10_R2_F AgeSY20_R2_F ...
+
+################ process/AGE_SY_v3 ################
+  newest mtime : 2026-07-20 16:58
+  calls.bcf    : 5
+  RefAlt (top) : 5  (real=5 symlink=0)
+  RefAlt/founder (fromsites): 0
+  catalog layout: Catalog/=no  Calls/RefAlt=0
+  R.haps       : 10
+  scan dirs    : AGE_SY10_F AGE_SY10_M AGE_SY20_F AGE_SY20_M 
+  other        : 
+  samples (80): AgeSY10_R1_F AgeSY10_R2_F AgeSY10_R3_F AgeSY10_R4_F AgeSY10_R5_F AgeSY10_R6_F AgeSY10_R7_F AgeSY10_R8_F ...
+
+################ process/AGE_SY_v3_size75k ################
+  newest mtime : 2026-07-15 17:17
+  calls.bcf    : 12
+  RefAlt (top) : 5  (real=0 symlink=5)
+  RefAlt/founder (fromsites): 0
+  catalog layout: Catalog/=no  Calls/RefAlt=0
+  R.haps       : 10
+  scan dirs    : AGE_SY10_F AGE_SY10_M AGE_SY20_F AGE_SY20_M 
+  other        : 
+  samples (80): AgeSY10_R1_F AgeSY10_R2_F AgeSY10_R3_F AgeSY10_R4_F AgeSY10_R5_F AgeSY10_R6_F AgeSY10_R7_F AgeSY10_R8_F ...
+
+################ process/AGE_SY_v6_size75k ################
+  newest mtime : 2026-07-28 17:07
+  calls.bcf    : 12
+  RefAlt (top) : 5  (real=0 symlink=5)
+  RefAlt/founder (fromsites): 0
+  catalog layout: Catalog/=yes  Calls/RefAlt=5
+  R.haps       : 10
+  scan dirs    : AGE_SY10_F AGE_SY10_M AGE_SY20_F AGE_SY20_M 
+  other        : 
+  samples (80): AB8 AgeSY10_R1_F AgeSY10_R1_M AgeSY10_R10_F AgeSY10_R10_M AgeSY10_R11_F AgeSY10_R11_M AgeSY10_R12_F ...
+
