@@ -49,3 +49,19 @@ check_cluster_state.out.txt
 # slurm* and *.out patterns above for anything under logs/. Prune old logs freely.
 !logs/
 !logs/**
+
+# ── universal (added by apply.sh) ──
+._*
+.Spotlight-V100
+.Trashes
+*.tmp
+*.swp
+.~lock*
+__pycache__/
+*.pyc
+node_modules/
+.quarto/
+
+# ── from setup-review.md (added by apply.sh) ──
+R.haps.chr2L.out.rds
+repro_error.tar.gz
