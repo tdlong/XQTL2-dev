@@ -65,3 +65,6 @@ node_modules/
 # ── from setup-review.md (added by apply.sh) ──
 R.haps.chr2L.out.rds
 repro_error.tar.gz
+
+# ── added: agent workspace ──
+.claude/
