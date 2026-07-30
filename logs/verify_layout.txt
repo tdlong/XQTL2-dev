@@ -1,0 +1,30 @@
+AGE_SY #28 layout verification — Thu Jul 30 16:44:22 PDT 2026
+  new (rebuilt): process/AGE_SY
+  old (baseline): process/AGE_SY_flatorg
+
+=== scan output — this is the verdict ===
+  IDENTICAL  AGE_SY10_F.scan.txt
+  IDENTICAL  AGE_SY10_M.scan.txt
+  IDENTICAL  AGE_SY20_F.scan.txt
+  IDENTICAL  AGE_SY20_M.scan.txt
+
+=== haplotypes (informational — .rds need not be byte-stable) ===
+  IDENTICAL  R.haps.chrX.out.rds
+  IDENTICAL  R.haps.chr2L.out.rds
+  IDENTICAL  R.haps.chr2R.out.rds
+  IDENTICAL  R.haps.chr3L.out.rds
+  IDENTICAL  R.haps.chr3R.out.rds
+
+=== layout: are the files where #28 says they should be? ===
+  OK         process/AGE_SY/Catalog/
+  OK         process/AGE_SY/Calls/
+  OK         process/AGE_SY/Haps/
+  OK         process/AGE_SY/Scans/
+  OK         process/AGE_SY/Scans/AGE_SY10_F/
+  OK         process/AGE_SY/Scans/AGE_SY10_M/
+  OK         process/AGE_SY/Scans/AGE_SY20_F/
+  OK         process/AGE_SY/Scans/AGE_SY20_M/
+
+RESULT: PASS — the #28 layout reproduces AGE_SY exactly.
+        Safe to delete the baseline:  rm -rf process/AGE_SY_flatorg
+        Report back on XQTL2 57042df / #28.

@@ -1,6 +1,0 @@
-Smoothing R²: 0.9838  (correction factor: 1.0165)
-Reading process/AGE_SY_v6_size75k/AGE_SY10_M/AGE_SY10_M.smooth.chrX.rds 
-Building arrays for chrX...
-Running Wald scan on chrX (4212 windows)...
-Writing process/AGE_SY_v6_size75k/AGE_SY10_M/AGE_SY10_M.scan.chrX.txt 
-Done.

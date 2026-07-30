@@ -1,6 +1,0 @@
-Smoothing R²: 0.9834  (correction factor: 1.0169)
-Reading process/AGE_SY_v6_size75k/AGE_SY10_F/AGE_SY10_F.smooth.chr3R.rds 
-Building arrays for chr3R...
-Running Wald scan on chr3R (6073 windows)...
-Writing process/AGE_SY_v6_size75k/AGE_SY10_F/AGE_SY10_F.scan.chr3R.txt 
-Done.
