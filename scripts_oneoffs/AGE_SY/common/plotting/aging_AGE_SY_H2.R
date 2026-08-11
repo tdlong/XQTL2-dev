@@ -10,10 +10,11 @@
 # Run from the XQTL2-dev repo ROOT, on the cluster (where process/AGE_SY is):
 #   module load R/4.2.2
 #   Rscript scripts_oneoffs/AGE_SY/common/plotting/aging_AGE_SY_H2.R
+# or submit it as a job with round3_v3_R12/plot_4scan_H2.sh.
 #
 # Output: figures/AGE_SY_4scan_CutlH2.png
 
-BASE <- Sys.getenv("SCAN_DIR", "process/AGE_SY")
+BASE <- "process/AGE_SY"   # to plot a different scan folder, edit this
 
 SCAN_FILES <- c(
   file.path(BASE, "AGE_SY10_F", "AGE_SY10_F.scan.txt"),
