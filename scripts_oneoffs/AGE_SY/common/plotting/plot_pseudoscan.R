@@ -19,6 +19,10 @@
 #
 # Optional override (dm6 defaults used if not set):
 #   HET_BOUNDS    data frame with columns chr, eu_start, eu_end
+#   Y_COL         scan column to plot (default "Wald_log10p"; e.g. "Cutl_H2")
+#   Y_LAB         y-axis label (default: -log10(P) Wald, or Y_COL if set)
+#   Y_FLOOR_ZERO  TRUE to clamp the y-axis at 0 (default TRUE for Wald_log10p,
+#                 FALSE for any other Y_COL)
 ###############################################################################
 
 library(tidyverse)
@@ -48,6 +52,13 @@ BASE_FONT <- fmt["font"]
 chr_order  <- c("chrX", "chr2L", "chr2R", "chr3L", "chr3R")
 chr_labels <- c(chrX = "X", chr2L = "2L", chr2R = "2R", chr3L = "3L", chr3R = "3R")
 
+# Which scan column goes on the y-axis. Scan files carry Wald_log10p, Falc_H2,
+# Cutl_H2; the Wald scan is the default so existing configs are unaffected.
+if (!exists("Y_COL")) Y_COL <- "Wald_log10p"
+if (!exists("Y_LAB"))
+  Y_LAB <- if (Y_COL == "Wald_log10p") expression(-log[10](italic(P)) ~ "Wald") else Y_COL
+if (!exists("Y_FLOOR_ZERO")) Y_FLOOR_ZERO <- (Y_COL == "Wald_log10p")
+
 if (!exists("HET_BOUNDS")) {
   # dm6 euchromatin boundaries
   # Source: Huynh et al. 2023 PLoS Genet 19:e1010439, Supplementary Table S2
@@ -74,7 +85,13 @@ scans_df <- map_dfr(seq_along(SCAN_FILES), function(i) {
     mutate(pos_mb = pos / 1e6, label = labels[i])
 }) %>%
   mutate(chr = factor(chr, levels = chr_order)) %>%
-  filter(!is.na(Wald_log10p), chr %in% chr_order)
+  filter(chr %in% chr_order)
+
+if (!Y_COL %in% names(scans_df))
+  stop("Column '", Y_COL, "' not in the scan files. Available: ",
+       paste(names(scans_df), collapse = ", "))
+
+scans_df <- scans_df %>% filter(!is.na(.data[[Y_COL]]))
 
 if (nrow(scans_df) == 0) stop("No scan data loaded — check SCAN_FILES paths.")
 
@@ -101,7 +118,7 @@ het_rects <- HET_BOUNDS %>%
 # ── Plot ──────────────────────────────────────────────────────────────────────
 
 p <- ggplot(scans_df,
-            aes(x = pos_mb, y = Wald_log10p, colour = label, group = label)) +
+            aes(x = pos_mb, y = .data[[Y_COL]], colour = label, group = label)) +
   geom_rect(data = het_rects,
             aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
             fill = "grey85", alpha = 0.5, colour = NA, inherit.aes = FALSE) +
@@ -114,8 +131,10 @@ p <- ggplot(scans_df,
             inherit.aes = FALSE) +
   scale_colour_manual(values = colour_map, name = NULL) +
   scale_x_continuous(expand = expansion(0), minor_breaks = seq(0, 40, by = 1)) +
-  scale_y_continuous(limits = c(0, NA), expand = expansion(mult = c(0, 0.15))) +
-  labs(x = "Position (Mb)", y = expression(-log[10](italic(P)) ~ "Wald")) +
+  scale_y_continuous(limits = if (Y_FLOOR_ZERO) c(0, NA) else c(NA, NA),
+                     expand = expansion(mult = if (Y_FLOOR_ZERO) c(0, 0.15)
+                                               else c(0.05, 0.15))) +
+  labs(x = "Position (Mb)", y = Y_LAB) +
   theme_classic(base_size = BASE_FONT) +
   theme(
     legend.position        = "none",
@@ -135,23 +154,29 @@ if (!is.null(THRESHOLD)) {
 # ── Peak labels ───────────────────────────────────────────────────────────────
 
 if (!is.null(PEAKS) && nrow(PEAKS) > 0) {
+  # Marker/label offsets: the Wald axis keeps its original fixed offsets; any
+  # other column gets offsets scaled to its own range.
+  y_range <- diff(range(scans_df[[Y_COL]], na.rm = TRUE))
+  off_pt  <- if (Y_COL == "Wald_log10p") 1.5 else 0.04 * y_range
+  off_txt <- if (Y_COL == "Wald_log10p") 4.0 else 0.10 * y_range
+
   peaks_plot <- PEAKS %>%
     mutate(chr = factor(chr, levels = chr_order)) %>%
     rowwise() %>%
-    mutate(Wald_log10p = {
+    mutate(y_peak = {
       s <- scans_df %>% filter(chr == .data$chr, label == labels[1])
-      if (nrow(s) == 0) THRESHOLD + 2
-      else s$Wald_log10p[which.min(abs(s$pos_mb - pos_mb))]
+      if (nrow(s) == 0) max(scans_df[[Y_COL]], na.rm = TRUE)
+      else s[[Y_COL]][which.min(abs(s$pos_mb - pos_mb))]
     }) %>%
     ungroup()
 
   p <- p +
     geom_point(data = peaks_plot,
-               aes(x = pos_mb, y = Wald_log10p + 1.5),
+               aes(x = pos_mb, y = y_peak + off_pt),
                shape = 25, size = 1.5, fill = NA,
                colour = "black", stroke = 0.8, inherit.aes = FALSE) +
     geom_text(data = peaks_plot,
-              aes(x = pos_mb, y = Wald_log10p + 4, label = label),
+              aes(x = pos_mb, y = y_peak + off_txt, label = label),
               size = BASE_FONT * 0.25, colour = "black",
               hjust = 0.5, inherit.aes = FALSE)
 }
