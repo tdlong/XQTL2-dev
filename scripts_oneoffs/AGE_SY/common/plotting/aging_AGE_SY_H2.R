@@ -14,7 +14,7 @@
 #
 # Output: figures/AGE_SY_4scan_CutlH2.png
 
-BASE <- "process/AGE_SY"   # to plot a different scan folder, edit this
+BASE <- "process/AGE_SY/Scans"   # to plot a different scan folder, edit this
 
 SCAN_FILES <- c(
   file.path(BASE, "AGE_SY10_F", "AGE_SY10_F.scan.txt"),
@@ -35,6 +35,6 @@ Y_LAB         <- expression("Cutler" ~ H^2)
 Y_FLOOR_ZERO  <- FALSE
 
 dir.create("figures", showWarnings = FALSE)
-OUT_FILE <- file.path("figures", paste0(basename(BASE), "_4scan_CutlH2.png"))
+OUT_FILE <- "figures/AGE_SY_4scan_CutlH2.png"
 
 source("scripts_oneoffs/AGE_SY/common/plotting/plot_pseudoscan.R")
