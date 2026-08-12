@@ -88,13 +88,22 @@ partition <- paired %>%
 # Adjacent windows are not independent -- haplotypes are smoothed at 100 kb and
 # linkage correlates neighbours -- so naive standard errors would be far too
 # small. Resample contiguous blocks of windows within chromosome instead.
-BLOCK <- 50L   # windows per block (~3.75 Mb at 75 kb)
-B     <- 400L
+# Block length is set in BASE PAIRS, not in windows: windows slide in 5 kb steps
+# while the haplotype window is 75 kb and the smoothing 100 kb, so neighbours
+# overlap heavily and a block counted in windows would be far shorter than the
+# correlation length -- giving intervals that are much too narrow.
+BLOCK_BP <- 2e6
+B        <- 400L
+
+step_bp <- paired %>% distinct(chr, pos) %>% arrange(chr, pos) %>%
+  group_by(chr) %>% summarise(s = median(diff(pos)), .groups = "drop") %>%
+  pull(s) %>% median()
+cat(sprintf("Window step %.0f kb; bootstrap blocks of %.1f Mb (%.0f windows)\n",
+            step_bp / 1e3, BLOCK_BP / 1e6, BLOCK_BP / step_bp))
 
 boot_ids <- paired %>%
   distinct(chr, pos) %>% arrange(chr, pos) %>%
-  group_by(chr) %>% mutate(block = paste0(chr, "_", (row_number() - 1L) %/% BLOCK)) %>%
-  ungroup()
+  mutate(block = paste0(chr, "_", pos %/% BLOCK_BP))
 
 paired_b <- paired %>% left_join(boot_ids, by = c("chr", "pos"))
 blocks   <- unique(paired_b$block)
@@ -138,8 +147,8 @@ partition %>%
 
 cat("\nreliability = cor(odd, even) for that contrast: the share of its spread\n")
 cat("that reproduces across independent halves. Near 0 means noise.\n")
-cat(sprintf("Intervals are 95%% from a moving-block bootstrap (%d blocks of %d\n",
-            length(blocks), BLOCK))
+cat(sprintf("Intervals are 95%% from a moving-block bootstrap (%d blocks of %.1f Mb\n",
+            length(blocks), BLOCK_BP/1e6))
 cat("windows, resampled within chromosome), which respects the fact that\n")
 cat("neighbouring windows are correlated.\n")
 if (any(!partition$real))
