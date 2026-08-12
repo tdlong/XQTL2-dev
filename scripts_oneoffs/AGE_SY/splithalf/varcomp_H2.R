@@ -99,6 +99,8 @@ HAVE_BIAS <- "Cutl_H2_bias" %in% names(long) && !all(is.na(long$Cutl_H2_bias))
 CLAMP_MAX <- 0.15   # above this the #34 bias is not trustworthy
 WALD_NULL <- 2      # Wald below this = frequencies did not move = true H2 ~ 0
 SMOOTH_BP <- 5e5    # rolling mean applied to the plotted curves (0 = none)
+PLOT_TERMS <- c("main", "sex", "diet")   # sex:diet is flat at zero genome-wide;
+                                         # add it back here to see for yourself
 if (HAVE_BIAS) {
   cat(sprintf("Subtracting the reported H2 floor: median bias %.3f against median H2 %.3f\n",
               median(long$Cutl_H2_bias, na.rm = TRUE), median(long$Cutl_H2, na.rm = TRUE)))
@@ -264,7 +266,8 @@ plot_df <- vc %>%
   summarise(main = mean(mainH2), sex = mean(sexH2), diet = mean(dietH2),
             `sex:diet` = mean(intH2), H2 = mean(H2), .groups = "drop") %>%
   pivot_longer(all_of(TERMS), names_to = "term", values_to = "pct") %>%
-  mutate(term = factor(term, levels = TERMS), pos_mb = bin / 1e6)
+  filter(term %in% PLOT_TERMS) %>%
+  mutate(term = factor(term, levels = PLOT_TERMS), pos_mb = bin / 1e6)
 
 # Rolling mean over the binned curves. Partial windows at the ends -- filling
 # the edges with the raw value instead puts an unsmoothed point next to smoothed
@@ -334,6 +337,12 @@ cat("\nWrote:", FIG, "\n")
 # Rankings in H2 UNITS, not percentages: once the floor is removed the total is
 # near zero over most of the genome, so a percentage of it is meaningless
 # (23,000% and worse). Percentages are only sane where H2 is well above zero.
+for (tm in setdiff(TERMS, PLOT_TERMS)) {
+  col <- if (tm == "sex:diet") vc$intH2 else vc[[paste0(tm, "H2")]]
+  cat(sprintf("\nnot plotted -- %s: median %.3f, 95th pct %.3f, max %.3f, below the replicate error at %.0f%% of windows\n",
+              tm, median(col), quantile(col, 0.95), max(col), 100*mean(col < 0)))
+}
+
 cat("\nLargest sex terms (H2 percentage points):\n")
 vc %>% slice_max(sexH2, n = 5) %>%
   transmute(chr, Mb = round(pos/1e6, 2), H2 = round(H2, 2), wald = round(wald_max, 1),
