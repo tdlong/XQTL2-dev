@@ -68,6 +68,31 @@ locally, which is the point:
 scp hpc3:<path>/process/AGE_SY_splithalf/AGE_SY_splithalf_H2.txt.gz .
 ```
 
+## Analysis (local, once the long file is down)
+
+```bash
+Rscript scripts_oneoffs/AGE_SY/splithalf/partition_H2.R        # the numbers
+Rscript scripts_oneoffs/AGE_SY/splithalf/plot_H2_components.R  # the picture
+```
+
+`partition_H2.R` reports, per term, the signal variance, the noise variance, the
+odd-even reliability with a block-bootstrap interval, and the share of signal.
+
+`plot_H2_components.R` splits the heritability at each position into its mean,
+sex, diet and sex:diet components: the total signal along the genome, and
+beneath it the share attributable to each term. Two things make it honest —
+
+- each component is `contrast_odd * contrast_even`, not the square. A square is
+  noise-inflated, so at a background window all four squares are noise of
+  similar size and the stack shows a tidy 25/25/25/25 that looks like a result.
+  The product's noise cancels in expectation, so background sits at zero.
+- shares are drawn only where the total clears `median + 3 MAD`. A quantile cut
+  admits noise, and noise over noise fills the panel with vivid nonsense.
+
+Both were checked on synthetic data with a sex effect planted on chrX and an
+interaction on chr3L: the components peak at 0.0395 and 0.0532 at the planted
+positions, against 0.0005-0.0007 for the two terms with nothing in them.
+
 ## Depends on XQTL2 #32
 
 The design files keep their real `REP` values — the odd file is `1,3,5,7,9,11`.
