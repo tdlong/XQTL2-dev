@@ -98,6 +98,7 @@ long <- read.table(IN, header = TRUE, sep = "\t") %>% as_tibble()
 HAVE_BIAS <- "Cutl_H2_bias" %in% names(long) && !all(is.na(long$Cutl_H2_bias))
 CLAMP_MAX <- 0.15   # above this the #34 bias is not trustworthy
 WALD_NULL <- 2      # Wald below this = frequencies did not move = true H2 ~ 0
+SMOOTH_BP <- 5e5    # rolling mean applied to the plotted curves (0 = none)
 if (HAVE_BIAS) {
   cat(sprintf("Subtracting the reported H2 floor: median bias %.3f against median H2 %.3f\n",
               median(long$Cutl_H2_bias, na.rm = TRUE), median(long$Cutl_H2, na.rm = TRUE)))
@@ -264,6 +265,20 @@ plot_df <- vc %>%
             `sex:diet` = mean(intH2), H2 = mean(H2), .groups = "drop") %>%
   pivot_longer(all_of(TERMS), names_to = "term", values_to = "pct") %>%
   mutate(term = factor(term, levels = TERMS), pos_mb = bin / 1e6)
+
+# Rolling mean over the binned curves. Partial windows at the ends -- filling
+# the edges with the raw value instead puts an unsmoothed point next to smoothed
+# ones and spikes every chromosome end.
+if (SMOOTH_BP > 0) {
+  k <- max(1L, as.integer(round(SMOOTH_BP / BIN)))
+  roll <- function(x, k) {
+    n <- length(x); h <- (k - 1L) %/% 2L
+    vapply(seq_len(n), function(i) mean(x[max(1L, i-h):min(n, i+h)], na.rm = TRUE), numeric(1))
+  }
+  plot_df <- plot_df %>% arrange(chr, term, pos_mb) %>%
+    group_by(chr, term) %>% mutate(pct = roll(pct, k)) %>% ungroup()
+  cat(sprintf("\ncurves smoothed with a %.0f kb rolling mean (%d bins)\n", SMOOTH_BP/1e3, k))
+}
 
 
 chr_lab_df <- plot_df %>% distinct(chr) %>% mutate(lab = chr_labels[as.character(chr)])
