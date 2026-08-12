@@ -249,13 +249,16 @@ print(p)
 invisible(dev.off())
 cat("\nWrote:", FIG, "\n")
 
-cat("\nWhere sex accounts for the most:\n")
-vc %>% slice_max(pct_sex, n = 5) %>%
-  transmute(chr, pos_mb = round(pos/1e6, 2), H2 = round(H2, 2),
-            `% sex` = round(pct_sex, 2), `% diet` = round(pct_diet, 2)) %>%
+# Rankings in H2 UNITS, not percentages: once the floor is removed the total is
+# near zero over most of the genome, so a percentage of it is meaningless
+# (23,000% and worse). Percentages are only sane where H2 is well above zero.
+cat("\nLargest sex terms (H2 percentage points):\n")
+vc %>% slice_max(sexH2, n = 5) %>%
+  transmute(chr, Mb = round(pos/1e6, 2), H2 = round(H2, 2), wald = round(wald_max, 1),
+            mainH2 = round(mainH2, 2), sexH2 = round(sexH2, 3), dietH2 = round(dietH2, 3)) %>%
   as.data.frame() %>% print(row.names = FALSE)
-cat("\nWhere diet accounts for the most:\n")
-vc %>% slice_max(pct_diet, n = 5) %>%
-  transmute(chr, pos_mb = round(pos/1e6, 2), H2 = round(H2, 2),
-            `% sex` = round(pct_sex, 2), `% diet` = round(pct_diet, 2)) %>%
+cat("\nLargest diet terms (H2 percentage points):\n")
+vc %>% slice_max(dietH2, n = 5) %>%
+  transmute(chr, Mb = round(pos/1e6, 2), H2 = round(H2, 2), wald = round(wald_max, 1),
+            mainH2 = round(mainH2, 2), sexH2 = round(sexH2, 3), dietH2 = round(dietH2, 3)) %>%
   as.data.frame() %>% print(row.names = FALSE)
