@@ -1,5 +1,11 @@
 # varcomp_H2.R — partition Cutler H2 at each position.
 #
+# UNITS: H2 is a PERCENTAGE. Heritability() multiplies by 200 (= 2 x 100), so a
+# reported 0.7 means 0.7% of the variance at that window, and the reported bias
+# carries the same factor. For a polygenic trait that is the expected scale per
+# 75 kb window; the chr3L peak at 4-5.5% is the outlier. All the terms below are
+# therefore in percentage points, not proportions.
+#
 # H2 is the response. Eight measures per position: 4 treatments x 2 halves, the
 # halves being pure replicates. The uncorrected sum of squares decomposes as
 #
@@ -215,7 +221,7 @@ p <- ggplot(plot_df, aes(pos_mb, pct, colour = term)) +
   scale_colour_manual(values = TERM_COLS, name = NULL) +
   scale_x_continuous(expand = expansion(0), minor_breaks = seq(0, 40, 1)) +
   labs(x = "Position (Mb)",
-       y = expression("Cutler" ~ H^2 ~ "units: deviation, replicate error subtracted"),
+       y = expression("Cutler" ~ H^2 ~ "(percentage points): deviation, replicate error subtracted"),
        title = if (HAVE_BIAS)
            "Variance in H2 attributable to sex and to diet, whole genome"
          else
