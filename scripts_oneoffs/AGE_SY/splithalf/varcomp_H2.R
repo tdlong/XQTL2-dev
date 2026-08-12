@@ -51,6 +51,29 @@ POOL_BP <- 0
 # So the partition is only reported where at least one treatment shows a real
 # frequency change. 6 is the threshold used on the 4-scan Wald figure.
 WALD_MIN <- 6
+#
+# How precisely is H2 measured, as a function of Wald? Binning on ONE half's
+# Wald and reading the other half's H2 (binning on the mean of both conditions
+# on a collider and manufactures negative correlations), and counting
+# INDEPENDENT REGIONS rather than windows -- windows step 5 kb under a 75 kb
+# haplotype window, so window counts are inflated ~50x:
+#
+#   Wald    regions  distinct Mb   |odd-even|   rel err
+#   <2        414       110          0.169       31%
+#   4-6       124        80          0.355       42%
+#   10-15      60        39          0.587       39%
+#   15-25      23        23          0.864       55%
+#   25-40       8         3          0.551       22%
+#   40-60       6         2          0.246        6%
+#   >60         3         2          0.057        1%
+#
+# Over the range with enough independent regions to support a statement
+# (Wald < 25), relative error is 30-55% and does NOT improve with Wald;
+# absolute error tracks H2, which is the multiplicative-error pattern. The
+# apparent collapse above 25 is not a trend: every window there is chr3L 8-9 Mb,
+# almost all of it male. So Wald > 6 marks where H2 MEANS something, not where
+# it is measured well. In this experiment H2 is imprecise nearly everywhere
+# except the chr3L peak.
 
 TERMS     <- c("sex", "diet", "sex:diet")
 TERM_COLS <- c(sex = "#1F78B4", diet = "#33A02C", `sex:diet` = "#E31A1C")
