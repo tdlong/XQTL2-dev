@@ -213,7 +213,10 @@ p <- ggplot(plot_df, aes(pos_mb, pct, colour = term)) +
   scale_x_continuous(expand = expansion(0), minor_breaks = seq(0, 40, 1)) +
   labs(x = "Position (Mb)",
        y = expression("variance in Cutler" ~ H^2 ~ ", replicate error subtracted"),
-       title = "Variance in H2 attributable to sex and to diet, whole genome",
+       title = if (HAVE_BIAS)
+           "Variance in H2 attributable to sex and to diet, whole genome"
+         else
+           "PRELIMINARY - H2 floor NOT subtracted, do not interpret (see XQTL2 #34)",
        subtitle = paste0("Each term is MS - MS_rep, so where nothing is happening it sits at zero ",
                          "by construction -- no masking needed.\n",
                          "Grey ticks below the axis mark where some treatment clears Wald > ",
