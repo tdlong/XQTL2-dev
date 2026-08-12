@@ -179,34 +179,45 @@ report <- function(df, label) {
 report(vc %>% filter(chr == "chr3L", pos == 9355000), "chr3L 9,355,000 (peak)")
 
 # ── the picture: how big are sex and diet relative to the whole, by position ──
+# Plot the ABSOLUTE terms, whole genome, no mask. Each is MS - MS_rep, so where
+# nothing is happening it sits at zero by construction -- the subtraction does
+# the masking. Percentages cannot be plotted this way: a percentage of a tiny
+# total is still a percentage, which is what forced a Wald cut before.
 BIN <- 1e5
 plot_df <- vc %>%
-  filter(wald_max > WALD_MIN) %>%     # only where the frequencies actually moved
   mutate(chr = factor(chr, levels = chr_order), bin = (pos %/% BIN) * BIN) %>%
   filter(!is.na(chr)) %>%
   group_by(chr, bin) %>%
-  summarise(sex = mean(pct_sex), diet = mean(pct_diet),
-            `sex:diet` = mean(pct_int), H2 = mean(H2), .groups = "drop") %>%
+  summarise(sex = mean(sex), diet = mean(diet), `sex:diet` = mean(`sex:diet`),
+            H2 = mean(H2), wald_max = max(wald_max), .groups = "drop") %>%
   pivot_longer(all_of(TERMS), names_to = "term", values_to = "pct") %>%
   mutate(term = factor(term, levels = TERMS), pos_mb = bin / 1e6)
 
+wald_bar <- plot_df %>% distinct(chr, pos_mb, wald_max) %>% filter(wald_max > WALD_MIN)
+
 chr_lab_df <- plot_df %>% distinct(chr) %>% mutate(lab = chr_labels[as.character(chr)])
 
+ylo <- min(plot_df$pct); yhi <- max(plot_df$pct)
 p <- ggplot(plot_df, aes(pos_mb, pct, colour = term)) +
-  geom_hline(yintercept = 0, colour = "grey60", linewidth = 0.3) +
-  geom_point(size = 0.35, alpha = 0.7) +
+  geom_rect(data = wald_bar,
+            aes(xmin = pos_mb - 0.05, xmax = pos_mb + 0.05,
+                ymin = ylo - 0.08*(yhi-ylo), ymax = ylo - 0.01*(yhi-ylo)),
+            fill = "grey45", colour = NA, inherit.aes = FALSE) +
+  geom_hline(yintercept = 0, colour = "grey55", linewidth = 0.3) +
+  geom_line(linewidth = 0.4) +
   facet_wrap(~ chr, ncol = 1, scales = "free_x") +
   geom_text(data = chr_lab_df, aes(x = Inf, y = Inf, label = lab),
             hjust = 1.3, vjust = 1.4, size = 3, colour = "grey20",
             fontface = "bold", inherit.aes = FALSE) +
   scale_colour_manual(values = TERM_COLS, name = NULL) +
   scale_x_continuous(expand = expansion(0), minor_breaks = seq(0, 40, 1)) +
-  labs(x = "Position (Mb)", y = "% of the H2 partition at that position",
-       title = "How much of the heritability is attributable to sex and to diet, where the haplotype frequencies actually moved",
-       subtitle = paste(paste0("Only windows with Wald > ", WALD_MIN, " in at least one treatment: elsewhere H2 is computed from frequency changes already called noise.\n"),
-                        "Percent of n*ybar^2 + sex + diet + sex:diet, each corrected by the replicate error.",
-                        "The remainder is the main term.\nThe main term is inflated -- the H2 floor sits in it",
-                        "-- but these three are contrasts between treatments, so the floor cancels.")) +
+  labs(x = "Position (Mb)",
+       y = expression("variance in Cutler" ~ H^2 ~ ", replicate error subtracted"),
+       title = "Variance in H2 attributable to sex and to diet, whole genome",
+       subtitle = paste0("Each term is MS - MS_rep, so where nothing is happening it sits at zero ",
+                         "by construction -- no masking needed.\n",
+                         "Grey ticks below the axis mark where some treatment clears Wald > ",
+                         WALD_MIN, ", i.e. where the frequencies demonstrably moved.")) +
   theme_classic(base_size = 9) +
   theme(legend.position = "top",
         plot.title = element_text(size = 9, face = "bold"),
