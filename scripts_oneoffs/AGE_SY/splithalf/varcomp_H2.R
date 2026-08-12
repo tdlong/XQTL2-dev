@@ -45,6 +45,13 @@ OUT  <- "process/AGE_SY_splithalf/H2_varcomp_by_window.txt.gz"
 FIG  <- "figures/AGE_SY_H2_varcomp.png"
 POOL_BP <- 0
 
+# Wald tests whether the haplotype frequencies changed at all. Where it is not
+# significant, H2 is computed from differences we have already called noise --
+# and because H2 squares those differences, noise still yields a positive H2.
+# So the partition is only reported where at least one treatment shows a real
+# frequency change. 6 is the threshold used on the 4-scan Wald figure.
+WALD_MIN <- 6
+
 TERMS     <- c("sex", "diet", "sex:diet")
 TERM_COLS <- c(sex = "#1F78B4", diet = "#33A02C", `sex:diet` = "#E31A1C")
 chr_order  <- c("chrX", "chr2L", "chr2R", "chr3L", "chr3R")
@@ -74,14 +81,25 @@ if (HAVE_BIAS) {
   long <- long %>% mutate(H2v = Cutl_H2)
 }
 
+# Strongest frequency change at each window, across the four treatments.
+wald_max <- long %>%
+  group_by(chr, pos, sex, sugar) %>%
+  summarise(w = mean(Wald_log10p), .groups = "drop") %>%
+  group_by(chr, pos) %>% summarise(wald_max = max(w), .groups = "drop")
+
 w <- long %>%
   select(chr, pos, sex, sugar, half, H2v) %>%
   unite("cell", sugar, sex) %>%
   pivot_wider(names_from = c(cell, half), values_from = H2v, names_glue = "{cell}_{half}") %>%
-  drop_na()
+  drop_na() %>%
+  left_join(wald_max, by = c("chr", "pos"))
+
+cat(sprintf("Windows with Wald > %g in at least one treatment: %d of %d (%.1f%%)\n",
+            WALD_MIN, sum(w$wald_max > WALD_MIN), nrow(w),
+            100 * mean(w$wald_max > WALD_MIN)))
 
 vc <- w %>% transmute(
-  chr, pos,
+  chr, pos, wald_max,
   a  = (SY10_F_odd + SY10_F_even) / 2,      # cell means
   b  = (SY20_F_odd + SY20_F_even) / 2,
   cc = (SY10_M_odd + SY10_M_even) / 2,
@@ -112,8 +130,8 @@ vc <- vc %>%
          pct_diet = 100 * diet / tot, pct_int = 100 * `sex:diet` / tot,
          H2 = ybar)
 
-write.table(vc %>% select(chr, pos, H2, ss_main, ss_sex, ss_diet, ss_int, ss_rep,
-                          ms_rep, main, sex, diet, `sex:diet`,
+write.table(vc %>% select(chr, pos, wald_max, H2, ss_main, ss_sex, ss_diet, ss_int,
+                          ss_rep, ms_rep, main, sex, diet, `sex:diet`,
                           pct_main, pct_sex, pct_diet, pct_int),
             gzfile(OUT), row.names = FALSE, quote = FALSE, sep = "\t")
 cat("Wrote:", OUT, "\n")
@@ -140,6 +158,7 @@ report(vc %>% filter(chr == "chr3L", pos == 9355000), "chr3L 9,355,000 (peak)")
 # ── the picture: how big are sex and diet relative to the whole, by position ──
 BIN <- 1e5
 plot_df <- vc %>%
+  filter(wald_max > WALD_MIN) %>%     # only where the frequencies actually moved
   mutate(chr = factor(chr, levels = chr_order), bin = (pos %/% BIN) * BIN) %>%
   filter(!is.na(chr)) %>%
   group_by(chr, bin) %>%
@@ -152,7 +171,7 @@ chr_lab_df <- plot_df %>% distinct(chr) %>% mutate(lab = chr_labels[as.character
 
 p <- ggplot(plot_df, aes(pos_mb, pct, colour = term)) +
   geom_hline(yintercept = 0, colour = "grey60", linewidth = 0.3) +
-  geom_line(linewidth = 0.45) +
+  geom_point(size = 0.35, alpha = 0.7) +
   facet_wrap(~ chr, ncol = 1, scales = "free_x") +
   geom_text(data = chr_lab_df, aes(x = Inf, y = Inf, label = lab),
             hjust = 1.3, vjust = 1.4, size = 3, colour = "grey20",
@@ -160,8 +179,9 @@ p <- ggplot(plot_df, aes(pos_mb, pct, colour = term)) +
   scale_colour_manual(values = TERM_COLS, name = NULL) +
   scale_x_continuous(expand = expansion(0), minor_breaks = seq(0, 40, 1)) +
   labs(x = "Position (Mb)", y = "% of the H2 partition at that position",
-       title = "How much of the heritability at each position is attributable to sex and to diet",
-       subtitle = paste("Percent of n*ybar^2 + sex + diet + sex:diet, each corrected by the replicate error.",
+       title = "How much of the heritability is attributable to sex and to diet, where the haplotype frequencies actually moved",
+       subtitle = paste(paste0("Only windows with Wald > ", WALD_MIN, " in at least one treatment: elsewhere H2 is computed from frequency changes already called noise.\n"),
+                        "Percent of n*ybar^2 + sex + diet + sex:diet, each corrected by the replicate error.",
                         "The remainder is the main term.\nThe main term is inflated -- the H2 floor sits in it",
                         "-- but these three are contrasts between treatments, so the floor cancels.")) +
   theme_classic(base_size = 9) +
