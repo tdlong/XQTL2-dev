@@ -13,7 +13,9 @@
 #
 # with, for this balanced design (a = b = 2 levels, n = 2 replicates per cell):
 #
-#   n*ybar^2      = 8 * ybar^2                                    1 df
+#   n*ybar^2      = 8 * ybar^2      <- correction for the grand mean, NOT a
+#                                      component: it is H2 itself. The main
+#                                      effects of this design are sex and diet.
 #   SS_sex        = 4 * sum_s (ybar_s - ybar)^2                    1 df
 #   SS_diet       = 4 * sum_d (ybar_d - ybar)^2                    1 df
 #   SS_sex:diet   = 2 * sum_sd (ybar_sd - ybar_s - ybar_d + ybar)^2  1 df
@@ -152,9 +154,10 @@ vc <- if (POOL_BP > 0) {
 
 # MS = SS for the 1 df terms; subtract the pure error from each
 vc <- vc %>%
-  mutate(main = ss_main - ms_rep, sex = ss_sex - ms_rep,
+  mutate(H2v_level = ybar,
+         sex = ss_sex - ms_rep,
          diet = ss_diet - ms_rep, `sex:diet` = ss_int - ms_rep,
-         tot  = main + sex + diet + `sex:diet`,
+         tot  = sex + diet + `sex:diet`,
          # Back to H2 UNITS (percentage points). Every term satisfies
          # SS = 8*deviation^2, so the deviation is sqrt(SS/8) -- comparable to the
          # four treatment curves, which sums of squares are not.
@@ -167,33 +170,36 @@ vc <- vc %>%
          sexH2  = sign(sex)        * sqrt(abs(sex) / 8),
          dietH2 = sign(diet)       * sqrt(abs(diet) / 8),
          intH2  = sign(`sex:diet`) * sqrt(abs(`sex:diet`) / 8),
-         mainH2 = sign(main)       * sqrt(abs(main) / 8),
          dir_sex  = sign(M_ - F_),      # +1 male higher
          dir_diet = sign(S20 - S10),    # +1 SY20 higher
-         pct_main = 100 * main / tot, pct_sex = 100 * sex / tot,
-         pct_diet = 100 * diet / tot, pct_int = 100 * `sex:diet` / tot,
+         # each component relative to the H2 at that window: "how big is the
+         # sex effect compared with the heritability here"
+         rel_sex = sexH2 / H2v_level, rel_diet = dietH2 / H2v_level,
+         rel_int = intH2 / H2v_level,
          H2 = ybar)
 
 write.table(vc %>% select(chr, pos, wald_max, H2, ss_main, ss_sex, ss_diet, ss_int,
-                          ss_rep, ms_rep, main, sex, diet, `sex:diet`,
-                          pct_main, pct_sex, pct_diet, pct_int,
-                          mainH2, sexH2, dietH2, intH2, dir_sex, dir_diet),
+                          ss_rep, ms_rep, sex, diet, `sex:diet`,
+                          sexH2, dietH2, intH2, rel_sex, rel_diet, rel_int,
+                          dir_sex, dir_diet),
             gzfile(OUT), row.names = FALSE, quote = FALSE, sep = "\t")
 cat("Wrote:", OUT, "\n")
 cat(if (POOL_BP > 0) sprintf("MS_rep pooled over %.0f kb\n", POOL_BP/1e3)
     else "MS_rep taken per window (4 df)\n")
 
 report <- function(df, label) {
-  s <- df %>% summarise(across(c(H2, ss_main, ss_sex, ss_diet, ss_int, ss_rep,
-                                 ms_rep, main, sex, diet, `sex:diet`), mean))
-  cat("\n", label, "   H2 = ", round(s$H2, 3), "   MS_rep = ", round(s$ms_rep, 4), "\n", sep = "")
-  tibble(term = c("main", "sex", "diet", "sex:diet", "rep"),
-         df   = c(1, 1, 1, 1, 4),
-         SS   = c(s$ss_main, s$ss_sex, s$ss_diet, s$ss_int, s$ss_rep)) %>%
+  s <- df %>% summarise(across(c(H2, ss_sex, ss_diet, ss_int, ss_rep,
+                                 ms_rep, sex, diet, `sex:diet`,
+                                 sexH2, dietH2, intH2), mean))
+  cat("\n", label, "   H2 (floor removed) = ", round(s$H2, 3),
+      "   MS_rep = ", round(s$ms_rep, 4), "\n", sep = "")
+  tibble(term = c("sex", "diet", "sex:diet", "rep"),
+         df   = c(1, 1, 1, 4),
+         SS   = c(s$ss_sex, s$ss_diet, s$ss_int, s$ss_rep)) %>%
     mutate(MS = SS / df,
            `MS-MSrep` = ifelse(term == "rep", NA, MS - s$ms_rep),
-           `%` = ifelse(term == "rep", NA,
-                        100 * `MS-MSrep` / (s$main + s$sex + s$diet + s$`sex:diet`)),
+           `H2 units` = c(s$sexH2, s$dietH2, s$intH2, NA),
+           `vs H2 here` = round(c(s$sexH2, s$dietH2, s$intH2, NA) / s$H2, 3),
            across(where(is.numeric), ~ round(.x, 4))) %>%
     as.data.frame() %>% print(row.names = FALSE)
 }
@@ -255,10 +261,12 @@ cat("\nWrote:", FIG, "\n")
 cat("\nLargest sex terms (H2 percentage points):\n")
 vc %>% slice_max(sexH2, n = 5) %>%
   transmute(chr, Mb = round(pos/1e6, 2), H2 = round(H2, 2), wald = round(wald_max, 1),
-            mainH2 = round(mainH2, 2), sexH2 = round(sexH2, 3), dietH2 = round(dietH2, 3)) %>%
+            sexH2 = round(sexH2, 3), dietH2 = round(dietH2, 3),
+            `sex/H2` = round(rel_sex, 2)) %>%
   as.data.frame() %>% print(row.names = FALSE)
 cat("\nLargest diet terms (H2 percentage points):\n")
 vc %>% slice_max(dietH2, n = 5) %>%
   transmute(chr, Mb = round(pos/1e6, 2), H2 = round(H2, 2), wald = round(wald_max, 1),
-            mainH2 = round(mainH2, 2), sexH2 = round(sexH2, 3), dietH2 = round(dietH2, 3)) %>%
+            sexH2 = round(sexH2, 3), dietH2 = round(dietH2, 3),
+            `sex/H2` = round(rel_sex, 2)) %>%
   as.data.frame() %>% print(row.names = FALSE)
