@@ -104,6 +104,13 @@ report <- function(df, label) {
 report(vc %>% filter(chr == "chr3L", pos > 9.3e6, pos < 9.5e6), "chr3L 9.3-9.5 Mb")
 report(vc, "genome-wide average")
 
+# ── F tests, so "sex does not matter here" can be said rather than eyeballed ──
+vc <- vc %>%
+  mutate(F_sex  = ss_sex  / ms_e, F_diet = ss_diet / ms_e, F_int = ss_int / ms_e,
+         p_sex  = pf(F_sex,  1, 4, lower.tail = FALSE),
+         p_diet = pf(F_diet, 1, 4, lower.tail = FALSE),
+         p_int  = pf(F_int,  1, 4, lower.tail = FALSE))
+
 BIN <- 2e5
 stacked <- vc %>%
   mutate(chr = factor(chr, levels = chr_order), bin = (pos %/% BIN) * BIN) %>%
@@ -116,22 +123,65 @@ stacked <- vc %>%
 
 chr_lab_df <- stacked %>% distinct(chr) %>% mutate(lab = chr_labels[as.character(chr)])
 
-p <- ggplot(stacked, aes(pos_mb, var, fill = source)) +
-  geom_area(position = "stack", colour = NA) +
+# The variance stack alone cannot separate "strong QTL, same in all four
+# treatments" from "nothing here" -- both have near-zero variance among the 8
+# measures. So the H2 LEVEL is the line, and the rug underneath marks where sex
+# or diet is significant. High line + no rug = heritability that sex and diet
+# do not touch.
+HET <- tribble(~chr, ~eu_start, ~eu_end,
+  "chrX", 2.5, 21.2, "chr2L", 0.5, 22.9, "chr2R", 1.3, 25.1,
+  "chr3L", 0.7, 24.0, "chr3R", 4.5, 32.0)
+
+lvl <- vc %>%
+  mutate(chr = factor(chr, levels = chr_order), pos_mb = pos / 1e6,
+         bin = (pos %/% BIN) * BIN) %>%
+  filter(!is.na(chr)) %>%
+  group_by(chr, bin) %>%
+  summarise(H2 = mean(H2), pos_mb = mean(pos_mb),
+            sex_sig = mean(p_sex < 0.05), diet_sig = mean(p_diet < 0.05),
+            .groups = "drop")
+
+bg <- median(vc$H2)
+ymax <- max(lvl$H2) * 1.08
+rug <- bind_rows(
+  lvl %>% filter(sex_sig  > 0.5) %>% transmute(chr, pos_mb, term = "sex matters here",
+                                               ymin = -0.28*bg, ymax = -0.06*bg),
+  lvl %>% filter(diet_sig > 0.5) %>% transmute(chr, pos_mb, term = "diet matters here",
+                                               ymin = -0.52*bg, ymax = -0.30*bg))
+
+het_rects <- HET %>% mutate(chr = factor(chr, levels = chr_order)) %>%
+  left_join(lvl %>% group_by(chr) %>% summarise(xmax = max(pos_mb), .groups="drop"), by="chr") %>%
+  { bind_rows(transmute(., chr, xmin = 0, xmax2 = eu_start),
+              transmute(., chr, xmin = eu_end, xmax2 = xmax)) } %>% rename(xmax = xmax2)
+
+p <- ggplot(lvl, aes(pos_mb, H2)) +
+  geom_rect(data = het_rects, aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
+            fill = "grey88", alpha = 0.6, colour = NA, inherit.aes = FALSE) +
+  geom_hline(yintercept = bg, linetype = "dashed", colour = "grey45", linewidth = 0.35) +
+  geom_area(fill = "grey75", colour = NA) +
+  geom_line(linewidth = 0.4) +
+  geom_rect(data = rug, aes(xmin = pos_mb - BIN/2e6, xmax = pos_mb + BIN/2e6,
+                            ymin = ymin, ymax = ymax, fill = term),
+            inherit.aes = FALSE) +
   facet_wrap(~ chr, ncol = 1, scales = "free_x") +
   geom_text(data = chr_lab_df, aes(x = Inf, y = Inf, label = lab),
             hjust = 1.3, vjust = 1.4, size = 3, colour = "grey20",
             fontface = "bold", inherit.aes = FALSE) +
-  scale_fill_manual(values = SRC_COLS, name = NULL) +
+  scale_fill_manual(values = c("sex matters here" = "#1F78B4",
+                               "diet matters here" = "#33A02C"), name = NULL) +
   scale_x_continuous(expand = expansion(0), minor_breaks = seq(0, 40, 1)) +
-  scale_y_continuous(expand = expansion(c(0, 0.05))) +
-  labs(x = "Position (Mb)", y = "variance in Cutler H2",
-       title = "Variance among the 8 H2 measures at each position, by source",
-       subtitle = "Stack height is the total variance. Grey is pure replicate error (odd vs even within a treatment).") +
+  scale_y_continuous(limits = c(-0.55*bg, ymax), expand = expansion(0)) +
+  labs(x = "Position (Mb)", y = expression("Cutler" ~ H^2),
+       title = "Where is the heritability, and where do sex or diet actually account for it",
+       subtitle = paste0("Dashed line is the genome-wide background (", round(bg, 2),
+                         "). Grey shading is heterochromatin.\n",
+                         "Bars below the axis mark 1 Mb bins where sex (blue) or diet (green) is ",
+                         "significant, F on 1 and 4 df, p<0.05 in most windows.\n",
+                         "A tall curve with no bar under it is heritability that sex and diet do not account for.")) +
   theme_classic(base_size = 9) +
   theme(legend.position = "top",
         plot.title = element_text(size = 9, face = "bold"),
-        plot.subtitle = element_text(size = 7.5, colour = "grey35"),
+        plot.subtitle = element_text(size = 7, colour = "grey35"),
         strip.background = element_blank(), strip.text = element_blank(),
         panel.grid.major.x = element_line(colour = "grey92", linewidth = 0.3),
         panel.spacing = unit(0.4, "lines"))
@@ -141,3 +191,12 @@ png(FIG, width = 8.5, height = 6.5, units = "in", res = 150)
 print(p)
 invisible(dev.off())
 cat("Wrote:", FIG, "\n")
+
+cat("\n1 Mb bins, H2 level vs whether sex/diet are significant:\n")
+lvl %>%
+  mutate(level = ifelse(H2 > quantile(lvl$H2, 0.75), "H2 elevated", "H2 at background"),
+         terms = case_when(sex_sig > 0.5 & diet_sig > 0.5 ~ "sex and diet",
+                           sex_sig > 0.5 ~ "sex only", diet_sig > 0.5 ~ "diet only",
+                           TRUE ~ "neither")) %>%
+  count(level, terms) %>% pivot_wider(names_from = terms, values_from = n, values_fill = 0) %>%
+  as.data.frame() %>% print(row.names = FALSE)
