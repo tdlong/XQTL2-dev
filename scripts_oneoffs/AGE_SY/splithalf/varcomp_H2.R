@@ -155,14 +155,21 @@ vc <- vc %>%
   mutate(main = ss_main - ms_rep, sex = ss_sex - ms_rep,
          diet = ss_diet - ms_rep, `sex:diet` = ss_int - ms_rep,
          tot  = main + sex + diet + `sex:diet`,
-         # Back to H2 UNITS. Every term satisfies SS = 8 * deviation^2, so the
-         # deviation is sqrt(SS/8) -- directly comparable to the four H2 curves,
-         # where SS is in H2-SQUARED units and is not. Signed by the direction of
-         # the contrast; zero where the term is below the replicate error.
-         sexH2  = sign(M_ - F_)   * sqrt(pmax(sex, 0) / 8),
-         dietH2 = sign(S20 - S10) * sqrt(pmax(diet, 0) / 8),
-         intH2  = sign(`sex:diet`) * sqrt(pmax(`sex:diet`, 0) / 8),
-         mainH2 = sqrt(pmax(main, 0) / 8),
+         # Back to H2 UNITS (percentage points). Every term satisfies
+         # SS = 8*deviation^2, so the deviation is sqrt(SS/8) -- comparable to the
+         # four treatment curves, which sums of squares are not.
+         #
+         # NOT floored at zero. A term goes negative when it sits below the
+         # replicate error, and that is the diagnostic worth seeing: it says the
+         # correction is larger than the signal, i.e. there is nothing here. So
+         # the signed root keeps the sign of the COMPONENT. Direction of the
+         # contrast (which sex, which diet is higher) is a separate column.
+         sexH2  = sign(sex)        * sqrt(abs(sex) / 8),
+         dietH2 = sign(diet)       * sqrt(abs(diet) / 8),
+         intH2  = sign(`sex:diet`) * sqrt(abs(`sex:diet`) / 8),
+         mainH2 = sign(main)       * sqrt(abs(main) / 8),
+         dir_sex  = sign(M_ - F_),      # +1 male higher
+         dir_diet = sign(S20 - S10),    # +1 SY20 higher
          pct_main = 100 * main / tot, pct_sex = 100 * sex / tot,
          pct_diet = 100 * diet / tot, pct_int = 100 * `sex:diet` / tot,
          H2 = ybar)
@@ -170,7 +177,7 @@ vc <- vc %>%
 write.table(vc %>% select(chr, pos, wald_max, H2, ss_main, ss_sex, ss_diet, ss_int,
                           ss_rep, ms_rep, main, sex, diet, `sex:diet`,
                           pct_main, pct_sex, pct_diet, pct_int,
-                          mainH2, sexH2, dietH2, intH2),
+                          mainH2, sexH2, dietH2, intH2, dir_sex, dir_diet),
             gzfile(OUT), row.names = FALSE, quote = FALSE, sep = "\t")
 cat("Wrote:", OUT, "\n")
 cat(if (POOL_BP > 0) sprintf("MS_rep pooled over %.0f kb\n", POOL_BP/1e3)
@@ -226,8 +233,8 @@ p <- ggplot(plot_df, aes(pos_mb, pct, colour = term)) +
            "Variance in H2 attributable to sex and to diet, whole genome"
          else
            "PRELIMINARY - H2 floor NOT subtracted, do not interpret (see XQTL2 #34)",
-       subtitle = paste0("sqrt((MS - MS_rep)/8), i.e. back in H2 units and comparable to the four ",
-                         "treatment curves. Zero where a term is below the replicate error.")) +
+       subtitle = paste0("Signed sqrt((MS - MS_rep)/8): back in H2 percentage points, comparable to the four treatment curves.\n",
+                         "NEGATIVE means the term is below the replicate error -- nothing there. Not floored at zero.")) +
   theme_classic(base_size = 9) +
   theme(legend.position = "top",
         plot.title = element_text(size = 9, face = "bold"),
