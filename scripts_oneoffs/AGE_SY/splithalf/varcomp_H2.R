@@ -149,13 +149,22 @@ vc <- vc %>%
   mutate(main = ss_main - ms_rep, sex = ss_sex - ms_rep,
          diet = ss_diet - ms_rep, `sex:diet` = ss_int - ms_rep,
          tot  = main + sex + diet + `sex:diet`,
+         # Back to H2 UNITS. Every term satisfies SS = 8 * deviation^2, so the
+         # deviation is sqrt(SS/8) -- directly comparable to the four H2 curves,
+         # where SS is in H2-SQUARED units and is not. Signed by the direction of
+         # the contrast; zero where the term is below the replicate error.
+         sexH2  = sign(M_ - F_)   * sqrt(pmax(sex, 0) / 8),
+         dietH2 = sign(S20 - S10) * sqrt(pmax(diet, 0) / 8),
+         intH2  = sign(`sex:diet`) * sqrt(pmax(`sex:diet`, 0) / 8),
+         mainH2 = sqrt(pmax(main, 0) / 8),
          pct_main = 100 * main / tot, pct_sex = 100 * sex / tot,
          pct_diet = 100 * diet / tot, pct_int = 100 * `sex:diet` / tot,
          H2 = ybar)
 
 write.table(vc %>% select(chr, pos, wald_max, H2, ss_main, ss_sex, ss_diet, ss_int,
                           ss_rep, ms_rep, main, sex, diet, `sex:diet`,
-                          pct_main, pct_sex, pct_diet, pct_int),
+                          pct_main, pct_sex, pct_diet, pct_int,
+                          mainH2, sexH2, dietH2, intH2),
             gzfile(OUT), row.names = FALSE, quote = FALSE, sep = "\t")
 cat("Wrote:", OUT, "\n")
 cat(if (POOL_BP > 0) sprintf("MS_rep pooled over %.0f kb\n", POOL_BP/1e3)
@@ -188,21 +197,15 @@ plot_df <- vc %>%
   mutate(chr = factor(chr, levels = chr_order), bin = (pos %/% BIN) * BIN) %>%
   filter(!is.na(chr)) %>%
   group_by(chr, bin) %>%
-  summarise(sex = mean(sex), diet = mean(diet), `sex:diet` = mean(`sex:diet`),
-            H2 = mean(H2), wald_max = max(wald_max), .groups = "drop") %>%
+  summarise(sex = mean(sexH2), diet = mean(dietH2), `sex:diet` = mean(intH2),
+            H2 = mean(H2), .groups = "drop") %>%
   pivot_longer(all_of(TERMS), names_to = "term", values_to = "pct") %>%
   mutate(term = factor(term, levels = TERMS), pos_mb = bin / 1e6)
 
-wald_bar <- plot_df %>% distinct(chr, pos_mb, wald_max) %>% filter(wald_max > WALD_MIN)
 
 chr_lab_df <- plot_df %>% distinct(chr) %>% mutate(lab = chr_labels[as.character(chr)])
 
-ylo <- min(plot_df$pct); yhi <- max(plot_df$pct)
 p <- ggplot(plot_df, aes(pos_mb, pct, colour = term)) +
-  geom_rect(data = wald_bar,
-            aes(xmin = pos_mb - 0.05, xmax = pos_mb + 0.05,
-                ymin = ylo - 0.08*(yhi-ylo), ymax = ylo - 0.01*(yhi-ylo)),
-            fill = "grey45", colour = NA, inherit.aes = FALSE) +
   geom_hline(yintercept = 0, colour = "grey55", linewidth = 0.3) +
   geom_line(linewidth = 0.4) +
   facet_wrap(~ chr, ncol = 1, scales = "free_x") +
@@ -212,15 +215,13 @@ p <- ggplot(plot_df, aes(pos_mb, pct, colour = term)) +
   scale_colour_manual(values = TERM_COLS, name = NULL) +
   scale_x_continuous(expand = expansion(0), minor_breaks = seq(0, 40, 1)) +
   labs(x = "Position (Mb)",
-       y = expression("variance in Cutler" ~ H^2 ~ ", replicate error subtracted"),
+       y = expression("Cutler" ~ H^2 ~ "units: deviation, replicate error subtracted"),
        title = if (HAVE_BIAS)
            "Variance in H2 attributable to sex and to diet, whole genome"
          else
            "PRELIMINARY - H2 floor NOT subtracted, do not interpret (see XQTL2 #34)",
-       subtitle = paste0("Each term is MS - MS_rep, so where nothing is happening it sits at zero ",
-                         "by construction -- no masking needed.\n",
-                         "Grey ticks below the axis mark where some treatment clears Wald > ",
-                         WALD_MIN, ", i.e. where the frequencies demonstrably moved.")) +
+       subtitle = paste0("sqrt((MS - MS_rep)/8), i.e. back in H2 units and comparable to the four ",
+                         "treatment curves. Zero where a term is below the replicate error.")) +
   theme_classic(base_size = 9) +
   theme(legend.position = "top",
         plot.title = element_text(size = 9, face = "bold"),
