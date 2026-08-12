@@ -268,6 +268,17 @@ plot_df <- vc %>%
 
 chr_lab_df <- plot_df %>% distinct(chr) %>% mutate(lab = chr_labels[as.character(chr)])
 
+# y range from the bulk, not the maximum, so the peak does not flatten the rest
+YHI  <- quantile(plot_df$pct, 0.99, na.rm = TRUE)
+YLO  <- quantile(plot_df$pct, 0.002, na.rm = TRUE)
+YLIM <- c(min(YLO, -0.15), max(YHI, 0.5))
+offscale <- plot_df %>% filter(pct > YLIM[2]) %>%
+  group_by(chr) %>% summarise(mx = max(pct), at = pos_mb[which.max(pct)], .groups = "drop")
+if (nrow(offscale))
+  cat("\nclipped by the y-axis (drawn, not dropped):\n",
+      paste(sprintf("  %s %.2f Mb reaches %.2f", offscale$chr, offscale$at, offscale$mx),
+            collapse = "\n"), "\n", sep = "")
+
 p <- ggplot(plot_df, aes(pos_mb, pct, colour = term)) +
   geom_hline(yintercept = 0, colour = "grey55", linewidth = 0.3) +
   geom_line(linewidth = 0.4) +
@@ -277,6 +288,10 @@ p <- ggplot(plot_df, aes(pos_mb, pct, colour = term)) +
             fontface = "bold", inherit.aes = FALSE) +
   scale_colour_manual(values = TERM_COLS, name = NULL) +
   scale_x_continuous(expand = expansion(0), minor_breaks = seq(0, 40, 1)) +
+  # Zoom rather than drop: the chr3L peak is several times anything else, and on
+  # a scale that fits it the rest of the genome is a flat line. coord_cartesian
+  # clips the drawing, it does not remove the data.
+  coord_cartesian(ylim = YLIM) +
   labs(x = "Position (Mb)",
        y = expression("Cutler" ~ H^2 ~ "(percentage points): deviation, replicate error subtracted"),
        title = if (HAVE_BIAS)
@@ -284,7 +299,9 @@ p <- ggplot(plot_df, aes(pos_mb, pct, colour = term)) +
          else
            "PRELIMINARY - H2 floor NOT subtracted, do not interpret (see XQTL2 #34)",
        subtitle = paste0("Percentage points of variance. The H2 floor and the replicate error are both removed.\n",
-                         "Below zero means the term is smaller than the replicate noise, i.e. nothing there.")) +
+                         "Below zero means the term is smaller than the replicate noise, i.e. nothing there.\n",
+                         sprintf("y-axis clipped at %.1f so the rest of the genome is visible; the chr3L peak runs to %.1f.",
+                                 YLIM[2], max(plot_df$pct, na.rm = TRUE)))) +
   theme_classic(base_size = 9) +
   theme(legend.position = "top",
         plot.title = element_text(size = 9, face = "bold"),
