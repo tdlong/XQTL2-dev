@@ -81,8 +81,8 @@ WALD_MIN <- 6
 # it is measured well. In this experiment H2 is imprecise nearly everywhere
 # except the chr3L peak.
 
-TERMS     <- c("sex", "diet", "sex:diet")
-TERM_COLS <- c(sex = "#1F78B4", diet = "#33A02C", `sex:diet` = "#E31A1C")
+TERMS     <- c("main", "sex", "diet", "sex:diet")
+TERM_COLS <- c(main = "grey30", sex = "#1F78B4", diet = "#33A02C", `sex:diet` = "#E31A1C")
 chr_order  <- c("chrX", "chr2L", "chr2R", "chr3L", "chr3R")
 chr_labels <- c(chrX = "X", chr2L = "2L", chr2R = "2R", chr3L = "3L", chr3R = "3R")
 
@@ -96,18 +96,53 @@ long <- read.table(IN, header = TRUE, sep = "\t") %>% as_tibble()
 # differs between cells (it tracks depth and fly counts), so a per-cell
 # subtraction cleans the treatment terms slightly too.
 HAVE_BIAS <- "Cutl_H2_bias" %in% names(long) && !all(is.na(long$Cutl_H2_bias))
+CLAMP_MAX <- 0.15   # above this the #34 bias is not trustworthy
+WALD_NULL <- 2      # Wald below this = frequencies did not move = true H2 ~ 0
 if (HAVE_BIAS) {
   cat(sprintf("Subtracting the reported H2 floor: median bias %.3f against median H2 %.3f\n",
               median(long$Cutl_H2_bias, na.rm = TRUE), median(long$Cutl_H2, na.rm = TRUE)))
   if ("Cutl_clamp_frac" %in% names(long))
     cat(sprintf("  median penetrance-clamp fraction %.3f (high values = bias less trustworthy)\n",
                 median(long$Cutl_clamp_frac, na.rm = TRUE)))
-  long <- long %>% mutate(H2v = Cutl_H2 - Cutl_H2_bias)
+  # Calibrate the reported floor against windows the Wald score calls null.
+  # Where the frequencies did not move, true H2 ~ 0, so the observed H2 IS the
+  # floor -- no assumption about what fraction of the genome is null is needed,
+  # the Wald test identifies those windows. Isotonic (monotone) fit of H2 on b
+  # over those windows, applied everywhere.
+  #
+  # Needed because the raw b is well calibrated where it is small (0.5-0.75,
+  # where 95% of the genome sits) but badly overstated where it is large: at
+  # null windows H2/b runs 0.90 for b in 0.5-0.75 and 0.16 for b > 2. Those few
+  # Mb are what drove corrected H2 to -6, which is impossible.
+  nullw <- long %>%
+    group_by(chr, pos) %>%
+    summarise(H2 = mean(Cutl_H2), b = mean(Cutl_H2_bias),
+              wald = max(Wald_log10p), .groups = "drop") %>%
+    filter(wald < WALD_NULL) %>% arrange(b)
+  if (nrow(nullw) > 200) {
+    iso   <- isoreg(nullw$b, nullw$H2)
+    bcal  <- approxfun(nullw$b, iso$yf, rule = 2)
+    long  <- long %>% mutate(Cutl_H2_bias_cal = bcal(Cutl_H2_bias))
+    cat(sprintf("  calibrated on %d windows with Wald < %g; floor now %.2f-%.2f (was %.2f-%.2f)\n",
+                nrow(nullw), WALD_NULL,
+                min(long$Cutl_H2_bias_cal), max(long$Cutl_H2_bias_cal),
+                min(long$Cutl_H2_bias), max(long$Cutl_H2_bias)))
+  } else {
+    cat("  too few null windows to calibrate; using the raw floor\n")
+    long <- long %>% mutate(Cutl_H2_bias_cal = Cutl_H2_bias)
+  }
+  long <- long %>% mutate(H2v = Cutl_H2 - Cutl_H2_bias_cal)
 } else {
   cat("NOTE: no Cutl_H2_bias column -- these scans predate XQTL2 #34.\n")
   cat("      The main term keeps its floor, so the sex and diet percentages\n")
   cat("      below are LOWER BOUNDS. Re-run the scans to fix this.\n")
   long <- long %>% mutate(H2v = Cutl_H2)
+}
+
+clamp <- if ("Cutl_clamp_frac" %in% names(long)) {
+  long %>% group_by(chr, pos) %>% summarise(clamp = mean(Cutl_clamp_frac), .groups = "drop")
+} else {
+  NULL
 }
 
 # Strongest frequency change at each window, across the four treatments.
@@ -122,13 +157,20 @@ w <- long %>%
   pivot_wider(names_from = c(cell, half), values_from = H2v, names_glue = "{cell}_{half}") %>%
   drop_na() %>%
   left_join(wald_max, by = c("chr", "pos"))
+if (!is.null(clamp)) {
+  w <- w %>% left_join(clamp, by = c("chr", "pos"))
+  cat(sprintf("Windows where the penetrance clamp binds (clamp frac > %.2f), so the reported\n  floor is unreliable: %d of %d (%.1f%%)\n",
+              CLAMP_MAX, sum(w$clamp > CLAMP_MAX), nrow(w), 100 * mean(w$clamp > CLAMP_MAX)))
+} else {
+  w$clamp <- NA_real_
+}
 
 cat(sprintf("Windows with Wald > %g in at least one treatment: %d of %d (%.1f%%)\n",
             WALD_MIN, sum(w$wald_max > WALD_MIN), nrow(w),
             100 * mean(w$wald_max > WALD_MIN)))
 
 vc <- w %>% transmute(
-  chr, pos, wald_max,
+  chr, pos, wald_max, clamp,
   a  = (SY10_F_odd + SY10_F_even) / 2,      # cell means
   b  = (SY20_F_odd + SY20_F_even) / 2,
   cc = (SY10_M_odd + SY10_M_even) / 2,
@@ -167,14 +209,18 @@ vc <- vc %>%
          sexH2  = sign(sex)        * sqrt(abs(sex) / 8),
          dietH2 = sign(diet)       * sqrt(abs(diet) / 8),
          intH2  = sign(`sex:diet`) * sqrt(abs(`sex:diet`) / 8),
-         mainH2 = sign(main)       * sqrt(abs(main) / 8),
+         # signed by YBAR, not by the component: main = 8*ybar^2 is a square, so
+         # a strongly NEGATIVE corrected H2 (over-corrected window) otherwise
+         # comes out as a large positive "shared effect". In H2 units this is
+         # just the corrected H2 level at the window.
+         mainH2 = sign(ybar)       * sqrt(abs(main) / 8),
          dir_sex  = sign(M_ - F_),      # +1 male higher
          dir_diet = sign(S20 - S10),    # +1 SY20 higher
          pct_main = 100 * main / tot, pct_sex = 100 * sex / tot,
          pct_diet = 100 * diet / tot, pct_int = 100 * `sex:diet` / tot,
          H2 = ybar)
 
-write.table(vc %>% select(chr, pos, wald_max, H2, ss_main, ss_sex, ss_diet, ss_int,
+write.table(vc %>% select(chr, pos, wald_max, clamp, H2, ss_main, ss_sex, ss_diet, ss_int,
                           ss_rep, ms_rep, main, sex, diet, `sex:diet`,
                           pct_main, pct_sex, pct_diet, pct_int,
                           mainH2, sexH2, dietH2, intH2, dir_sex, dir_diet),
@@ -205,13 +251,17 @@ report(vc %>% filter(chr == "chr3L", pos == 9355000), "chr3L 9,355,000 (peak)")
 # nothing is happening it sits at zero by construction -- the subtraction does
 # the masking. Percentages cannot be plotted this way: a percentage of a tiny
 # total is still a percentage, which is what forced a Wald cut before.
+# Where the penetrance clamp binds, #34's own note says the floor is unreliable,
+# and it shows: those windows carry a reported floor several times H2 and come
+# out at -6 percentage points. They are dropped rather than drawn, so the lines
+# break instead of the scale being set by the least trustworthy windows.
 BIN <- 1e5
 plot_df <- vc %>%
   mutate(chr = factor(chr, levels = chr_order), bin = (pos %/% BIN) * BIN) %>%
   filter(!is.na(chr)) %>%
   group_by(chr, bin) %>%
-  summarise(sex = mean(sexH2), diet = mean(dietH2), `sex:diet` = mean(intH2),
-            H2 = mean(H2), .groups = "drop") %>%
+  summarise(main = mean(mainH2), sex = mean(sexH2), diet = mean(dietH2),
+            `sex:diet` = mean(intH2), H2 = mean(H2), .groups = "drop") %>%
   pivot_longer(all_of(TERMS), names_to = "term", values_to = "pct") %>%
   mutate(term = factor(term, levels = TERMS), pos_mb = bin / 1e6)
 
@@ -230,11 +280,11 @@ p <- ggplot(plot_df, aes(pos_mb, pct, colour = term)) +
   labs(x = "Position (Mb)",
        y = expression("Cutler" ~ H^2 ~ "(percentage points): deviation, replicate error subtracted"),
        title = if (HAVE_BIAS)
-           "Variance in H2 attributable to sex and to diet, whole genome"
+           "Cutler H2 split into shared, sex, diet and sex-by-diet parts"
          else
            "PRELIMINARY - H2 floor NOT subtracted, do not interpret (see XQTL2 #34)",
-       subtitle = paste0("Signed sqrt((MS - MS_rep)/8): back in H2 percentage points, comparable to the four treatment curves.\n",
-                         "NEGATIVE means the term is below the replicate error -- nothing there. Not floored at zero.")) +
+       subtitle = paste0("Percentage points of variance. The H2 floor and the replicate error are both removed.\n",
+                         "Below zero means the term is smaller than the replicate noise, i.e. nothing there.")) +
   theme_classic(base_size = 9) +
   theme(legend.position = "top",
         plot.title = element_text(size = 9, face = "bold"),
