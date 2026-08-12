@@ -53,10 +53,31 @@ chr_labels <- c(chrX = "X", chr2L = "2L", chr2R = "2R", chr3L = "3L", chr3R = "3
 if (!file.exists(IN)) stop("input not found: ", IN)
 long <- read.table(IN, header = TRUE, sep = "\t") %>% as_tibble()
 
+# XQTL2 #34: H2 has an upward floor from squaring a noisy Affect, and the
+# pipeline now reports it. Subtract it from EACH of the 8 measures before
+# decomposing -- the floor lives in the main term, which is the denominator of
+# every percentage below, so leaving it in makes sex and diet read low. It also
+# differs between cells (it tracks depth and fly counts), so a per-cell
+# subtraction cleans the treatment terms slightly too.
+HAVE_BIAS <- "Cutl_H2_bias" %in% names(long) && !all(is.na(long$Cutl_H2_bias))
+if (HAVE_BIAS) {
+  cat(sprintf("Subtracting the reported H2 floor: median bias %.3f against median H2 %.3f\n",
+              median(long$Cutl_H2_bias, na.rm = TRUE), median(long$Cutl_H2, na.rm = TRUE)))
+  if ("Cutl_clamp_frac" %in% names(long))
+    cat(sprintf("  median penetrance-clamp fraction %.3f (high values = bias less trustworthy)\n",
+                median(long$Cutl_clamp_frac, na.rm = TRUE)))
+  long <- long %>% mutate(H2v = Cutl_H2 - Cutl_H2_bias)
+} else {
+  cat("NOTE: no Cutl_H2_bias column -- these scans predate XQTL2 #34.\n")
+  cat("      The main term keeps its floor, so the sex and diet percentages\n")
+  cat("      below are LOWER BOUNDS. Re-run the scans to fix this.\n")
+  long <- long %>% mutate(H2v = Cutl_H2)
+}
+
 w <- long %>%
-  select(chr, pos, sex, sugar, half, Cutl_H2) %>%
+  select(chr, pos, sex, sugar, half, H2v) %>%
   unite("cell", sugar, sex) %>%
-  pivot_wider(names_from = c(cell, half), values_from = Cutl_H2, names_glue = "{cell}_{half}") %>%
+  pivot_wider(names_from = c(cell, half), values_from = H2v, names_glue = "{cell}_{half}") %>%
   drop_na()
 
 vc <- w %>% transmute(

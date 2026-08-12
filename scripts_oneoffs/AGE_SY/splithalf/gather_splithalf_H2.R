@@ -32,11 +32,20 @@ if (length(missing))
   stop("missing scan output:\n  ", paste(missing, collapse = "\n  "))
 
 long <- pmap_dfr(cells, function(sugar, sex, half, scan, file) {
-  read.table(file, header = TRUE) %>%
-    as_tibble() %>%
-    transmute(chr, pos = as.integer(pos), sex, sugar, half,
-              Cutl_H2, Falc_H2, Wald_log10p)
+  d <- read.table(file, header = TRUE) %>% as_tibble()
+  # XQTL2 #34 added the squaring-bias columns. Carry them if present -- H2 has
+  # a floor and the partition's main term rests on it -- but do not require
+  # them, so scans made before #34 still gather.
+  for (v in c("Cutl_H2_bias", "Falc_H2_bias", "Cutl_clamp_frac"))
+    if (!v %in% names(d)) d[[v]] <- NA_real_
+  d %>% transmute(chr, pos = as.integer(pos), sex, sugar, half,
+                  Cutl_H2, Falc_H2, Wald_log10p,
+                  Cutl_H2_bias, Falc_H2_bias, Cutl_clamp_frac)
 })
+
+if (all(is.na(long$Cutl_H2_bias)))
+  cat("NOTE: no Cutl_H2_bias column -- these scans predate XQTL2 #34.\n",
+      "      Re-run them to get the H2 floor.\n", sep = "")
 
 # Every cell must cover the same windows, or the contrasts below are comparing
 # different places. Fail here rather than silently recycling downstream.
@@ -58,10 +67,12 @@ cat("Wrote:", OUT, "\n")
 cat(sprintf("  %d rows = %d windows x %d cells\n",
             nrow(long), per_cell$n_windows[1], nrow(per_cell)))
 print(per_cell)
-cat("\nCutl_H2 by cell:\n")
+cat("\nCutl_H2 by cell (bias = the reported floor, XQTL2 #34):\n")
 long %>%
   group_by(sex, sugar, half) %>%
   summarise(median = median(Cutl_H2, na.rm = TRUE),
-            frac_negative = mean(Cutl_H2 < 0, na.rm = TRUE),
-            n_na = sum(is.na(Cutl_H2)), .groups = "drop") %>%
+            median_bias = median(Cutl_H2_bias, na.rm = TRUE),
+            median_corrected = median(Cutl_H2 - Cutl_H2_bias, na.rm = TRUE),
+            clamp_frac = median(Cutl_clamp_frac, na.rm = TRUE),
+            frac_negative = mean(Cutl_H2 < 0, na.rm = TRUE), .groups = "drop") %>%
   as.data.frame() %>% print(row.names = FALSE)
