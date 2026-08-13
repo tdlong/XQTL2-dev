@@ -1,15 +1,20 @@
-euchromatin: 104 blocks of 2 cM covering 97 Mb
-block size in Mb: median 0.67, range 0.38-6.38
-summed h2 321 points, scaled x0.156 so the genome totals 50%
+autosomes: 109 blocks -- 104 euchromatic of 2 cM, 5 heterochromatic
+            (one telomeric + one centromeric block per arm)
+h2 rescaled so the genome totals 50%; interval from 300 bootstraps over
+BOTH the block sample and the floor fit
 
- top % genome blocks   Mb h2 (of 50) main sex+diet % sex+diet            CI
-            5      6  8.5       20.9 19.5     1.46        7.0   [3.7, 11.7]
-           10     11 19.0       35.0 31.9     3.14        9.0   [6.0, 14.3]
-           20     21 27.2       41.0 36.5     4.49       11.0   [7.3, 18.4]
-           30     31 34.7       44.6 39.7     4.96       11.1   [7.5, 18.2]
-           50     52 55.5       48.8 43.9     4.86       10.0   [6.3, 15.6]
-          100    104 96.8       50.0 56.2    -6.39      -12.8 [-82.3, 11.1]
+ top % genome blocks    Mb h2 (of 50) main sex+diet % sex+diet            CI
+            5    6+0   8.0       11.5 10.6     0.97        8.4   [3.5, 13.9]
+           10   11+0  17.7       24.1 22.5     1.61        6.7   [3.8, 12.5]
+           20   20+2  31.1       37.5 34.8     2.76        7.3   [4.4, 13.3]
+           30   31+2  45.7       41.8 38.4     3.46        8.3   [4.5, 13.4]
+           50   52+3  62.3       46.5 43.0     3.47        7.5  [-2.2, 12.7]
+          100  104+5 103.9       50.0 46.9     2.72        5.4 [-62.7, 10.0]
 
-The 100% row is not a conservative choice -- it is broken. In the bottom
-half of the genome the non-main terms sit BELOW the replicate error, so they
-sum negative and drag the numerator through zero.
+the heterochromatic blocks on their own:
+           block  Mb h2 (of 50) wald % sex+diet
+ chr3R_het_start 3.1       4.81 17.4        1.7
+   chr3L_het_end 3.0       4.30 18.6        0.3
+ chr2L_het_start 0.4       0.20  7.5       -4.1
+ chr3L_het_start 0.5       0.02  1.4         NA
+   chr2L_het_end 0.3      -0.06  4.1       53.5
