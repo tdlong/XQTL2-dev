@@ -100,6 +100,13 @@ cmp <- vcx %>%
 # Broken y axis on every panel via ggbreak, so the chr3L locus does not set the
 # scale for the whole genome. scales = 1/3 makes the upper segment a third the
 # height of the lower, i.e. the 3:1 split.
+#
+# The break gap is ~zero width on purpose. ggbreak REMOVES the range between the
+# two values and clips anything inside it to the edge of BOTH sub-panels, so a
+# peak landing in the gap is drawn twice -- chr2L main tops out at 0.764 and did
+# exactly that against a 0.75-0.82 break. With no gap, each value appears once
+# and a line crossing the break simply continues from the top of the lower panel
+# into the bottom of the upper one.
 
 deco <- function(tag, xaxis = FALSE) {
   th <- theme_classic(base_size = 8) +
@@ -124,16 +131,17 @@ deco <- function(tag, xaxis = FALSE) {
 pA <- ggplot(scans, aes(gx, wald, colour = trt)) +
   geom_line(linewidth = 0.28) +
   scale_colour_manual(values = TRT_COL) +
-  scale_y_continuous(breaks = c(0, 5, 10, 15, 25, 50, 75, 100)) +
-  scale_y_break(c(15, 17), scales = 1/3, space = 0.12, ticklabels = c(25, 50, 75, 100)) +
+  scale_y_continuous(breaks = c(0, 5, 10, 15, 20, 40, 60, 80, 100)) +
+  scale_y_break(c(20, 20.001), scales = 1/3, space = 0.12,
+                ticklabels = c(40, 60, 80, 100)) +
   labs(y = expression(-log[10] * italic(P))) +
   deco("A")
 
 pB <- ggplot(scans, aes(gx, h2, colour = trt)) +
   geom_line(linewidth = 0.28) +
   scale_colour_manual(values = TRT_COL) +
-  scale_y_continuous(breaks = c(0, 0.5, 1, 1.5, 2, 3, 4, 5)) +
-  scale_y_break(c(2, 2.2), scales = 1/3, space = 0.12, ticklabels = c(3, 4, 5)) +
+  scale_y_continuous(breaks = c(0, 0.5, 1, 1.5, 2, 2.5, 3, 4, 5)) +
+  scale_y_break(c(2.5, 2.501), scales = 1/3, space = 0.12, ticklabels = c(3, 4, 5)) +
   labs(y = expression(italic(h)^2)) +
   deco("B")
 
@@ -141,8 +149,9 @@ pC <- ggplot(cmp, aes(gx, y, colour = term)) +
   geom_hline(yintercept = 0, colour = "grey60", linewidth = 0.25) +
   geom_line(linewidth = 0.35) +
   scale_colour_manual(values = CMP_COL) +
-  scale_y_continuous(breaks = c(-0.2, 0, 0.25, 0.5, 0.75, 1, 2)) +
-  scale_y_break(c(0.75, 0.82), scales = 1/3, space = 0.12, ticklabels = c(1, 2)) +
+  scale_y_continuous(breaks = c(-0.2, 0, 0.25, 0.5, 0.75, 1, 1.5, 2, 2.5)) +
+  scale_y_break(c(0.75, 0.7501), scales = 1/3, space = 0.12,
+                ticklabels = c(1, 1.5, 2, 2.5)) +
   labs(y = expression(italic(h)^2)) +
   deco("C", xaxis = TRUE)
 

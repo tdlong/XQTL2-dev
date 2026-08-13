@@ -3,6 +3,11 @@
 **Lifespan selection in a 2x2 of sex and diet, and the partition of heritability
 into shared, sex and diet components.**
 
+In all three panels the vertical axis is broken so that the large-effect locus
+on 3L does not set the scale for the rest of the genome: the lower segment
+occupies three quarters of the panel height and the upper segment one quarter,
+with the break at 20 in (A), 2.5 in (B) and 0.75 in (C).
+
 Chromosome arms are concatenated left to right (X, 2L, 2R, 3L, 3R); dotted
 vertical lines separate arms and grey bands mark pericentromeric and telomeric
 heterochromatin (dm6 euchromatin boundaries from Huynh et al. 2023 *PLoS Genet*
@@ -27,11 +32,9 @@ sign x sqrt((MS - MS_rep)/8), i.e. returned to *h*² units and directly
 comparable with (B), after subtracting both the replicate mean square (pure
 error, 4 df) and the estimation floor. Terms are not floored at zero: a value
 below zero means the term is smaller than the replicate error, i.e. nothing is
-there. Curves are smoothed with a 500 kb rolling mean. The vertical axis is
-clipped at 1; main and sex exceed it at the chr3L peak and main exceeds it over
-chr3L 20-26 Mb and chr3R 1-9 Mb. The sex-by-diet interaction is not drawn: it
-lies below the replicate error at 67% of windows and its 95th percentile is
-0.08.
+there. Curves are smoothed with a 500 kb rolling mean. The sex-by-diet interaction is
+not drawn: it lies below the replicate error at 67% of windows and its 95th
+percentile is 0.08.
 
 *h*² is upwardly biased because it squares an estimated quantity, and the bias
 does not shrink with replication. In (C) it is removed using a floor calibrated
