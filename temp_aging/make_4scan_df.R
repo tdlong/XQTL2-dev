@@ -29,7 +29,12 @@ long <- pmap_dfr(cells, function(sugar, sex, scan, file) {
   # bias columns exist only in scans made after XQTL2 #34; carry them if present
   for (v in c("Cutl_H2_bias", "Falc_H2_bias", "Cutl_clamp_frac"))
     if (!v %in% names(d)) d[[v]] <- NA_real_
-  d %>% transmute(chr, pos = as.integer(pos), sugar, sex,
+  # cM comes from add_genetic() in the pipeline. Needed because clumping in
+  # physical distance is wrong here: h2 is smeared over ~9 Mb in the
+  # low-recombination blocks flanking the centromeres and over ~1 Mb in
+  # euchromatin, so a fixed Mb window counts one block as ten loci.
+  if (!"cM" %in% names(d)) d$cM <- NA_real_
+  d %>% transmute(chr, pos = as.integer(pos), cM, sugar, sex,
                   Wald_log10p, Cutl_H2, Falc_H2,
                   Cutl_H2_bias, Falc_H2_bias, Cutl_clamp_frac)
 })
