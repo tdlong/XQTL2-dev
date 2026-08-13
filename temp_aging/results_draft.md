@@ -1,67 +1,64 @@
 # Results (draft)
 
-**Selection for long life moves haplotype frequencies over much of the genome.**
-Each of the four sex-by-diet groups was scanned separately, contrasting the
-long-lived tail of each of 12 cages against an unselected sample from the same
-cage (Fig. 1a). Windows overlap fifteenfold and are in linkage disequilibrium
-besides, so the tests are far from independent and no multiple-testing correction
-is attempted; taking −log10 *P* = 5 as a working cutoff, 55% of the euchromatic
-genome exceeds it in at least one group, 29% exceeds 10 and 20% exceeds 15, and
-within a single group the corresponding figures are 28–38%, 17–19% and 12–15%. A
-threshold does not usefully divide this genome into hits and non-hits, because
-too much of it qualifies. One region stands far apart: a locus at chr3L 9.3 Mb
-reaching −log10 *P* = 207.5 in high-sugar males, the strongest signal in all four
-groups. The better peaks also give a sense of the resolution available. This is
-not a single-generation cross but an advanced-generation one, in which repeated
-rounds of recombination have broken the founder haplotypes into short blocks.
-Across the twelve well-separated peaks above −log10 *P* = 15, the interval within
-2 units of the peak has a median width of 0.5 cM, and 0.11–0.84 cM for all but
-one of them — corresponding to anywhere between 50 kb and 1.4 Mb of sequence,
-depending on the local recombination rate. The genetic width of these intervals
-is consistent; the physical width is not, and tracks recombination. The narrowest
-of them are at or below the 75 kb window and 100 kb smoothing, so what limits
-resolution here is the analysis rather than the extent of linkage disequilibrium
-in the population.
+**Selection for longevity shifts haplotype frequencies across much of the
+genome.** Each sex × diet group was scanned independently, contrasting the
+long-lived tail of each of 12 cages with an unselected sample from the same cage
+(Fig. 1a). Windows overlap fifteenfold and are further correlated through linkage
+disequilibrium, so no multiple-testing correction is meaningful; at a working
+threshold of −log10 *P* = 5, 55% of the euchromatic genome responds in at least
+one group, 29% exceeds 10 and 20% exceeds 15 (28–38%, 17–19% and 12–15% within a
+single group). Thresholding does not partition this genome into hits and
+non-hits. One region is exceptional: a locus at chr3L 9.3 Mb reaching −log10 *P*
+= 207.5 in high-sugar males, the strongest signal in all four groups. Because the
+mapping population is an advanced-generation rather than a single-generation
+cross, founder haplotypes are broken into short blocks and the stronger peaks are
+correspondingly narrow. Across the twelve well-separated peaks above −log10 *P* =
+15, the interval within 2 units of the peak spans a median of 0.48 cM (0.11–0.84
+cM for eleven of the twelve) but 50 kb to 1.4 Mb of sequence, physical width
+tracking local recombination rate. The narrowest intervals approach the 75 kb
+window and 100 kb smoothing, indicating that resolution is limited by the
+analysis rather than by linkage disequilibrium in the population.
 
-**On a scale of trait variance, none of it is large.** The Wald test asks whether
-a haplotype frequency moved, not how much of the trait the region controls, and
-at this sample size a very small shift is very significant. The population
-descends from eight inbred founders and the proportion selected in each cage is
-known, and there is theory relating the squared changes in the eight founder
-frequencies at a window to the heritability that window accounts for (Methods).
-This gives an estimate of *h*² per window, as a percentage of phenotypic
-variance, and it is what Fig. 1b shows. The chr3L locus accounts for
-4.6% of phenotypic variance in the group where it is strongest and 2.5% where it
-is weakest: large for a longevity locus, but not the classical major QTL that a
-−log10 *P* of 207 might suggest. The next largest regions reach only 1.3–1.7%,
-and the median euchromatic window 0.15% in males and 0.07% in females. Effects of
-that size are why the experiment is the size it is — roughly 400,000 flies
-screened across the 40 cages with recorded counts, the longest-lived 5.5% taken,
-and 23,500 selected flies sequenced. The second tier of Fig. 1a is visible
-because of that scale rather than because the effects are big; in a conventional
-experiment an order of magnitude smaller it would sit under the noise.
+**Longevity is highly polygenic.** Frequency change establishes that a region
+responded to selection but not the magnitude of its contribution, and at this
+sample size very small shifts are highly significant. Because the population
+derives from eight inbred founders and the selected proportion of each cage is
+known, the squared changes in founder frequency at a window can be converted to
+the heritability that window accounts for (Methods), placing the scan on a scale
+of phenotypic variance (Fig. 1b). Comparing non-overlapping 75 kb tiles against
+the replicate error recovered from the odd/even split, the estimated contribution
+exceeds that error at 83% of euchromatic tiles against 37% expected in its
+absence, bounding the null fraction at 28% and implying that at least 72% of the
+euchromatic genome carries non-zero heritability for lifespan (69–81% within a
+single group). Individual contributions are nonetheless small. The chr3L locus
+accounts for 4.6% of phenotypic variance in the group in which it is strongest
+and 2.5% in the weakest — substantial for a longevity locus, but far from the
+major QTL implied by a −log10 *P* of 207 — while the next largest regions reach
+1.3–1.7% and the median euchromatic window 0.15% in males and 0.07% in females.
+Resolving contributions of this magnitude required screening ~400,000 flies,
+selecting the longest-lived 5.5% and sequencing 23,485 selected individuals;
+effects in the second tier of Fig. 1a fall below the detection limit of designs
+an order of magnitude smaller.
 
-**Which parts of the genome matter depends on sex, and hardly at all on diet.**
-Lifespan does not have one genetic basis shared by all flies. On the X chromosome
-the median window carries 0.43% of phenotypic variance in males and 0.01% in
-females, and males are higher at every single window; on 2L males are higher at
-79% of windows, while on 3R the direction reverses and females are higher at 71%
-(Fig. 1b). Part of the X difference is expected, since males carry one copy and
-recessive variation that a second chromosome would mask is exposed — but 2L and
-3R are ordinary autosomes and that explanation does not reach them. Diet behaves
-quite differently. The two sugar levels change lifespan substantially, yet they
-barely change which parts of the genome contribute to it. Splitting the
-heritability at each window into the part shared by all four groups and the parts
-that differ by sex or by diet (Fig. 1c), 10.2% of the genetic variance is
-specific to one sex and 1.9% to one diet, with no detectable interaction between
-them; on the autosomes alone, where hemizygosity cannot contribute, the sex share
-is 7.3%. Within the fifth of the genome carrying most of the signal, where the
-split is best determined, sex and diet together account for 9.4% (95% CI
-5.9–15.9%). That is the part an analysis which pools the sexes and treats
-environment as a covariate — the usual construction when environment cannot be
-manipulated, as in human studies — is unable to see. It is not spread thinly
-across the genome either: it sits at loci that act in one sex and not the other,
-which such an analysis would report at a fraction of their real effect.
+**Architecture differs between the sexes but is largely invariant to diet.** On
+the X chromosome the median window contributes 0.43% of phenotypic variance in
+males and 0.01% in females, males exceeding females at every window; on 2L males
+exceed females at 79% of windows, whereas on 3R the direction reverses and
+females exceed males at 71% (Fig. 1b). Hemizygosity accounts for part of the X
+difference, exposing recessive variation that a second chromosome would mask, but
+2L and 3R are ordinary autosomes. Diet behaves differently: the two sugar levels
+alter lifespan substantially yet leave the distribution of contributing loci
+nearly unchanged. Partitioning per-window heritability into a component shared by
+all four groups and components differing by sex or by diet (Fig. 1c), 10.2% of
+the genetic variance is sex-specific and 1.9% diet-specific, with no detectable
+interaction; on autosomes alone, where hemizygosity cannot contribute, the
+sex-specific fraction is 7.3%. Within the fifth of the genome carrying most of the
+signal, where the ratio is best determined, sex and diet together account for
+9.4% (95% CI 5.9–15.9%). This fraction is invisible to any analysis that pools
+sexes and treats environment as a covariate — the standard construction wherever
+environment cannot be manipulated — and it is not distributed uniformly: it is
+concentrated at loci acting in one sex and not the other, which such an analysis
+reports at a fraction of their true effect.
 
 ---
 
@@ -112,8 +109,23 @@ limit", not as a 50 kb localisation.
 | median window h², males / females | 0.15 / 0.07 |
 | median window h² by group (SY10 M / SY20 M / SY20 F / SY10 F) | 0.18 / 0.14 / 0.09 / 0.06 |
 | windows above 2× / 5× / 10× / 20× the median | 35 / 17 / 4.0 / 0.5 % |
-| euchromatic windows with h² > 0 after floor removal | 77.7% (M 79.0, F 65.8) |
-| windows where the shared component exceeds replicate error | 83.3% |
+
+**Fraction of the genome with non-zero h²** — on 1,537 non-overlapping euchromatic
+tiles (every 15th window), comparing the shared component against the replicate
+error from the odd/even split. Both are 1 df against 4 df, so under the null the
+difference is positive only 37.4% of the time, not 50%; the excess over that
+bounds the null fraction.
+
+| quantity | value |
+|---|---|
+| tiles where the shared component exceeds replicate error | 82.7% euchromatin, 83.0% genome-wide |
+| expected under no heritability (simulation, 2×10⁶ draws) | 37.4% |
+| implied upper bound on the null fraction | 28% |
+| implied lower bound on tiles with h² > 0 | 72% |
+| same within one group (SY20 M / SY10 M / SY20 F / SY10 F) | 80.5 / 78.5 / 75.5 / 68.6 % |
+
+The bound assumes a window with real signal is detected with probability 1. If
+detection is imperfect the null fraction is smaller still, so 72% is conservative.
 
 **Design scale**
 
