@@ -138,31 +138,74 @@ headline number depends on them.
 
 ## Results
 
-Autosomes, replicate error and floor both removed:
+The number is a ratio at a place, not a genome-wide constant. Three things have
+to be right before it means anything, and each was got wrong first:
 
-```
-main 90.9%    sex 7.3%    diet 2.2%    sex:diet -0.5%
-```
+- **windows overlap 15-fold** (75 kb windows stepping 5 kb), so summing raw
+  windows counts each piece of genome fifteen times. Every 15th window tiles it
+  once.
+- **blocks must be genetic, not physical.** h2 is smeared over ~9 Mb in the
+  low-recombination regions flanking the centromeres and ~1 Mb in euchromatin,
+  so a fixed Mb block counts one region as ten. A 2 cM block here is 0.38 to
+  6.38 Mb depending on where it sits.
+- **heterochromatin has to go.** It is 7% of the sequence but carries 20% of the
+  h2 -- a threefold enrichment -- and reads ~0% sex+diet, so leaving it in pulls
+  the ratio down.
 
-So a main-effect analysis discards ~9% of the autosomal genetic variance.
+With all three: 2 cM non-overlapping blocks, euchromatin, autosomes, ranked by
+Wald. `partition_by_wald_rank.R` produces this.
 
-- The interaction is **negative under every treatment of the floor** — below the
-  replicate error everywhere. No sex-by-diet interaction across this diet range.
-- The sex term is **concentrated**, not diffuse: the top 1 Mb bin holds 35% of
-  all autosomal sex variance, the top 5 Mb hold 53%. A sex-blind analysis is
-  accurate across most of the genome and substantially wrong at a few loci,
-  which is worse than a uniform loss because it is invisible in aggregate.
-- **The X is excluded from the headline.** It shows main 59.4% / sex 44.3%, but
-  that is largely dominance exposure — hemizygous males cannot mask recessive
-  variation, which is a sex-chromosome property rather than evidence about
-  sex-differential effects. Dosage compensation equalises expression, not allele
-  count, so it does not remove this. The fly X is ~17-20% of the genome against
-  ~5% in humans, where it is often dropped from GWAS entirely, so including it
-  would inflate the number with something that does not transfer.
+| top % genome | blocks | Mb | h2 (of 50) | main | sex+diet | % sex+diet | CI |
+|---|---|---|---|---|---|---|---|
+| 5 | 6 | 8.5 | 20.9 | 19.5 | 1.46 | 7.0 | [3.7, 11.7] |
+| 10 | 11 | 19.0 | 35.0 | 31.9 | 3.14 | 9.0 | [6.0, 14.3] |
+| 20 | 21 | 27.2 | 41.0 | 36.5 | 4.49 | 11.0 | [7.3, 18.4] |
+| 30 | 31 | 34.7 | 44.6 | 39.7 | 4.96 | 11.1 | [7.5, 18.2] |
+| 50 | 52 | 55.5 | 48.8 | 43.9 | 4.86 | 10.0 | [6.3, 15.6] |
+| 100 | 104 | 96.8 | 50.0 | 56.2 | -6.39 | -12.8 | [-82.3, 11.1] |
+
+**Eleven blocks -- 19 Mb, a tenth of the euchromatin -- carry 70% of the
+heritability; twenty-one carry 82%.** Across that range sex + diet is
+**9-11%, with an interval of roughly [6, 18]**.
+
+Going wider gains nothing and eventually breaks. The 100% row is not the
+conservative choice: in the bottom half of the genome the non-main terms sit
+BELOW the replicate error, so they sum negative and take the ratio through zero.
+
+The h2 column is scaled so the genome totals 50%. That scaling is a factor of
+~6 and assumes the overcounting is uniform across the genome, so the absolute
+columns are indicative. The ratio does not depend on it.
+
+### Other properties of the partition
+
+- The **interaction is negative under every treatment of the floor** -- below
+  the replicate error everywhere. No sex-by-diet interaction across this diet
+  range.
+- **The X is excluded.** It reads main 59.4% / sex 44.3%, but that is largely
+  dominance exposure -- hemizygous males cannot mask recessive variation, which
+  is a sex-chromosome property, not evidence about sex-differential effects.
+  Dosage compensation equalises expression, not allele count, so it does not
+  remove this. The fly X is ~17% of the genome against ~5% in humans, where it
+  is often dropped from GWAS entirely, so including it would inflate the number
+  with something that does not transfer.
 - Male Wald scores on the X are *higher* than female (median 1.03 vs 0.30, 4.2%
   vs 0.0% of windows clearing Wald 6) despite males being hemizygous and so
   sampled at half the chromosomes. Lower coverage would cut male power, so the X
   signal is not a precision artifact.
+
+### What this experiment can and cannot resolve
+
+It resolves roughly **ten to twenty independent regions**. That is the
+denominator for any statement about how the variance partitions, and it is why
+the interval is [6, 18] rather than anything sharper. More replicates or finer
+windows will not tighten it; more genome or a trait with more loci would.
+
+It cannot count loci or recover an effect-size distribution. Peak-calling is
+censored both ways: the ten peaks above h2 = 0.75 blank out 19% of the genome
+under any exclusion rule, and the noise floor (median MS_rep 0.020) sits exactly
+where a power law says the counts should be growing. The chr3L QTL is 1.1 Mb
+wide at half-max and spans 4.4 cM, so no fixed exclusion window separates loci
+there and in the pericentromeric blocks at the same time.
 
 ## Are the terms real? (the sign test, and its non-obvious null)
 
