@@ -164,6 +164,31 @@ So a main-effect analysis discards ~9% of the autosomal genetic variance.
   sampled at half the chromosomes. Lower coverage would cut male power, so the X
   signal is not a precision artifact.
 
+## Are the terms real? (the sign test, and its non-obvious null)
+
+A term below zero means it is smaller than the replicate error. It is tempting
+to read "below zero half the time" as noise, but that is the wrong baseline.
+MS_term carries 1 df and MS_rep carries 4, and a 1 df chi-square is strongly
+right-skewed (median 0.45 sigma^2 against mean sigma^2), so a term that is PURE
+NOISE sits below zero **62.6%** of the time, not 50%. Simulated over 2e6 draws.
+
+Observed, with 95% intervals from resampling 67 independent 2 Mb blocks:
+
+| term | % below zero | 95% CI | reading |
+|---|---|---|---|
+| main | 16.7% | [12.2, 21.1] | real |
+| sex | 29.9% | [22.1, 36.8] | real |
+| diet | 47.5% | [40.4, 55.4] | real, weakest |
+| sex:diet | 67.4% | [61.1, 73.0] | nothing -- CI contains the null |
+
+Autosomes only: sex 35.6% [28.1, 44.0], diet 42.1% [34.0, 50.4]; both still
+exclude 62.6.
+
+So the stretches where main or sex dip below zero in Figure 1C are expected even
+for a strongly real term, and diet spending about half its time below zero is
+evidence FOR diet, not against it. The interaction sitting on the null is the
+one term the test calls empty, which agrees with every other view of it.
+
 ## Open
 
 - Panels A and B of Figure 1 currently use the split-half scans averaged over
