@@ -15,7 +15,7 @@
 # point LIVE_SCAN_DIR at a folder holding <scan>/<scan>.scan.txt for the four
 # treatments; everything else is unchanged.
 
-suppressMessages({library(tidyverse); library(patchwork)})
+suppressMessages({library(tidyverse); library(ggbreak); library(aplot)})
 
 LONG      <- "process/AGE_SY_splithalf/AGE_SY_splithalf_H2.txt.gz"
 VARCOMP   <- "process/AGE_SY_splithalf/H2_varcomp_by_window.txt.gz"
@@ -97,56 +97,68 @@ cmp <- vcx %>%
   mutate(term = factor(term, levels = CMP_LEV), gx = (bin + offset) / 1e6)
 
 # ── panels ───────────────────────────────────────────────────────────────────
-base <- function(p, ybreaks = waiver()) p +
-  geom_rect(data = het_bands, aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
-            fill = "grey88", colour = NA, inherit.aes = FALSE) +
-  geom_vline(xintercept = chr_edges, linetype = "dotted", colour = "grey35", linewidth = 0.3) +
-  scale_x_continuous(limits = c(0, xmax_all), expand = expansion(0),
-                     breaks = chr_breaks, labels = CHRLAB[CHRS]) +
-  scale_y_continuous(breaks = ybreaks) +
-  theme_classic(base_size = 8) +
-  theme(axis.title.x = element_blank(),
-        plot.margin = margin(2, 4, 1, 2),
-        plot.tag = element_text(size = 10, face = "bold"),
-        plot.tag.position = c(0.005, 0.98),
-        legend.position = "none")
+# Broken y axis on every panel via ggbreak, so the chr3L locus does not set the
+# scale for the whole genome. scales = 1/3 makes the upper segment a third the
+# height of the lower, i.e. the 3:1 split.
 
-pA <- base(ggplot(scans, aes(gx, wald, colour = trt)) + geom_line(linewidth = 0.28)) +
-  scale_colour_manual(values = TRT_COL, drop = FALSE) +
+deco <- function(tag, xaxis = FALSE) {
+  th <- theme_classic(base_size = 8) +
+    theme(axis.title.x = element_blank(),
+          plot.tag = element_text(size = 10, face = "bold"),
+          plot.tag.position = c(0.004, 0.97),
+          plot.margin = margin(2, 4, 1, 2),
+          legend.position = "none",
+          # ggbreak mirrors the axis on the right; drop it
+          axis.text.y.right = element_blank(), axis.ticks.y.right = element_blank(),
+          axis.line.y.right = element_blank(), axis.title.y.right = element_blank())
+  if (!xaxis) th <- th + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+  list(
+    geom_rect(data = het_bands, aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
+              fill = "grey88", colour = NA, inherit.aes = FALSE),
+    geom_vline(xintercept = chr_edges, linetype = "dotted", colour = "grey35", linewidth = 0.3),
+    scale_x_continuous(limits = c(0, xmax_all), expand = expansion(0),
+                       breaks = chr_breaks, labels = CHRLAB[CHRS]),
+    labs(tag = tag), th)
+}
+
+pA <- ggplot(scans, aes(gx, wald, colour = trt)) +
+  geom_line(linewidth = 0.28) +
+  scale_colour_manual(values = TRT_COL) +
+  scale_y_continuous(breaks = c(0, 5, 10, 15, 25, 50, 75, 100)) +
+  scale_y_break(c(15, 17), scales = 1/3, space = 0.12, ticklabels = c(25, 50, 75, 100)) +
   labs(y = expression(-log[10] * italic(P))) +
-  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+  deco("A")
 
-pB <- base(ggplot(scans, aes(gx, h2, colour = trt)) + geom_line(linewidth = 0.28)) +
-  scale_colour_manual(values = TRT_COL, drop = FALSE) +
+pB <- ggplot(scans, aes(gx, h2, colour = trt)) +
+  geom_line(linewidth = 0.28) +
+  scale_colour_manual(values = TRT_COL) +
+  scale_y_continuous(breaks = c(0, 0.5, 1, 1.5, 2, 3, 4, 5)) +
+  scale_y_break(c(2, 2.2), scales = 1/3, space = 0.12, ticklabels = c(3, 4, 5)) +
   labs(y = expression(italic(h)^2)) +
-  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+  deco("B")
 
-pC <- base(ggplot(cmp, aes(gx, y, colour = term)) +
-             geom_hline(yintercept = 0, colour = "grey60", linewidth = 0.25) +
-             geom_line(linewidth = 0.35)) +
-  scale_colour_manual(values = CMP_COL, drop = FALSE) +
-  coord_cartesian(ylim = YLIM_C) +
-  labs(y = expression(italic(h)^2))
+pC <- ggplot(cmp, aes(gx, y, colour = term)) +
+  geom_hline(yintercept = 0, colour = "grey60", linewidth = 0.25) +
+  geom_line(linewidth = 0.35) +
+  scale_colour_manual(values = CMP_COL) +
+  scale_y_continuous(breaks = c(-0.2, 0, 0.25, 0.5, 0.75, 1, 2)) +
+  scale_y_break(c(0.75, 0.82), scales = 1/3, space = 0.12, ticklabels = c(1, 2)) +
+  labs(y = expression(italic(h)^2)) +
+  deco("C", xaxis = TRUE)
 
-# two short keys, side by side, below
-key <- function(lev, col, ttl) {
+key <- function(lev, col) {
   ggplot(tibble(x = 1, y = 1, g = factor(lev, levels = lev)), aes(x, y, colour = g)) +
     geom_line() + scale_colour_manual(values = col, name = NULL, drop = FALSE) +
     guides(colour = guide_legend(nrow = 1, keywidth = unit(9, "pt"),
                                  override.aes = list(linewidth = 0.8))) +
     theme_void(base_size = 8) + theme(legend.position = "bottom")
 }
-
-fig <- (pA / pB / pC) + plot_layout(heights = c(1, 1, 1)) +
-  plot_annotation(tag_levels = "A")
-
-# assemble with the two keys underneath
-g <- cowplot::plot_grid(
-  fig,
+legs <- ggplotify::as.ggplot(
   cowplot::plot_grid(cowplot::get_legend(key(TRT_LEV, TRT_COL)),
                      cowplot::get_legend(key(CMP_LEV, CMP_COL)),
-                     nrow = 1, rel_widths = c(2.1, 1)),
-  ncol = 1, rel_heights = c(1, 0.085))
+                     nrow = 1, rel_widths = c(2.1, 1)))
+
+g <- aplot::plot_list(pA, pB, pC, legs, ncol = 1, heights = c(1, 1, 1.12, 0.1))
 
 png(OUT, width = W_IN, height = H_IN, units = "in", res = DPI)
 print(g)
