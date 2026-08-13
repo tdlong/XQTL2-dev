@@ -140,14 +140,15 @@ deco <- function(xaxis = FALSE) {
 
 # marks the break with two short diagonals on the y axis
 # the // that marks the discontinuity, straddling the y axis
+# two short parallel strokes across the axis, stacked vertically -- the y-axis
+# form of a break mark (side by side is the x-axis form)
 slash <- function(yr, at) {
-  d <- diff(yr) * 0.045; w <- xmax_all * 0.0045
-  list(
-    annotate("segment", x = -w*2.4, xend = w*1.2, y = at, yend = at,
-             colour = "white", linewidth = 1.4),
-    annotate("segment", x = c(-w*2.0, -w*0.6), xend = c(-w*0.6, w*0.8),
-             y = c(at - d, at - d), yend = c(at + d, at + d),
-             colour = "black", linewidth = 0.4))
+  dy <- diff(yr) * 0.045     # separation of the two strokes
+  h  <- diff(yr) * 0.028     # slant of each
+  w  <- xmax_all * 0.0035
+  annotate("segment", x = c(-w, -w), xend = c(w, w),
+           y = c(at - dy - h, at + dy - h), yend = c(at - dy + h, at + dy + h),
+           colour = "black", linewidth = 0.4)
 }
 
 split_panel <- function(d, yv, cv, cols, brk, lo, hi, lo_brk, hi_brk,
@@ -165,24 +166,24 @@ split_panel <- function(d, yv, cv, cols, brk, lo, hi, lo_brk, hi_brk,
     coord_cartesian(xlim = c(0, xmax_all), ylim = hi, clip = "off") + slash(hi, hi[1]) +
     labs(y = NULL, tag = tag) +
     theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
-          axis.line.x = element_blank(), plot.margin = margin(2, 4, 0, 16))
+          axis.line.x = element_blank(), plot.margin = margin(7, 4, 0, 16))
   bot <- ggplot() + deco(xaxis) + z + gl(mask(d, yv, FALSE, brk)) +
     scale_colour_manual(values = cols, drop = FALSE) +
     scale_y_continuous(breaks = lo_brk, expand = expansion(0)) +
     coord_cartesian(xlim = c(0, xmax_all), ylim = lo, clip = "off") + slash(lo, lo[2]) +
     labs(y = ylab) +
     theme(plot.margin = margin(0, 4, 2, 16))
-  top / bot + plot_layout(heights = c(1, 3))
+  list(top = top, bot = bot)
 }
 
 pA <- split_panel(scans, "wald", "trt", TRT_COL, 20, c(0, 20), c(20, 105),
-                  c(0, 5, 10, 15, 20), c(40, 60, 80, 100),
+                  c(0, 5, 10, 15), c(40, 60, 80, 100),
                   expression(-log[10] * italic(P)), "A", lw = 0.28)
 pB <- split_panel(scans, "h2", "trt", TRT_COL, 2.5, c(0, 2.5), c(2.5, 5),
-                  c(0, 0.5, 1, 1.5, 2, 2.5), c(3, 4, 5),
+                  c(0, 0.5, 1, 1.5, 2), c(3, 4, 5),
                   expression(italic(h)^2), "B", lw = 0.28)
 pC <- split_panel(cmp, "y", "term", CMP_COL, 0.75, c(-0.25, 0.75), c(0.75, 2.9),
-                  c(-0.2, 0, 0.25, 0.5, 0.75), c(1, 2),
+                  c(-0.2, 0, 0.25, 0.5), c(1, 2),
                   expression(italic(h)^2), "C", lw = 0.35, zero = TRUE, xaxis = TRUE)
 
 key <- function(lev, col) {
@@ -193,8 +194,13 @@ key <- function(lev, col) {
     theme_void(base_size = 8) + theme(legend.position = "bottom")
 }
 
+# one patchwork over all six sub-panels: patchwork aligns the panel areas, so
+# the three groups line up even though their y labels differ in width
+fig <- pA$top / pA$bot / pB$top / pB$bot / pC$top / pC$bot +
+  plot_layout(heights = c(1, 3, 1, 3, 1, 3))
+
 g <- cowplot::plot_grid(
-  cowplot::plot_grid(pA, pB, pC, ncol = 1, rel_heights = c(1, 1, 1.1)),
+  fig,
   cowplot::plot_grid(cowplot::get_legend(key(TRT_LEV, TRT_COL)),
                      cowplot::get_legend(key(CMP_LEV, CMP_COL)),
                      nrow = 1, rel_widths = c(2.1, 1)),
