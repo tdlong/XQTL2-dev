@@ -6,7 +6,7 @@ into shared, sex and diet components.**
 In all three panels the vertical axis is broken so that the large-effect locus
 on 3L does not set the scale for the rest of the genome: the lower segment
 occupies three quarters of the panel height and the upper segment one quarter,
-with the break at 20 in (A), 2.5 in (B) and 0.75 in (C). The chr3L peak reaches
+with the break at 45 in (A), 2.5 in (B) and 0.75 in (C). The chr3L peak reaches
 -log10(P) = 207 in SY20 males.
 
 Chromosome arms are concatenated left to right (X, 2L, 2R, 3L, 3R); dotted
