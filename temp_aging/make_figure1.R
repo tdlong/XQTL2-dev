@@ -19,7 +19,11 @@ suppressMessages({library(tidyverse); library(patchwork)})
 
 LONG      <- "process/AGE_SY_splithalf/AGE_SY_splithalf_H2.txt.gz"
 VARCOMP   <- "process/AGE_SY_splithalf/H2_varcomp_by_window.txt.gz"
-LIVE_SCAN_DIR <- NULL          # e.g. "process/AGE_SY/Scans" for the 12-rep scans
+# The 12-replicate scans, collapsed to one small file by make_4scan_df.R on the
+# cluster. If it is present it is used for panels A and B; otherwise those fall
+# back to the split-half scans averaged over halves, which is NOT the same thing
+# (6 replicates per half, so the Wald peaks are lower).
+FOURSCAN <- "process/AGE_SY/AGE_SY_4scan.txt.gz"
 OUT       <- "temp_aging/Figure1_plot.png"
 W_IN <- 7.5; H_IN <- 6; DPI <- 300
 SMOOTH_BP_C <- 5e5             # rolling mean on panel C only
@@ -42,18 +46,15 @@ CMP_COL <- c(main = "grey25", sex = "#E69F00", diet = "#009E73")
 long <- read.table(LONG, header = TRUE, sep = "\t") %>% as_tibble()
 vc   <- read.table(VARCOMP, header = TRUE, sep = "\t") %>% as_tibble()
 
-scans <- if (is.null(LIVE_SCAN_DIR)) {
+scans <- if (file.exists(FOURSCAN)) {
+  cat("panels A/B: 12-replicate scans from", FOURSCAN, "\n")
+  read.table(FOURSCAN, header = TRUE, sep = "\t") %>% as_tibble() %>%
+    transmute(chr, pos, sugar, sex, wald = Wald_log10p, h2 = Cutl_H2)
+} else {
+  cat("panels A/B: FALLING BACK to the split-half scans averaged over halves.\n",
+      "  Run temp_aging/make_4scan_df.R on hpc3 and fetch", basename(FOURSCAN), "\n", sep = "")
   long %>% group_by(chr, pos, sugar, sex) %>%
     summarise(wald = mean(Wald_log10p), h2 = mean(Cutl_H2), .groups = "drop")
-} else {
-  expand_grid(sugar = c("SY10","SY20"), sex = c("F","M")) %>%
-    mutate(scan = paste0("AGE_", sugar, "_", sex)) %>%
-    pmap_dfr(function(sugar, sex, scan) {
-      read.table(file.path(LIVE_SCAN_DIR, scan, paste0(scan, ".scan.txt")),
-                 header = TRUE) %>%
-        transmute(chr, pos = as.integer(pos), sugar, sex,
-                  wald = Wald_log10p, h2 = Cutl_H2)
-    })
 }
 scans <- scans %>%
   mutate(trt = factor(paste0(sugar, " ", ifelse(sex == "F", "female", "male")),
@@ -144,8 +145,12 @@ deco <- function(xaxis = FALSE) {
 # gets one at its top and the upper panel one at its bottom; with the gap
 # between the panels those two strokes are the break notation. (Two strokes per
 # panel gives four at the break, which is wrong.)
-slash <- function(yr, at) {
-  h <- diff(yr) * 0.030      # slant
+# `rel` is the sub-panel's relative height in the layout (1 for the short upper
+# segment, 3 for the tall lower one). Dividing by it makes the stroke the same
+# size ON THE PAGE in both, hence the same angle -- a fixed fraction of each
+# panel's data range would make the lower stroke three times taller.
+slash <- function(yr, at, rel) {
+  h <- diff(yr) * 0.030 / rel
   w <- xmax_all * 0.004
   annotate("segment", x = -w, xend = w, y = at - h, yend = at + h,
            colour = "black", linewidth = 0.4)
@@ -166,16 +171,16 @@ split_panel <- function(d, yv, cv, cols, brk, lo, hi, lo_brk, hi_brk,
   top <- ggplot() + deco() + zl(hi) + gl(mask(d, yv, TRUE, brk)) +
     scale_colour_manual(values = cols, drop = FALSE) +
     scale_y_continuous(breaks = hi_brk, expand = expansion(0)) +
-    coord_cartesian(xlim = c(0, xmax_all), ylim = hi, clip = "off") + slash(hi, hi[1]) +
+    coord_cartesian(xlim = c(0, xmax_all), ylim = hi, clip = "off") + slash(hi, hi[1], 1) +
     labs(y = NULL, tag = tag) +
     theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
-          axis.line.x = element_blank(), plot.margin = margin(7, 4, 5, 16))
+          axis.line.x = element_blank(), plot.margin = margin(7, 4, 2, 16))
   bot <- ggplot() + deco(xaxis) + zl(lo) + gl(mask(d, yv, FALSE, brk)) +
     scale_colour_manual(values = cols, drop = FALSE) +
     scale_y_continuous(breaks = lo_brk, expand = expansion(0)) +
-    coord_cartesian(xlim = c(0, xmax_all), ylim = lo, clip = "off") + slash(lo, lo[2]) +
+    coord_cartesian(xlim = c(0, xmax_all), ylim = lo, clip = "off") + slash(lo, lo[2], 3) +
     labs(y = ylab) +
-    theme(plot.margin = margin(5, 4, 2, 16))
+    theme(plot.margin = margin(2, 4, 2, 16))
   list(top = top, bot = bot)
 }
 
