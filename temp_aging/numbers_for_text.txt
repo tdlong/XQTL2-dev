@@ -1,0 +1,15 @@
+VARIANCE PARTITION OF CUTLER h2
+
+autosomes (headline)         main  90.9%   sex   7.3%   diet   2.2%   sex:diet  -0.5%   (n=20776 windows)
+whole genome incl. X         main  88.5%   sex  10.2%   diet   1.9%   sex:diet  -0.6%   (n=24988 windows)
+X only                       main  59.4%   sex  44.3%   diet  -1.8%   sex:diet  -1.9%   (n=4212 windows)
+autosomes, Wald>6 windows    main  91.7%   sex   6.8%   diet   1.9%   sex:diet  -0.4%   (n=6552 windows)
+
+chr3L QTL, 9.3-9.6 Mb:
+  chr3L peak                 main  86.3%   sex  13.4%   diet   0.5%   sex:diet  -0.2%   (n=59 windows)
+
+concentration of the sex term (autosomes): share of total sex variance
+  top  1 Mb bins: 35%
+  top  5 Mb bins: 53%
+  top 10 Mb bins: 67%
+  top 20 Mb bins: 83%
