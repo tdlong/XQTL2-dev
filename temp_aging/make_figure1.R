@@ -140,14 +140,14 @@ deco <- function(xaxis = FALSE) {
 
 # marks the break with two short diagonals on the y axis
 # the // that marks the discontinuity, straddling the y axis
-# two short parallel strokes across the axis, stacked vertically -- the y-axis
-# form of a break mark (side by side is the x-axis form)
+# ONE stroke, marking where this sub-panel's y axis terminates. The lower panel
+# gets one at its top and the upper panel one at its bottom; with the gap
+# between the panels those two strokes are the break notation. (Two strokes per
+# panel gives four at the break, which is wrong.)
 slash <- function(yr, at) {
-  dy <- diff(yr) * 0.045     # separation of the two strokes
-  h  <- diff(yr) * 0.028     # slant of each
-  w  <- xmax_all * 0.0035
-  annotate("segment", x = c(-w, -w), xend = c(w, w),
-           y = c(at - dy - h, at + dy - h), yend = c(at - dy + h, at + dy + h),
+  h <- diff(yr) * 0.030      # slant
+  w <- xmax_all * 0.004
+  annotate("segment", x = -w, xend = w, y = at - h, yend = at + h,
            colour = "black", linewidth = 0.4)
 }
 
@@ -159,20 +159,23 @@ split_panel <- function(d, yv, cv, cols, brk, lo, hi, lo_brk, hi_brk,
                                aes(gx, .data[[yv]], colour = .data[[cv]],
                                    group = interaction(.data[[cv]], chr)),
                                linewidth = lw)
-  z <- if (zero) geom_hline(yintercept = 0, colour = "grey60", linewidth = 0.25) else NULL
-  top <- ggplot() + deco() + z + gl(mask(d, yv, TRUE, brk)) +
+  # the zero line belongs only to the segment whose range contains zero; with
+  # clip = "off" the other segment would draw it far outside its own panel
+  zl <- function(r) if (zero && r[1] <= 0 && r[2] >= 0)
+    geom_hline(yintercept = 0, colour = "grey60", linewidth = 0.25) else NULL
+  top <- ggplot() + deco() + zl(hi) + gl(mask(d, yv, TRUE, brk)) +
     scale_colour_manual(values = cols, drop = FALSE) +
     scale_y_continuous(breaks = hi_brk, expand = expansion(0)) +
     coord_cartesian(xlim = c(0, xmax_all), ylim = hi, clip = "off") + slash(hi, hi[1]) +
     labs(y = NULL, tag = tag) +
     theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
-          axis.line.x = element_blank(), plot.margin = margin(7, 4, 0, 16))
-  bot <- ggplot() + deco(xaxis) + z + gl(mask(d, yv, FALSE, brk)) +
+          axis.line.x = element_blank(), plot.margin = margin(7, 4, 5, 16))
+  bot <- ggplot() + deco(xaxis) + zl(lo) + gl(mask(d, yv, FALSE, brk)) +
     scale_colour_manual(values = cols, drop = FALSE) +
     scale_y_continuous(breaks = lo_brk, expand = expansion(0)) +
     coord_cartesian(xlim = c(0, xmax_all), ylim = lo, clip = "off") + slash(lo, lo[2]) +
     labs(y = ylab) +
-    theme(plot.margin = margin(0, 4, 2, 16))
+    theme(plot.margin = margin(5, 4, 2, 16))
   list(top = top, bot = bot)
 }
 
