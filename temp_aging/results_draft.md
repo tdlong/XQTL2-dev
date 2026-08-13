@@ -25,18 +25,12 @@ in the population.
 
 **On a scale of trait variance, none of it is large.** The Wald test asks whether
 a haplotype frequency moved, not how much of the trait the region controls, and
-at this sample size a very small shift is very significant. To put the scan on a
-variance scale we use the founder frequencies themselves. The population descends
-from eight inbred founders, so at every window we estimate the frequency of each
-founder haplotype in the selected flies and in the control from the same cage. A
-founder haplotype over-represented among the long-lived is one whose carriers
-were more likely to reach the selected tail, and the ratio of its two frequencies
-is the penetrance of that haplotype for the selection criterion. Treating lifespan
-as an underlying liability with a threshold at the selected proportion, each
-penetrance becomes a displacement in mean liability for carriers of that
-haplotype, and the variance in displacement among the eight founders — weighted
-by their frequencies — is the share of phenotypic variance the window accounts
-for (Methods). Figure 1b is that quantity. On it, the chr3L locus accounts for
+at this sample size a very small shift is very significant. The population
+descends from eight inbred founders and the proportion selected in each cage is
+known, and there is theory relating the squared changes in the eight founder
+frequencies at a window to the heritability that window accounts for (Methods).
+This gives an estimate of *h*² per window, as a percentage of phenotypic
+variance, and it is what Fig. 1b shows. The chr3L locus accounts for
 4.6% of phenotypic variance in the group where it is strongest and 2.5% where it
 is weakest: large for a longevity locus, but not the classical major QTL that a
 −log10 *P* of 207 might suggest. The next largest regions reach only 1.3–1.7%,
