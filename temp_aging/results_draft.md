@@ -25,20 +25,25 @@ sample size very small shifts are highly significant. Because the population
 derives from eight inbred founders and the selected proportion of each cage is
 known, the squared changes in founder frequency at a window can be converted to
 the heritability that window accounts for (Methods), placing the scan on a scale
-of phenotypic variance (Fig. 1b). Comparing non-overlapping 75 kb tiles against
-the replicate error recovered from the odd/even split, the estimated contribution
-exceeds that error at 83% of euchromatic tiles against 37% expected in its
-absence, bounding the null fraction at 28% and implying that at least 72% of the
-euchromatic genome carries non-zero heritability for lifespan (69–81% within a
-single group). Individual contributions are nonetheless small. The chr3L locus
-accounts for 4.6% of phenotypic variance in the group in which it is strongest
-and 2.5% in the weakest — substantial for a longevity locus, but far from the
-major QTL implied by a −log10 *P* of 207 — while the next largest regions reach
-1.3–1.7% and the median euchromatic window 0.15% in males and 0.07% in females.
-Resolving contributions of this magnitude required screening ~400,000 flies,
-selecting the longest-lived 5.5% and sequencing 23,485 selected individuals;
-effects in the second tier of Fig. 1a fall below the detection limit of designs
-an order of magnitude smaller.
+of phenotypic variance (Fig. 1b). Within a character the two are driven by the
+same frequency shifts and trace a single curve, so the significance threshold
+transfers directly onto the heritability scale: fitting *h*² on Wald per
+character and evaluating at −log10 *P* = 5 returns 0.72, 0.75, 0.77 and 0.83% of
+phenotypic variance across the four groups, against ~0.5% where the Wald test
+detects nothing. Windows contributing more than ~0.8% of phenotypic variance are
+therefore significant, and 32–45% of the euchromatic genome exceeds that value in
+each group; because −log10 *P* = 5 is a conservative cutoff rather than a
+detection limit, a considerably larger fraction is suggestive. Individual
+contributions are nonetheless small. The chr3L locus reaches 4.85% of phenotypic
+variance in high-sugar males and 2.51% in low-sugar females — substantial for a
+longevity locus, but far from the major QTL implied by a −log10 *P* of 207 — the
+next largest regions reach 1.5–2.2%, and the great majority of the significant
+genome lies just above 0.8%. Resolving contributions of this magnitude required
+screening ~400,000 flies, selecting the longest-lived 5.5% and sequencing 23,485
+selected individuals; effects in this range fall below the detection limit of
+designs an order of magnitude smaller. This third of the genome is also where the
+partition in Fig. 1c can be read, a ratio of components being meaningful only
+where there is heritability to divide.
 
 **Architecture differs between the sexes but is largely invariant to diet.** On
 the X chromosome the median window contributes 0.43% of phenotypic variance in
@@ -102,30 +107,34 @@ limit", not as a 50 kb localisation.
 
 **Magnitude (Fig. 1b)**
 
+**What value of h² is significant** (`h2_threshold.R`). Within a character, Wald
+and *h*² trace a single curve, so the −log10 *P* = 5 cutoff transfers onto the
+*h*² scale. Fit is a spline of *h*² on log(Wald) per character over 1,537
+non-overlapping euchromatic windows; values are raw, as plotted in Fig. 1b.
+
+| character | h² at Wald 2 | **h² at Wald 5** | se | h² at Wald 10 | % euchr. above h²(Wald 5) | % euchr. Wald > 5 |
+|---|---|---|---|---|---|---|
+| SY10 female | 0.58 | **0.72** | 0.007 | 0.89 | 32.8 | 28.3 |
+| SY20 female | 0.59 | **0.75** | 0.007 | 0.89 | 31.9 | 31.3 |
+| SY10 male | 0.68 | **0.77** | 0.010 | 1.09 | 45.0 | 38.8 |
+| SY20 male | 0.63 | **0.83** | 0.012 | 1.03 | 34.8 | 27.9 |
+
+The last two columns are two routes to the same cut and agree to within a few
+points, as they must if the curve is monotone. Where they differ it is scatter
+about the spline: the male *h*² distributions are wider, so more windows clear the
+fitted *h*² than clear the Wald cut itself.
+
+At windows where the character's own Wald is below 2 — the floor — raw *h*² is
+0.52 / 0.50 / 0.56 / 0.55 (median) in the four groups.
+
+**Effect sizes on the same raw scale**
+
 | quantity | value |
 |---|---|
-| chr3L 9.30 Mb, corrected h² (SY20 M / SY10 M / SY20 F / SY10 F) | 4.60 / 4.07 / 2.93 / 2.50 |
-| next largest regions: 3R 8.68 / 3L 21.64 / 2L 14.85 / 2L 10.70 / X 10.10 | 1.67 / 1.34 / 1.46 / 1.16 / 1.54 |
-| median window h², males / females | 0.15 / 0.07 |
-| median window h² by group (SY10 M / SY20 M / SY20 F / SY10 F) | 0.18 / 0.14 / 0.09 / 0.06 |
-| windows above 2× / 5× / 10× / 20× the median | 35 / 17 / 4.0 / 0.5 % |
-
-**Fraction of the genome with non-zero h²** — on 1,537 non-overlapping euchromatic
-tiles (every 15th window), comparing the shared component against the replicate
-error from the odd/even split. Both are 1 df against 4 df, so under the null the
-difference is positive only 37.4% of the time, not 50%; the excess over that
-bounds the null fraction.
-
-| quantity | value |
-|---|---|
-| tiles where the shared component exceeds replicate error | 82.7% euchromatin, 83.0% genome-wide |
-| expected under no heritability (simulation, 2×10⁶ draws) | 37.4% |
-| implied upper bound on the null fraction | 28% |
-| implied lower bound on tiles with h² > 0 | 72% |
-| same within one group (SY20 M / SY10 M / SY20 F / SY10 F) | 80.5 / 78.5 / 75.5 / 68.6 % |
-
-The bound assumes a window with real signal is detected with probability 1. If
-detection is imperfect the null fraction is smaller still, so 72% is conservative.
+| chr3L 9.30 Mb (SY20 M / SY10 M / SY20 F / SY10 F) | 4.85 / 4.42 / 3.09 / 2.51 |
+| next largest regions: 3R 8.66 / X 10.09 / 2L 14.85 / 3L 21.64 / 2L 10.70 | 2.23 / 2.08 / 1.99 / 1.89 / 1.69 |
+| floor-corrected equivalents at chr3L 9.30 | 4.60 / 4.07 / 2.93 / 2.50 |
+| median floor-corrected window h², males / females | 0.15 / 0.07 |
 
 **Design scale**
 
