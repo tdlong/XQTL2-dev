@@ -26,13 +26,23 @@ SS_rep (within-cell odd−even) on 4. Each term is reported as MS − SS_rep/4, 
 in *h*² units as sign·√(|MS − MS_rep|/8). Terms are not truncated at zero.
 Verified against `aov()`.
 
-**Heritability floor.** *h*² squares an estimate, so E[*h*²] = true + b with b > 0
-and independent of replication (minimum observed *h*² 0.114). XQTL2 reports b,
-but it is overstated where large and subtracting it unmodified yields *h*² of −6.
-It was recalibrated by isotonic regression of *h*² on b over windows with Wald
-−log10 *P* < 2, where true *h*² ≈ 0 so the observed value is the floor; the fit
-is near-flat (b of 0.13–8.29 maps to 0.47–0.64). b cancels from the sex, diet and
-interaction contrasts and enters only the main term.
+**Heritability floor.** *h*² is a sum of squared founder effects, and those
+effects are estimated with error, so squaring inflates them: a window at which no
+frequency changed still returns a positive *h*². Call that inflation *b*. It is a
+within-replicate bias — every replicate carries the same offset — so averaging
+replicates reduces the variance of *h*² but not *b*. Consistent with this, *h*²
+never falls below 0.114 across the 199,904 measures.
+
+XQTL2 estimates *b* per window by integrating E[Affect²] over the sampling
+distribution of the frequency estimates. That estimate is sound where *b* is
+small but overstated where it is large, and subtracting it unmodified gives *h*²
+of −6 at some windows. It was therefore recalibrated against an internal null:
+windows with Wald −log10 *P* < 2 have no detectable frequency change, so their
+true *h*² is ≈ 0 and their observed *h*² is *b* itself. An isotonic regression of
+*h*² on the reported *b* over those windows was fitted and applied genome-wide;
+the fit is near-flat, mapping reported *b* of 0.13–8.29 onto 0.47–0.64. *b*
+cancels from the sex, diet and interaction contrasts, which are differences
+between cells, and enters only the main term.
 
 **Blocks.** Windows overlap 15-fold, so every 15th was taken to tile the genome
 once, then aggregated into 2 cM blocks — genetic distance because *h*² spreads
