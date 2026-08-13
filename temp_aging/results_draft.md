@@ -3,21 +3,25 @@
 **Selection for long life moves haplotype frequencies over much of the genome.**
 Each of the four sex-by-diet groups was scanned separately, contrasting the
 long-lived tail of each of 12 cages against an unselected sample from the same
-cage (Fig. 1a). A Bonferroni threshold over the ~1,670 independent 75 kb windows
-that tile the genome falls at −log10 *P* = 4.5, and 45% of euchromatic windows
-exceed −log10 *P* = 6 in at least one group; within a single group the figure is
-24–32%. Significance therefore does not usefully divide this genome into hits and
-non-hits, because too much of it qualifies. One region is far above the rest: a
-locus at chr3L 9.3 Mb reaches −log10 *P* = 207.5 in high-sugar males and is the
-strongest signal in all four groups. What the scan is not is a featureless
-elevation. The 40 contiguous euchromatic regions above threshold have a median
-width of 530 kb (1.1 cM), with a quartile range of 180 kb to 1.7 Mb, and the
-narrowest of them are as narrow as the 75 kb window and 100 kb smoothing can
-render — the resolution limit here is the analysis, not the extent of linkage
-disequilibrium in a population that has been recombining freely for many
-generations. Structure on that scale is easier to reconcile with many discrete
-loci of small effect than with a strictly infinitesimal architecture, though the
-scan alone cannot separate the two.
+cage (Fig. 1a). Windows overlap fifteenfold and are in linkage disequilibrium
+besides, so the tests are far from independent and no multiple-testing correction
+is attempted; taking −log10 *P* = 5 as a working cutoff, 55% of the euchromatic
+genome exceeds it in at least one group, 29% exceeds 10 and 20% exceeds 15, and
+within a single group the corresponding figures are 28–38%, 17–19% and 12–15%. A
+threshold does not usefully divide this genome into hits and non-hits, because
+too much of it qualifies. One region stands far apart: a locus at chr3L 9.3 Mb
+reaching −log10 *P* = 207.5 in high-sugar males, the strongest signal in all four
+groups. The better peaks also give a sense of the resolution available. This is
+not a single-generation cross but an advanced-generation one, in which repeated
+rounds of recombination have broken the founder haplotypes into short blocks.
+Across the twelve well-separated peaks above −log10 *P* = 15, the interval within
+2 units of the peak has a median width of 0.5 cM, and 0.11–0.84 cM for all but
+one of them — corresponding to anywhere between 50 kb and 1.4 Mb of sequence,
+depending on the local recombination rate. The genetic width of these intervals
+is consistent; the physical width is not, and tracks recombination. The narrowest
+of them are at or below the 75 kb window and 100 kb smoothing, so what limits
+resolution here is the analysis rather than the extent of linkage disequilibrium
+in the population.
 
 **On a scale of trait variance, none of it is large.** The Wald test asks whether
 a haplotype frequency moved, not how much of the trait the region controls, and
@@ -76,13 +80,34 @@ over euchromatic windows unless noted.
 
 | quantity | value |
 |---|---|
-| windows / independent tiles / Bonferroni 0.05 threshold | 24,988 / 1,666 / −log10 *P* = 4.52 |
-| euchromatic windows above 4.52 / 6 / 8 / 10 | 59.3 / 45.4 / 35.6 / 28.7 % |
-| above 6 within one group (SY10 M / SY10 F / SY20 F / SY20 M) | 31.6 / 26.0 / 26.2 / 24.1 % |
+| euchromatic genome above −log10 *P* 5 / 10 / 15 / 20, any group | 54.7 / 28.7 / 20.3 / 16.7 % |
+| same within one group, above 5 | 28.1–38.4% (SY20 M lowest, SY10 M highest) |
+| same within one group, above 10 / 15 | 16.6–19.4 / 12.4–15.0 % |
 | max −log10 *P* per group (SY20 M / SY10 M / SY20 F / SY10 F) | 207.5 / 133.6 / 73.1 / 49.8 |
-| contiguous euchromatic regions above −log10 *P* = 6 | 40 |
-| their width: median / quartiles / max | 530 kb (1.09 cM) / 178 kb–1.7 Mb / 10.4 Mb |
-| their peak height: median / upper quartile | 9.1 / 14.4 |
+| well-separated euchromatic peaks above 15 (±5 cM exclusion) | 12 |
+
+2-unit support intervals for those twelve, sorted by peak height:
+
+| peak | −log10 *P* | 2-unit drop, kb | 2-unit drop, cM |
+|---|---|---|---|
+| chr3L 9.30 | 207.5 | 50 | 0.20 |
+| chr3R 8.66 | 42.1 | 855 | 0.31 |
+| chr3L 21.64 | 38.2 | 1370 | 0.14 |
+| chr2L 10.70 | 30.5 | 120 | 0.37 |
+| chr2R 25.10 | 28.7 | 90 | 0.11 |
+| chr3L 7.50 | 27.0 | 555 | 2.23 |
+| chr2L 14.85 | 23.9 | 225 | 0.31 |
+| chr2R 13.88 | 21.0 | 270 | 0.80 |
+| chr2R 16.52 | 17.3 | 165 | 0.58 |
+| chr3R 22.41 | 16.8 | 195 | 0.84 |
+| chr3R 21.09 | 16.7 | 240 | 0.77 |
+| chrX 10.09 | 15.9 | 175 | 0.65 |
+
+Median 210 kb / 0.48 cM. The chr3L 7.50 entry sits exactly 5.0 cM from the 9.30
+peak, at the edge of the exclusion, and may be part of the same signal — it is
+also the one interval wider than 0.84 cM. The 50 kb interval at chr3L 9.30 is
+narrower than the 75 kb window, so it should be read as "at the resolution
+limit", not as a 50 kb localisation.
 
 **Magnitude (Fig. 1b)**
 
@@ -131,12 +156,16 @@ totals do not survive it, which is why none are given.
   earlier draft reported 70 / 57 / 41 / 32% for the four groups; those came from
   summing the overlap and then rescaling the genome to 50%, which is the number
   the exercise was supposed to produce.
-- **No count of loci.** Clumping the scan top-down with a ±1 cM exclusion returns
-  102 "peaks", but six of the top seven are shoulders of the chr3L signal, which
-  is 3.5 Mb wide above threshold. No fixed exclusion width works for both that
-  locus and the sub-Mb regions elsewhere, so the number is an artifact of the
-  choice. The 40 contiguous runs quoted above are a description of the scan, not
-  a count of causal loci.
+- **No count of loci, and no multiple-testing correction.** Clumping the scan
+  top-down with a ±1 cM exclusion returns 102 "peaks", but six of the top seven
+  are shoulders of the chr3L signal. No fixed exclusion width works for both that
+  locus and the sub-Mb regions elsewhere, so any such number is an artifact of the
+  choice. The twelve peaks quoted above are chosen with a deliberately generous
+  ±5 cM exclusion in order to have well-separated examples to measure widths on;
+  they are not a claim that there are twelve loci. Likewise, an earlier draft
+  quoted a Bonferroni threshold over ~1,670 tiles, which is meaningless when the
+  windows overlap fifteenfold and are in LD on top of that. The cutoff is stated
+  as a choice and a range of thresholds is given instead.
 - **Male:female stated per window, not as a ratio of sums.** An earlier draft gave
   67× on X and 9× on 2L; those divide by a female sum near zero — 2L's female
   median is in fact slightly negative — so they are unstable. Median-versus-median

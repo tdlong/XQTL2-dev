@@ -1,44 +1,35 @@
 suppressMessages(library(tidyverse))
-FLYMAP <- "pipeline/helpfiles/flymap.r6.txt"
-add_genetic <- function(df){ fm<-read.table(FLYMAP,header=FALSE); colnames(fm)<-c("chr","pos","cM")
-  df$cM<-NA_real_; for(c_ in unique(df$chr)){x<-fm%>%filter(chr==c_)
-  o<-ksmooth(x$pos,x$cM,kernel="normal",bandwidth=3e6); df$cM[df$chr==c_]<-splinefun(o$x,o$y)(df$pos[df$chr==c_])}; df}
-HET <- tribble(~chr,~eu_start,~eu_end,"chrX",2.5,21.2,"chr2L",0.5,22.9,
-               "chr2R",1.3,25.1,"chr3L",0.7,24.0,"chr3R",4.5,32.0)
+FLYMAP<-"pipeline/helpfiles/flymap.r6.txt"
+add_genetic<-function(df){fm<-read.table(FLYMAP,header=FALSE);colnames(fm)<-c("chr","pos","cM")
+ df$cM<-NA_real_;for(c_ in unique(df$chr)){x<-fm%>%filter(chr==c_)
+ o<-ksmooth(x$pos,x$cM,kernel="normal",bandwidth=3e6);df$cM[df$chr==c_]<-splinefun(o$x,o$y)(df$pos[df$chr==c_])};df}
+HET<-tribble(~chr,~eu_start,~eu_end,"chrX",2.5,21.2,"chr2L",0.5,22.9,
+             "chr2R",1.3,25.1,"chr3L",0.7,24.0,"chr3R",4.5,32.0)
+d<-read.table("process/AGE_SY/AGE_SY_4scan.txt.gz",header=TRUE,sep="\t")%>%as_tibble()
+w<-d%>%group_by(chr,pos)%>%summarise(wald=max(Wald_log10p),.groups="drop")%>%
+   add_genetic()%>%left_join(HET,by="chr")%>%
+   mutate(eu=pos/1e6>=eu_start&pos/1e6<=eu_end)%>%arrange(chr,pos)
+cat("fraction of the EUCHROMATIC genome above a threshold (max over 4 scans)\n")
+for(TH in c(5,10,15,20)) cat(sprintf("  -log10P > %2d : %4.1f%%\n",TH,100*mean(w$wald[w$eu]>TH)))
+cat("\nsame, within a single scan\n")
+d%>%left_join(HET,by="chr")%>%filter(pos/1e6>=eu_start,pos/1e6<=eu_end)%>%group_by(sugar,sex)%>%
+  summarise(`>5`=round(100*mean(Wald_log10p>5),1),`>10`=round(100*mean(Wald_log10p>10),1),
+            `>15`=round(100*mean(Wald_log10p>15),1),.groups="drop")%>%
+  as.data.frame()%>%print(row.names=FALSE)
 
-d <- read.table("process/AGE_SY/AGE_SY_4scan.txt.gz",header=TRUE,sep="\t")%>%as_tibble()
-w <- d %>% group_by(chr,pos) %>% summarise(wald=max(Wald_log10p), h2=max(Cutl_H2),.groups="drop") %>%
-     add_genetic() %>% left_join(HET,by="chr") %>%
-     mutate(eu = pos/1e6>=eu_start & pos/1e6<=eu_end) %>% arrange(chr,pos)
-
-TH <- 6
-runs <- w %>% filter(eu) %>% group_by(chr) %>%
-  mutate(above = wald>TH, grp = cumsum(above != lag(above, default=FALSE))) %>%
-  filter(above) %>% group_by(chr,grp) %>%
-  summarise(kb=(max(pos)-min(pos))/1e3, cM=max(cM)-min(cM), peak=max(wald),
-            at=pos[which.max(wald)]/1e6, .groups="drop")
-cat(sprintf("contiguous euchromatic runs above -log10P=%g: %d\n", TH, nrow(runs)))
-cat(sprintf("run width kb: median %.0f, quartiles %.0f-%.0f, max %.0f\n",
-    median(runs$kb), quantile(runs$kb,.25), quantile(runs$kb,.75), max(runs$kb)))
-cat(sprintf("run width cM: median %.2f, quartiles %.2f-%.2f, max %.2f\n\n",
-    median(runs$cM), quantile(runs$cM,.25), quantile(runs$cM,.75), max(runs$cM)))
-cat("run peak height distribution:\n")
-print(round(quantile(runs$peak, c(0,.25,.5,.75,.9,1)),1))
-
-cat("\nlargest 12 runs by peak height (kb = full run, not half-max):\n")
-runs %>% slice_max(peak,n=12) %>% transmute(chr, peak_Mb=round(at,2),
-  wald=round(peak,1), run_kb=round(kb), run_cM=round(cM,2)) %>%
-  as.data.frame() %>% print(row.names=FALSE)
-
-cat("\nmax raw Cutl_H2 at the top runs (uncorrected, % of phenotypic variance):\n")
-runs %>% slice_max(peak,n=12) %>% pmap_dfr(function(chr,grp,kb,cM,peak,at)
-  w %>% filter(chr==!!chr, abs(pos/1e6-at)<0.05) %>% slice_max(wald,n=1) %>%
-    transmute(chr, Mb=round(pos/1e6,2), wald=round(wald,1), h2=round(h2,2))) %>%
-  as.data.frame() %>% print(row.names=FALSE)
-
-# Also computed for the draft, from the same inputs:
-#   - euchromatic fraction above a range of thresholds, whole and per treatment
-#   - selection counts from helpfiles/AGE_SY/info.AGE_SY.txt (40 of 48 cages have
-#     them; one row is space- not tab-separated, hence the regex parse)
-#   - corrected peak h2, which needs the splithalf floor and so is computed in
-#     varcomp_H2.R / partition_by_wald_rank.R rather than here
+# the better peaks: top-down, but exclude generously (5 cM) so shoulders don't count
+pk<-list(); x<-w%>%filter(eu)
+while(nrow(x) && max(x$wald)>15){p<-x[which.max(x$wald),];pk[[length(pk)+1]]<-p
+  x<-x%>%filter(!(chr==p$chr & abs(cM-p$cM)<=5))}
+pk<-bind_rows(pk)
+cat(sprintf("\ndistinct euchromatic peaks above 15, +/-5 cM exclusion: %d\n\n",nrow(pk)))
+int<-function(chr_,pos_,drop){x<-w%>%filter(chr==chr_)%>%arrange(pos);k<-which(x$pos==pos_)
+  hi<-x$wald[k]-drop;lo<-k;while(lo>1&&x$wald[lo-1]>hi)lo<-lo-1
+  up<-k;while(up<nrow(x)&&x$wald[up+1]>hi)up<-up+1
+  c(kb=(x$pos[up]-x$pos[lo])/1e3, cM=x$cM[up]-x$cM[lo])}
+pk%>%pmap_dfr(function(chr,pos,wald,cM,...){
+  a<-int(chr,pos,2); b<-int(chr,pos,wald/2)
+  tibble(chr,Mb=round(pos/1e6,2),wald=round(wald,1),
+         `2-unit drop kb`=round(a["kb"]),`2-unit cM`=round(a["cM"],2),
+         `half-max kb`=round(b["kb"]),`half-max cM`=round(b["cM"],2))})%>%
+  as.data.frame()%>%print(row.names=FALSE)
