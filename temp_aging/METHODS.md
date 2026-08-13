@@ -26,23 +26,26 @@ SS_rep (within-cell odd−even) on 4. Each term is reported as MS − SS_rep/4, 
 in *h*² units as sign·√(|MS − MS_rep|/8). Terms are not truncated at zero.
 Verified against `aov()`.
 
-**Heritability floor.** *h*² is a sum of squared founder effects, and those
-effects are estimated with error, so squaring inflates them: a window at which no
-frequency changed still returns a positive *h*². Call that inflation *b*. It is a
-within-replicate bias — every replicate carries the same offset — so averaging
-replicates reduces the variance of *h*² but not *b*. Consistent with this, *h*²
-never falls below 0.114 across the 199,904 measures.
+**Heritability floor.** *h*² sums squared founder effects estimated with error,
+so squaring inflates it and a window at which no frequency changed still returns
+a positive value. The pipeline reports this inflation per measure as *b*,
+obtained by integrating E[Affect²] over the sampling distribution of the
+frequency estimates. *b* is not used directly: it is well behaved where small but
+overstated where large, and subtracting it as reported drives corrected *h*² to
+−6 at some windows.
 
-XQTL2 estimates *b* per window by integrating E[Affect²] over the sampling
-distribution of the frequency estimates. That estimate is sound where *b* is
-small but overstated where it is large, and subtracting it unmodified gives *h*²
-of −6 at some windows. It was therefore recalibrated against an internal null:
-windows with Wald −log10 *P* < 2 have no detectable frequency change, so their
-true *h*² is ≈ 0 and their observed *h*² is *b* itself. An isotonic regression of
-*h*² on the reported *b* over those windows was fitted and applied genome-wide;
-the fit is near-flat, mapping reported *b* of 0.13–8.29 onto 0.47–0.64. *b*
-cancels from the sex, diet and interaction contrasts, which are differences
-between cells, and enters only the main term.
+The floor actually subtracted was obtained as follows. Windows were classified as
+null when the largest Wald −log10 *P* across the four treatments was < 2; at such
+windows the frequencies did not detectably move, so true *h*² ≈ 0 and the
+observed *h*² estimates the floor. Over the null windows, *h*² and *b* were each
+averaged across the 8 measures, and an isotonic (monotone non-decreasing)
+regression of mean *h*² on mean *b* was fitted, giving F. Every one of the 8
+measures at every window was then corrected as *h*² − F(*b*), using that measure's
+own *b*, and the corrected values are what enter the partition. F is near-flat:
+reported *b* spanning 0.13–8.29 maps to 0.47–0.64.
+
+F enters only the main term; it cancels from the sex, diet and interaction
+contrasts, which are differences between cells.
 
 **Blocks.** Windows overlap 15-fold, so every 15th was taken to tile the genome
 once, then aggregated into 2 cM blocks — genetic distance because *h*² spreads
