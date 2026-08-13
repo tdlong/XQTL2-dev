@@ -44,7 +44,8 @@ WNULL  <- 2       # Wald below this: frequencies did not move, so true h2 ~ 0
 NBOOT  <- 300
 
 HET <- tribble(~chr, ~eu_start, ~eu_end,
-  "chr2L", 0.5, 22.9, "chr2R", 1.3, 25.1, "chr3L", 0.7, 24.0, "chr3R", 4.5, 32.0)
+  "chrX", 2.5, 21.2, "chr2L", 0.5, 22.9, "chr2R", 1.3, 25.1,
+  "chr3L", 0.7, 24.0, "chr3R", 4.5, 32.0)
 
 add_genetic <- function(df) {
   fm <- read.table(FLYMAP, header = FALSE); colnames(fm) <- c("chr","pos","cM")
@@ -57,7 +58,10 @@ add_genetic <- function(df) {
   df
 }
 
-long <- read.table(LONG, header = TRUE, sep = "\t") %>% as_tibble() %>% filter(chr != "chrX")
+# The X is INCLUDED. It contributes heritability and data, and the question this
+# table answers is how well % non-main can be estimated -- not whether the X's
+# sex component transfers to another species.
+long <- read.table(LONG, header = TRUE, sep = "\t") %>% as_tibble()
 
 # windows used to fit the floor: Wald says nothing moved, so the observed h2 IS
 # the floor there
@@ -137,7 +141,7 @@ H2_TOT <- 50
 K <- H2_TOT / sum(obs$H2)
 sel <- function(pc) obs %>% filter(wald >= quantile(obs$wald, max(0, 1 - pc/100)))
 
-cat(sprintf("autosomes: %d blocks -- %d euchromatic of %g cM, %d heterochromatic\n",
+cat(sprintf("whole genome: %d blocks -- %d euchromatic of %g cM, %d heterochromatic\n",
             nrow(obs), sum(!obs$het), CM, sum(obs$het)))
 cat("            (one telomeric + one centromeric block per arm)\n")
 cat(sprintf("h2 rescaled so the genome totals %g%%; interval from %d bootstraps over\n",

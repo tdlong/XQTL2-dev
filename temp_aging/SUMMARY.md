@@ -138,67 +138,92 @@ headline number depends on them.
 
 ## Results
 
-The number is a ratio at a place, not a genome-wide constant. Three things have
-to be right before it means anything, and each was got wrong first:
+The question is how well the non-main share can be estimated, and where. Four
+things had to be right before the number meant anything, each of which was got
+wrong first:
 
 - **windows overlap 15-fold** (75 kb windows stepping 5 kb), so summing raw
   windows counts each piece of genome fifteen times. Every 15th window tiles it
   once.
 - **blocks must be genetic, not physical.** h2 is smeared over ~9 Mb in the
   low-recombination regions flanking the centromeres and ~1 Mb in euchromatin,
-  so a fixed Mb block counts one region as ten. A 2 cM block here is 0.38 to
+  so a fixed Mb block counts one region as ten. A 2 cM block here runs 0.38 to
   6.38 Mb depending on where it sits.
-- **heterochromatin has to go.** It is 7% of the sequence but carries 20% of the
-  h2 -- a threefold enrichment -- and reads ~0% sex+diet, so leaving it in pulls
-  the ratio down.
+- **heterochromatin is included but collapsed** to one telomeric and one
+  centromeric block per arm. It is 7% of the sequence but carries 20% of the h2;
+  split at 2 cM it would fragment into dozens of blocks and dominate the
+  ranking. Excluding it altogether was the earlier error -- it is real data.
+- **the X is included.** This table is about how well the ratio can be
+  estimated, not about what transfers to another species, and the X contributes
+  both heritability and signal.
 
-With all three: 2 cM non-overlapping blocks, euchromatin, autosomes, ranked by
-Wald. `partition_by_wald_rank.R` produces this.
+h2 is rescaled so the genome totals 50%, the known broad-sense heritability of
+longevity. That is a real number, not a convenience; the ratio does not depend
+on it in any case.
+
+`partition_by_wald_rank.R` produces this. Blocks are given as
+euchromatic+heterochromatic.
 
 | top % genome | blocks | Mb | h2 (of 50) | main | sex+diet | % sex+diet | CI |
 |---|---|---|---|---|---|---|---|
-| 5 | 6 | 8.5 | 20.9 | 19.5 | 1.46 | 7.0 | [3.7, 11.7] |
-| 10 | 11 | 19.0 | 35.0 | 31.9 | 3.14 | 9.0 | [6.0, 14.3] |
-| 20 | 21 | 27.2 | 41.0 | 36.5 | 4.49 | 11.0 | [7.3, 18.4] |
-| 30 | 31 | 34.7 | 44.6 | 39.7 | 4.96 | 11.1 | [7.5, 18.2] |
-| 50 | 52 | 55.5 | 48.8 | 43.9 | 4.86 | 10.0 | [6.3, 15.6] |
-| 100 | 104 | 96.8 | 50.0 | 56.2 | -6.39 | -12.8 | [-82.3, 11.1] |
+| 5 | 8+0 | 13.0 | 17.5 | 16.1 | 1.33 | 7.6 | [3.6, 13.2] |
+| 10 | 13+2 | 26.2 | 33.1 | 30.7 | 2.35 | 7.1 | [4.3, 14.8] |
+| 20 | 26+3 | 38.7 | 38.6 | 35.0 | 3.61 | 9.4 | [5.9, 15.9] |
+| 30 | 40+3 | 54.1 | 41.9 | 37.7 | 4.12 | 9.8 | [6.0, 16.3] |
+| 50 | 68+4 | 74.9 | 46.3 | 41.6 | 4.64 | 10.0 | [4.4, 15.8] |
+| 100 | 136+7 | 124.9 | 50.0 | 45.0 | 4.78 | 9.6 | [-25.9, 20.9] |
 
-**Eleven blocks -- 19 Mb, a tenth of the euchromatin -- carry 70% of the
-heritability; twenty-one carry 82%.** Across that range sex + diet is
-**9-11%, with an interval of roughly [6, 18]**.
+**Thirteen blocks -- 26 Mb, a fifth of the genome -- hold 33 of the 50 points.**
+Across the top 10-50% the estimate is **7-10%, with intervals around [4, 16]**.
 
-Going wider gains nothing and eventually breaks. The 100% row is not the
-conservative choice: in the bottom half of the genome the non-main terms sit
-BELOW the replicate error, so they sum negative and take the ratio through zero.
+Going wider gains little and eventually breaks: the last half of the genome adds
+under 4 points of heritability and takes the interval to [-25.9, 20.9], because
+where main is near zero the ratio has a pole in it.
 
-The h2 column is scaled so the genome totals 50%. That scaling is a factor of
-~6 and assumes the overcounting is uniform across the genome, so the absolute
-columns are indicative. The ratio does not depend on it.
+### The interval
+
+It integrates two sources of uncertainty in one bootstrap, rather than reporting
+the floor as a separate sensitivity table:
+
+1. **which blocks you sampled** -- resample 8 cM groups
+2. **the h2 floor** -- the floor is an isotonic fit of h2 on the reported bias
+   over Wald-null windows, so each replicate resamples those windows in blocks
+   and refits, carrying its own floor
+
+The floor is the larger of the two and is why the interval blows up once
+low-h2 blocks are included.
+
+### What the blocks are made of
+
+Only 5 of the 8 autosomal arm ends exist as blocks, and 7 of 10 with the X: the
+scan does not reach chr2R's centromere-proximal end or chr3R's telomere-proximal
+end, and chr2R's other end is 20 kb, smaller than one tile. So the
+heterochromatin here is **almost entirely chromosome 3's centromere** --
+chr3L_het_end (3.0 Mb, 4.14 points) and chr3R_het_start (3.1 Mb, 4.64 points),
+both reading ~0% sex+diet. Chromosome 2's centromere contributes 0.17 points.
+Whether chromosome 2's would behave the same way is untestable here.
+
+The X's heterochromatic blocks go the other way: chrX_het_end reads 49.9% and
+chrX_het_start 80.8% non-main, on small absolute contributions.
 
 ### Other properties of the partition
 
 - The **interaction is negative under every treatment of the floor** -- below
   the replicate error everywhere. No sex-by-diet interaction across this diet
   range.
-- **The X is excluded.** It reads main 59.4% / sex 44.3%, but that is largely
-  dominance exposure -- hemizygous males cannot mask recessive variation, which
-  is a sex-chromosome property, not evidence about sex-differential effects.
-  Dosage compensation equalises expression, not allele count, so it does not
-  remove this. The fly X is ~17% of the genome against ~5% in humans, where it
-  is often dropped from GWAS entirely, so including it would inflate the number
-  with something that does not transfer.
 - Male Wald scores on the X are *higher* than female (median 1.03 vs 0.30, 4.2%
   vs 0.0% of windows clearing Wald 6) despite males being hemizygous and so
   sampled at half the chromosomes. Lower coverage would cut male power, so the X
-  signal is not a precision artifact.
+  signal is not a precision artifact. Dosage compensation equalises expression,
+  not allele count, so it does not remove the dominance exposure that makes the
+  X's sex component large.
 
 ### What this experiment can and cannot resolve
 
 It resolves roughly **ten to twenty independent regions**. That is the
-denominator for any statement about how the variance partitions, and it is why
-the interval is [6, 18] rather than anything sharper. More replicates or finer
-windows will not tighten it; more genome or a trait with more loci would.
+denominator for any statement about the partition, and it is why the interval is
+[4, 16] rather than anything sharper. More replicates or finer windows will not
+tighten it; more genome or a trait with more loci would.
 
 It cannot count loci or recover an effect-size distribution. Peak-calling is
 censored both ways: the ten peaks above h2 = 0.75 blank out 19% of the genome
