@@ -45,25 +45,27 @@ designs an order of magnitude smaller. This third of the genome is also where th
 partition in Fig. 1c can be read, a ratio of components being meaningful only
 where there is heritability to divide.
 
-**Architecture differs between the sexes but is largely invariant to diet.** On
-the X chromosome the median window contributes 0.43% of phenotypic variance in
-males and 0.01% in females, males exceeding females at every window; on 2L males
-exceed females at 79% of windows, whereas on 3R the direction reverses and
-females exceed males at 71% (Fig. 1b). Hemizygosity accounts for part of the X
-difference, exposing recessive variation that a second chromosome would mask, but
-2L and 3R are ordinary autosomes. Diet behaves differently: the two sugar levels
-alter lifespan substantially yet leave the distribution of contributing loci
-nearly unchanged. Partitioning per-window heritability into a component shared by
-all four groups and components differing by sex or by diet (Fig. 1c), 10.2% of
-the genetic variance is sex-specific and 1.9% diet-specific, with no detectable
-interaction; on autosomes alone, where hemizygosity cannot contribute, the
-sex-specific fraction is 7.3%. Within the fifth of the genome carrying most of the
-signal, where the ratio is best determined, sex and diet together account for
-9.4% (95% CI 5.9–15.9%). This fraction is invisible to any analysis that pools
-sexes and treats environment as a covariate — the standard construction wherever
-environment cannot be manipulated — and it is not distributed uniformly: it is
-concentrated at loci acting in one sex and not the other, which such an analysis
-reports at a fraction of their true effect.
+**Architecture differs between the sexes but is largely invariant to diet.**
+Restricting to the significant genome — the 843 euchromatic tiles, 55% of the
+total, exceeding −log10 *P* = 5 in at least one group — heritability is sharply
+sex-dependent and its direction varies by chromosome arm. Males exceed females at
+100% of significant tiles on the X, 82% on 2L and 81% on 3L, with median *h*²
+ratios of 31, 4.4 and 1.7; on 3R the direction reverses and females exceed males
+at 81% of tiles (ratio 0.54), while 2R shows no consistent difference. Hemizygosity
+accounts for the X, exposing recessive variation that a second chromosome would
+mask, but 2L, 3L and 3R are ordinary autosomes and their sex dependence, in both
+directions, is not attributable to it. Diet behaves differently: the two sugar
+levels alter lifespan substantially yet leave the distribution of contributing
+loci nearly unchanged. Partitioning heritability across these tiles into a
+component shared by all four groups and components differing by sex or by diet
+(Fig. 1c), 10.9% of the genetic variance is sex-specific and 2.0% diet-specific,
+with no detectable interaction; on autosomes alone the sex-specific fraction is
+9.2%, and over the fifth of the genome carrying most of the signal sex and diet
+together account for 9.4% (95% CI 5.9–15.9%). This fraction is invisible to any
+analysis that pools sexes and treats environment as a covariate — the standard
+construction wherever environment cannot be manipulated — and it is not
+distributed uniformly: it is concentrated at loci acting in one sex and not the
+other, which such an analysis reports at a fraction of their true effect.
 
 ---
 
@@ -147,21 +149,36 @@ At windows where the character's own Wald is below 2 — the floor — raw *h*²
 
 **Sex and diet (Fig. 1c)**
 
-| quantity | value |
-|---|---|
-| median window h², M vs F: chrX | 0.429 vs 0.006, M higher at 100% of windows |
-| 2L | 0.128 vs −0.015, M higher at 79% |
-| 2R | 0.044 vs −0.011, M higher at 67% |
-| 3L | 0.165 vs 0.146, M higher at 69% |
-| 3R | 0.113 vs 0.222, M higher at 29% |
-| split, all chromosomes (shared / sex / diet / sex×diet) | 88.5 / 10.2 / 1.9 / −0.6 % |
-| split, autosomes | 90.9 / 7.3 / 2.2 / −0.5 % |
-| split, X only | 59.4 / 44.3 / −1.8 / −1.9 % |
-| top 20% of genome by Wald: sex+diet share | 9.4% [5.9, 15.9] |
+Restricted to the 843 significant euchromatic tiles (Wald > 5 in at least one
+group), from `significant_regions.R`.
 
-The shares (10.2%, 7.3%, 9.4%) are ratios of sums over the same windows, so the
-fifteenfold window overlap cancels from numerator and denominator. Absolute
-totals do not survive it, which is why none are given.
+| arm | tiles | median h² M | median h² F | M/F | M > F at |
+|---|---|---|---|---|---|
+| chrX | 62 | 0.67 | 0.02 | 30.8 | 100% |
+| chr2L | 169 | 0.22 | 0.05 | 4.44 | 82% |
+| chr3L | 186 | 0.87 | 0.51 | 1.72 | 81% |
+| chr2R | 172 | 0.16 | 0.18 | 0.87 | 59% |
+| chr3R | 254 | 0.19 | 0.34 | 0.54 | 19% |
+
+The "M > F at" column is **identical** with the floor removed and with it left in
+(82 / 59 / 81 / 19 / 100 either way). The floor is a near-constant added to every
+window; it cancels from a within-window comparison between groups, and where h²
+is well clear of it the comparison does not depend on how it was estimated.
+
+| split over significant tiles | main | sex | diet | sex×diet |
+|---|---|---|---|---|
+| all chromosomes | 87.5 | 10.9 | 2.0 | −0.4 |
+| autosomes | 89.0 | 9.2 | 2.1 | −0.4 |
+| top 20% of genome by Wald: sex+diet | | 9.4% [5.9, 15.9] | | |
+
+The split, unlike the male:female comparison, does move if the floor is left in
+(sex 3.8% rather than 10.9%), because the floor adds to every group equally and
+so inflates the shared component. That is why Fig. 1c is floor-corrected and
+Fig. 1b is not.
+
+The shares are ratios of sums over the same windows, so the fifteenfold window
+overlap cancels from numerator and denominator. Absolute totals do not survive
+it, which is why none are given.
 
 ## What is deliberately not claimed
 

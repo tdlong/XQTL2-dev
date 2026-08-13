@@ -1,75 +1,47 @@
-# The h² floor is sex-dependent, and `b` does not report it
+# Note on the h² floor: where it matters and where it does not
 
-Found by plotting h² against Wald per character (`h2_vs_wald.R`, figure
-`h2_vs_wald.png`). Quantified in `floor_sensitivity.R`.
+*h*² squares founder effects estimated with error, so a window at which nothing
+happened still returns a positive value — the floor, roughly 0.5 on the Fig. 1b
+scale. `h2_threshold.R` and `significant_regions.R` between them settle how much
+this matters, and the answer depends entirely on where you look.
 
-## What the plot shows
+## Where it does not matter
 
-At Wald-null windows (max −log10 *P* < 2 over the four characters), where true
-h² is ~0, the raw uncorrected h² is not the same in the two sexes:
+Restricted to the significant genome (Wald > 5 in at least one group), the
+male-versus-female comparison is **unchanged** by floor removal:
 
-| character | median raw h² at null windows | sd | reported *b* |
-|---|---|---|---|
-| SY10 female | 0.497 | 0.121 | 0.64 |
-| SY20 female | 0.487 | 0.139 | 0.63 |
-| SY10 male | 0.577 | 0.237 | 0.63 |
-| SY20 male | 0.554 | 0.222 | 0.65 |
+| arm | M > F at, floor removed | floor left in |
+|---|---|---|
+| chrX | 100% | 100% |
+| chr2L | 82% | 82% |
+| chr3L | 81% | 81% |
+| chr2R | 59% | 59% |
+| chr3R | 19% | 19% |
 
-The male floor is ~0.07 higher and roughly twice as variable. The reported bias
-*b* is the same in all four to two decimal places, so a floor built as one
-function *F*(*b*) applied to all characters **cannot** remove this — it subtracts
-the same amount from a male window and a female window that report the same *b*.
+The floor is near-constant across groups at a given window, so it cancels from
+any within-window comparison between them. Every sex claim in the draft rests on
+these regions and none of them depends on how the floor was estimated.
 
-## Consequence
+## Where it does matter
 
-Three defensible ways to handle the floor give three answers:
+The partition into shared / sex / diet components does move — sex is 10.9% with
+the floor removed and 3.8% with it left in — because the floor adds equally to
+all four groups and so inflates the shared component. This is why Fig. 1c is
+floor-corrected and Fig. 1b is not.
 
-| floor treatment | null median, F / M | sex share, all | sex share, autosomes |
-|---|---|---|---|
-| one global *F*(*b*) (as published) | −0.07 / +0.02 | 10.2% | 7.3% |
-| global *F*(*b*), then recentre each character on its null median | 0 / 0 | 8.4% | 6.5% |
-| separate isotonic *F*(*b*) per character | −0.014 / −0.069 | 8.7% | 7.3% |
-
-The per-character isotonic fit centres the *mean* at zero, but male h² is
-right-skewed, so it leaves the median negative — which is why it does not agree
-with the median recentring. None of the three is obviously correct.
-
-Per-chromosome male-vs-female comparisons move much more than the headline:
-
-| arm | global *F* | median recentred | per-character *F* |
-|---|---|---|---|
-| chrX | M > F at 100% | 100% | 98% |
-| chr3R | M > F at 29% | 13% | 9% |
-| chr2L | M > F at 79% | 71% | 61% |
-| chr2R | M > F at 67% | 49% | 24% |
-| chr3L | M > F at 69% | 53% | 47% |
-
-## What survives
-
-- **chrX strongly male-biased** — holds under all three, and is expected from
-  hemizygosity anyway.
-- **chr3R female-biased** — holds under all three and strengthens under both
-  corrections, because the residual bias runs against it.
-- **chr2L male-biased** — direction holds but the magnitude is set by the floor
-  treatment. Weak.
-- **chr2R and chr3L** — do not survive. Both reverse direction between
-  treatments. The earlier draft called 2R male-biased and 3L male-biased; neither
-  claim is supportable.
-- **Genome-wide sex share is 8–10%, autosomes 6.5–7.3%**, not 10.2% / 7.3% as a
-  point value.
-
-## The published interval understates this
-
-The bootstrap in `partition_by_wald_rank.R` resamples null windows and refits the
-floor, so it captures sampling noise *in* the floor. It always refits the same
-global *F*(*b*) form, so it does not capture the choice of whether the floor may
-differ by character. The [5.9, 15.9] interval on the top-20% sex+diet share is
-therefore too narrow by an unknown amount.
+It matters more the less signal there is. Over the whole genome, including the
+45% that never clears the threshold, the floor dominates and small changes in how
+it is fitted swing the answer around; three defensible treatments give sex shares
+of 10.2%, 8.4% and 8.7%. Restricted to significant tiles the estimate is stable
+because the quantity being corrected is large relative to the correction.
 
 ## Worth reporting upstream
 
-XQTL2 issue #34 added `Cutl_H2_bias`. The level is roughly right — global *F*
-maps *b* onto 0.51–0.64 and the observed null h² is 0.49–0.58 — but *b* does not
-track the difference between male and female scans, which is real and about 0.07
-in h² units. Male scans have lower coverage per pool; if *b* is computed from
-haplotype-frequency sampling variance it may not be picking that up.
+XQTL2 issue #34 added `Cutl_H2_bias`. Its level is about right — the global fit
+maps *b* onto 0.51–0.64 and observed null h² is 0.49–0.58 — but *b* does not
+distinguish the male from the female scans, reading 0.63–0.65 in all four while
+the actual null distributions differ (95th percentile 1.06–1.10 in males against
+0.70–0.74 in females). Male scans have lower coverage per pool; if *b* comes from
+haplotype-frequency sampling variance it may not be capturing that. This does not
+affect any conclusion here, for the reason above, but a user working closer to
+the floor would be misled.
