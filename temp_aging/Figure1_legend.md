@@ -16,6 +16,26 @@ horizontal axis. The vertical axes are broken so the chr3L locus does not set th
 scale for the rest of the genome, at 45 in (A), 2.5 in (B) and 0.75 in (C); the
 chr3L peak reaches −log10(*P*) = 207.
 
+## Numbers
+
+The chr3L peak at 9.30 Mb reaches −log10(*P*) = 207.5 in SY20 males, 133.6 in
+SY10 males, 73.1 in SY20 females and 49.8 in SY10 females (A), with peak *h*² of
+4.85, 4.42, 3.09 and 2.51 respectively (B). At 9.34 Mb, with the floor removed,
+*h*² is 3.11 and partitions as main 3.11, sex 0.90, diet 0.20 — sex and diet
+together account for 7.8% of the heritability at that locus.
+
+Genome-wide, main accounts for 88.5% of the genetic variance, sex 10.2%, diet
+1.9% and sex-by-diet −0.6%. On autosomes alone these are 90.9%, 7.3%, 2.2% and
+−0.5%; on the X, 59.4% and 44.3% for main and sex. The X's large sex component
+reflects hemizygosity in males exposing recessive variation that a diploid
+autosome masks, a sex-chromosome property rather than evidence of
+sex-differential effects.
+
+The signal is concentrated: 13 blocks of 2 cM — 26 Mb, a fifth of the genome —
+carry 33 of the 50 percentage points of trait heritability, and across the top
+10–50% of the genome ranked by Wald the sex-plus-diet share is 7–10% (95% CI
+[4, 16]).
+
 ## The partition in (C)
 
 At each window the four treatment *h*² values are rewritten as
@@ -34,7 +54,7 @@ itself is pure replicate error, and it is subtracted from every component. A lin
 below zero therefore means that component is smaller than the replicate noise,
 i.e. nothing is there. Components are plotted in *h*² units and smoothed with a
 500 kb rolling mean. The sex-by-diet interaction is not drawn: it lies below the
-replicate error at 67% of windows.
+replicate error at 67% of windows and its 95th percentile is 0.08.
 
 *h*² is upwardly biased because it squares a quantity estimated with error, so it
 comes out positive even where nothing is happening, and the bias does not shrink
