@@ -15,7 +15,7 @@
 # point LIVE_SCAN_DIR at a folder holding <scan>/<scan>.scan.txt for the four
 # treatments; everything else is unchanged.
 
-suppressMessages({library(tidyverse); library(ggbreak); library(aplot)})
+suppressMessages({library(tidyverse); library(patchwork)})
 
 LONG      <- "process/AGE_SY_splithalf/AGE_SY_splithalf_H2.txt.gz"
 VARCOMP   <- "process/AGE_SY_splithalf/H2_varcomp_by_window.txt.gz"
@@ -97,63 +97,93 @@ cmp <- vcx %>%
   mutate(term = factor(term, levels = CMP_LEV), gx = (bin + offset) / 1e6)
 
 # ── panels ───────────────────────────────────────────────────────────────────
-# Broken y axis on every panel via ggbreak, so the chr3L locus does not set the
-# scale for the whole genome. scales = 1/3 makes the upper segment a third the
-# height of the lower, i.e. the 3:1 split.
+# Broken y axis: each panel is two ggplots stacked 3:1, so the chr3L locus does
+# not set the scale for the whole genome.
 #
-# The break gap is ~zero width on purpose. ggbreak REMOVES the range between the
-# two values and clips anything inside it to the edge of BOTH sub-panels, so a
-# peak landing in the gap is drawn twice -- chr2L main tops out at 0.764 and did
-# exactly that against a 0.75-0.82 break. With no gap, each value appears once
-# and a line crossing the break simply continues from the top of the lower panel
-# into the bottom of the upper one.
+# Not ggbreak. It renders correctly on its own but cannot be composed: through
+# aplot::plot_list() the sub-break data is drawn again, squashed along the
+# bottom of the upper segment (the traces on 3L/3R in panel A), and through
+# ggplotify + cowplot the break is silently dropped altogether.
+#
+# Two things are needed and both matter:
+#
+#   expand = expansion(0)  -- the sub-panel ranges must be mutually exclusive
+#     and exhaustive. With the default 5% expansion c(0, 20) actually renders as
+#     -1 to 21 and c(20, 105) as ~15.7 to 109, so they overlap and anything in
+#     the overlap is drawn in BOTH sub-panels.
+#
+#   mask()                 -- the break marks need clip = "off", which also
+#     stops out-of-range data being clipped, so it spills across the whole
+#     figure. Setting the wrong side of the break to NA keeps geom_line from
+#     drawing it at all.
 
-deco <- function(tag, xaxis = FALSE) {
+mask <- function(d, yv, keep_above, brk) {
+  d[[yv]][if (keep_above) d[[yv]] < brk else d[[yv]] > brk] <- NA_real_
+  d
+}
+
+deco <- function(xaxis = FALSE) {
   th <- theme_classic(base_size = 8) +
     theme(axis.title.x = element_blank(),
           plot.tag = element_text(size = 10, face = "bold"),
-          plot.tag.position = c(0.004, 0.97),
-          plot.margin = margin(2, 4, 1, 2),
-          legend.position = "none",
-          # ggbreak mirrors the axis on the right; drop it
-          axis.text.y.right = element_blank(), axis.ticks.y.right = element_blank(),
-          axis.line.y.right = element_blank(), axis.title.y.right = element_blank())
+          plot.tag.position = c(0.004, 0.88),
+          legend.position = "none")
   if (!xaxis) th <- th + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
   list(
     geom_rect(data = het_bands, aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
               fill = "grey88", colour = NA, inherit.aes = FALSE),
     geom_vline(xintercept = chr_edges, linetype = "dotted", colour = "grey35", linewidth = 0.3),
-    scale_x_continuous(limits = c(0, xmax_all), expand = expansion(0),
+    scale_x_continuous(expand = expansion(0),
                        breaks = chr_breaks, labels = CHRLAB[CHRS]),
-    labs(tag = tag), th)
+    th)
 }
 
-pA <- ggplot(scans, aes(gx, wald, colour = trt)) +
-  geom_line(linewidth = 0.28) +
-  scale_colour_manual(values = TRT_COL) +
-  scale_y_continuous(breaks = c(0, 5, 10, 15, 20, 40, 60, 80, 100)) +
-  scale_y_break(c(20, 20.001), scales = 1/3, space = 0.12,
-                ticklabels = c(40, 60, 80, 100)) +
-  labs(y = expression(-log[10] * italic(P))) +
-  deco("A")
+# marks the break with two short diagonals on the y axis
+# the // that marks the discontinuity, straddling the y axis
+slash <- function(yr, at) {
+  d <- diff(yr) * 0.045; w <- xmax_all * 0.0045
+  list(
+    annotate("segment", x = -w*2.4, xend = w*1.2, y = at, yend = at,
+             colour = "white", linewidth = 1.4),
+    annotate("segment", x = c(-w*2.0, -w*0.6), xend = c(-w*0.6, w*0.8),
+             y = c(at - d, at - d), yend = c(at + d, at + d),
+             colour = "black", linewidth = 0.4))
+}
 
-pB <- ggplot(scans, aes(gx, h2, colour = trt)) +
-  geom_line(linewidth = 0.28) +
-  scale_colour_manual(values = TRT_COL) +
-  scale_y_continuous(breaks = c(0, 0.5, 1, 1.5, 2, 2.5, 3, 4, 5)) +
-  scale_y_break(c(2.5, 2.501), scales = 1/3, space = 0.12, ticklabels = c(3, 4, 5)) +
-  labs(y = expression(italic(h)^2)) +
-  deco("B")
+split_panel <- function(d, yv, cv, cols, brk, lo, hi, lo_brk, hi_brk,
+                        ylab, tag, lw = 0.3, zero = FALSE, xaxis = FALSE) {
+  # group by chromosome as well as series, or geom_line joins the last window of
+  # one arm to the first of the next straight through the centromere
+  gl <- function(dd) geom_line(data = dd,
+                               aes(gx, .data[[yv]], colour = .data[[cv]],
+                                   group = interaction(.data[[cv]], chr)),
+                               linewidth = lw)
+  z <- if (zero) geom_hline(yintercept = 0, colour = "grey60", linewidth = 0.25) else NULL
+  top <- ggplot() + deco() + z + gl(mask(d, yv, TRUE, brk)) +
+    scale_colour_manual(values = cols, drop = FALSE) +
+    scale_y_continuous(breaks = hi_brk, expand = expansion(0)) +
+    coord_cartesian(xlim = c(0, xmax_all), ylim = hi, clip = "off") + slash(hi, hi[1]) +
+    labs(y = NULL, tag = tag) +
+    theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+          axis.line.x = element_blank(), plot.margin = margin(2, 4, 0, 16))
+  bot <- ggplot() + deco(xaxis) + z + gl(mask(d, yv, FALSE, brk)) +
+    scale_colour_manual(values = cols, drop = FALSE) +
+    scale_y_continuous(breaks = lo_brk, expand = expansion(0)) +
+    coord_cartesian(xlim = c(0, xmax_all), ylim = lo, clip = "off") + slash(lo, lo[2]) +
+    labs(y = ylab) +
+    theme(plot.margin = margin(0, 4, 2, 16))
+  top / bot + plot_layout(heights = c(1, 3))
+}
 
-pC <- ggplot(cmp, aes(gx, y, colour = term)) +
-  geom_hline(yintercept = 0, colour = "grey60", linewidth = 0.25) +
-  geom_line(linewidth = 0.35) +
-  scale_colour_manual(values = CMP_COL) +
-  scale_y_continuous(breaks = c(-0.2, 0, 0.25, 0.5, 0.75, 1, 1.5, 2, 2.5)) +
-  scale_y_break(c(0.75, 0.7501), scales = 1/3, space = 0.12,
-                ticklabels = c(1, 1.5, 2, 2.5)) +
-  labs(y = expression(italic(h)^2)) +
-  deco("C", xaxis = TRUE)
+pA <- split_panel(scans, "wald", "trt", TRT_COL, 20, c(0, 20), c(20, 105),
+                  c(0, 5, 10, 15, 20), c(40, 60, 80, 100),
+                  expression(-log[10] * italic(P)), "A", lw = 0.28)
+pB <- split_panel(scans, "h2", "trt", TRT_COL, 2.5, c(0, 2.5), c(2.5, 5),
+                  c(0, 0.5, 1, 1.5, 2, 2.5), c(3, 4, 5),
+                  expression(italic(h)^2), "B", lw = 0.28)
+pC <- split_panel(cmp, "y", "term", CMP_COL, 0.75, c(-0.25, 0.75), c(0.75, 2.9),
+                  c(-0.2, 0, 0.25, 0.5, 0.75), c(1, 2),
+                  expression(italic(h)^2), "C", lw = 0.35, zero = TRUE, xaxis = TRUE)
 
 key <- function(lev, col) {
   ggplot(tibble(x = 1, y = 1, g = factor(lev, levels = lev)), aes(x, y, colour = g)) +
@@ -162,12 +192,13 @@ key <- function(lev, col) {
                                  override.aes = list(linewidth = 0.8))) +
     theme_void(base_size = 8) + theme(legend.position = "bottom")
 }
-legs <- ggplotify::as.ggplot(
+
+g <- cowplot::plot_grid(
+  cowplot::plot_grid(pA, pB, pC, ncol = 1, rel_heights = c(1, 1, 1.1)),
   cowplot::plot_grid(cowplot::get_legend(key(TRT_LEV, TRT_COL)),
                      cowplot::get_legend(key(CMP_LEV, CMP_COL)),
-                     nrow = 1, rel_widths = c(2.1, 1)))
-
-g <- aplot::plot_list(pA, pB, pC, legs, ncol = 1, heights = c(1, 1, 1.12, 0.1))
+                     nrow = 1, rel_widths = c(2.1, 1)),
+  ncol = 1, rel_heights = c(1, 0.075))
 
 png(OUT, width = W_IN, height = H_IN, units = "in", res = DPI)
 print(g)
