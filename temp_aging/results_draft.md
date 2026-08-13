@@ -1,48 +1,101 @@
 # Results (draft)
 
-**Longevity architecture is continuously polygenic.** Broad-sense heritability for longevity is elevated above the noise floor across much of the euchromatic genome in every sex–diet combination (Fig. 1b). After removing the estimation floor, 78% of euchromatic windows retain positive H², and the main effect exceeds the replicate error at 83% of windows. Integrated over the mapped genome, total broad-sense H² is 70% in low-sugar males, 57% in high-sugar males, 41% in low-sugar females and 32% in high-sugar females — approximately twofold higher in males than females in both diets. In every condition the majority of this variance comes from a continuously elevated polygenic background rather than a few large-effect loci: 93% of total H² lies outside the ten highest-heritability windows and 80% outside the top fifty. The polygenic background is therefore a spatially resolved object rather than a threshold artifact, and it accounts for the bulk of the genetic variance contributing to longevity in this population.
+**Heritability for lifespan is spread across most of the genome.** Selecting the
+longest-lived flies moved haplotype frequencies at windows throughout the genome
+rather than at a handful of loci (Fig. 1a,b). After removing the estimation
+floor, 78% of euchromatic windows still carry positive heritability, and the
+shared component exceeds the replicate error at 83% of them. Almost all of these
+windows are individually small: the median window accounts for 0.15% of
+phenotypic variance in males and 0.07% in females, and only 4% of windows reach
+ten times the median. One region stands apart — a locus at chr3L 9.3 Mb reaching
+−log10 *P* = 207 and 4.6% of phenotypic variance in high-sugar males, thirty
+times a typical window — but it has few companions: 0.5% of windows reach twenty
+times the median. We do not report a genome-wide total. The 75 kb windows step 5
+kb and so overlap fifteenfold, and each value is a point estimate carrying an
+upward bias that does not shrink with replication, so summing them measures
+neither. Everything below concerns the distribution of heritability across
+windows and the way it splits, not its integral.
 
-**The polygenic background reorganizes across sex and diet.** The background is not a single shared architecture uniformly rescaled across contexts; distinct chromosomal regions contribute preferentially to male or female heritability (Fig. 1b). The X chromosome and 2L are strongly male-biased along their lengths, with integrated H² 67-fold and 9-fold higher in males than females respectively, while 3R is female-biased (male:female 0.67). Male bias on the X is expected in part from hemizygous exposure of partially recessive variation, but the parallel bias on 2L cannot be attributed to that mechanism and points to sex-differential contribution to longevity variance from an autosomal arm. Partitioning H² at each window into a component shared by all four treatments and components differing by sex or by diet (Fig. 1c) shows that 10.2% of the genetic variance is sex-specific and 1.9% diet-specific, with no detectable sex-by-diet interaction. Restricted to the fifth of the genome carrying two-thirds of the heritability, where the ratio is best estimated, sex and diet together account for 7–10% (95% CI 4–16%). A marginal analysis that regresses out sex and environment — the standard construction in human GWAS, where factorial manipulation of environment is not possible — estimates only the shared component and is structurally blind to this fraction.
+**Which parts of the genome matter depends on sex, and hardly at all on diet.**
+Lifespan does not have one genetic basis shared by all flies. On the X
+chromosome the median window carries 0.43% of phenotypic variance in males and
+0.01% in females, and males are higher at every single window; on 2L males are
+higher at 79% of windows, while on 3R the direction reverses and females are
+higher at 71% (Fig. 1b). Part of the X difference is expected, since males carry
+one copy and recessive variation that a second chromosome would mask is exposed
+— but 2L and 3R are ordinary autosomes and that explanation does not reach them.
+Diet behaves quite differently. The two sugar levels change lifespan
+substantially, yet they barely change which parts of the genome contribute to
+it. Splitting the heritability at each window into the part shared by all four
+groups and the parts that differ by sex or by diet (Fig. 1c), 10.2% of the
+genetic variance is specific to one sex and 1.9% to one diet, with no detectable
+interaction between them; on the autosomes alone, where hemizygosity cannot
+contribute, the sex share is 7.3%. Within the fifth of the genome carrying most
+of the signal, where the split is best determined, sex and diet together account
+for 9.4% (95% CI 5.9–15.9%). That is the part an analysis which pools the sexes
+and treats environment as a covariate — the usual construction when environment
+cannot be manipulated, as in human studies — is unable to see. It is not spread
+thinly across the genome either: it sits at loci that act in one sex and not the
+other, which such an analysis would report at a fraction of their real effect.
 
 ---
 
 ## Numbers behind the above
 
+Per-window values are corrected heritability, in percentage points of phenotypic
+variance, over euchromatic windows only.
+
 | quantity | value |
 |---|---|
-| euchromatic windows with H² > 0 after floor removal | 77.7% |
-| windows where main exceeds the replicate error | 83.3% |
-| median corrected H² per euchromatic window | 0.136 |
-| integrated H², SY10 male / SY20 male / SY10 female / SY20 female | 70 / 57 / 41 / 32 % |
-| H² outside the top 10 / 50 / 100 windows | 93 / 80 / 66 % |
-| integrated H² male:female — chrX / 2L / 2R / 3L / 3R | 66.9 / 9.0 / 1.38 / 1.68 / 0.67 |
-| partition, all chromosomes (main / sex / diet / sex×diet) | 88.5 / 10.2 / 1.9 / −0.6 % |
-| partition, autosomes | 90.9 / 7.3 / 2.2 / −0.5 % |
-| partition, X only | 59.4 / 44.3 / −1.8 / −1.9 % |
-| top 20% of genome by Wald: share of h², sex+diet | 66% of h², 9.4% [5.9, 15.9] |
-| chr3L peak H² (SY20 M / SY10 M / SY20 F / SY10 F) | 4.60 / 4.07 / 2.93 / 2.50 |
+| euchromatic windows with h² > 0 after floor removal | 77.7% (M 79.0, F 65.8) |
+| windows where the shared component exceeds replicate error | 83.3% |
+| median window h², males / females | 0.15 / 0.07 |
+| median window h² by condition (SY10 M / SY20 M / SY10 F / SY20 F) | 0.18 / 0.14 / 0.06 / 0.09 |
+| windows above 2× / 5× / 10× / 20× the median | 35 / 17 / 4.0 / 0.5 % |
+| peak ÷ median within a condition | 21–33× |
+| median window h², M vs F: chrX | 0.429 vs 0.006, M higher at 100% |
+| 2L | 0.128 vs −0.015, M higher at 79% |
+| 2R | 0.044 vs −0.011, M higher at 67% |
+| 3L | 0.165 vs 0.146, M higher at 69% |
+| 3R | 0.113 vs 0.222, M higher at 29% |
+| chr3L peak Wald −log10 *P* (SY20 M / SY10 M / SY20 F / SY10 F) | 207.5 / 133.6 / 73.1 / 49.8 |
+| chr3L peak corrected h² | 4.60 / 4.07 / 2.93 / 2.50 |
+| split, all chromosomes (shared / sex / diet / sex×diet) | 88.5 / 10.2 / 1.9 / −0.6 % |
+| split, autosomes | 90.9 / 7.3 / 2.2 / −0.5 % |
+| split, X only | 59.4 / 44.3 / −1.8 / −1.9 % |
+| top 20% of genome by Wald: sex+diet share | 9.4% [5.9, 15.9] |
 
-Integrated H² percentages carry the scaling described in Methods — summed window
-H² overcounts, so absolute values are rescaled to a genome total of 50%. The
-male:female ratios are unaffected by that scaling; the absolute percentages
-inherit it.
+The shares (10.2%, 7.3%, 9.4%) are ratios of sums over the same windows, so the
+fifteenfold window overlap cancels from numerator and denominator and they are
+not affected by it. Absolute totals are, which is why none are given.
 
 ## Changed from the earlier draft, and why
 
-- **"essentially the entire euchromatic genome" → "much of".** After floor
-  removal 22% of euchromatic windows sit at or below zero. 78% is a substantial
-  polygenic background but not the whole genome, and "significantly elevated"
-  would require a per-window test that has not been run.
-- **2R dropped from the female-biased claim.** It is mildly male-biased
-  (male:female 1.38). 3R is female-biased (0.67) and that part stands. ("The left
-  arm of 3R" also does not parse — 3R is an arm.)
+- **Per-condition heritability totals removed** (they read 70 / 57 / 41 / 32%).
+  They were circular: window h² was summed, which overcounts fifteenfold, and
+  then rescaled so the genome came to 50% — the number that was supposed to be
+  the result. Nothing in this experiment estimates broad-sense heritability for
+  lifespan overall. Replaced with per-window medians and the male:female
+  comparison at matched windows, which need no integration.
+- **"93% of H² lies outside the top ten windows" removed.** Same problem: a
+  statement about a sum of overlapping point estimates. The concentration claim
+  is now made by counting windows above multiples of the median.
+- **Male:female contrasts restated per window.** The earlier chromosome ratios
+  (66.9× on X, 9.0× on 2L) were ratios of sums, so they inherit whatever the
+  denominator does when it approaches zero — the female median on 2L is in fact
+  slightly negative, which is why that ratio was large. Median-versus-median plus
+  the fraction of windows where males exceed females says the same thing without
+  a pole in it.
+- **"essentially the entire euchromatic genome" → "most".** 22% of euchromatic
+  windows sit at or below zero after floor removal.
+- **2R dropped from the female-biased claim.** It is mildly male-biased. 3R is
+  female-biased and that part stands.
 - **chr3L peak values corrected.** Not "~5 in one condition and >3 in the
-  others": the corrected peaks are 4.60 and 4.07 in males against 2.93 and 2.50
-  in females, so two of the four are below 3.
-- **Marginal-analysis sentence rests on the partition.** Averaging the four
-  condition curves recovers 25% by construction, which is arithmetic rather than
-  a result; the defensible statement is that a main-effect analysis captures the
-  shared component and discards the 7–10% that is sex- or diet-specific.
+  others": 4.60 and 4.07 in males against 2.93 and 2.50 in females.
+- **Second paragraph rewritten for a reader who has not done this analysis.**
+  The previous version led with the machinery of the decomposition. The point is
+  that lifespan genetics differs between the sexes and barely differs between
+  diets, and that a pooled analysis cannot recover the difference.
 
 ## Not written, because the analysis does not exist
 
