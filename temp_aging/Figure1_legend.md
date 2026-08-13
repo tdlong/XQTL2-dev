@@ -6,7 +6,8 @@ into shared, sex and diet components.**
 In all three panels the vertical axis is broken so that the large-effect locus
 on 3L does not set the scale for the rest of the genome: the lower segment
 occupies three quarters of the panel height and the upper segment one quarter,
-with the break at 20 in (A), 2.5 in (B) and 0.75 in (C).
+with the break at 20 in (A), 2.5 in (B) and 0.75 in (C). The chr3L peak reaches
+-log10(P) = 207 in SY20 males.
 
 Chromosome arms are concatenated left to right (X, 2L, 2R, 3L, 3R); dotted
 vertical lines separate arms and grey bands mark pericentromeric and telomeric
@@ -16,7 +17,8 @@ heterochromatin (dm6 euchromatin boundaries from Huynh et al. 2023 *PLoS Genet*
 **(A)** Wald test of haplotype frequency change between the selected long-lived
 pool and its unselected control, as -log10(*P*), for each of the four
 treatments: SY10 and SY20 diets in females and males. One curve per treatment,
-75 kb haplotype windows in 5 kb steps, smoothed at 100 kb.
+12 replicate cages each, 75 kb haplotype windows in 5 kb steps, smoothed at
+100 kb.
 
 **(B)** Cutler broad-sense heritability *h*² at the same windows, one curve per
 treatment, same colours as (A). *h*² is expressed as a percentage of phenotypic

@@ -184,8 +184,8 @@ split_panel <- function(d, yv, cv, cols, brk, lo, hi, lo_brk, hi_brk,
   list(top = top, bot = bot)
 }
 
-pA <- split_panel(scans, "wald", "trt", TRT_COL, 20, c(0, 20), c(20, 105),
-                  c(0, 5, 10, 15), c(40, 60, 80, 100),
+pA <- split_panel(scans, "wald", "trt", TRT_COL, 20, c(0, 20), c(20, 215),
+                  c(0, 5, 10, 15), c(50, 100, 150, 200),
                   expression(-log[10] * italic(P)), "A", lw = 0.28)
 pB <- split_panel(scans, "h2", "trt", TRT_COL, 2.5, c(0, 2.5), c(2.5, 5),
                   c(0, 0.5, 1, 1.5, 2), c(3, 4, 5),
