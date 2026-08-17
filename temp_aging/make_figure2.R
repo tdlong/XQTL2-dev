@@ -88,18 +88,20 @@ dfreq <- means %>%
   ungroup() %>% mutate(alpha = ifelse(rare, 0.2, 1)) %>%
   arrange(alpha, founder)                      # faded lines drawn behind
 
-# ---- the founder that drops most at each peak, ignoring the faded ones -----
-drops <- dfreq %>% filter(!rare) %>%
-  group_by(locus) %>% filter(pos == peak_pos) %>%
-  slice_min(Dfreq, n = 1) %>% ungroup() %>%
-  select(locus, founder, Dfreq_at_peak = Dfreq)
+# ---- the founders that move most at each peak, ignoring the faded ones -----
+# One that rises under selection and one that falls, per peak.
+at_peak <- dfreq %>% filter(!rare, pos == peak_pos)
+movers <- bind_rows(
+  at_peak %>% group_by(locus) %>% slice_max(Dfreq, n = 1) %>% mutate(dir = "up"),
+  at_peak %>% group_by(locus) %>% slice_min(Dfreq, n = 1) %>% mutate(dir = "down")) %>%
+  ungroup() %>% select(locus, founder, dir, Dfreq_at_peak = Dfreq)
 
-# its frequency in the controls, by replicate
+# their frequency in the controls, by replicate
 ctrl <- means %>%
   inner_join(best %>% select(locus, sugar, sex), by = c("locus","sugar","sex")) %>%
-  inner_join(drops %>% select(locus, founder), by = c("locus","founder")) %>%
+  inner_join(movers %>% select(locus, founder, dir), by = c("locus","founder")) %>%
   filter(TRT == "C", pos == peak_pos) %>%
-  transmute(locus, founder, REP, freq)
+  transmute(locus, founder, dir, REP, freq)
 
 # ---- panels ---------------------------------------------------------------
 base <- theme_bw(7) + theme(panel.grid.minor = element_blank(),
@@ -135,33 +137,42 @@ freq_panel <- function(lc, ylab = NULL) {
     labs(x = NULL, y = ylab) + base
 }
 
-# Both keys drawn as one plot rather than two extracted legends: cowplot's
-# get_legend returns a gtable, which patchwork will not compose.
-legend_cell <- function() {
-  fk <- tibble(lab = founders, x = 1, y = rev(seq_along(founders)))
-  tk <- tibble(lab = TRT_LEV, x = 4.6, y = rev(seq_along(TRT_LEV)) * 2 - 0.5)
-  ggplot() +
-    geom_point(data = fk, aes(x, y, colour = lab), size = 1.5) +
-    geom_text(data = fk, aes(x + 0.22, y, label = lab), hjust = 0, size = 1.9) +
-    geom_segment(data = tk, aes(x = x, xend = x + 0.45, y = y, yend = y, colour = lab),
-                 linewidth = 0.6) +
-    geom_text(data = tk, aes(x + 0.62, y, label = lab), hjust = 0, size = 1.9) +
-    scale_colour_manual(values = c(FOUNDER_COL, TRT_COL)) +
-    scale_x_continuous(limits = c(0.7, 8.2)) +
-    scale_y_continuous(limits = c(0, length(founders) + 1)) +
+# Founder key, drawn as a plot rather than an extracted legend: cowplot's
+# get_legend returns a gtable, which patchwork will not compose. The treatment
+# colours are not repeated here -- they are defined in Figure 1 -- and the peak
+# colours need no key, each cell's locus label being drawn in its own colour.
+founder_legend <- function() {
+  fk <- tibble(lab = founders, x = seq_along(founders))
+  ggplot(fk) +
+    geom_point(aes(x, 1, colour = lab), size = 1.6) +
+    geom_text(aes(x + 0.09, 1, label = lab), hjust = 0, size = 2.1) +
+    scale_colour_manual(values = FOUNDER_COL) +
+    scale_x_continuous(limits = c(0.6, length(founders) + 0.8)) +
     theme_void(7) + theme(legend.position = "none",
-                          plot.margin = margin(1, 3, 1, 3))
+                          plot.margin = margin(2, 3, 0, 3))
 }
 
-control_panel <- function() {
-  ggplot(ctrl, aes(REP, freq, colour = locus, group = locus)) +
+# The two halves of the eighth cell. At each peak, the founder enriched most in
+# the long-lived pool (most protective) and the one depleted most (most
+# susceptible), faded rare founders excluded, shown as their frequency in the
+# CONTROLS across replicates. If these hits were just founders on their way out
+# of the cage, the susceptible set would slope down here too.
+control_panel <- function(d, lab, show_x) {
+  ggplot(ctrl %>% filter(dir == d), aes(REP, freq, colour = locus, group = locus)) +
     geom_line(linewidth = 0.4) + geom_point(size = 0.5) +
     scale_colour_manual(values = PEAK_COL) +
     scale_x_continuous(breaks = c(1, 4, 8, 12), expand = expansion(0.03)) +
-    coord_cartesian(ylim = c(0, NA)) +
-    labs(x = "replicate (time)", y = NULL) + base +
-    annotate("text", x = -Inf, y = Inf, label = "control frequency",
-             hjust = -0.06, vjust = 1.4, size = 2.1)
+    scale_y_continuous(limits = c(0, 0.75), breaks = c(0, 0.2, 0.4, 0.6),
+                       expand = expansion(0)) +
+    labs(x = if (show_x) "replicate" else NULL,
+         # One title for both halves: it goes on the upper panel pushed to its
+         # bottom edge, which is the middle of the stacked pair.
+         y = if (show_x) NULL else "haplotype freq in controls") + base +
+    theme(axis.title.y = element_text(hjust = 0)) +
+    (if (show_x) NULL else theme(axis.text.x = element_blank(),
+                                 axis.ticks.x = element_blank())) +
+    annotate("text", x = -Inf, y = Inf, label = lab,
+             hjust = -0.06, vjust = 1.5, size = 2.1)
 }
 
 lc <- loci$locus
@@ -175,13 +186,26 @@ F_ <- map2(lc, c(list(YF), rep(list(NULL), 3), list(YF), rep(list(NULL), 2)), fr
 xlab_strip <- ggplot() + annotate("text", x = 0, y = 0, label = "Mb", size = 2.4) +
   theme_void()
 
-design <- c("ABCD", "EFGH", "EFGH", "IJKL", "MNOP", "MNOP", "QQQ#")
+# Six unit rows per cell row, so the Wald:frequency 1:2 split still lands on
+# whole rows (2 and 4) while the eighth cell divides in half (3 and 3).
+# Letters map to plots alphabetically against the order plots are added below,
+# so the two bottom strips are S (Mb, added first) then T (founder key).
+design <- c("ABCD", "ABCD",
+            "EFGH", "EFGH", "EFGH", "EFGH",
+            "IJKQ", "IJKQ",
+            "MNOQ",
+            "MNOR", "MNOR", "MNOR",
+            "SSS#",
+            "TTTT")
 p <- W[[1]] + W[[2]] + W[[3]] + W[[4]] +
      F_[[1]] + F_[[2]] + F_[[3]] + F_[[4]] +
-     W[[5]] + W[[6]] + W[[7]] + legend_cell() +
-     F_[[5]] + F_[[6]] + F_[[7]] + control_panel() + xlab_strip +
+     W[[5]] + W[[6]] + W[[7]] +
+     F_[[5]] + F_[[6]] + F_[[7]] +
+     control_panel("up",   "most protective",  FALSE) +
+     control_panel("down", "most susceptible", TRUE) +
+     xlab_strip + founder_legend() +
      plot_layout(design = paste(design, collapse = "\n"),
-                 heights = c(1, 1, 1, 1, 1, 1, 0.18))
+                 heights = c(rep(1, 12), 0.28, 0.42))
 
 png(OUT, width = 7.5, height = 5.2, units = "in", res = 300)
 print(p)
@@ -190,10 +214,11 @@ dev.off()
 cat("wrote", OUT, "\n\n")
 cat("treatment drawn in each frequency sub-panel:\n")
 best %>% mutate(wald = round(wald, 1)) %>% as.data.frame() %>% print(row.names = FALSE)
-cat("\nfounder dropping most at each peak (faded rare founders excluded):\n")
-drops %>% mutate(Dfreq_at_peak = round(Dfreq_at_peak, 3)) %>%
-  left_join(ctrl %>% group_by(locus) %>%
+cat("\nfounders moving most at each peak (faded rare founders excluded):\n")
+movers %>% mutate(Dfreq_at_peak = round(Dfreq_at_peak, 3)) %>%
+  left_join(ctrl %>% group_by(locus, dir) %>%
     summarise(ctrl_first = round(freq[which.min(REP)], 3),
               ctrl_last  = round(freq[which.max(REP)], 3),
               ctrl_slope = round(coef(lm(freq ~ REP))[2], 4), .groups = "drop"),
-    by = "locus") %>% as.data.frame() %>% print(row.names = FALSE)
+    by = c("locus", "dir")) %>% arrange(dir, Dfreq_at_peak) %>%
+  as.data.frame() %>% print(row.names = FALSE)
