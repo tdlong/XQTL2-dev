@@ -176,9 +176,20 @@ control_panel <- function(d, lab, show_x) {
 # The eighth cell is built as its own block so its y title can be centred across
 # both halves: a rotated text element beside the stacked pair, rather than an
 # axis title on one panel, which would centre on that panel alone.
-YGAP <- 0.05                       # width of that title column, as a fraction
-ctrl_cell <- (wrap_elements(grid::textGrob("haplotype freq in controls",
-                                           rot = 90, gp = grid::gpar(fontsize = 7))) |
+# Column 4 is widened by exactly the width its title column consumes, so all
+# eight plotting areas come out the same width and the extra simply becomes
+# white space between columns 3 and 4. One constant drives both.
+YGAP  <- 0.30
+# The two column-4 cells are nested patchworks, which the outer layout treats as
+# single units and so does not align with columns 1-3; they also carry their own
+# margins. PAD is the empirical correction that makes all eight panels equal.
+PAD   <- 0.25
+YTEXT <- "haplotype freq in controls"
+ylab_el <- function(visible = TRUE)
+  wrap_elements(grid::textGrob(YTEXT, rot = 90,
+    gp = grid::gpar(fontsize = 7, col = if (visible) "black" else NA)))
+
+ctrl_cell <- (ylab_el(TRUE) |
   (control_panel("up", "most protective", FALSE) /
    control_panel("down", "most susceptible", TRUE))) +
   plot_layout(widths = c(YGAP, 1))
@@ -189,10 +200,9 @@ YW <- expression(-log[10]*italic(P)); YF <- expression(Delta*" frequency")
 W  <- map2(lc, c(list(YW), rep(list(NULL), 3), list(YW), rep(list(NULL), 2)), wald_panel)
 F_ <- map2(lc, c(list(YF), rep(list(NULL), 3), list(YF), rep(list(NULL), 2)), freq_panel)
 
-# Cell 4 is nested the same way, against an empty spacer of the same width, so
-# its plotting area lines up with the eighth cell below it rather than being
-# offset by the width of that rotated title.
-cell4 <- (plot_spacer() | (W[[4]] / F_[[4]] + plot_layout(heights = c(1, 2)))) +
+# Cell 4 is nested the same way, against an invisible copy of the same label, so
+# it reserves identical space and its panels line up with the eighth cell below.
+cell4 <- (ylab_el(FALSE) | (W[[4]] / F_[[4]] + plot_layout(heights = c(1, 2)))) +
   plot_layout(widths = c(YGAP, 1))
 
 # one shared x title under the three columns of zoom cells; the control cell
@@ -205,8 +215,6 @@ xlab_strip <- ggplot() + annotate("text", x = 0, y = 1, label = "Mb", size = 2.4
 # Six unit rows per cell row, so the Wald:frequency 1:2 split still lands on
 # whole rows (2 and 4) while the eighth cell divides in half (3 and 3).
 # Letters map to plots alphabetically against the order plots are added below.
-# Column 4 is slightly wider so that, after its internal title column is taken
-# out, its panels are about as wide as those in columns 1-3.
 design <- c("ABCG", "ABCG",
             "DEFG", "DEFG", "DEFG", "DEFG",
             "HIJN", "HIJN",
@@ -220,7 +228,7 @@ p <- W[[1]] + W[[2]] + W[[3]] +
      F_[[5]] + F_[[6]] + F_[[7]] +
      ctrl_cell + xlab_strip + founder_legend() +
      plot_layout(design = paste(design, collapse = "\n"),
-                 widths  = c(1, 1, 1, 1 + YGAP),
+                 widths  = c(1, 1, 1, 1 + YGAP + PAD),
                  heights = c(rep(1, 12), 0.20, 0.34))
 
 png(OUT, width = 7.5, height = 5.2, units = "in", res = 300)
