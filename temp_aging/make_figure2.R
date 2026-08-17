@@ -112,22 +112,22 @@ freq_panel <- function(lc) {
     labs(x = NULL, y = NULL) + base
 }
 
+# Both keys drawn as one plot rather than two extracted legends: cowplot's
+# get_legend returns a gtable, which patchwork will not compose.
 legend_cell <- function() {
-  g <- tibble(x = seq_along(founders), y = 1, f = factor(founders, levels = founders))
-  p1 <- ggplot(g, aes(x, y, colour = f)) + geom_point(size = 1.6) +
-    scale_colour_manual(values = FOUNDER_COL, name = NULL) +
-    guides(colour = guide_legend(nrow = 2, byrow = TRUE,
-             keywidth = unit(6,"pt"), keyheight = unit(6,"pt"))) +
-    theme_void(7) + theme(legend.position = "left",
-             legend.margin = margin(0,0,0,0), legend.text = element_text(size = 5.5))
-  t <- tibble(x = 1, y = 1, g = factor(TRT_LEV, levels = TRT_LEV))
-  p2 <- ggplot(t, aes(x, y, colour = g)) + geom_line() +
-    scale_colour_manual(values = TRT_COL, name = NULL) +
-    guides(colour = guide_legend(nrow = 2, byrow = TRUE,
-             keywidth = unit(6,"pt"), keyheight = unit(6,"pt"))) +
-    theme_void(7) + theme(legend.position = "left",
-             legend.margin = margin(0,0,0,0), legend.text = element_text(size = 5.5))
-  (cowplot::get_legend(p1) | cowplot::get_legend(p2)) + plot_layout(widths = c(1, 1))
+  fk <- tibble(lab = founders, x = 1, y = rev(seq_along(founders)))
+  tk <- tibble(lab = TRT_LEV, x = 4.6, y = rev(seq_along(TRT_LEV)) * 2 - 0.5)
+  ggplot() +
+    geom_point(data = fk, aes(x, y, colour = lab), size = 1.5) +
+    geom_text(data = fk, aes(x + 0.22, y, label = lab), hjust = 0, size = 1.9) +
+    geom_segment(data = tk, aes(x = x, xend = x + 0.45, y = y, yend = y, colour = lab),
+                 linewidth = 0.6) +
+    geom_text(data = tk, aes(x + 0.62, y, label = lab), hjust = 0, size = 1.9) +
+    scale_colour_manual(values = c(FOUNDER_COL, TRT_COL)) +
+    scale_x_continuous(limits = c(0.7, 8.2)) +
+    scale_y_continuous(limits = c(0, length(founders) + 1)) +
+    theme_void(7) + theme(legend.position = "none",
+                          plot.margin = margin(1, 3, 1, 3))
 }
 
 control_panel <- function() {
