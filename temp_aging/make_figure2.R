@@ -180,7 +180,7 @@ ctrl_cell <- wrap_elements(grid::textGrob("haplotype freq in controls",
                                           rot = 90, gp = grid::gpar(fontsize = 7))) |
   (control_panel("up", "most protective", FALSE) /
    control_panel("down", "most susceptible", TRUE))
-ctrl_cell <- ctrl_cell + plot_layout(widths = c(0.07, 1))
+ctrl_cell <- ctrl_cell + plot_layout(widths = c(0.05, 1))
 
 lc <- loci$locus
 # y titles only on the leftmost column of cells (1 and 5)
@@ -190,8 +190,10 @@ F_ <- map2(lc, c(list(YF), rep(list(NULL), 3), list(YF), rep(list(NULL), 2)), fr
 
 # one shared x title under the three columns of zoom cells; the control cell
 # keeps its own, since its x is replicate and not position
-xlab_strip <- ggplot() + annotate("text", x = 0, y = 0, label = "Mb", size = 2.4) +
-  theme_void()
+xlab_strip <- ggplot() + annotate("text", x = 0, y = 1, label = "Mb", size = 2.4,
+                                  vjust = 1) +
+  scale_y_continuous(limits = c(0, 1), expand = expansion(0)) +
+  theme_void() + theme(plot.margin = margin(0, 0, 0, 0))
 
 # Six unit rows per cell row, so the Wald:frequency 1:2 split still lands on
 # whole rows (2 and 4) while the eighth cell divides in half (3 and 3).
@@ -209,7 +211,7 @@ p <- W[[1]] + W[[2]] + W[[3]] + W[[4]] +
      F_[[5]] + F_[[6]] + F_[[7]] +
      ctrl_cell + xlab_strip + founder_legend() +
      plot_layout(design = paste(design, collapse = "\n"),
-                 heights = c(rep(1, 12), 0.28, 0.42))
+                 heights = c(rep(1, 12), 0.20, 0.34))
 
 png(OUT, width = 7.5, height = 5.2, units = "in", res = 300)
 print(p)
