@@ -214,9 +214,14 @@ F_ <- pmap(list(lc, YTITLF, SHOWY), freq_panel)
 
 # one shared x title under the three columns of zoom cells; the control cell
 # keeps its own, since its x is replicate and not position
+# The row's axis block reserves height for the control panel's "replicate" title,
+# so this strip starts well below the tick labels and "Mb" sat 64 px under them
+# against 13 px for "replicate". plot.margin does not move it -- patchwork fixes
+# the row -- so the text is drawn above its own panel with clipping off.
+MBV <- -1.6
 xlab_strip <- ggplot() + annotate("text", x = 0, y = 1, label = "Mb", size = 2.4,
-                                  vjust = 1) +
-  scale_y_continuous(limits = c(0, 1), expand = expansion(0)) +
+                                  vjust = MBV) +
+  coord_cartesian(ylim = c(0, 1), clip = "off") +
   theme_void() + theme(plot.margin = margin(0, 0, 0, 0))
 
 # Six unit rows per cell row, so the Wald:frequency 1:2 split lands on whole rows
