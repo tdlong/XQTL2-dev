@@ -107,7 +107,7 @@ ctrl <- means %>%
 
 # ---- panels ---------------------------------------------------------------
 base <- theme_bw(7) + theme(panel.grid.minor = element_blank(),
-          plot.margin = margin(1, 3, 1, 3), legend.position = "none",
+          plot.margin = margin(1, 2, 1, 2), legend.position = "none",
           plot.title = element_blank())
 
 # The control panels reserve no space for a sign. An earlier version padded them
@@ -116,9 +116,16 @@ base <- theme_bw(7) + theme(panel.grid.minor = element_blank(),
 # patchwork aligns the axis block across the whole column, so one decimal and no
 # padding is enough.
 ylab_zoom <- function(x) sprintf("%.2f", x)
+
+# Only panels that introduce a scale carry y tick labels. Repeating "-0.06" on
+# every frequency panel is not just clutter: patchwork sizes a column's axis
+# block to its widest label, so cell 4's labels were forcing two characters of
+# empty buffer to the left of the control panels' own "0.6".
+noy <- function(show) if (show) NULL else
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
 ylab_ctrl <- function(x) sprintf("%.1f", x)
 
-wald_panel <- function(lc, ylab = NULL) {
+wald_panel <- function(lc, ylab = NULL, showy = FALSE) {
   L <- loci %>% filter(locus == lc)
   d <- scan %>% filter(chr == L$chr, abs(pos - L$peak_pos) <= WIN) %>%
        mutate(trt = trt_lab(sugar, sex), mb = pos/1e6)
@@ -128,13 +135,13 @@ wald_panel <- function(lc, ylab = NULL) {
     scale_x_continuous(expand = expansion(0)) +
     scale_y_continuous(limits = yspec("wald", lc)$lim,
                        breaks = yspec("wald", lc)$brk, expand = expansion(0)) +
-    labs(x = NULL, y = ylab) + base +
+    labs(x = NULL, y = ylab) + base + noy(showy) +
     theme(axis.text.x = element_blank(), axis.ticks.x = element_blank()) +
     annotate("text", x = -Inf, y = Inf, label = lc, hjust = -0.08, vjust = 1.4,
              size = 2.1, colour = PEAK_COL[[lc]], fontface = "bold")
 }
 
-freq_panel <- function(lc, ylab = NULL) {
+freq_panel <- function(lc, ylab = NULL, showy = FALSE) {
   d <- dfreq %>% filter(locus == lc) %>% mutate(mb = pos/1e6)
   ggplot(d, aes(mb, Dfreq, colour = founder, alpha = alpha,
                 group = interaction(founder, locus))) +
@@ -145,7 +152,7 @@ freq_panel <- function(lc, ylab = NULL) {
     scale_y_continuous(limits = yspec("freq", lc)$lim,
                        breaks = yspec("freq", lc)$brk, expand = expansion(0),
                        labels = ylab_zoom) +
-    labs(x = NULL, y = ylab) + base
+    labs(x = NULL, y = ylab) + base + noy(showy)
 }
 
 # Founder key, drawn as a plot rather than an extracted legend: cowplot's
@@ -198,8 +205,12 @@ ylab_el <- wrap_elements(grid::textGrob("haplotype freq in controls",
 lc <- loci$locus
 # y titles only on the leftmost column of cells (1 and 5)
 YW <- expression(-log[10]*italic(P)); YF <- expression(Delta*" frequency")
-W  <- map2(lc, c(list(YW), rep(list(NULL), 3), list(YW), rep(list(NULL), 2)), wald_panel)
-F_ <- map2(lc, c(list(YF), rep(list(NULL), 3), list(YF), rep(list(NULL), 2)), freq_panel)
+# leftmost cell of each row, plus chr3L which is on its own scale in both rows
+SHOWY <- c(TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, TRUE)
+YTITLE <- c(list(YW), rep(list(NULL), 3), list(YW), rep(list(NULL), 2))
+YTITLF <- c(list(YF), rep(list(NULL), 3), list(YF), rep(list(NULL), 2))
+W  <- pmap(list(lc, YTITLE, SHOWY), wald_panel)
+F_ <- pmap(list(lc, YTITLF, SHOWY), freq_panel)
 
 # one shared x title under the three columns of zoom cells; the control cell
 # keeps its own, since its x is replicate and not position
