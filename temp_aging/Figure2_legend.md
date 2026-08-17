@@ -1,16 +1,17 @@
 # Figure 2
 
-**Seven loci in detail.** Each labelled cell spans 1 Mb centred on a peak. Upper
-subpanel: Wald test in all four treatments. Lower subpanel: change in founder
-haplotype frequency, selected minus control, for the treatment with the strongest
-signal at that peak. Eighth cell: frequency in the unselected controls across
-replicates of the haplotype most enriched in the long-lived pool (most
-protective) and the one most depleted (most susceptible), one line per locus.
+Detail of 1 Mb regions centered on seven strong Wald peaks. Upper subpanels are
+Wald scores across the four treatments (same colors as Figure 1). Lower subpanels
+are changes in founder haplotype frequencies, selected minus control, for the
+treatment with the most significant Wald score (rare founders have muted
+shading). The 8th panel depicts founder frequencies in the unselected controls
+across replicates: the upper the haplotype for each of the seven preceding
+regions most enriched in the long-lived pool (most protective), the lower the one
+most depleted (most susceptible). Colors correspond to labels for panels one
+through seven.
 
-Founder colours are fixed throughout; founders below 2.5% frequency in the
-controls are faded. Each locus label is drawn in that peak's colour, which is its
-colour in the eighth cell. Replicate order is time order. Axes are shared — Wald
-0–30, Δ frequency −0.06 to 0.06 — except chr3L, at 0–200 and −0.10 to 0.05.
+Replicate order is time order. Axes are shared — Wald 0–30, Δ frequency −0.06 to
+0.06 — except chr3L, at 0–200 and −0.10 to 0.05.
 
 ## Numbers
 
@@ -26,6 +27,11 @@ colour in the eighth cell. Replicate order is time order. Axes are shared — Wa
 
 Changes are at the peak window, averaged over 12 replicates. B6 is protective at
 four of seven peaks and susceptible at chrX:10.09.
+
+**Not the seven strongest.** Of the twelve well-separated peaks above −log10 *P*
+= 15, three that outrank most of these are not shown: chr3R:8.66 (42.1),
+chr3L:21.64 (38.2) and chr2R:25.10 (28.7). chrX:10.09 at 15.9 is the weakest of
+the twelve. Say how the seven were chosen, or the claim has to be dropped.
 
 ## The eighth cell
 
