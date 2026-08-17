@@ -94,7 +94,7 @@ base <- theme_bw(7) + theme(panel.grid.minor = element_blank(),
           plot.margin = margin(1, 3, 1, 3), legend.position = "none",
           plot.title = element_blank())
 
-wald_panel <- function(lc) {
+wald_panel <- function(lc, ylab = NULL) {
   L <- loci %>% filter(locus == lc)
   d <- scan %>% filter(chr == L$chr, abs(pos - L$peak_pos) <= WIN) %>%
        mutate(trt = trt_lab(sugar, sex), mb = pos/1e6)
@@ -103,13 +103,13 @@ wald_panel <- function(lc) {
     scale_colour_manual(values = TRT_COL) +
     scale_x_continuous(expand = expansion(0)) +
     scale_y_continuous(expand = expansion(c(0, 0.05))) +
-    labs(x = NULL, y = NULL) + base +
+    labs(x = NULL, y = ylab) + base +
     theme(axis.text.x = element_blank(), axis.ticks.x = element_blank()) +
     annotate("text", x = -Inf, y = Inf, label = lc, hjust = -0.08, vjust = 1.4,
              size = 2.1, colour = PEAK_COL[[lc]], fontface = "bold")
 }
 
-freq_panel <- function(lc) {
+freq_panel <- function(lc, ylab = NULL) {
   d <- dfreq %>% filter(locus == lc) %>% mutate(mb = pos/1e6)
   ggplot(d, aes(mb, Dfreq, colour = founder, alpha = alpha,
                 group = interaction(founder, locus))) +
@@ -117,7 +117,7 @@ freq_panel <- function(lc) {
     geom_line(linewidth = 0.4) +
     scale_colour_manual(values = FOUNDER_COL) + scale_alpha_identity() +
     scale_x_continuous(expand = expansion(0)) +
-    labs(x = NULL, y = NULL) + base
+    labs(x = NULL, y = ylab) + base
 }
 
 # Both keys drawn as one plot rather than two extracted legends: cowplot's
@@ -150,15 +150,23 @@ control_panel <- function() {
 }
 
 lc <- loci$locus
-W <- map(lc, wald_panel); F_ <- map(lc, freq_panel)
+# y titles only on the leftmost column of cells (1 and 5)
+YW <- expression(-log[10]*italic(P)); YF <- expression(Delta*" frequency")
+W  <- map2(lc, c(list(YW), rep(list(NULL), 3), list(YW), rep(list(NULL), 2)), wald_panel)
+F_ <- map2(lc, c(list(YF), rep(list(NULL), 3), list(YF), rep(list(NULL), 2)), freq_panel)
 
-# four columns, two rows of cells; each cell is 1 unit of Wald over 2 of frequency
-design <- c("ABCD", "EFGH", "EFGH", "IJKL", "MNOP", "MNOP")
+# one shared x title under the three columns of zoom cells; the control cell
+# keeps its own, since its x is replicate and not position
+xlab_strip <- ggplot() + annotate("text", x = 0, y = 0, label = "Mb", size = 2.4) +
+  theme_void()
+
+design <- c("ABCD", "EFGH", "EFGH", "IJKL", "MNOP", "MNOP", "QQQ#")
 p <- W[[1]] + W[[2]] + W[[3]] + W[[4]] +
      F_[[1]] + F_[[2]] + F_[[3]] + F_[[4]] +
      W[[5]] + W[[6]] + W[[7]] + legend_cell() +
-     F_[[5]] + F_[[6]] + F_[[7]] + control_panel() +
-     plot_layout(design = paste(design, collapse = "\n"))
+     F_[[5]] + F_[[6]] + F_[[7]] + control_panel() + xlab_strip +
+     plot_layout(design = paste(design, collapse = "\n"),
+                 heights = c(1, 1, 1, 1, 1, 1, 0.18))
 
 png(OUT, width = 7.5, height = 5.2, units = "in", res = 300)
 print(p)
