@@ -185,10 +185,13 @@ control_panel <- function(d, lab, show_x) {
 # No nested blocks. patchwork equalises panel widths only for plots that are
 # direct children of one layout, so everything sits in a single five-column
 # design: three zoom columns, a narrow column carrying nothing but the rotated
-# title for the eighth cell, and a fourth zoom column. Nesting cells 4 and 8 in
+# title for the eighth cell, and a fourth zoom column. YGAP is nearly all the
+# slack there is -- at 0.10 the gap before column 4 measures 181 px against 93
+# elsewhere, and at 0.03 it is 152 px. The floor is set by the y tick labels of
+# that column, not by the title. Nesting cells 4 and 8 in
 # their own sub-layouts is what made their boxes different widths, because each
 # then got whatever space was left after its own axis material.
-YGAP  <- 0.10
+YGAP  <- 0.03
 ylab_el <- wrap_elements(grid::textGrob("haplotype freq in controls",
              rot = 90, gp = grid::gpar(fontsize = 7)))
 
