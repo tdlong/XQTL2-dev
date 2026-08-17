@@ -110,13 +110,13 @@ base <- theme_bw(7) + theme(panel.grid.minor = element_blank(),
           plot.margin = margin(1, 3, 1, 3), legend.position = "none",
           plot.title = element_blank())
 
-# The panel box is whatever remains after the axis material, so the y labels of
-# the zoom and control panels have to occupy the same width or the boxes differ.
-# Padding with spaces is not enough -- a space is narrower than a minus sign, and
-# left the control panels 7 px wide. phantom("-") reserves exactly a minus.
+# The control panels reserve no space for a sign. An earlier version padded them
+# to the width of "-0.06" so the two boxes would match, which was only needed
+# while cells 4 and 8 were nested and sized independently; in one flat layout
+# patchwork aligns the axis block across the whole column, so one decimal and no
+# padding is enough.
 ylab_zoom <- function(x) sprintf("%.2f", x)
-ylab_ctrl <- function(x) lapply(x, function(v)
-  bquote(phantom("-") * .(sprintf("%.2f", v))))
+ylab_ctrl <- function(x) sprintf("%.1f", x)
 
 wald_panel <- function(lc, ylab = NULL) {
   L <- loci %>% filter(locus == lc)
@@ -191,7 +191,7 @@ control_panel <- function(d, lab, show_x) {
 # that column, not by the title. Nesting cells 4 and 8 in
 # their own sub-layouts is what made their boxes different widths, because each
 # then got whatever space was left after its own axis material.
-YGAP  <- 0.03
+YGAP  <- 0.07
 ylab_el <- wrap_elements(grid::textGrob("haplotype freq in controls",
              rot = 90, gp = grid::gpar(fontsize = 7)))
 
