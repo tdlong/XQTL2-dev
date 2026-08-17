@@ -38,7 +38,9 @@ YLIM  <- list(
   wald = list(def = list(lim = c(0, 31),           brk = c(0, 10, 20, 30)),
               big = list(lim = c(0, 212),          brk = c(0, 50, 100, 150, 200))),
   freq = list(def = list(lim = c(-0.062, 0.062),   brk = c(-0.06, -0.03, 0, 0.03, 0.06)),
-              big = list(lim = c(-0.115, 0.115),   brk = c(-0.10, -0.05, 0, 0.05, 0.10))))
+              # chr3L has its own scale anyway, so it is trimmed to its data:
+              # the trough reaches -0.110 and nothing rises past 0.046.
+              big = list(lim = c(-0.115, 0.052),   brk = c(-0.10, -0.05, 0, 0.05))))
 yspec <- function(which, lc) YLIM[[which]][[if (lc == BIG) "big" else "def"]]
 
 if (!file.exists(MEANS)) stop("missing ", MEANS,
@@ -164,16 +166,21 @@ control_panel <- function(d, lab, show_x) {
     scale_x_continuous(breaks = c(1, 4, 8, 12), expand = expansion(0.03)) +
     scale_y_continuous(limits = c(0, 0.75), breaks = c(0, 0.2, 0.4, 0.6),
                        expand = expansion(0)) +
-    labs(x = if (show_x) "replicate" else NULL,
-         # One title for both halves: it goes on the upper panel pushed to its
-         # bottom edge, which is the middle of the stacked pair.
-         y = if (show_x) NULL else "haplotype freq in controls") + base +
-    theme(axis.title.y = element_text(hjust = 0)) +
+    labs(x = if (show_x) "replicate" else NULL, y = NULL) + base +
     (if (show_x) NULL else theme(axis.text.x = element_blank(),
                                  axis.ticks.x = element_blank())) +
     annotate("text", x = -Inf, y = Inf, label = lab,
              hjust = -0.06, vjust = 1.5, size = 2.1)
 }
+
+# The eighth cell is built as its own block so its y title can be centred across
+# both halves: a rotated text element beside the stacked pair, rather than an
+# axis title on one panel, which would centre on that panel alone.
+ctrl_cell <- wrap_elements(grid::textGrob("haplotype freq in controls",
+                                          rot = 90, gp = grid::gpar(fontsize = 7))) |
+  (control_panel("up", "most protective", FALSE) /
+   control_panel("down", "most susceptible", TRUE))
+ctrl_cell <- ctrl_cell + plot_layout(widths = c(0.07, 1))
 
 lc <- loci$locus
 # y titles only on the leftmost column of cells (1 and 5)
@@ -193,17 +200,14 @@ xlab_strip <- ggplot() + annotate("text", x = 0, y = 0, label = "Mb", size = 2.4
 design <- c("ABCD", "ABCD",
             "EFGH", "EFGH", "EFGH", "EFGH",
             "IJKQ", "IJKQ",
-            "MNOQ",
-            "MNOR", "MNOR", "MNOR",
+            "MNOQ", "MNOQ", "MNOQ", "MNOQ",
             "SSS#",
             "TTTT")
 p <- W[[1]] + W[[2]] + W[[3]] + W[[4]] +
      F_[[1]] + F_[[2]] + F_[[3]] + F_[[4]] +
      W[[5]] + W[[6]] + W[[7]] +
      F_[[5]] + F_[[6]] + F_[[7]] +
-     control_panel("up",   "most protective",  FALSE) +
-     control_panel("down", "most susceptible", TRUE) +
-     xlab_strip + founder_legend() +
+     ctrl_cell + xlab_strip + founder_legend() +
      plot_layout(design = paste(design, collapse = "\n"),
                  heights = c(rep(1, 12), 0.28, 0.42))
 
