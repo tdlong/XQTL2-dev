@@ -43,6 +43,12 @@ trt_lab <- function(sugar, sex) factor(paste0(sugar, " ", ifelse(sex == "F", "fe
 FOUNDER_COL <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442",
                  "#D55E00", "#CC79A7", "#000000", "#990099")
 
+# Peak colours. The control panel has one line per peak, not per founder -- two
+# peaks can share a top-dropping founder. Each cell's locus label is drawn in its
+# peak colour, which is the key, so the control panel needs no legend of its own.
+PEAK_COL <- c("#1B9E77", "#D95F02", "#7570B3", "#E7298A",
+              "#66A61E", "#E6AB02", "#A6761D")
+
 means <- read.table(MEANS, header = TRUE, sep = "\t") %>% as_tibble()
 scan  <- read.table(SCAN,  header = TRUE, sep = "\t") %>% as_tibble()
 
@@ -51,6 +57,7 @@ names(FOUNDER_COL) <- founders
 
 loci <- means %>% distinct(locus, chr, peak_pos) %>%
   arrange(match(chr, c("chrX","chr2L","chr2R","chr3L")), peak_pos)
+names(PEAK_COL) <- loci$locus
 
 # treatment with the highest Wald at each peak -- the one whose frequency change
 # gets drawn
@@ -98,7 +105,8 @@ wald_panel <- function(lc) {
     scale_y_continuous(expand = expansion(c(0, 0.05))) +
     labs(x = NULL, y = NULL) + base +
     theme(axis.text.x = element_blank(), axis.ticks.x = element_blank()) +
-    annotate("text", x = -Inf, y = Inf, label = lc, hjust = -0.08, vjust = 1.4, size = 2.1)
+    annotate("text", x = -Inf, y = Inf, label = lc, hjust = -0.08, vjust = 1.4,
+             size = 2.1, colour = PEAK_COL[[lc]], fontface = "bold")
 }
 
 freq_panel <- function(lc) {
@@ -131,9 +139,9 @@ legend_cell <- function() {
 }
 
 control_panel <- function() {
-  ggplot(ctrl, aes(REP, freq, colour = founder, group = locus)) +
+  ggplot(ctrl, aes(REP, freq, colour = locus, group = locus)) +
     geom_line(linewidth = 0.4) + geom_point(size = 0.5) +
-    scale_colour_manual(values = FOUNDER_COL) +
+    scale_colour_manual(values = PEAK_COL) +
     scale_x_continuous(breaks = c(1, 4, 8, 12), expand = expansion(0.03)) +
     coord_cartesian(ylim = c(0, NA)) +
     labs(x = "replicate (time)", y = NULL) + base +
