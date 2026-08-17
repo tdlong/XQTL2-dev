@@ -29,6 +29,18 @@ OUT   <- "temp_aging/Figure2_plot.png"
 WIN   <- 0.5e6                      # half-width actually plotted
 RARE  <- 0.025                      # founders below this in controls are faded
 
+# Common y scales, so panels are comparable at a glance. chr3L is the exception
+# in both sub-panels -- it is an order of magnitude bigger and would flatten
+# everything else. Limits sit just outside the breaks because two panels would
+# otherwise clip: chr2L:10.71 reaches Wald 30.5 and chr2L:11.95 reaches 0.061.
+BIG   <- "chr3L:9.31"
+YLIM  <- list(
+  wald = list(def = list(lim = c(0, 31),           brk = c(0, 10, 20, 30)),
+              big = list(lim = c(0, 212),          brk = c(0, 50, 100, 150, 200))),
+  freq = list(def = list(lim = c(-0.062, 0.062),   brk = c(-0.06, -0.03, 0, 0.03, 0.06)),
+              big = list(lim = c(-0.115, 0.115),   brk = c(-0.10, -0.05, 0, 0.05, 0.10))))
+yspec <- function(which, lc) YLIM[[which]][[if (lc == BIG) "big" else "def"]]
+
 if (!file.exists(MEANS)) stop("missing ", MEANS,
   "\nRun temp_aging/make_zoom_means.R on HPC3 and scp the result back.")
 
@@ -102,7 +114,8 @@ wald_panel <- function(lc, ylab = NULL) {
     geom_line(linewidth = 0.35) +
     scale_colour_manual(values = TRT_COL) +
     scale_x_continuous(expand = expansion(0)) +
-    scale_y_continuous(expand = expansion(c(0, 0.05))) +
+    scale_y_continuous(limits = yspec("wald", lc)$lim,
+                       breaks = yspec("wald", lc)$brk, expand = expansion(0)) +
     labs(x = NULL, y = ylab) + base +
     theme(axis.text.x = element_blank(), axis.ticks.x = element_blank()) +
     annotate("text", x = -Inf, y = Inf, label = lc, hjust = -0.08, vjust = 1.4,
@@ -117,6 +130,8 @@ freq_panel <- function(lc, ylab = NULL) {
     geom_line(linewidth = 0.4) +
     scale_colour_manual(values = FOUNDER_COL) + scale_alpha_identity() +
     scale_x_continuous(expand = expansion(0)) +
+    scale_y_continuous(limits = yspec("freq", lc)$lim,
+                       breaks = yspec("freq", lc)$brk, expand = expansion(0)) +
     labs(x = NULL, y = ylab) + base
 }
 
