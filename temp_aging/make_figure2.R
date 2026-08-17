@@ -110,6 +110,14 @@ base <- theme_bw(7) + theme(panel.grid.minor = element_blank(),
           plot.margin = margin(1, 3, 1, 3), legend.position = "none",
           plot.title = element_blank())
 
+# The panel box is whatever remains after the axis material, so the y labels of
+# the zoom and control panels have to occupy the same width or the boxes differ.
+# Padding with spaces is not enough -- a space is narrower than a minus sign, and
+# left the control panels 7 px wide. phantom("-") reserves exactly a minus.
+ylab_zoom <- function(x) sprintf("%.2f", x)
+ylab_ctrl <- function(x) lapply(x, function(v)
+  bquote(phantom("-") * .(sprintf("%.2f", v))))
+
 wald_panel <- function(lc, ylab = NULL) {
   L <- loci %>% filter(locus == lc)
   d <- scan %>% filter(chr == L$chr, abs(pos - L$peak_pos) <= WIN) %>%
@@ -135,7 +143,8 @@ freq_panel <- function(lc, ylab = NULL) {
     scale_colour_manual(values = FOUNDER_COL) + scale_alpha_identity() +
     scale_x_continuous(expand = expansion(0)) +
     scale_y_continuous(limits = yspec("freq", lc)$lim,
-                       breaks = yspec("freq", lc)$brk, expand = expansion(0)) +
+                       breaks = yspec("freq", lc)$brk, expand = expansion(0),
+                       labels = ylab_zoom) +
     labs(x = NULL, y = ylab) + base
 }
 
@@ -165,7 +174,7 @@ control_panel <- function(d, lab, show_x) {
     scale_colour_manual(values = PEAK_COL) +
     scale_x_continuous(breaks = c(1, 4, 8, 12), expand = expansion(0.03)) +
     scale_y_continuous(limits = c(0, 0.75), breaks = c(0, 0.2, 0.4, 0.6),
-                       expand = expansion(0)) +
+                       expand = expansion(0), labels = ylab_ctrl) +
     labs(x = if (show_x) "replicate" else NULL, y = NULL) + base +
     (if (show_x) NULL else theme(axis.text.x = element_blank(),
                                  axis.ticks.x = element_blank())) +
@@ -173,37 +182,21 @@ control_panel <- function(d, lab, show_x) {
              hjust = -0.06, vjust = 1.5, size = 2.1)
 }
 
-# The eighth cell is built as its own block so its y title can be centred across
-# both halves: a rotated text element beside the stacked pair, rather than an
-# axis title on one panel, which would centre on that panel alone.
-# Column 4 is widened by exactly the width its title column consumes, so all
-# eight plotting areas come out the same width and the extra simply becomes
-# white space between columns 3 and 4. One constant drives both.
-YGAP  <- 0.30
-# The two column-4 cells are nested patchworks, which the outer layout treats as
-# single units and so does not align with columns 1-3; they also carry their own
-# margins. PAD is the empirical correction that makes all eight panels equal.
-PAD   <- 0.25
-YTEXT <- "haplotype freq in controls"
-ylab_el <- function(visible = TRUE)
-  wrap_elements(grid::textGrob(YTEXT, rot = 90,
-    gp = grid::gpar(fontsize = 7, col = if (visible) "black" else NA)))
-
-ctrl_cell <- (ylab_el(TRUE) |
-  (control_panel("up", "most protective", FALSE) /
-   control_panel("down", "most susceptible", TRUE))) +
-  plot_layout(widths = c(YGAP, 1))
+# No nested blocks. patchwork equalises panel widths only for plots that are
+# direct children of one layout, so everything sits in a single five-column
+# design: three zoom columns, a narrow column carrying nothing but the rotated
+# title for the eighth cell, and a fourth zoom column. Nesting cells 4 and 8 in
+# their own sub-layouts is what made their boxes different widths, because each
+# then got whatever space was left after its own axis material.
+YGAP  <- 0.10
+ylab_el <- wrap_elements(grid::textGrob("haplotype freq in controls",
+             rot = 90, gp = grid::gpar(fontsize = 7)))
 
 lc <- loci$locus
 # y titles only on the leftmost column of cells (1 and 5)
 YW <- expression(-log[10]*italic(P)); YF <- expression(Delta*" frequency")
 W  <- map2(lc, c(list(YW), rep(list(NULL), 3), list(YW), rep(list(NULL), 2)), wald_panel)
 F_ <- map2(lc, c(list(YF), rep(list(NULL), 3), list(YF), rep(list(NULL), 2)), freq_panel)
-
-# Cell 4 is nested the same way, against an invisible copy of the same label, so
-# it reserves identical space and its panels line up with the eighth cell below.
-cell4 <- (ylab_el(FALSE) | (W[[4]] / F_[[4]] + plot_layout(heights = c(1, 2)))) +
-  plot_layout(widths = c(YGAP, 1))
 
 # one shared x title under the three columns of zoom cells; the control cell
 # keeps its own, since its x is replicate and not position
@@ -212,23 +205,26 @@ xlab_strip <- ggplot() + annotate("text", x = 0, y = 1, label = "Mb", size = 2.4
   scale_y_continuous(limits = c(0, 1), expand = expansion(0)) +
   theme_void() + theme(plot.margin = margin(0, 0, 0, 0))
 
-# Six unit rows per cell row, so the Wald:frequency 1:2 split still lands on
-# whole rows (2 and 4) while the eighth cell divides in half (3 and 3).
-# Letters map to plots alphabetically against the order plots are added below.
-design <- c("ABCG", "ABCG",
-            "DEFG", "DEFG", "DEFG", "DEFG",
-            "HIJN", "HIJN",
-            "KLMN", "KLMN", "KLMN", "KLMN",
-            "OOO#",
-            "PPPP")
-p <- W[[1]] + W[[2]] + W[[3]] +
-     F_[[1]] + F_[[2]] + F_[[3]] +
-     cell4 +
+# Six unit rows per cell row, so the Wald:frequency 1:2 split lands on whole rows
+# (2 and 4) while the eighth cell divides in half (3 and 3). Letters map to plots
+# alphabetically against the order the plots are added below.
+design <- c("ABC#D", "ABC#D",
+            "EFG#H", "EFG#H", "EFG#H", "EFG#H",
+            "IJKLM", "IJKLM",
+            "NOPLM",
+            "NOPLQ", "NOPLQ", "NOPLQ",
+            "RRR##",
+            "SSSSS")
+p <- W[[1]] + W[[2]] + W[[3]] + W[[4]] +
+     F_[[1]] + F_[[2]] + F_[[3]] + F_[[4]] +
      W[[5]] + W[[6]] + W[[7]] +
+     ylab_el +
+     control_panel("up", "most protective", FALSE) +
      F_[[5]] + F_[[6]] + F_[[7]] +
-     ctrl_cell + xlab_strip + founder_legend() +
+     control_panel("down", "most susceptible", TRUE) +
+     xlab_strip + founder_legend() +
      plot_layout(design = paste(design, collapse = "\n"),
-                 widths  = c(1, 1, 1, 1 + YGAP + PAD),
+                 widths  = c(1, 1, 1, YGAP, 1),
                  heights = c(rep(1, 12), 0.20, 0.34))
 
 png(OUT, width = 7.5, height = 5.2, units = "in", res = 300)
