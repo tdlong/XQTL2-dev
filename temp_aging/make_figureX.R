@@ -25,6 +25,23 @@ OUT_A  <- "temp_aging/FigureX_plot.png"
 OUT_B  <- "temp_aging/FigureXb_plot.png"
 W_IN <- 7.5; H_IN <- 4.2; DPI <- 300
 
+# Subtract each scan's own h2 floor before drawing panel B, and write the result
+# alongside as FigureX_h2corrected_plot.png.
+#
+# h2 sums SQUARED founder effects, so estimation error contributes E[noise^2] --
+# a positive quantity ADDED to the truth. It is not a scale factor. And it is
+# effectively one number per scan: regressing h2 on the pipeline's reported bias
+# b at null windows gives slope 0.02-0.06 and r2 0.01-0.04, so b carries no
+# useful window-to-window information and only its level matters. The floor is
+# therefore taken as the median h2 over that scan's own windows where the Wald
+# test finds nothing (below FLOOR_WALD), where true h2 is ~0 and the observed
+# value is the estimation error itself.
+SUBTRACT_FLOOR <- TRUE
+FLOOR_WALD     <- 2
+OUT_C          <- "temp_aging/FigureX_h2corrected_plot.png"
+BRK_C <- 2; LO_C <- c(-0.5, 2); HI_C <- c(2, 4.5)
+TICK_LO_C <- c(-0.5, 0, 0.5, 1, 1.5); TICK_HI_C <- c(2.5, 3.5, 4.5)
+
 # Which 6-replicate cut of AGE_SY to draw. "1-6" is the contiguous block; "odd"
 # and "even" are the split-half scans, and switching to them is a one-word edit.
 SY_REPS <- "1-6"
@@ -69,6 +86,14 @@ scans <- g %>%
          levels = LEV)) %>%
   filter(!is.na(trt)) %>%
   transmute(chr, pos, trt, wald = Wald_log10p, h2 = Cutl_H2)
+
+floors <- scans %>% filter(wald < FLOOR_WALD) %>% group_by(trt) %>%
+  summarise(floor = median(h2, na.rm = TRUE), n_null = n(), .groups = "drop")
+cat("h2 floor per scan (median h2 where its own Wald < ", FLOOR_WALD, "):\n", sep = "")
+floors %>% mutate(floor = round(floor, 3)) %>% as.data.frame() %>% print(row.names = FALSE)
+cat("\n")
+scans <- scans %>% left_join(floors %>% select(trt, floor), by = "trt") %>%
+  mutate(h2c = h2 - floor)
 
 got <- scans %>% count(trt, name = "windows")
 cat("series drawn (AGE_SY at reps '", SY_REPS, "'):\n", sep = "")
@@ -196,5 +221,25 @@ build <- function(d, lev, out) {
   cat("wrote", out, "--", length(lev), "series\n")
 }
 
-build(scans, levels(scans$trt)[levels(scans$trt) %in% unique(as.character(scans$trt))], OUT_A)
-build(scans, intersect(FEMALES, unique(as.character(scans$trt))), OUT_B)
+present <- levels(scans$trt)[levels(scans$trt) %in% unique(as.character(scans$trt))]
+build(scans, present, OUT_A)
+build(scans, intersect(FEMALES, present), OUT_B)
+
+if (SUBTRACT_FLOOR) {
+  cat("\nfloor-corrected h2 range:",
+      paste(round(range(scans$h2c, na.rm = TRUE), 2), collapse = " to "), "\n")
+  build_c <- function(d, lev, out) {
+    d <- d %>% filter(trt %in% lev) %>% mutate(trt = factor(as.character(trt), levels = lev))
+    pA <- split_panel(d, "wald", BRK_A, LO_A, HI_A, TICK_LO_A, TICK_HI_A,
+                      expression(-log[10] * italic(P)), "A")
+    pB <- split_panel(d, "h2c", BRK_C, LO_C, HI_C, TICK_LO_C, TICK_HI_C,
+                      expression(italic(h)^2 ~ "\u2212 floor"), "B", xaxis = TRUE)
+    parts <- list(); hts <- numeric(0)
+    add <- function(p, h) { if (!is.null(p)) { parts[[length(parts)+1]] <<- p; hts <<- c(hts, h) } }
+    add(pA$top, 1); add(pA$bot, 3); add(pB$top, 1); add(pB$bot, 3); add(key(lev), 0.45)
+    png(out, width = W_IN, height = H_IN, units = "in", res = DPI)
+    suppressWarnings(print(wrap_plots(parts, ncol = 1, heights = hts))); dev.off()
+    cat("wrote", out, "--", length(lev), "series\n")
+  }
+  build_c(scans, present, OUT_C)
+}
