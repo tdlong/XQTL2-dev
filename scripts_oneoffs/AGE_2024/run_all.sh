@@ -46,6 +46,18 @@ DESIGN=helpfiles/AGE_Aug13_24/Ageing_Aug13.txt
 SMOOTH=100                         # kb -- matches AGE_SY's size75k scans
 FOUNDERS=(B1 B2 B3 B4 B5 B6 B7 AB8)
 
+# Take the job ID from a pipeline script's output. Several of them print a
+# banner line before the ID (call_samples.sh says "counting N BAM(s) ..."), so
+# capturing the whole of stdout yields a multi-line string, and passing that to
+# --after builds a malformed --dependency that sbatch rejects.
+jobid_from() {
+  local raw="$1" id
+  id=$(printf '%s\n' "$raw" | tail -1 | tr -d '[:space:]')
+  [[ "$id" =~ ^[0-9]+$ ]] || { echo "ERROR: no job id in:" >&2
+                               printf '%s\n' "$raw" >&2; exit 1; }
+  printf '%s' "$id"
+}
+
 # ── guards ───────────────────────────────────────────────────────────────────
 for f in "$BAMLIST" "$PARFILE" "$DESIGN"; do
   [ -f "$f" ] || { echo "ERROR: missing $f" >&2; exit 1; }
@@ -80,13 +92,15 @@ echo "   founder counts in place: $(ls "$DIR"/Calls/counts/*.tsv.gz 2>/dev/null 
 SAMPLE_BAMS="$DIR/sample_bams.txt"
 grep '^data/bam/AGE_2024/' "$BAMLIST" > "$SAMPLE_BAMS"
 echo "2. calling SNPs for $(wc -l < "$SAMPLE_BAMS") samples ..."
-JID_CALL=$(bash pipeline/scripts/call_samples.sh \
+raw=$(bash pipeline/scripts/call_samples.sh \
     --catalog "$DIR/Catalog" --bamlist "$SAMPLE_BAMS" --dir "$DIR")
+printf '%s\n' "$raw" | sed 's/^/     /'
+JID_CALL=$(jobid_from "$raw")
 echo "   call_samples merge job: $JID_CALL"
 
 # ── 3. haplotypes ────────────────────────────────────────────────────────────
-JID_HAPS=$(bash pipeline/scripts/run_haps.sh --after "$JID_CALL" \
-    --parfile "$PARFILE" --dir "$DIR")
+JID_HAPS=$(jobid_from "$(bash pipeline/scripts/run_haps.sh --after "$JID_CALL" \
+    --parfile "$PARFILE" --dir "$DIR")")
 echo "3. haplotypes (75 kb / 5 kb) job: $JID_HAPS"
 
 # ── 4. the AGE_2024 scan ─────────────────────────────────────────────────────
