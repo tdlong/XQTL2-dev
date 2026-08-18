@@ -17,7 +17,12 @@
 #   bash scripts_oneoffs/AGE_2024/resume_haps_scan.sh
 #
 # It checks the merge output is really there rather than trusting the queue, so
-# it is safe to run early -- it will just tell you to wait.
+# it is safe to run early -- it will just tell you to wait, and exit 75.
+#
+# To stop watching the queue altogether, leave this polling every 5 minutes and
+# it will submit the moment the SNP calling lands:
+#   until bash scripts_oneoffs/AGE_2024/resume_haps_scan.sh; do sleep 300; done
+# (only "not ready yet" exits 75; a real error exits 1 and breaks the loop)
 
 set -euo pipefail
 
@@ -43,8 +48,8 @@ done
 if [ ${#missing[@]} -gt 0 ]; then
   echo "The merge has not finished -- no RefAlt for: ${missing[*]}"
   echo "Counts present: $(ls "$DIR"/Calls/counts/*.tsv.gz 2>/dev/null | wc -l) of 20 (12 samples + 8 founders)"
-  echo "Wait for the catalog_count array and its merge, then run this again."
-  exit 1
+  echo "Wait for the SNP calling (job 55321190) and its merge (55321191)."
+  exit 75
 fi
 
 echo "RefAlt tables present for all 5 chromosomes:"
