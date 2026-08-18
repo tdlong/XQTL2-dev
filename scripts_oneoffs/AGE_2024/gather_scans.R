@@ -8,10 +8,18 @@
 #   scp tdlong@hpc3.rcic.uci.edu:/dfs7/adl/tdlong/fly_pool/XQTL2-dev/process/AGE_2024/AGE_2024_vs_AGE_SY.txt.gz \
 #       process/AGE_2024/
 #
-# Nine scans go in:
-#   AGE_2024                    the pilot -- 6 cages, females, lab food
-#   AGE_SY{10,20}_{F,M}_R1to6   AGE_SY cut to its first 6 replicates (matched)
-#   AGE_SY{10,20}_{F,M}         AGE_SY on all 12 (free, and worth having)
+# Seventeen scans go in, all at 75 kb windows smoothed 100 kb:
+#
+#   AGE_2024                          the pilot -- 6 cages, females, lab food
+#   AGE_SY{10,20}_{F,M}_R1to6         AGE_SY on its first 6 replicates
+#   AGE_SY{10,20}_{F,M}_{odd,even}    AGE_SY on 6 replicates, two other ways
+#   AGE_SY{10,20}_{F,M}               AGE_SY on all 12
+#
+# The odd/even pair is the reason to bother. Each is 6 replicates of the SAME
+# experiment, so the difference between them is what a 6-replicate scan looks
+# like when nothing has changed -- which is the yardstick the pilot has to be
+# measured against. R1to6 is a third 6-replicate draw, contiguous in time like
+# the pilot was; the full 12 are there for reference.
 #
 # Missing scans are reported and skipped rather than aborting, so this is usable
 # while the last jobs are still running.
@@ -19,17 +27,23 @@
 suppressMessages(library(tidyverse))
 
 OUT <- "process/AGE_2024/AGE_2024_vs_AGE_SY.txt.gz"
+SY  <- expand_grid(sugar = c("SY10", "SY20"), sex = c("F", "M"))
 
 scans <- bind_rows(
   tibble(scan = "AGE_2024", dir = "process/AGE_2024",
          diet = "lab", sex = "F", reps = "1-6"),
-  expand_grid(sugar = c("SY10", "SY20"), sex = c("F", "M")) %>%
-    mutate(scan = paste0("AGE_", sugar, "_", sex, "_R1to6"), dir = "process/AGE_SY",
-           diet = sugar, reps = "1-6") %>% select(scan, dir, diet, sex, reps),
-  expand_grid(sugar = c("SY10", "SY20"), sex = c("F", "M")) %>%
-    mutate(scan = paste0("AGE_", sugar, "_", sex), dir = "process/AGE_SY",
-           diet = sugar, reps = "1-12") %>% select(scan, dir, diet, sex, reps)
-) %>% mutate(file = file.path(dir, "Scans", scan, paste0(scan, ".scan.txt")))
+  SY %>% mutate(scan = paste0("AGE_", sugar, "_", sex, "_R1to6"),
+                dir = "process/AGE_SY", diet = sugar, reps = "1-6"),
+  # the split-half scans already exist -- same haplotypes (symlinked), same
+  # smoothing -- so they cost nothing to include
+  expand_grid(sugar = c("SY10", "SY20"), sex = c("F", "M"),
+              half = c("odd", "even")) %>%
+    mutate(scan = paste0("AGE_", sugar, "_", sex, "_", half),
+           dir = "process/AGE_SY_splithalf", diet = sugar, reps = half),
+  SY %>% mutate(scan = paste0("AGE_", sugar, "_", sex),
+                dir = "process/AGE_SY", diet = sugar, reps = "1-12")
+) %>% select(scan, dir, diet, sex, reps) %>%
+  mutate(file = file.path(dir, "Scans", scan, paste0(scan, ".scan.txt")))
 
 have <- scans %>% filter(file.exists(file))
 gone <- scans %>% filter(!file.exists(file))

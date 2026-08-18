@@ -21,7 +21,10 @@ bash scripts_oneoffs/AGE_2024/run_all.sh      # submits everything
 3. **Haplotypes** at 75 kb windows stepping 5 kb.
 4. **Scan** smoothed at 100 kb, design `helpfiles/AGE_Aug13_24/Ageing_Aug13.txt`.
 5. **AGE_SY re-scanned on replicates 1–6** — four scans, matching the pilot's
-   replicate count. Haplotypes already exist, so this is scan-only.
+   replicate count. Haplotypes already exist, so this is scan-only. Optional:
+   the existing odd/even split-half scans are already 6-replicate scans, so this
+   only adds a *contiguous* block, matched to the pilot in time as well as in
+   count. Delete the step-5 loop from `run_all.sh` if you would rather not.
 
 Steps 2–4 are chained on job IDs; step 5 runs immediately alongside.
 
@@ -31,9 +34,25 @@ Then, once the queue drains:
 Rscript scripts_oneoffs/AGE_2024/gather_scans.R
 ```
 
-which writes one `process/AGE_2024/AGE_2024_vs_AGE_SY.txt.gz` to scp home —
-the pilot, the four matched 6-replicate AGE_SY scans, and the four full
-12-replicate ones.
+which writes one `process/AGE_2024/AGE_2024_vs_AGE_SY.txt.gz` to scp home:
+17 scans, all at 75 kb windows smoothed 100 kb.
+
+| scans | what |
+|---|---|
+| `AGE_2024` | the pilot — 6 cages, females, lab food |
+| `AGE_SY{10,20}_{F,M}_{odd,even}` | 8 existing split-half scans, 6 reps each |
+| `AGE_SY{10,20}_{F,M}_R1to6` | 4 new, the first 6 reps contiguously |
+| `AGE_SY{10,20}_{F,M}` | 4 full 12-replicate, for reference |
+
+**The odd/even pair is the yardstick.** Each is 6 replicates of the same
+experiment, so the difference between the two is what a 6-replicate scan looks
+like when nothing has changed — which is what the pilot has to be measured
+against before any difference can be called real. Note that R1to6 is not an
+independent third draw: it is the union of the first three odd and first three
+even replicates. What it adds is that it is contiguous in time.
+
+This is an **additional** analysis. It replaces nothing — Figure 1 and everything
+in `temp_aging/` stand as they are, on all 12 replicates.
 
 ## Why these settings
 
