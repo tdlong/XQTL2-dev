@@ -45,10 +45,12 @@ HET <- tribble(~chr, ~eu_start, ~eu_end,
   "chrX", 2.5, 21.2, "chr2L", 0.5, 22.9, "chr2R", 1.3, 25.1,
   "chr3L", 0.7, 24.0, "chr3R", 4.5, 32.0)
 
-# Figure 1's four, plus the pilot in cyan.
+# Figure 1's four, plus the pilot. The palette's logic is warm = female, cool =
+# male, light = SY10, dark = SY20, so the third female is a warm colour: cyan
+# read as a male, sitting right next to SY10 male's light blue.
 LEV <- c("SY10 female", "SY20 female", "lab female", "SY10 male", "SY20 male")
 COL <- c("SY10 female" = "#F49AC2", "SY20 female" = "#D62728",
-         "lab female"  = "#17BECF",
+         "lab female"  = "#FF7F0E",
          "SY10 male"   = "#8EC7E8", "SY20 male"   = "#1F4E9C")
 FEMALES <- c("SY10 female", "SY20 female", "lab female")
 
