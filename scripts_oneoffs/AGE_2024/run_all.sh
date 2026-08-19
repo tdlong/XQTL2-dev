@@ -51,10 +51,13 @@ FOUNDERS=(B1 B2 B3 B4 B5 B6 B7 AB8)
 # capturing the whole of stdout yields a multi-line string, and passing that to
 # --after builds a malformed --dependency that sbatch rejects.
 jobid_from() {
-  local raw="$1" id
-  id=$(printf '%s\n' "$raw" | tail -1 | tr -d '[:space:]')
-  [[ "$id" =~ ^[0-9]+$ ]] || { echo "ERROR: no job id in:" >&2
-                               printf '%s\n' "$raw" >&2; exit 1; }
+  # Take the LAST number anywhere in the output. call_samples.sh prints a banner
+  # line before its id; run_scan.sh ends with "done:     <id>". Requiring the
+  # last line to be all digits rejected the latter.
+  local id
+  id=$(printf '%s\n' "$1" | grep -oE '[0-9]+' | tail -1)
+  [[ -n "$id" ]] || { echo "ERROR: no job id in:" >&2
+                      printf '%s\n' "$1" >&2; return 1; }
   printf '%s' "$id"
 }
 
