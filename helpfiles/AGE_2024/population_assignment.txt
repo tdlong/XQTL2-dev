@@ -1,0 +1,33 @@
+# Source population (cage) for each replicate.
+#
+# Both experiments drew from two synthetic populations built from the same eight
+# founders but maintained as separate cages, set up May 2023 and November 2023.
+# Nothing in the sequencing or design files records this -- it came from the
+# collaborator, so it is written down here rather than inferred.
+#
+# NOTE this confounds the pilot-vs-AGE_SY comparison: AGE_SY replicates 1-6, the
+# cut used in FigureX, are entirely Nov_2023, while the pilot is 4/6 May_2023.
+#
+# NOTE also that within the pilot, population is confounded with selection
+# intensity: its May cages were selected at 0.113/0.087/0.040/0.080 and its Nov
+# cages at 0.045/0.053, so May was the weaker selection.
+#
+# experiment  REP  population
+AGE_2024      1    May_2023
+AGE_2024      2    May_2023
+AGE_2024      3    May_2023
+AGE_2024      4    May_2023
+AGE_2024      5    Nov_2023
+AGE_2024      6    Nov_2023
+AGE_SY        1    Nov_2023
+AGE_SY        2    Nov_2023
+AGE_SY        3    Nov_2023
+AGE_SY        4    Nov_2023
+AGE_SY        5    Nov_2023
+AGE_SY        6    Nov_2023
+AGE_SY        7    Nov_2023
+AGE_SY        8    May_2023
+AGE_SY        9    May_2023
+AGE_SY        10   Nov_2023
+AGE_SY        11   Nov_2023
+AGE_SY        12   Nov_2023

@@ -8,12 +8,14 @@
 #   scp tdlong@hpc3.rcic.uci.edu:/dfs7/adl/tdlong/fly_pool/XQTL2-dev/process/AGE_2024/AGE_2024_vs_AGE_SY.txt.gz \
 #       process/AGE_2024/
 #
-# Seventeen scans go in, all at 75 kb windows smoothed 100 kb:
+# Twenty-three scans go in, all at 75 kb windows smoothed 100 kb:
 #
 #   AGE_2024                          the pilot -- 6 cages, females, lab food
 #   AGE_SY{10,20}_{F,M}_R1to6         AGE_SY on its first 6 replicates
 #   AGE_SY{10,20}_{F,M}_{odd,even}    AGE_SY on 6 replicates, two other ways
 #   AGE_SY{10,20}_{F,M}               AGE_SY on all 12
+#   AGE_2024_{May,Nov}                the pilot split by source cage
+#   AGE_SY{10,20}_F_{May,Nov}         AGE_SY females split by source cage
 #
 # The odd/even pair is the reason to bother. Each is 6 replicates of the SAME
 # experiment, so the difference between them is what a 6-replicate scan looks
@@ -41,7 +43,16 @@ scans <- bind_rows(
     mutate(scan = paste0("AGE_", sugar, "_", sex, "_", half),
            dir = "process/AGE_SY_splithalf", diet = sugar, reps = half),
   SY %>% mutate(scan = paste0("AGE_", sugar, "_", sex),
-                dir = "process/AGE_SY", diet = sugar, reps = "1-12")
+                dir = "process/AGE_SY", diet = sugar, reps = "1-12"),
+  # split by source cage: both experiments used a May 2023 and a Nov 2023 cage
+  # built from the same founders (helpfiles/AGE_2024/population_assignment.txt).
+  # AGE_SY replicates 1-6 are entirely Nov, so food and population are
+  # confounded in the R1to6 comparison; these separate them.
+  tibble(scan = c("AGE_2024_May", "AGE_2024_Nov"), dir = "process/AGE_2024",
+         diet = "lab", sex = "F", reps = c("May", "Nov")),
+  expand_grid(sugar = c("SY10", "SY20"), pop = c("May", "Nov")) %>%
+    mutate(scan = paste0("AGE_", sugar, "_F_", pop), dir = "process/AGE_SY",
+           diet = sugar, sex = "F", reps = pop)
 ) %>% select(scan, dir, diet, sex, reps) %>%
   mutate(file = file.path(dir, "Scans", scan, paste0(scan, ".scan.txt")))
 
