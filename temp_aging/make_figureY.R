@@ -12,23 +12,23 @@
 # Run from the XQTL2-dev repo ROOT:
 #   Rscript temp_aging/make_figureY.R
 #
-# READ THE REPLICATE COUNTS. They are not matched, and the Wald statistic grows
-# with the number of replicates, so line height is not a cage difference:
+# The replicate counts are not matched -- SY10 and SY20 are May 2 against Nov 10,
+# lab is May 4 against Nov 2 -- and the Wald statistic grows with them, so the raw
+# profiles are not comparable in height. Each is therefore divided by its own
+# replicate count, which puts all six in the same 3-6 range and downweights the
+# well-replicated scans. The counts stay in the legends regardless.
 #
-#     SY10   May 2 reps   vs   Nov 10 reps
-#     SY20   May 2        vs   Nov 10
-#     lab    May 4        vs   Nov 2
-#
-# Nov will sit above May in A and B, and below it in C, for that reason alone.
-# The counts are printed in each legend so this cannot be read off by accident.
-# What IS comparable is where the peaks are, not how tall they are.
+# The y axis is deliberately low: the peaks run off the top so the low-level
+# structure across the rest of the genome is legible. Raise YMAX to see them.
 
 suppressMessages({library(tidyverse); library(patchwork)})
 
 GATHER <- "process/AGE_2024/AGE_2024_vs_AGE_SY.txt.gz"
 OUT    <- "temp_aging/FigureY_plot.png"
 W_IN <- 7.5; H_IN <- 5.4; DPI <- 300
-YLIM <- c(0, 65); YBRK <- c(0, 20, 40, 60)
+NORMALIZE <- TRUE          # divide each scan's Wald by its replicate count
+YMAX <- 3.5                # ceiling; peaks above it are clipped, not dropped
+YBRK <- c(0, 1, 2, 3)
 
 CHRS   <- c("chrX", "chr2L", "chr2R", "chr3L", "chr3R")
 CHRLAB <- c(chrX = "X", chr2L = "2L", chr2R = "2R", chr3L = "3L", chr3R = "3R")
@@ -55,16 +55,17 @@ g <- read.table(GATHER, header = TRUE, sep = "\t") %>% as_tibble()
 
 d <- g %>% filter(reps %in% c("May", "Nov"), chr %in% CHRS) %>%
   transmute(chr = factor(chr, levels = CHRS), pos, diet,
-            pop = factor(reps, levels = c("May", "Nov")), wald = Wald_log10p)
+            pop = factor(reps, levels = c("May", "Nov")), wald = Wald_log10p) %>%
+  left_join(NREP, by = c("diet", "pop" = "pop")) %>%
+  mutate(wald = if (NORMALIZE) wald / n else wald)
 
 missing <- setdiff(paste(NREP$diet, NREP$pop), paste(d$diet, d$pop) %>% unique())
 if (length(missing)) cat("NOT FOUND:", paste(missing, collapse = ", "), "\n\n")
 
-cat("Wald by food and cage -- note the replicate counts:\n\n")
-d %>% group_by(diet, pop) %>%
-  summarise(max = round(max(wald), 1), median = round(median(wald), 2),
-            `% >5` = round(100 * mean(wald > 5), 1), .groups = "drop") %>%
-  left_join(NREP, by = c("diet", "pop")) %>% relocate(n, .after = pop) %>%
+cat(if (NORMALIZE) "Wald / n_replicates" else "Wald", " by food and cage:\n\n", sep = "")
+d %>% group_by(diet, pop, n) %>%
+  summarise(max = round(max(wald), 2), median = round(median(wald), 2),
+            `% clipped` = round(100 * mean(wald > YMAX), 1), .groups = "drop") %>%
   as.data.frame() %>% print(row.names = FALSE)
 cat("\n")
 
@@ -105,8 +106,9 @@ panel <- function(dt, tag, title, xaxis) {
     scale_x_continuous(expand = expansion(0), breaks = chr_breaks,
                        labels = CHRLAB[CHRS]) +
     scale_y_continuous(breaks = YBRK, expand = expansion(c(0, 0.04))) +
-    coord_cartesian(xlim = c(0, xmax_all), ylim = YLIM) +
-    labs(y = expression(-log[10] * italic(P)), tag = tag) +
+    coord_cartesian(xlim = c(0, xmax_all), ylim = c(0, YMAX)) +
+    labs(y = if (NORMALIZE) expression(-log[10] * italic(P) / n)
+             else expression(-log[10] * italic(P)), tag = tag) +
     annotate("text", x = xmax_all * 0.5, y = Inf, label = title,
              vjust = 1.6, size = 2.8, fontface = "bold") +
     theme_classic(base_size = 8) +
