@@ -38,7 +38,10 @@ suppressMessages(library(tidyverse))
 args <- commandArgs(trailingOnly = TRUE)
 IN   <- if (length(args) >= 1) args[1] else
   "process/AGE_SY_splithalf/AGE_SY_splithalf_H2.txt.gz"
-OUT  <- "process/AGE_SY_splithalf/H2_varcomp_by_window.txt.gz"
+# Second argument sets the output, so a variant input (e.g. the no-8-9 halves)
+# does not overwrite the 12-replicate partition.
+OUT  <- if (length(args) >= 2) args[2] else
+        "process/AGE_SY_splithalf/H2_varcomp_by_window.txt.gz"
 
 WALD_NULL <- 2      # Wald below this: frequencies did not move, so true h2 ~ 0
 POOL_BP   <- 0      # >0 pools MS_rep over this span before subtracting

@@ -23,9 +23,19 @@
 
 suppressMessages({library(tidyverse); library(patchwork)})
 
+# Optional variant, e.g.  Rscript temp_aging/make_figure2.R no89
+# "no89" drops replicates 8 and 9 -- the May 2023 cage -- leaving a single-cage
+# experiment. The zoom means carry REP, so they are filtered here rather than
+# re-extracted; only the scan file has to be regenerated on the cluster.
+VARIANT <- commandArgs(trailingOnly = TRUE)[1]
+VARIANT <- if (is.na(VARIANT)) "" else VARIANT
+SUF     <- if (nzchar(VARIANT)) paste0("_", VARIANT) else ""
+TAG     <- if (nzchar(VARIANT)) "b" else ""
+DROP_REP <- if (VARIANT == "no89") c(8, 9) else integer(0)
+
 MEANS <- "process/AGE_SY/AGE_SY_zoom_means.txt.gz"
-SCAN  <- "process/AGE_SY/AGE_SY_4scan.txt.gz"
-OUT   <- "temp_aging/Figure2_plot.png"
+SCAN  <- sprintf("process/AGE_SY/AGE_SY_4scan%s.txt.gz", SUF)
+OUT   <- sprintf("temp_aging/Figure2%s_plot.png", TAG)
 WIN   <- 0.5e6                      # half-width actually plotted
 RARE  <- 0.025                      # founders below this in controls are faded
 
@@ -45,6 +55,9 @@ yspec <- function(which, lc) YLIM[[which]][[if (lc == BIG) "big" else "def"]]
 
 if (!file.exists(MEANS)) stop("missing ", MEANS,
   "\nRun temp_aging/make_zoom_means.R on HPC3 and scp the result back.")
+if (!file.exists(SCAN)) stop("missing ", SCAN,
+  "\nRun scripts_oneoffs/AGE_SY/nov_only/run_scans.sh then gather.R on HPC3,",
+  "\nand scp the result back.", call. = FALSE)
 
 TRT_LEV <- c("SY10 female", "SY20 female", "SY10 male", "SY20 male")
 TRT_COL <- c("SY10 female" = "#F49AC2", "SY20 female" = "#D62728",
@@ -64,6 +77,12 @@ PEAK_COL <- c("#1B9E77", "#D95F02", "#7570B3", "#E7298A",
               "#66A61E", "#E6AB02", "#A6761D")
 
 means <- read.table(MEANS, header = TRUE, sep = "\t") %>% as_tibble()
+if (length(DROP_REP)) {
+  n0 <- n_distinct(means$REP)
+  means <- means %>% filter(!REP %in% DROP_REP)
+  cat(sprintf("dropped REP %s: %d -> %d replicates\n",
+              paste(DROP_REP, collapse = ","), n0, n_distinct(means$REP)))
+}
 scan  <- read.table(SCAN,  header = TRUE, sep = "\t") %>% as_tibble()
 
 founders <- sort(unique(means$founder))
