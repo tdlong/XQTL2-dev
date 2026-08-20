@@ -204,8 +204,12 @@ pA <- split_panel(scans, "wald", "trt", TRT_COL, 45, c(0, 45), c(45, 215),
 pB <- split_panel(scans, "h2", "trt", TRT_COL, 2.5, c(0, 2.5), c(2.5, 5),
                   c(0, 0.5, 1, 1.5, 2), c(3, 4, 5),
                   expression(italic(h)^2), "B", lw = 0.28)
-pC <- split_panel(cmp, "y", "term", CMP_COL, 0.75, c(-0.25, 0.75), c(0.75, 2.9),
-                  c(-0.2, 0, 0.25, 0.5), c(1, 2),
+# Break at 1.25, not 0.75: the pericentromeric main plateau runs to ~1.0, and a
+# break below it pushed that whole stretch into the short upper sub-panel. Only
+# 0.3-0.4% of smoothed values exceed 1.25 -- essentially just the chr3L spike --
+# in both the 12- and 10-replicate versions.
+pC <- split_panel(cmp, "y", "term", CMP_COL, 1.25, c(-0.25, 1.25), c(1.25, 2.9),
+                  c(-0.2, 0, 0.5, 1.0), c(1.5, 2, 2.5),
                   expression(italic(h)^2), "C", lw = 0.35, zero = TRUE, xaxis = TRUE)
 
 key <- function(lev, col) {

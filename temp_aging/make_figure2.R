@@ -47,7 +47,10 @@ BIG   <- "chr3L:9.31"
 YLIM  <- list(
   wald = list(def = list(lim = c(0, 31),           brk = c(0, 10, 20, 30)),
               big = list(lim = c(0, 212),          brk = c(0, 50, 100, 150, 200))),
-  freq = list(def = list(lim = c(-0.062, 0.062),   brk = c(-0.06, -0.03, 0, 0.03, 0.06)),
+  # Asymmetric: the largest rise among the non-chr3L loci is +0.071 once
+  # replicates 8 and 9 are dropped, against +0.061 with all twelve. One scale
+  # covers both so Figure 2 and 2b stay comparable.
+  freq = list(def = list(lim = c(-0.06, 0.08),     brk = c(-0.06, -0.03, 0, 0.03, 0.06)),
               # chr3L has its own scale anyway, so it is trimmed to its data:
               # the trough reaches -0.110 and nothing rises past 0.046.
               big = list(lim = c(-0.115, 0.052),   brk = c(-0.10, -0.05, 0, 0.05))))
@@ -132,6 +135,13 @@ ctrl <- means %>%
   filter(TRT == "C", pos == peak_pos) %>%
   transmute(locus, founder, dir, REP, freq)
 
+# Replicate is an ORDERED LABEL, not a number. Dropping 8 and 9 leaves 1..7,10..12,
+# and plotting that on a numeric axis would open a false gap where the missing
+# cages were. Positions are the rank of each replicate, ticks mark every one, and
+# the numbers themselves are not shown -- only the order carries meaning.
+REP_LEV <- sort(unique(ctrl$REP))
+ctrl <- ctrl %>% mutate(ri = match(REP, REP_LEV))
+
 # ---- panels ---------------------------------------------------------------
 base <- theme_bw(7) + theme(panel.grid.minor = element_blank(),
           plot.margin = margin(1, 2, 1, 2), legend.position = "none",
@@ -203,10 +213,11 @@ founder_legend <- function() {
 # CONTROLS across replicates. If these hits were just founders on their way out
 # of the cage, the susceptible set would slope down here too.
 control_panel <- function(d, lab, show_x) {
-  ggplot(ctrl %>% filter(dir == d), aes(REP, freq, colour = locus, group = locus)) +
+  ggplot(ctrl %>% filter(dir == d), aes(ri, freq, colour = locus, group = locus)) +
     geom_line(linewidth = 0.4) + geom_point(size = 0.5) +
     scale_colour_manual(values = PEAK_COL) +
-    scale_x_continuous(breaks = c(1, 4, 8, 12), expand = expansion(0.03)) +
+    scale_x_continuous(breaks = seq_along(REP_LEV), labels = NULL,
+                       expand = expansion(0.03)) +
     scale_y_continuous(limits = c(0, 0.75), breaks = c(0, 0.2, 0.4, 0.6),
                        expand = expansion(0), labels = ylab_ctrl) +
     labs(x = if (show_x) "replicate" else NULL, y = NULL) + base +
