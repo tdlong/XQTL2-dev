@@ -90,6 +90,14 @@ names(FOUNDER_COL) <- founders
 
 loci <- means %>% distinct(locus, chr, peak_pos) %>%
   arrange(match(chr, c("chrX","chr2L","chr2R","chr3L")), peak_pos)
+
+# chr3L is the one locus needing its own y scale in both sub-panels, and the
+# control cell in position 8 needs its own too. Moving chr3L to position 4 puts
+# it directly above the control cell, so every non-standard axis sits in column
+# 4 and columns 1-3 share one scale throughout. Genomic order is otherwise kept:
+# only chr3L is out of sequence.
+rest <- setdiff(loci$locus, BIG)
+loci <- loci[match(c(rest[1:3], BIG, rest[4:6]), loci$locus), ]
 names(PEAK_COL) <- loci$locus
 
 # treatment with the highest Wald at each peak -- the one whose frequency change
@@ -225,9 +233,14 @@ lc <- loci$locus
 # y titles only on the leftmost column of cells (1 and 5)
 YW <- expression(-log[10]*italic(P)); YF <- expression(Delta*" frequency")
 # leftmost cell of each row, plus chr3L which is on its own scale in both rows
-SHOWY <- c(TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, TRUE)
-YTITLE <- c(list(YW), rep(list(NULL), 3), list(YW), rep(list(NULL), 2))
-YTITLF <- c(list(YF), rep(list(NULL), 3), list(YF), rep(list(NULL), 2))
+# Tick labels only where a panel introduces a scale: the leftmost cell of each
+# row, plus chr3L, which is on its own scale. Derived from the locus order rather
+# than hardcoded by position, so moving chr3L to column 4 cannot silently strip
+# its labels -- which is exactly what happened when it was a fixed vector.
+LEFTMOST <- c(1L, 5L)
+SHOWY  <- seq_along(lc) %in% LEFTMOST | lc == BIG
+YTITLE <- map(seq_along(lc), function(i) if (i %in% LEFTMOST) YW else NULL)
+YTITLF <- map(seq_along(lc), function(i) if (i %in% LEFTMOST) YF else NULL)
 W  <- pmap(list(lc, YTITLE, SHOWY), wald_panel)
 F_ <- pmap(list(lc, YTITLF, SHOWY), freq_panel)
 
