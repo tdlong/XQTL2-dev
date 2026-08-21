@@ -31,7 +31,13 @@ SNP  <- "process/AGE_SY/AGE_SY_4snpscan_no89.txt.gz"
 REMOTE <- "tdlong@hpc3.rcic.uci.edu:/dfs7/adl/tdlong/fly_pool/XQTL2-dev"
 OUT  <- "temp_aging/Figure3_plot.png"
 W_IN <- 7.5; H_IN <- 6.5; DPI <- 300
-PT_SIZE <- 0.35; PT_ALPHA <- 0.25   # see note below
+PT_SIZE <- 0.35
+# Transparency is a FUNCTION of the Wald score rather than a constant: alpha
+# rises from A_MIN at 0 to A_MAX at A_SAT and is flat above it. The noise floor,
+# which is most of 1.2M points per treatment, nearly vanishes; the peaks are
+# solid. That also blunts the overlap problem -- a faint point no longer hides
+# the colour beneath it, so where the two diets differ only one is opaque.
+A_MIN <- 0.02; A_MAX <- 0.9; A_SAT <- 20
 
 CHRS   <- c("chrX", "chr2L", "chr2R", "chr3L", "chr3R")
 CHRLAB <- c(chrX = "X", chr2L = "2L", chr2R = "2R", chr3L = "3L", chr3R = "3R")
@@ -50,13 +56,7 @@ TRT_COL <- c("SY10 female" = "#F49AC2", "SY20 female" = "#D62728",
 PANELS <- list(A = c("SY10 female", "SY20 female"),
                B = c("SY10 male",   "SY20 male"))
 PANEL_TITLE <- c(A = "females", B = "males")
-# The paler diet is drawn first so the darker is not buried under it. At ~1.2M
-# points per treatment the second colour still covers the first wherever both
-# are present, and transparency only softens that -- at PT_ALPHA 0.15, 0.25 and
-# 0.40 the overlap looks much the same, because the points saturate either way.
-# 0.25 lets some of the under-colour speckle through the dense peaks. So a pale
-# region means the pale diet EXCEEDS the dark one there; it does not mean the
-# dark one is absent.
+# The paler diet is drawn first so the darker is not buried under it.
 DRAW_ORDER <- c("SY10 female", "SY20 female", "SY10 male", "SY20 male")
 
 # Fetch it if it is not here. run_snp_scans.sh chains the gather on the cluster,
@@ -128,6 +128,7 @@ deco <- function() list(
              colour = "grey35", linewidth = 0.3),
   scale_x_continuous(expand = expansion(0), breaks = chr_breaks,
                      labels = CHRLAB[CHRS]),
+  scale_alpha_identity(),
   theme_classic(base_size = 8),
   theme(axis.title.x = element_blank(),
         plot.tag = element_text(size = 10, face = "bold"),
@@ -136,9 +137,11 @@ deco <- function() list(
 
 pts <- function(lvs, keep_above) {
   lapply(intersect(DRAW_ORDER, lvs), function(lv) {
-    dd <- d %>% filter(trt == lv) %>% mutate(y = mask(Wald_log10p, keep_above))
-    geom_point(data = dd, aes(gx, y), colour = TRT_COL[[lv]],
-               size = PT_SIZE, alpha = PT_ALPHA, stroke = 0)
+    dd <- d %>% filter(trt == lv) %>%
+      mutate(y = mask(Wald_log10p, keep_above),
+             a = A_MIN + (A_MAX - A_MIN) * pmin(Wald_log10p / A_SAT, 1))
+    geom_point(data = dd, aes(gx, y, alpha = a), colour = TRT_COL[[lv]],
+               size = PT_SIZE, stroke = 0)
   })
 }
 
