@@ -44,7 +44,14 @@ HET <- tribble(~chr, ~eu_start, ~eu_end,
 TRT_LEV <- c("SY10 female", "SY20 female", "SY10 male", "SY20 male")
 TRT_COL <- c("SY10 female" = "#F49AC2", "SY20 female" = "#D62728",
              "SY10 male"   = "#8EC7E8", "SY20 male"   = "#1F4E9C")
-TAGS <- c("A", "B", "C", "D")
+# Two panels, both diets overlaid within a sex. The two diets track each other
+# closely, so overlaying them shows where they diverge instead of asking the
+# reader to compare across panels.
+PANELS <- list(A = c("SY10 female", "SY20 female"),
+               B = c("SY10 male",   "SY20 male"))
+PANEL_TITLE <- c(A = "females", B = "males")
+# the paler diet drawn first so the darker is not buried under it
+DRAW_ORDER <- c("SY10 female", "SY20 female", "SY10 male", "SY20 male")
 
 # Fetch it if it is not here. run_snp_scans.sh chains the gather on the cluster,
 # so by the time those jobs are done the file exists there; there is no reason to
@@ -121,11 +128,23 @@ deco <- function() list(
         plot.tag.position = c(0.004, 0.88),
         legend.position = "none"))
 
-pts <- function(lv, keep_above) {
-  dd <- d %>% filter(trt == lv) %>% mutate(y = mask(Wald_log10p, keep_above))
-  geom_point(data = dd, aes(gx, y), colour = TRT_COL[[lv]],
-             size = PT_SIZE, alpha = PT_ALPHA, stroke = 0)
+pts <- function(lvs, keep_above) {
+  lapply(intersect(DRAW_ORDER, lvs), function(lv) {
+    dd <- d %>% filter(trt == lv) %>% mutate(y = mask(Wald_log10p, keep_above))
+    geom_point(data = dd, aes(gx, y), colour = TRT_COL[[lv]],
+               size = PT_SIZE, alpha = PT_ALPHA, stroke = 0)
+  })
 }
+
+key <- function(lvs) list(
+  geom_point(data = tibble(gx = -Inf, y = -Inf, g = factor(lvs, levels = lvs)),
+             aes(gx, y, colour = g), size = 1.4, na.rm = TRUE),
+  scale_colour_manual(values = TRT_COL[lvs], name = NULL, drop = FALSE),
+  guides(colour = guide_legend(override.aes = list(size = 1.6, alpha = 1))),
+  theme(legend.position = "inside", legend.position.inside = c(0.075, 0.72),
+        legend.background = element_rect(fill = alpha("white", 0.7), colour = NA),
+        legend.key.height = unit(8, "pt"), legend.text = element_text(size = 6.5),
+        legend.margin = margin(1, 2, 1, 2)))
 
 panel <- function(lv, tag, xaxis) {
   top <- ggplot() + deco() + pts(lv, TRUE) +
@@ -133,11 +152,11 @@ panel <- function(lv, tag, xaxis) {
     coord_cartesian(xlim = c(0, xmax_all), ylim = HI, clip = "off") +
     slash(HI, HI[1], 1) +
     labs(y = NULL, tag = tag) +
-    annotate("text", x = xmax_all * 0.5, y = Inf, label = as.character(lv),
+    annotate("text", x = xmax_all * 0.5, y = Inf, label = PANEL_TITLE[[tag]],
              vjust = 1.5, size = 2.8, fontface = "bold") +
     theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
           axis.line.x = element_blank(), plot.margin = margin(6, 4, 2, 16))
-  bot <- ggplot() + deco() + pts(lv, FALSE) +
+  bot <- ggplot() + deco() + pts(lv, FALSE) + key(lv) +
     scale_y_continuous(breaks = LO_BRK, expand = expansion(0)) +
     coord_cartesian(xlim = c(0, xmax_all), ylim = LO, clip = "off") +
     slash(LO, LO[2], 3) +
@@ -148,10 +167,12 @@ panel <- function(lv, tag, xaxis) {
   list(top, bot)
 }
 
-cells <- pmap(list(TRT_LEV, TAGS, TRT_LEV == TRT_LEV[length(TRT_LEV)]), panel)
+tags <- names(PANELS)
+cells <- pmap(list(PANELS, tags, tags == tags[length(tags)]), panel)
 ps <- unlist(cells, recursive = FALSE)
 
-png(OUT, width = W_IN, height = H_IN, units = "in", res = DPI)
-suppressWarnings(print(wrap_plots(ps, ncol = 1, heights = rep(c(1, 3), 4))))
+png(OUT, width = W_IN, height = 4.4, units = "in", res = DPI)
+suppressWarnings(print(wrap_plots(ps, ncol = 1,
+                                  heights = rep(c(1, 3), length(PANELS)))))
 dev.off()
 cat("wrote", OUT, "\n")
