@@ -68,3 +68,4 @@ repro_error.tar.gz
 
 # ── added: agent workspace ──
 .claude/
+temp_aging/archive/
