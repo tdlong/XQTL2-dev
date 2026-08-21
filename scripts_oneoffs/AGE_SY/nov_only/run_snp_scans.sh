@@ -21,8 +21,8 @@
 #
 # The gather is chained on all four scans, so it needs no separate submission. It
 # writes process/AGE_SY/AGE_SY_4snpscan_no89.txt.gz. Fetching that file and
-# drawing the figure are still manual -- the cluster has no route to the laptop --
-# and the closing message gives both commands in full.
+# drawing the figure is one command on the laptop: make_figure3.R scps the file
+# itself if it is not already there.
 #
 # The scan is NOT independent of the haplotype scan -- same smoothed haplotypes.
 
@@ -103,12 +103,11 @@ echo "   $(printf '%-22s' gather) $GID   (afterok on the four above)"
 cat <<EOF
 
 ------------------------------------------------------------------
-4 SNP scans + the gather submitted. The gather runs itself; the two
-lines below are yours -- the cluster cannot push a file to your laptop.
+4 SNP scans + the gather submitted ($GID).
 
-When job $GID has finished, from your LAPTOP in the XQTL2-dev repo root:
+That is everything on the cluster. When $GID has finished, ONE command on your
+laptop, from the XQTL2-dev repo root -- it fetches the file itself:
 
-  scp tdlong@hpc3.rcic.uci.edu:/dfs7/adl/tdlong/fly_pool/XQTL2-dev/$DIR/AGE_SY_4snpscan_no89.txt.gz $DIR/
   Rscript temp_aging/make_figure3.R
 
 Gather log (row count and file size): logs/AGE_SY/snp_gather.out
