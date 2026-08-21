@@ -4,10 +4,15 @@
 # Run from the XQTL2-dev repo ROOT:
 #   Rscript temp_aging/partition_by_wald_rank.R
 #
-# UNITS. Raw summed window h2 overcounts -- neighbouring windows measure
-# overlapping bits of the same signal -- so the genome is rescaled to total 50%,
-# the known broad-sense heritability of longevity. That is a real number, not a
-# convenience.
+# UNITS. This reports RATIOS ONLY -- sex+diet as a share of h2 within a Wald
+# band. That survives the fifteenfold window overlap, because numerator and
+# denominator run over the same windows and the overcount cancels.
+#
+# It used to also report absolute h2, by summing window h2 and rescaling the
+# genome to total 50%. That is WITHDRAWN and the columns are gone. Summing
+# overlapping windows overcounts, and rescaling to 50% sets the answer to the
+# quantity being estimated -- circular. results_draft.md now states plainly that
+# no genome-wide total is claimed; this file used to contradict it.
 #
 # BLOCKS are 2 cM and non-overlapping. Heterochromatin is INCLUDED but collapsed:
 # each arm contributes exactly one telomeric and one centromeric block, so it
@@ -34,10 +39,16 @@
 #
 # The floor is the larger of the two and is the reason low-h2 regions have such
 # wide intervals: there main is near zero, so the ratio has a pole in it.
+#
+# DATA: the 10-replicate AGE_SY dataset -- replicates 8 and 9 dropped, those
+# being the May 2023 cage (helpfiles/AGE_2024/population_assignment.txt). The
+# 12-replicate files still exist on disk; nothing here reads them.
 
 suppressMessages({library(tidyverse); library(splines)})
 
-LONG   <- "process/AGE_SY_splithalf/AGE_SY_splithalf_H2.txt.gz"
+
+
+LONG   <- "process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz"
 FLYMAP <- "pipeline/helpfiles/flymap.r6.txt"
 CM     <- 2       # block width, cM
 WNULL  <- 2       # Wald below this: frequencies did not move, so true h2 ~ 0
@@ -137,24 +148,18 @@ for (i in seq_len(NBOOT)) {
   boot[i, ] <- stat(bl[unlist(ix[sample(g, length(g), TRUE)]), ])
 }
 
-H2_TOT <- 50
-K <- H2_TOT / sum(obs$H2)
 sel <- function(pc) obs %>% filter(wald >= quantile(obs$wald, max(0, 1 - pc/100)))
 
 cat(sprintf("whole genome: %d blocks -- %d euchromatic of %g cM, %d heterochromatic\n",
             nrow(obs), sum(!obs$het), CM, sum(obs$het)))
 cat("            (one telomeric + one centromeric block per arm)\n")
-cat(sprintf("h2 rescaled so the genome totals %g%%; interval from %d bootstraps over\n",
-            H2_TOT, NBOOT))
+cat(sprintf("ratios only -- no absolute h2. interval from %d bootstraps over\n", NBOOT))
 cat("BOTH the block sample and the floor fit\n\n")
 
 tibble(`top % genome` = CUTS,
        # euchromatic + heterochromatic, so you can see the arm-end blocks enter
        blocks = map_chr(CUTS, ~sprintf("%d+%d", sum(!sel(.x)$het), sum(sel(.x)$het))),
        Mb     = map_dbl(CUTS, ~round(sum(sel(.x)$Mb), 1)),
-       `h2 (of 50)` = map_dbl(CUTS, ~round(K * sum(sel(.x)$H2), 1)),
-       main   = map_dbl(CUTS, ~round(K * sum(sel(.x)$h2_main, na.rm=TRUE), 1)),
-       `sex+diet` = map_dbl(CUTS, ~round(K * sum(sel(.x)$h2_other, na.rm=TRUE), 2)),
        `% sex+diet` = round(stat(obs), 1),
        CI = sprintf("[%.1f, %.1f]", apply(boot, 2, quantile, .025, na.rm = TRUE),
                                     apply(boot, 2, quantile, .975, na.rm = TRUE))) %>%
@@ -162,6 +167,6 @@ tibble(`top % genome` = CUTS,
 
 cat("\nthe heterochromatic blocks on their own:\n")
 obs %>% filter(het) %>% arrange(desc(H2)) %>%
-  transmute(block = blk, Mb = round(Mb, 1), `h2 (of 50)` = round(K * H2, 2),
+  transmute(block = blk, Mb = round(Mb, 1),
             wald = round(wald, 1), `% sex+diet` = round(100 * h2_other / H2, 1)) %>%
   as.data.frame() %>% print(row.names = FALSE)

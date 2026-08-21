@@ -1,10 +1,16 @@
 # Everything restricted to the significant part of the genome: non-overlapping
 # euchromatic tiles with Wald > 5 in at least one character.
+#
+# DATA: the 10-replicate AGE_SY dataset -- replicates 8 and 9 dropped, those
+# being the May 2023 cage (helpfiles/AGE_2024/population_assignment.txt). The
+# 12-replicate files still exist on disk; nothing here reads them.
 suppressMessages(library(tidyverse))
+
+
 HET<-tribble(~chr,~eu_start,~eu_end,"chrX",2.5,21.2,"chr2L",0.5,22.9,
              "chr2R",1.3,25.1,"chr3L",0.7,24.0,"chr3R",4.5,32.0)
-l<-read.table("process/AGE_SY_splithalf/AGE_SY_splithalf_H2.txt.gz",header=TRUE,sep="\t")%>%as_tibble()
-d<-read.table("process/AGE_SY/AGE_SY_4scan.txt.gz",header=TRUE,sep="\t")%>%as_tibble()
+l<-read.table("process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz",header=TRUE,sep="\t")%>%as_tibble()
+d<-read.table("process/AGE_SY/AGE_SY_4scan_no89.txt.gz",header=TRUE,sep="\t")%>%as_tibble()
 tiles<-d%>%distinct(chr,pos)%>%arrange(chr,pos)%>%group_by(chr)%>%
        slice(seq(1,n(),by=15))%>%ungroup()
 sig<-d%>%group_by(chr,pos)%>%summarise(mw=max(Wald_log10p),.groups="drop")%>%

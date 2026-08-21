@@ -1,0 +1,9 @@
+# control_drift.R
+# run:    2026-08-21 09:29
+# script: be21e5e
+# reads:
+#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.5M  2026-08-20 15:46  md5:dabab56e
+#   process/AGE_SY/AGE_SY_zoom_means.txt.gz                   15M  2026-08-17 09:52  md5:154c5a7b
+#
+Error: object 'DROP_REP' not found
+Execution halted

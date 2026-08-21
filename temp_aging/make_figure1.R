@@ -14,6 +14,10 @@
 # behind AGE_SY_v6_size75k_4scan.png. To use the 12-replicate scans instead,
 # point LIVE_SCAN_DIR at a folder holding <scan>/<scan>.scan.txt for the four
 # treatments; everything else is unchanged.
+#
+# DATA: the 10-replicate AGE_SY dataset -- replicates 8 and 9 dropped, those
+# being the May 2023 cage (helpfiles/AGE_2024/population_assignment.txt). The
+# 12-replicate files still exist on disk; nothing here reads them.
 
 suppressMessages({library(tidyverse); library(patchwork)})
 `%||%` <- function(a, b) if (is.null(a) || is.na(a)) b else a
@@ -22,18 +26,15 @@ suppressMessages({library(tidyverse); library(patchwork)})
 # "no89" is AGE_SY without replicates 8 and 9 -- the May 2023 cage -- leaving a
 # single-cage experiment on 10 replicates that still halves evenly 5/5. Inputs
 # gain the suffix, the figure is written as Figure1b.
-VARIANT <- (commandArgs(trailingOnly = TRUE)[1] %||% "")
-SUF     <- if (nzchar(VARIANT)) paste0("_", VARIANT) else ""
-TAG     <- if (nzchar(VARIANT)) "b" else ""
 
-LONG      <- sprintf("process/AGE_SY_splithalf/AGE_SY_splithalf_H2%s.txt.gz", SUF)
-VARCOMP   <- sprintf("process/AGE_SY_splithalf/H2_varcomp_by_window%s.txt.gz", SUF)
+LONG      <- "process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz"
+VARCOMP   <- "process/AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz"
 # The 12-replicate scans, collapsed to one small file by make_4scan_df.R on the
 # cluster. If it is present it is used for panels A and B; otherwise those fall
 # back to the split-half scans averaged over halves, which is NOT the same thing
 # (6 replicates per half, so the Wald peaks are lower).
-FOURSCAN <- sprintf("process/AGE_SY/AGE_SY_4scan%s.txt.gz", SUF)
-OUT       <- sprintf("temp_aging/Figure1%s_plot.png", TAG)
+FOURSCAN <- "process/AGE_SY/AGE_SY_4scan_no89.txt.gz"
+OUT       <- "temp_aging/Figure1_plot.png"
 W_IN <- 7.5; H_IN <- 6; DPI <- 300
 SMOOTH_BP_C <- 5e5             # rolling mean on panel C only
 YLIM_C <- c(-0.1, 1)
@@ -53,9 +54,10 @@ CMP_COL <- c(main = "grey25", sex = "#E69F00", diet = "#009E73")
 
 # ── data ─────────────────────────────────────────────────────────────────────
 for (f in c(LONG, VARCOMP)) if (!file.exists(f)) stop("missing ", f,
-  if (nzchar(VARIANT))
-    "\nRun scripts_oneoffs/AGE_SY/nov_only/{run_scans.sh,gather.R} on HPC3, scp back,\nthen varcomp_H2.R with the two paths as arguments."
-  else "", call. = FALSE)
+  "
+Run scripts_oneoffs/AGE_SY/nov_only/{run_scans.sh,gather.R} on HPC3, scp back,",
+  "
+then varcomp_H2.R with the two paths as arguments.", call. = FALSE)
 
 long <- read.table(LONG, header = TRUE, sep = "\t") %>% as_tibble()
 vc   <- read.table(VARCOMP, header = TRUE, sep = "\t") %>% as_tibble()

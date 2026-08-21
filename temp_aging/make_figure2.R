@@ -3,7 +3,7 @@
 #   Rscript temp_aging/make_figure2.R
 #
 # Needs process/AGE_SY/AGE_SY_zoom_means.txt.gz (make_zoom_means.R, run on HPC3)
-# and process/AGE_SY/AGE_SY_4scan.txt.gz.
+# and process/AGE_SY/AGE_SY_4scan_no89.txt.gz.
 #
 # LAYOUT. Four columns by two rows of cells. Seven cells are a peak; the eighth
 # is a legend over the control panel. Each peak cell is two sub-panels:
@@ -20,22 +20,20 @@
 # its frequency in the CONTROL pools against replicate, replicates having accrued
 # over months. Seven lines, one per peak. Lines that are flat say the founder is
 # not on its way out of the cage and the drop is selection, not drift or purging.
+#
+# DATA: the 10-replicate AGE_SY dataset -- replicates 8 and 9 dropped, those
+# being the May 2023 cage (helpfiles/AGE_2024/population_assignment.txt). The
+# 12-replicate files still exist on disk; nothing here reads them.
 
 suppressMessages({library(tidyverse); library(patchwork)})
 
-# Optional variant, e.g.  Rscript temp_aging/make_figure2.R no89
-# "no89" drops replicates 8 and 9 -- the May 2023 cage -- leaving a single-cage
-# experiment. The zoom means carry REP, so they are filtered here rather than
-# re-extracted; only the scan file has to be regenerated on the cluster.
-VARIANT <- commandArgs(trailingOnly = TRUE)[1]
-VARIANT <- if (is.na(VARIANT)) "" else VARIANT
-SUF     <- if (nzchar(VARIANT)) paste0("_", VARIANT) else ""
-TAG     <- if (nzchar(VARIANT)) "b" else ""
-DROP_REP <- if (VARIANT == "no89") c(8, 9) else integer(0)
 
+# The zoom means hold every replicate, so 8 and 9 are dropped here rather than
+# by reading a different file.
+DROP_REP <- c(8, 9)
 MEANS <- "process/AGE_SY/AGE_SY_zoom_means.txt.gz"
-SCAN  <- sprintf("process/AGE_SY/AGE_SY_4scan%s.txt.gz", SUF)
-OUT   <- sprintf("temp_aging/Figure2%s_plot.png", TAG)
+SCAN  <- "process/AGE_SY/AGE_SY_4scan_no89.txt.gz"
+OUT   <- "temp_aging/Figure2_plot.png"
 WIN   <- 0.5e6                      # half-width actually plotted
 RARE  <- 0.025                      # founders below this in controls are faded
 

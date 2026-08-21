@@ -1,7 +1,16 @@
 # Are the control trajectories doing anything beyond drift?
+#
+# DATA: the 10-replicate AGE_SY dataset -- replicates 8 and 9 dropped, those
+# being the May 2023 cage (helpfiles/AGE_2024/population_assignment.txt). The
+# 12-replicate files still exist on disk; nothing here reads them.
 suppressMessages(library(tidyverse)); set.seed(1)
+
+
 m<-read.table("process/AGE_SY/AGE_SY_zoom_means.txt.gz",header=TRUE,sep="\t")%>%as_tibble()
-s<-read.table("process/AGE_SY/AGE_SY_4scan.txt.gz",header=TRUE,sep="\t")%>%as_tibble()
+# the zoom means hold every replicate, so the variant is applied here rather than
+# by reading a different file
+if (length(DROP_REP)) m <- m %>% filter(!REP %in% DROP_REP)
+s<-read.table("process/AGE_SY/AGE_SY_4scan_no89.txt.gz",header=TRUE,sep="\t")%>%as_tibble()
 L<-m%>%distinct(locus,chr,peak_pos)
 b<-L%>%pmap_dfr(function(locus,chr,peak_pos) s%>%filter(chr==!!chr,pos==!!peak_pos)%>%
   slice_max(Wald_log10p,n=1)%>%transmute(locus,sugar,sex))

@@ -1,11 +1,13 @@
 suppressMessages(library(tidyverse))
+
+
 FLYMAP<-"pipeline/helpfiles/flymap.r6.txt"
 add_genetic<-function(df){fm<-read.table(FLYMAP,header=FALSE);colnames(fm)<-c("chr","pos","cM")
  df$cM<-NA_real_;for(c_ in unique(df$chr)){x<-fm%>%filter(chr==c_)
  o<-ksmooth(x$pos,x$cM,kernel="normal",bandwidth=3e6);df$cM[df$chr==c_]<-splinefun(o$x,o$y)(df$pos[df$chr==c_])};df}
 HET<-tribble(~chr,~eu_start,~eu_end,"chrX",2.5,21.2,"chr2L",0.5,22.9,
              "chr2R",1.3,25.1,"chr3L",0.7,24.0,"chr3R",4.5,32.0)
-d<-read.table("process/AGE_SY/AGE_SY_4scan.txt.gz",header=TRUE,sep="\t")%>%as_tibble()
+d<-read.table("process/AGE_SY/AGE_SY_4scan_no89.txt.gz",header=TRUE,sep="\t")%>%as_tibble()
 w<-d%>%group_by(chr,pos)%>%summarise(wald=max(Wald_log10p),.groups="drop")%>%
    add_genetic()%>%left_join(HET,by="chr")%>%
    mutate(eu=pos/1e6>=eu_start&pos/1e6<=eu_end)%>%arrange(chr,pos)

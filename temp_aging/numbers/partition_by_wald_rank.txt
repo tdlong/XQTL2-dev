@@ -1,0 +1,29 @@
+# partition_by_wald_rank.R
+# run:    2026-08-21 09:29
+# script: aa05bb1
+# reads:
+#   process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz     9.3M  2026-08-20 15:47  md5:87da32c5
+#
+There were 50 or more warnings (use warnings() to see the first 50)
+whole genome: 143 blocks -- 136 euchromatic of 2 cM, 7 heterochromatic
+            (one telomeric + one centromeric block per arm)
+ratios only -- no absolute h2. interval from 300 bootstraps over
+BOTH the block sample and the floor fit
+
+ top % genome blocks    Mb % sex+diet           CI
+            5    8+0  13.0        9.5  [4.9, 14.1]
+           10   13+2  26.1        8.9  [6.3, 15.8]
+           20   27+2  43.0       11.4  [7.8, 18.2]
+           30   39+4  53.7       12.6  [7.5, 18.3]
+           50   68+4  73.2       13.6  [7.0, 18.7]
+          100  136+7 124.9       16.7 [-4.6, 26.1]
+
+the heterochromatic blocks on their own:
+           block  Mb wald % sex+diet
+ chr3R_het_start 3.1 17.5        4.6
+   chr3L_het_end 3.0 17.5        1.8
+    chrX_het_end 1.3  6.6       41.7
+ chr2L_het_start 0.4  7.1       -1.0
+ chr3L_het_start 0.5  1.2         NA
+  chrX_het_start 1.0  4.4       83.0
+   chr2L_het_end 0.3  4.1       36.9
