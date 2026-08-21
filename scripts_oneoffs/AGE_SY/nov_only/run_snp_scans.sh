@@ -19,9 +19,10 @@
 # Uses the same --scan names as the haplotype scans, so output lands beside them:
 #   process/AGE_SY/Scans/<scan>_no89/<scan>_no89.snp_scan.txt
 #
-# The gather is chained on all four scans, so there is nothing to run afterwards.
-# It writes process/AGE_SY/AGE_SY_4snpscan_no89.txt.gz and the script prints the
-# scp command to fetch it.
+# The gather is chained on all four scans, so it needs no separate submission. It
+# writes process/AGE_SY/AGE_SY_4snpscan_no89.txt.gz. Fetching that file and
+# drawing the figure are still manual -- the cluster has no route to the laptop --
+# and the closing message gives both commands in full.
 #
 # The scan is NOT independent of the haplotype scan -- same smoothed haplotypes.
 
@@ -102,7 +103,8 @@ echo "   $(printf '%-22s' gather) $GID   (afterok on the four above)"
 cat <<EOF
 
 ------------------------------------------------------------------
-4 SNP scans + the gather submitted. Nothing to run afterwards.
+4 SNP scans + the gather submitted. The gather runs itself; the two
+lines below are yours -- the cluster cannot push a file to your laptop.
 
 When job $GID has finished, from your LAPTOP in the XQTL2-dev repo root:
 
