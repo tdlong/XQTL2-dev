@@ -18,9 +18,10 @@
 suppressMessages({library(tidyverse); library(patchwork)})
 
 SNP  <- "process/AGE_SY/AGE_SY_4snpscan_no89.txt.gz"
+REMOTE <- "tdlong@hpc3.rcic.uci.edu:/dfs7/adl/tdlong/fly_pool/XQTL2-dev"
 OUT  <- "temp_aging/Figure3_plot.png"
 W_IN <- 7.5; H_IN <- 6.5; DPI <- 300
-PT_SIZE <- 0.05; PT_ALPHA <- 0.25
+PT_SIZE <- 0.35; PT_ALPHA <- 0.6
 
 CHRS   <- c("chrX", "chr2L", "chr2R", "chr3L", "chr3R")
 CHRLAB <- c(chrX = "X", chr2L = "2L", chr2R = "2R", chr3L = "3L", chr3R = "3R")
@@ -35,9 +36,19 @@ TRT_COL <- c("SY10 female" = "#F49AC2", "SY20 female" = "#D62728",
              "SY10 male"   = "#8EC7E8", "SY20 male"   = "#1F4E9C")
 TAGS <- c("A", "B", "C", "D")
 
-if (!file.exists(SNP)) stop("missing ", SNP,
-  "\nRun scripts_oneoffs/AGE_SY/nov_only/gather_snp.R on HPC3 and scp it back.",
-  call. = FALSE)
+# Fetch it if it is not here. run_snp_scans.sh chains the gather on the cluster,
+# so by the time those jobs are done the file exists there; there is no reason to
+# make fetching it a separate thing to remember.
+if (!file.exists(SNP)) {
+  cat("not found locally, fetching:\n  ", SNP, "\n", sep = "")
+  dir.create(dirname(SNP), showWarnings = FALSE, recursive = TRUE)
+  rc <- system2("scp", c(file.path(REMOTE, SNP), dirname(SNP)))
+  if (rc != 0 || !file.exists(SNP))
+    stop("scp failed. Either the gather has not finished on HPC3, or fetch it by hand:\n",
+         "  scp ", file.path(REMOTE, SNP), " ", dirname(SNP), "/", call. = FALSE)
+  cat("fetched", format(structure(file.size(SNP), class = "object_size"),
+                        units = "auto"), "\n\n")
+}
 
 d <- read.table(SNP, header = TRUE, sep = "\t") %>% as_tibble() %>%
   filter(chr %in% CHRS) %>%
@@ -68,8 +79,11 @@ chr_breaks <- (lens$offset + lens$len/2) / 1e6
 chr_edges  <- (lens$offset + lens$len)[-nrow(lens)] / 1e6
 xmax_all   <- sum(lens$len) / 1e6
 
-# one y scale across the four, so panels are comparable
-YMAX <- max(d$Wald_log10p, na.rm = TRUE) * 1.02
+# free y per panel. A shared scale means SY20 male's 161 sets the height and the
+# other three use a quarter of theirs.
+YMAX <- d %>% group_by(trt) %>%
+  summarise(ymax = max(Wald_log10p, na.rm = TRUE) * 1.03, .groups = "drop") %>%
+  deframe()
 
 panel <- function(lv, tag, xaxis) {
   ggplot(d %>% filter(trt == lv)) +
@@ -82,7 +96,7 @@ panel <- function(lv, tag, xaxis) {
     scale_x_continuous(expand = expansion(0), breaks = chr_breaks,
                        labels = CHRLAB[CHRS]) +
     scale_y_continuous(expand = expansion(c(0, 0.04))) +
-    coord_cartesian(xlim = c(0, xmax_all), ylim = c(0, YMAX)) +
+    coord_cartesian(xlim = c(0, xmax_all), ylim = c(0, YMAX[[lv]])) +
     labs(y = expression(-log[10] * italic(P)), tag = tag) +
     annotate("text", x = xmax_all * 0.5, y = Inf, label = as.character(lv),
              vjust = 1.6, size = 2.8, fontface = "bold") +
