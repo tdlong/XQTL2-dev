@@ -31,7 +31,7 @@ SNP  <- "process/AGE_SY/AGE_SY_4snpscan_no89.txt.gz"
 REMOTE <- "tdlong@hpc3.rcic.uci.edu:/dfs7/adl/tdlong/fly_pool/XQTL2-dev"
 OUT  <- "temp_aging/Figure3_plot.png"
 W_IN <- 7.5; H_IN <- 6.5; DPI <- 300
-PT_SIZE <- 0.35; PT_ALPHA <- 0.6
+PT_SIZE <- 0.35; PT_ALPHA <- 0.25   # see note below
 
 CHRS   <- c("chrX", "chr2L", "chr2R", "chr3L", "chr3R")
 CHRLAB <- c(chrX = "X", chr2L = "2L", chr2R = "2R", chr3L = "3L", chr3R = "3R")
@@ -50,7 +50,13 @@ TRT_COL <- c("SY10 female" = "#F49AC2", "SY20 female" = "#D62728",
 PANELS <- list(A = c("SY10 female", "SY20 female"),
                B = c("SY10 male",   "SY20 male"))
 PANEL_TITLE <- c(A = "females", B = "males")
-# the paler diet drawn first so the darker is not buried under it
+# The paler diet is drawn first so the darker is not buried under it. At ~1.2M
+# points per treatment the second colour still covers the first wherever both
+# are present, and transparency only softens that -- at PT_ALPHA 0.15, 0.25 and
+# 0.40 the overlap looks much the same, because the points saturate either way.
+# 0.25 lets some of the under-colour speckle through the dense peaks. So a pale
+# region means the pale diet EXCEEDS the dark one there; it does not mean the
+# dark one is absent.
 DRAW_ORDER <- c("SY10 female", "SY20 female", "SY10 male", "SY20 male")
 
 # Fetch it if it is not here. run_snp_scans.sh chains the gather on the cluster,
