@@ -57,7 +57,6 @@ reproduced by re-running the script. **All five are hardcoded to the
 | `h2_threshold.R` | 4scan | the h²-at-Wald-5 table in `results_draft.md` — "windows above ~0.8% of phenotypic variance are significant" |
 | `scan_resolution.R` | 4scan | paragraph 1 of `results_draft.md` — the twelve peaks above −log10 P 15 and their 2-unit support intervals |
 | `significant_regions.R` | 4scan, splithalf H2 | paragraph 3 — the partition over significant tiles, and the male-vs-female medians by arm |
-| `control_drift.R` | zoom means, 4scan | the drift test in `Figure2_legend.md` — 0 of 14 slopes significant against a random walk |
 | `partition_by_wald_rank.R` | splithalf H2 | **half-live.** Its *ratio* column (sex+diet as a share, 9.4% [5.9, 15.9]) is quoted in `results_draft.md` and is sound — numerator and denominator run over the same windows, so the fifteenfold window overlap cancels. Its *absolute* column, rescaling the genome to total 50%, is **withdrawn**: summing overlapping windows and rescaling to the quantity being estimated is circular. `results_draft.md` now states plainly that no genome-wide total is claimed. `SUMMARY.md` still carries the old table and contradicts it. |
 
 ## Prose

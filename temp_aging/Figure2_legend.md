@@ -33,16 +33,4 @@ four of seven peaks and susceptible at chrX:10.09.
 chr3L:21.64 (38.2) and chr2R:25.10 (28.7). chrX:10.09 at 15.9 is the weakest of
 the twelve. Say how the seven were chosen, or the claim has to be dropped.
 
-## The eighth cell
-
-Tests whether a haplotype is simply leaving the cages, which would make it look
-depleted in any selected pool. If so, the susceptible traces would slope down.
-
-They do not. Six of fourteen slopes reach *P* < 0.05, but that treats a frequency
-trajectory as twelve independent points. Against a random walk of the same
-per-step variance, none does — chr2L:14.85 goes from *P* = 2 × 10⁻⁶ to 0.67.
-Protective series average +0.0044 per replicate, susceptible −0.0019; paired
-across loci, *P* = 0.16. Nothing departs from drift. The excursion at replicates
-8–9 moves several series together and looks like a batch.
-
-*Code: `temp_aging/make_figure2.R`, `make_zoom_means.R`, `control_drift.R`.*
+*Code: `temp_aging/make_figure2.R`, `make_zoom_means.R`.*
