@@ -14,6 +14,16 @@
 # The SNP scan tests every SNP, so each panel is a dense scatter rather than a
 # line. It is not independent of the haplotype scan in Figure 1 -- both come from
 # the same smoothed haplotype estimates.
+#
+# Broken y axis, built the same way as Figure 1 panel A and for the same reason:
+# the chr3L locus alone sets the scale otherwise. Each panel is two ggplots
+# stacked 3:1. Two details matter and are easy to lose --
+#   expand = expansion(0)  the two sub-panel ranges must be mutually exclusive
+#     and exhaustive, or the default 5% padding overlaps them and points in the
+#     overlap are drawn TWICE, once in each.
+#   mask()                 the break marks need clip = "off", which also stops
+#     out-of-range points being clipped, so they spill across the figure. Setting
+#     the wrong side to NA keeps them from being drawn at all.
 
 suppressMessages({library(tidyverse); library(patchwork)})
 
@@ -79,40 +89,69 @@ chr_breaks <- (lens$offset + lens$len/2) / 1e6
 chr_edges  <- (lens$offset + lens$len)[-nrow(lens)] / 1e6
 xmax_all   <- sum(lens$len) / 1e6
 
-# free y per panel. A shared scale means SY20 male's 161 sets the height and the
-# other three use a quarter of theirs.
-YMAX <- d %>% group_by(trt) %>%
-  summarise(ymax = max(Wald_log10p, na.rm = TRUE) * 1.03, .groups = "drop") %>%
-  deframe()
+# One scale across all four, split at 40. Below the break is where every panel
+# has its bulk; above it is chr3L and little else. Shared rather than free so the
+# four stay comparable.
+BRK <- 40
+LO  <- c(0, BRK);  LO_BRK <- c(0, 10, 20, 30)
+HI  <- c(BRK, 170); HI_BRK <- c(50, 100, 150)
 
-panel <- function(lv, tag, xaxis) {
-  ggplot(d %>% filter(trt == lv)) +
-    geom_rect(data = het_bands, aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
-              fill = "grey88", colour = NA, inherit.aes = FALSE) +
-    geom_vline(xintercept = chr_edges, linetype = "dotted",
-               colour = "grey35", linewidth = 0.3) +
-    geom_point(aes(gx, Wald_log10p), colour = TRT_COL[[lv]],
-               size = PT_SIZE, alpha = PT_ALPHA, stroke = 0) +
-    scale_x_continuous(expand = expansion(0), breaks = chr_breaks,
-                       labels = CHRLAB[CHRS]) +
-    scale_y_continuous(expand = expansion(c(0, 0.04))) +
-    coord_cartesian(xlim = c(0, xmax_all), ylim = c(0, YMAX[[lv]])) +
-    labs(y = expression(-log[10] * italic(P)), tag = tag) +
-    annotate("text", x = xmax_all * 0.5, y = Inf, label = as.character(lv),
-             vjust = 1.6, size = 2.8, fontface = "bold") +
-    theme_classic(base_size = 8) +
-    theme(axis.title.x = element_blank(),
-          plot.tag = element_text(size = 10, face = "bold"),
-          plot.tag.position = c(0.004, 0.92),
-          legend.position = "none",
-          plot.margin = margin(5, 4, 2, 16)) +
-    (if (xaxis) NULL else theme(axis.text.x = element_blank(),
-                                axis.ticks.x = element_blank()))
+mask <- function(x, keep_above) { x[if (keep_above) x < BRK else x > BRK] <- NA_real_; x }
+
+# one stroke marking where a sub-panel's y axis terminates; rel is the
+# sub-panel's relative height, so the stroke is the same size on the page in
+# both and therefore the same angle
+slash <- function(yr, at, rel) {
+  h <- diff(yr) * 0.030 / rel
+  w <- xmax_all * 0.004
+  annotate("segment", x = -w, xend = w, y = at - h, yend = at + h,
+           colour = "black", linewidth = 0.4)
 }
 
-ps <- pmap(list(TRT_LEV, TAGS, TRT_LEV == TRT_LEV[length(TRT_LEV)]), panel)
+deco <- function() list(
+  geom_rect(data = het_bands, aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
+            fill = "grey88", colour = NA, inherit.aes = FALSE),
+  geom_vline(xintercept = chr_edges, linetype = "dotted",
+             colour = "grey35", linewidth = 0.3),
+  scale_x_continuous(expand = expansion(0), breaks = chr_breaks,
+                     labels = CHRLAB[CHRS]),
+  theme_classic(base_size = 8),
+  theme(axis.title.x = element_blank(),
+        plot.tag = element_text(size = 10, face = "bold"),
+        plot.tag.position = c(0.004, 0.88),
+        legend.position = "none"))
+
+pts <- function(lv, keep_above) {
+  dd <- d %>% filter(trt == lv) %>% mutate(y = mask(Wald_log10p, keep_above))
+  geom_point(data = dd, aes(gx, y), colour = TRT_COL[[lv]],
+             size = PT_SIZE, alpha = PT_ALPHA, stroke = 0)
+}
+
+panel <- function(lv, tag, xaxis) {
+  top <- ggplot() + deco() + pts(lv, TRUE) +
+    scale_y_continuous(breaks = HI_BRK, expand = expansion(0)) +
+    coord_cartesian(xlim = c(0, xmax_all), ylim = HI, clip = "off") +
+    slash(HI, HI[1], 1) +
+    labs(y = NULL, tag = tag) +
+    annotate("text", x = xmax_all * 0.5, y = Inf, label = as.character(lv),
+             vjust = 1.5, size = 2.8, fontface = "bold") +
+    theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+          axis.line.x = element_blank(), plot.margin = margin(6, 4, 2, 16))
+  bot <- ggplot() + deco() + pts(lv, FALSE) +
+    scale_y_continuous(breaks = LO_BRK, expand = expansion(0)) +
+    coord_cartesian(xlim = c(0, xmax_all), ylim = LO, clip = "off") +
+    slash(LO, LO[2], 3) +
+    labs(y = expression(-log[10] * italic(P))) +
+    theme(plot.margin = margin(2, 4, 2, 16)) +
+    (if (xaxis) NULL else theme(axis.text.x = element_blank(),
+                                axis.ticks.x = element_blank()))
+  list(top, bot)
+}
+
+cells <- pmap(list(TRT_LEV, TAGS, TRT_LEV == TRT_LEV[length(TRT_LEV)]), panel)
+ps <- unlist(cells, recursive = FALSE)
 
 png(OUT, width = W_IN, height = H_IN, units = "in", res = DPI)
-suppressWarnings(print(wrap_plots(ps, ncol = 1)))
+suppressWarnings(print(wrap_plots(ps, ncol = 1, heights = rep(c(1, 3), 4))))
 dev.off()
 cat("wrote", OUT, "\n")
