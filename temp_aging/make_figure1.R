@@ -34,7 +34,15 @@ VARCOMP   <- "process/AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz"
 # back to the split-half scans averaged over halves, which is NOT the same thing
 # (6 replicates per half, so the Wald peaks are lower).
 FOURSCAN <- "process/AGE_SY/AGE_SY_4scan_no89.txt.gz"
-OUT       <- "temp_aging/Figure1_plot.png"
+# X_UNIT "Mb" gives the physical axis; X_UNIT=cM gives the genetic one, written
+# as Figure1_cM_plot.png. In cM, 2L and 2R are contiguous (2L ends at 54.0, 2R
+# starts at 54.6) and so are 3L and 3R, so that axis concatenates by LINKAGE
+# GROUP -- X, 2, 3 -- with the arm boundaries still marked inside each. Peak
+# width in cM is the thing that should be roughly constant; in Mb it tracks
+# recombination.
+X_UNIT    <- Sys.getenv("X_UNIT", "Mb")
+OUT       <- sprintf("temp_aging/Figure1%s_plot.png",
+                     if (X_UNIT == "cM") "_cM" else "")
 W_IN <- 7.5; H_IN <- 6; DPI <- 300
 SMOOTH_BP_C <- 5e5             # rolling mean on panel C only
 YLIM_C <- c(-0.1, 1)
@@ -65,40 +73,88 @@ vc   <- read.table(VARCOMP, header = TRUE, sep = "\t") %>% as_tibble()
 scans <- if (file.exists(FOURSCAN)) {
   cat("panels A/B: 12-replicate scans from", FOURSCAN, "\n")
   read.table(FOURSCAN, header = TRUE, sep = "\t") %>% as_tibble() %>%
-    transmute(chr, pos, sugar, sex, wald = Wald_log10p, h2 = Cutl_H2)
+    transmute(chr, pos, cM, sugar, sex, wald = Wald_log10p, h2 = Cutl_H2)
 } else {
   cat("panels A/B: FALLING BACK to the split-half scans averaged over halves.\n",
       "  Run temp_aging/make_4scan_df.R on hpc3 and fetch", basename(FOURSCAN), "\n", sep = "")
+  # the split-half file has no cM, so this fallback cannot draw the genetic axis
   long %>% group_by(chr, pos, sugar, sex) %>%
-    summarise(wald = mean(Wald_log10p), h2 = mean(Cutl_H2), .groups = "drop")
+    summarise(wald = mean(Wald_log10p), h2 = mean(Cutl_H2),
+              cM = NA_real_, .groups = "drop")
 }
 scans <- scans %>%
   mutate(trt = factor(paste0(sugar, " ", ifelse(sex == "F", "female", "male")),
                       levels = TRT_LEV))
 
 # ── one concatenated x-axis shared by all three panels ───────────────────────
-lens <- scans %>% filter(chr %in% CHRS) %>% group_by(chr) %>%
-  summarise(len = max(pos), .groups = "drop") %>%
-  mutate(chr = factor(chr, levels = CHRS)) %>% arrange(chr) %>%
-  mutate(offset = lag(cumsum(len), default = 0))
+if (X_UNIT == "cM") {
+  if (all(is.na(scans$cM))) stop("no cM in the scan file", call. = FALSE)
+  GROUP <- c(chrX = "X", chr2L = "2", chr2R = "2", chr3L = "3", chr3R = "3")
+  GAP   <- 4                                # cM of white space between groups
 
-addx <- function(d) d %>% filter(chr %in% CHRS) %>%
-  mutate(chr = factor(chr, levels = CHRS)) %>%
-  left_join(lens %>% select(chr, offset), by = "chr") %>%
-  mutate(gx = (pos + offset) / 1e6)
+  # within a linkage group cM is already continuous across the two arms, so the
+  # offset is per group, not per arm
+  grp <- scans %>% filter(chr %in% CHRS) %>% mutate(g = GROUP[as.character(chr)]) %>%
+    group_by(g) %>% summarise(gmin = min(cM, na.rm = TRUE),
+                              gmax = max(cM, na.rm = TRUE), .groups = "drop") %>%
+    mutate(g = factor(g, levels = c("X", "2", "3"))) %>% arrange(g) %>%
+    mutate(span = gmax - gmin,
+           offset = lag(cumsum(span + GAP), default = 0) - gmin)
 
-scans <- addx(scans)
-vcx   <- addx(vc)
+  addx <- function(d) d %>% filter(chr %in% CHRS) %>%
+    mutate(chr = factor(chr, levels = CHRS), g = factor(GROUP[as.character(chr)],
+                                                        levels = c("X","2","3"))) %>%
+    left_join(grp %>% select(g, offset), by = "g") %>%
+    mutate(gx = cM + offset)
 
-het_bands <- HET %>% mutate(chr = factor(chr, levels = CHRS)) %>%
-  left_join(lens, by = "chr") %>%
-  { bind_rows(
-      transmute(., xmin = offset/1e6, xmax = (offset + eu_start*1e6)/1e6),
-      transmute(., xmin = (offset + eu_end*1e6)/1e6, xmax = (offset + len)/1e6)) } %>%
-  filter(xmax > xmin)
-chr_breaks <- (lens$offset + lens$len/2) / 1e6           # label at chromosome centre
-chr_edges  <- (lens$offset + lens$len)[-nrow(lens)] / 1e6 # divider between chromosomes
-xmax_all   <- sum(lens$len) / 1e6
+  # vc carries no cM, so interpolate it from the scan's own pos -> cM per arm
+  vc <- vc %>% group_split(chr) %>% map_dfr(function(v) {
+    x <- scans %>% filter(chr == v$chr[1]) %>% arrange(pos)
+    if (!nrow(x)) return(v %>% mutate(cM = NA_real_))
+    v %>% mutate(cM = approx(x$pos, x$cM, xout = pos, rule = 2)$y)
+  })
+  scans <- addx(scans); vcx <- addx(vc)
+
+  # arm extents in cM, taken from the scan itself so they cannot disagree with it
+  arms <- scans %>% group_by(chr) %>%
+    summarise(lo = min(gx), hi = max(gx), .groups = "drop") %>%
+    mutate(chr = factor(chr, levels = CHRS)) %>% arrange(chr)
+
+  # heterochromatin: interpolate each arm's euchromatin boundaries onto cM
+  het_bands <- HET %>% pmap_dfr(function(chr, eu_start, eu_end) {
+    x <- scans %>% filter(chr == !!chr) %>% arrange(pos)
+    at <- approx(x$pos, x$gx, xout = c(eu_start, eu_end) * 1e6, rule = 2)$y
+    tibble(chr, xmin = c(min(x$gx), at[2]), xmax = c(at[1], max(x$gx)))
+  }) %>% filter(xmax > xmin)
+
+  chr_breaks <- (arms$lo + arms$hi) / 2                # label each arm
+  chr_edges  <- sort(c(arms$hi[-nrow(arms)]))          # arm and group boundaries
+  xmax_all   <- max(scans$gx)
+  XLAB       <- "cM"
+} else {
+  lens <- scans %>% filter(chr %in% CHRS) %>% group_by(chr) %>%
+    summarise(len = max(pos), .groups = "drop") %>%
+    mutate(chr = factor(chr, levels = CHRS)) %>% arrange(chr) %>%
+    mutate(offset = lag(cumsum(len), default = 0))
+
+  addx <- function(d) d %>% filter(chr %in% CHRS) %>%
+    mutate(chr = factor(chr, levels = CHRS)) %>%
+    left_join(lens %>% select(chr, offset), by = "chr") %>%
+    mutate(gx = (pos + offset) / 1e6)
+
+  scans <- addx(scans); vcx <- addx(vc)
+
+  het_bands <- HET %>% mutate(chr = factor(chr, levels = CHRS)) %>%
+    left_join(lens, by = "chr") %>%
+    { bind_rows(
+        transmute(., xmin = offset/1e6, xmax = (offset + eu_start*1e6)/1e6),
+        transmute(., xmin = (offset + eu_end*1e6)/1e6, xmax = (offset + len)/1e6)) } %>%
+    filter(xmax > xmin)
+  chr_breaks <- (lens$offset + lens$len/2) / 1e6
+  chr_edges  <- (lens$offset + lens$len)[-nrow(lens)] / 1e6
+  xmax_all   <- sum(lens$len) / 1e6
+  XLAB       <- "Mb"
+}
 
 # ── panel C components, lightly smoothed ─────────────────────────────────────
 roll <- function(x, k) { n <- length(x); h <- (k-1L) %/% 2L
@@ -107,11 +163,13 @@ BIN <- 1e5
 cmp <- vcx %>%
   mutate(bin = (pos %/% BIN) * BIN) %>%
   group_by(chr, offset, bin) %>%
-  summarise(main = mean(mainH2), sex = mean(sexH2), diet = mean(dietH2), .groups = "drop") %>%
+  summarise(main = mean(mainH2), sex = mean(sexH2), diet = mean(dietH2),
+            bin_gx = mean(gx), .groups = "drop") %>%
   pivot_longer(all_of(CMP_LEV), names_to = "term", values_to = "y") %>%
   arrange(chr, term, bin) %>% group_by(chr, term) %>%
   mutate(y = roll(y, max(1L, as.integer(round(SMOOTH_BP_C / BIN))))) %>% ungroup() %>%
-  mutate(term = factor(term, levels = CMP_LEV), gx = (bin + offset) / 1e6)
+  mutate(term = factor(term, levels = CMP_LEV),
+         gx = if (X_UNIT == "cM") bin_gx else (bin + offset) / 1e6)
 
 # ── panels ───────────────────────────────────────────────────────────────────
 # Broken y axis: each panel is two ggplots stacked 3:1, so the chr3L locus does
