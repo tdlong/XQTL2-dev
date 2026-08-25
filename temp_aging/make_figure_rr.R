@@ -80,8 +80,11 @@ wald <- wald %>% mutate(chr = factor(chr, levels = CHRS)) %>%
   left_join(lens %>% select(chr, offset), by = "chr") %>%
   mutate(gx = (pos + offset) / 1e6)
 
-# right axis rescaled onto the left so both curves share one panel
-RMAX <- max(rr$rate); WMAX <- max(wald$w)
+# Right axis fixed at 0-30, not to the data maximum. Scaling to the maximum let
+# the chr3L spike (mean 80) set the height and squashed the 3L/3R plateaus -- the
+# feature the plot exists to show -- into the bottom third. The spike runs off
+# the top instead.
+RMAX <- max(rr$rate); WMAX <- 30
 wald <- wald %>% mutate(y = w * RMAX / WMAX)
 
 cat("recombination rate, cM/Mb  (ksmooth bandwidth", BANDWIDTH/1e6, "Mb)\n\n")
@@ -104,8 +107,9 @@ p <- ggplot(rr) +
                      labels = CHRLAB[CHRS]) +
   scale_y_continuous(expand = expansion(c(0, 0.04)),
                      sec.axis = sec_axis(~ . * WMAX / RMAX,
+                                         breaks = c(0, 10, 20, 30),
                                          name = expression(mean~-log[10]*italic(P)))) +
-  coord_cartesian(xlim = c(0, xmax_all)) +
+  coord_cartesian(xlim = c(0, xmax_all), ylim = c(0, RMAX * 1.02)) +
   labs(y = "cM / Mb") +
   theme_classic(base_size = 8) +
   theme(axis.title.x = element_blank(), legend.position = "none",
