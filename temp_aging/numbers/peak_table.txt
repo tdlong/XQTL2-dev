@@ -1,6 +1,6 @@
 # peak_table.R
-# run:    2026-08-28 12:09
-# script: c33c3ca
+# run:    2026-08-28 12:22
+# script: eab92cb
 # reads:
 #   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.5M  2026-08-20 15:46  md5:dabab56e
 #
@@ -84,3 +84,16 @@ traits represented:
      A: > 15           1         3           3         1
  B: 7.5 - 15           1         8           3         3
 wrote temp_aging/peak_table.txt 
+
+
+INTERVAL WIDTH: set A (>15) against set B (7.5-15)
+Wilcoxon rank-sum, two-sided; widths are skewed so ranks rather than t
+
+  int_cM   A median    0.39 (n=8)   B median    0.73 (n=15)   P = 0.047
+  int_kb   A median  270.00 (n=8)   B median  245.00 (n=15)   P = 0.601
+
+pooled over all 23 peaks -- mean with an 80% bootstrap CI
+(bootstrap rather than t, because the widths are right-skewed)
+
+  int_cM   mean    0.90  80% CI [0.71, 1.10]   median    0.69
+  int_kb   mean  401.30  80% CI [310.43, 499.35]   median  255.00

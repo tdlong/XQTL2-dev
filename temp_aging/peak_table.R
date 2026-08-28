@@ -103,3 +103,26 @@ cat("\ntraits represented:\n\n")
 tab %>% count(set, peak_trait) %>% pivot_wider(names_from = peak_trait,
        values_from = n, values_fill = 0) %>% as.data.frame() %>% print(row.names = FALSE)
 cat("wrote", OUT, "\n")
+
+# ── are the two sets' intervals different? ───────────────────────────────────
+# If the weaker peaks are no wider than the strong ones, there is no reason to
+# quote two medians and the 23 can be pooled.
+cat("\n\nINTERVAL WIDTH: set A (>15) against set B (7.5-15)\n")
+cat("Wilcoxon rank-sum, two-sided; widths are skewed so ranks rather than t\n\n")
+A <- tab %>% filter(set == "A: > 15"); B <- tab %>% filter(set != "A: > 15")
+for (v in c("int_cM", "int_kb")) {
+  wt <- suppressWarnings(wilcox.test(A[[v]], B[[v]]))
+  cat(sprintf("  %-7s  A median %7.2f (n=%d)   B median %7.2f (n=%d)   P = %.3f\n",
+              v, median(A[[v]]), nrow(A), median(B[[v]]), nrow(B), wt$p.value))
+}
+
+set.seed(1)
+cat("\npooled over all 23 peaks -- mean with an 80% bootstrap CI\n")
+cat("(bootstrap rather than t, because the widths are right-skewed)\n\n")
+for (v in c("int_cM", "int_kb")) {
+  x  <- tab[[v]]
+  bs <- replicate(20000, mean(sample(x, length(x), TRUE)))
+  ci <- quantile(bs, c(0.10, 0.90))
+  cat(sprintf("  %-7s  mean %7.2f  80%% CI [%.2f, %.2f]   median %7.2f\n",
+              v, mean(x), ci[1], ci[2], median(x)))
+}
