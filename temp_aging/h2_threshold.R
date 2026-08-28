@@ -37,20 +37,23 @@ cat("and the fraction of 1 cM TILES whose strongest window exceeds it\n\n")
 res <- map_dfr(sort(unique(w$trt)), function(t) {
   z <- w %>% filter(trt == t) %>% mutate(lw = log(Wald_log10p))
   m <- gam(Cutl_H2 ~ s(lw), data = z)
-  p <- as.numeric(predict(m, newdata = tibble(lw = log(c(2, 5, 10)))))
-  h5 <- p[2]
+  p <- as.numeric(predict(m, newdata = tibble(lw = log(c(2, 5, 7.5, 10, 15)))))
   tl <- z %>% group_by(chr, tile) %>%
     summarise(h2 = max(Cutl_H2), wald = max(Wald_log10p), .groups = "drop")
   tibble(trait = t,
-         `h2 @W2` = round(p[1], 2), `h2 @W5` = round(h5, 2), `h2 @W10` = round(p[3], 2),
-         `% tiles h2 > that` = round(100 * mean(tl$h2 > h5), 1),
-         `% tiles Wald > 5`  = round(100 * mean(tl$wald > 5), 1))
+         `h2 @W2` = round(p[1], 2), `h2 @W5` = round(p[2], 2),
+         `h2 @W7.5` = round(p[3], 2), `h2 @W10` = round(p[4], 2),
+         `h2 @W15` = round(p[5], 2),
+         `% tiles > h2(W5)`   = round(100 * mean(tl$h2 > p[2]), 1),
+         `% tiles > h2(W7.5)` = round(100 * mean(tl$h2 > p[3]), 1),
+         `% tiles > h2(W15)`  = round(100 * mean(tl$h2 > p[5]), 1))
 })
 as.data.frame(res) %>% print(row.names = FALSE)
-cat(sprintf("\n  h2 at Wald 5 spans %.2f to %.2f across the four traits\n",
-            min(res$`h2 @W5`), max(res$`h2 @W5`)))
-cat(sprintf("  tiles exceeding it: %.0f%% to %.0f%%\n",
-            min(res$`% tiles h2 > that`), max(res$`% tiles h2 > that`)))
+for (th in c("5", "7.5", "15")) {
+  h <- res[[paste0("h2 @W", th)]]; f <- res[[paste0("% tiles > h2(W", th, ")")]]
+  cat(sprintf("\n  Wald %-4s -> h2 %.2f-%.2f%%;  %.0f-%.0f%% of tiles exceed it\n",
+              th, min(h), max(h), min(f), max(f)))
+}
 
 cat("\nfloor: h2 at tiles whose own Wald stays below 2\n\n")
 w %>% group_by(chr, tile, trt) %>%
