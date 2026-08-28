@@ -1,34 +1,44 @@
 # significant_regions.R
-# run:    2026-08-28 14:59
+# run:    2026-08-28 15:25
 # script: e76a62e
 # reads:
 #   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.5M  2026-08-20 15:46  md5:dabab56e
 #   process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz     9.3M  2026-08-20 15:47  md5:87da32c5
 #
-euchromatic tiles: 1496, of which Wald>5 in some character: 757 (51%)
-
-partition over SIGNIFICANT tiles only (%):
-  floor removed      all        main  84.8  sex  12.0  diet  3.4  int  -0.2
-  floor removed      autosomes  main  86.3  sex  10.2  diet  3.6  int  -0.1
-  floor left in      all        main  94.9  sex   4.0  diet  1.1  int  -0.1
-  floor left in      autosomes  main  95.3  sex   3.5  diet  1.2  int  -0.0
-
-  ^ if these two agree, the floor is irrelevant here, which is the point
+268 tiles of 1 cM; 98 reach -log10 P 7.5 in some treatment (37%)
 
 male vs female h2 in significant tiles, by arm (floor removed):
 
-   chr tiles med M med F   M/F M>F at
- chr2L   174  0.31  0.04  7.57    84%
- chr2R   135  0.23  0.25  0.93    61%
- chr3L   162  0.84  0.43  1.96    87%
- chr3R   223  0.22  0.39  0.55    19%
-  chrX    63  0.64  0.03 24.00   100%
+   chr tiles med M med F med M/F M>F at
+ chr2L    18  0.63  0.14    3.41    83%
+ chr2R    26  0.25  0.36    0.45    50%
+ chr3L    18  1.14  0.69    1.70    78%
+ chr3R    21  0.15  0.36    0.36    10%
+  chrX    15  0.79  0.04   15.35   100%
 
-same, floor NOT removed (raw), to show it does not matter here:
+same with the floor left in:
 
-   chr M>F at
- chr2L    85%
- chr2R    61%
- chr3L    87%
- chr3R    19%
-  chrX   100%
+   chr tiles med M med F med M/F M>F at
+ chr2L    18  1.19  0.70    1.75    78%
+ chr2R    26  0.82  0.94    1.00    50%
+ chr3L    18  1.71  1.26    1.51    78%
+ chr3R    21  0.71  0.93    0.75    10%
+  chrX    15  1.36  0.63    2.14   100%
+
+partition over significant tiles (% of the four-treatment sum of squares):
+  floor removed  all         98 tiles   main  83.0  sex  15.8  diet  1.6  int  -0.4
+  floor removed  autosomes   83 tiles   main  85.6  sex  13.0  diet  1.7  int  -0.3
+  floor left in  all         98 tiles   main  93.0  sex   6.5  diet  0.7  int  -0.1
+  floor left in  autosomes   83 tiles   main  93.9  sex   5.5  diet  0.7  int  -0.1
+
+  ^ these do NOT agree, and the reason is arithmetic, not biology. Removing the
+    floor subtracts about the same amount from all four treatments, so it shrinks
+    main (8*mean^2, quadratic in the mean) far more than it shrinks any contrast,
+    which is a difference between treatments and barely moves. The sex sum of
+    squares is nearly the same either way; the denominator is not. So the share
+    is a share OF THE h2 ABOVE THE FLOOR, and has to be said that way.
+
+95% intervals, 2000 bootstraps over 4 cM groups of tiles (floor removed):
+
+  all        sex 15.8 [10.9, 27.2]   diet  1.6 [ 0.7,  3.8]   int  -0.4 [ -0.8,  0.2]
+  autosomes  sex 13.0 [ 8.5, 21.1]   diet  1.7 [ 0.8,  4.5]   int  -0.3 [ -0.8,  0.4]
