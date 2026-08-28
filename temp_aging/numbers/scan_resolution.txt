@@ -1,35 +1,67 @@
 # scan_resolution.R
-# run:    2026-08-28 10:24
-# script: c6835db
+# run:    2026-08-28 10:29
+# script: e76a62e
 # reads:
 #   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.5M  2026-08-20 15:46  md5:dabab56e
 #
-EUCHROMATIC GENOME ABOVE A THRESHOLD -- by cM and, for contrast, by Mb
-(max over the four treatments; 1493 non-overlapping tiles, 267 cM, 112 Mb)
+270 tiles of 1 cM over 263 cM of euchromatin (111 Mb)
 
- threshold % of cM % of Mb
-         5    42.8    50.8
-        10    16.2    25.0
-        15    10.0    17.8
+fraction of tiles whose strongest window exceeds a threshold
+(max over the four treatments)
 
-PEAKS: top-down, excluding +/-5 cM around each, euchromatin, Wald > 15
+ threshold   n % of tiles
+         5 152       56.3
+        10  61       22.6
+        15  33       12.2
+        20  24        8.9
 
-   chr    Mb  wald cM_width kb_width
- chr3L  9.30 163.8     0.22       55
- chr3R  8.63  39.6     0.28      775
- chr3L 21.62  33.9     0.16     1485
- chr2L 11.95  30.5     0.47      180
- chr2L 14.85  23.6     0.31      220
- chr3L  7.43  20.5     2.28      570
- chr2R 13.88  19.9     0.83      280
- chr2R 24.08  16.1     0.54      260
+tile size in Mb -- the reason a physical tile is the wrong unit
 
-  n = 8 peaks;  cM width median 0.39, range 0.16-2.28
-  physical width range 55 kb to 1.49 Mb
+ median Mb min Mb max Mb
+       0.3   0.06   4.38
 
-  chr3L peak: 163.8  (max over treatments)
- sugar sex     w
-  SY10   F  36.2
-  SY10   M 109.6
-  SY20   F  61.1
-  SY20   M 163.8
+by arm:
+
+   chr  n % > 5 % > 15 median Mb/tile
+ chr2L 52    52     15           0.25
+ chr2R 50    70      8           0.33
+ chr3L 47    53     34           0.30
+ chr3R 55    69      9           0.36
+  chrX 66    41      0           0.26
+
+tiles above 15, in order:
+
+   chr      cM   Mb  wald
+ chr2L   40-41 0.31  26.5
+ chr2L   41-42 0.33  25.6
+ chr2L   42-43 0.36  19.1
+ chr2L   43-44 0.36  26.5
+ chr2L   44-45 0.38  30.5
+ chr2L   45-46 0.41  18.5
+ chr2L   49-50 0.70  23.6
+ chr2L   50-51 0.74  23.5
+ chr2R   68-69 0.38  17.4
+ chr2R   69-70 0.33  19.9
+ chr2R   70-71 0.30  17.1
+ chr2R 103-104 0.50  16.1
+ chr3L   19-20 0.28  16.6
+ chr3L   20-21 0.26  20.5
+ chr3L   21-22 0.24  19.9
+ chr3L   22-23 0.23  19.8
+ chr3L   24-25 0.23  27.7
+ chr3L   25-26 0.24  58.9
+ chr3L   26-27 0.24 102.3
+ chr3L   27-28 0.24 156.9
+ chr3L   28-29 0.24 163.8
+ chr3L   29-30 0.24 105.3
+ chr3L   30-31 0.24  64.1
+ chr3L   31-32 0.24  45.0
+ chr3L   32-33 0.26  25.6
+ chr3L   44-45 1.71  27.5
+ chr3L   45-46 1.42  33.6
+ chr3L   46-47 3.31  33.9
+ chr3R 47.3-48 3.40  37.6
+ chr3R   48-49 1.98  39.6
+ chr3R   49-50 1.00  24.7
+ chr3R   50-51 0.80  22.7
+ chr3R   51-52 0.72  23.3
