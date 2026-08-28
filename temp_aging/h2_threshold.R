@@ -32,35 +32,39 @@ keep <- w %>% group_by(chr, tile) %>% summarise(f = mean(is_eu), .groups = "drop
   filter(f > 0) %>% select(chr, tile)
 w <- w %>% semi_join(keep, by = c("chr", "tile")) %>% filter(is_eu)
 
-cat("h2 at a given Wald, per trait (spline of h2 on log Wald, over windows)\n")
-cat("and the fraction of 1 cM TILES whose strongest window exceeds it\n\n")
-res <- map_dfr(sort(unique(w$trt)), function(t) {
-  z <- w %>% filter(trt == t) %>% mutate(lw = log(Wald_log10p))
-  m <- gam(Cutl_H2 ~ s(lw), data = z)
-  p <- as.numeric(predict(m, newdata = tibble(lw = log(c(2, 5, 7.5, 10, 15)))))
-  tl <- z %>% group_by(chr, tile) %>%
-    summarise(h2 = max(Cutl_H2), wald = max(Wald_log10p), .groups = "drop")
+# The floor and the cutoffs, both on 1 cM tiles. The floor is the flat average
+# over tiles whose Wald never reaches 2; the cutoffs are a smooth fit of tile h2
+# on log(tile Wald) read off at 7.5 and 15. Same object, estimated the same way,
+# so the three numbers are comparable.
+#
+# This is NOT a conversion. h2 and Wald are correlated but not monotone -- within
+# a trait Spearman is 0.69-0.79, and among windows at Wald 7-8 the h2 runs 0.78
+# to 1.35 between the 10th and 90th percentiles. These are averages through wide
+# scatter: the h2 a tile at that significance carries on average, not the h2 that
+# significance implies.
+tl <- w %>% mutate(trt = paste0(sugar, "_", sex)) %>%
+  group_by(trt, chr, tile) %>%
+  summarise(h2 = max(Cutl_H2), wald = max(Wald_log10p), .groups = "drop")
+
+cat("h2 on 1 cM tiles: the floor, and the value at each cutoff\n\n")
+res <- map_dfr(sort(unique(tl$trt)), function(t) {
+  z <- tl %>% filter(trt == t) %>% mutate(lw = log(pmax(wald, 0.01)))
+  m <- gam(h2 ~ s(lw), data = z)
+  p <- as.numeric(predict(m, newdata = tibble(lw = log(c(7.5, 15)))))
   tibble(trait = t,
-         `h2 @W2` = round(p[1], 2), `h2 @W5` = round(p[2], 2),
-         `h2 @W7.5` = round(p[3], 2), `h2 @W10` = round(p[4], 2),
-         `h2 @W15` = round(p[5], 2),
-         `% tiles > h2(W5)`   = round(100 * mean(tl$h2 > p[2]), 1),
-         `% tiles > h2(W7.5)` = round(100 * mean(tl$h2 > p[3]), 1),
-         `% tiles > h2(W15)`  = round(100 * mean(tl$h2 > p[5]), 1))
+         `floor (Wald<2)` = round(mean(z$h2[z$wald < 2]), 2),
+         `n tiles` = sum(z$wald < 2),
+         `at 7.5` = round(p[1], 2), `at 15` = round(p[2], 2),
+         `% tiles > 7.5` = round(100 * mean(z$wald > 7.5), 1),
+         `% tiles > 15`  = round(100 * mean(z$wald > 15), 1))
 })
 as.data.frame(res) %>% print(row.names = FALSE)
-for (th in c("5", "7.5", "15")) {
-  h <- res[[paste0("h2 @W", th)]]; f <- res[[paste0("% tiles > h2(W", th, ")")]]
-  cat(sprintf("\n  Wald %-4s -> h2 %.2f-%.2f%%;  %.0f-%.0f%% of tiles exceed it\n",
-              th, min(h), max(h), min(f), max(f)))
-}
-
-cat("\nfloor: h2 at tiles whose own Wald stays below 2\n\n")
-w %>% group_by(chr, tile, trt) %>%
-  summarise(h2 = max(Cutl_H2), wald = max(Wald_log10p), .groups = "drop") %>%
-  filter(wald < 2) %>% group_by(trt) %>%
-  summarise(tiles = n(), `median h2` = round(median(h2), 2), .groups = "drop") %>%
-  as.data.frame() %>% print(row.names = FALSE)
+cat(sprintf("\n  averaged over the four traits:  floor %.2f   at 7.5 %.2f   at 15 %.2f\n",
+            mean(res$`floor (Wald<2)`), mean(res$`at 7.5`), mean(res$`at 15`)))
+cat(sprintf("  ranges: %.2f-%.2f, %.2f-%.2f, %.2f-%.2f\n",
+            min(res$`floor (Wald<2)`), max(res$`floor (Wald<2)`),
+            min(res$`at 7.5`), max(res$`at 7.5`),
+            min(res$`at 15`), max(res$`at 15`)))
 
 cat("\nh2 at the peaks in Table S1, per trait\n\n")
 PK <- tribble(~chr, ~Mb,

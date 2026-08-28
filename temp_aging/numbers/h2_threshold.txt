@@ -1,36 +1,19 @@
 # h2_threshold.R
-# run:    2026-08-28 12:50
+# run:    2026-08-28 14:59
 # script: 6a1e444
 # reads:
 #   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.5M  2026-08-20 15:46  md5:dabab56e
 #
-h2 at a given Wald, per trait (spline of h2 on log Wald, over windows)
-and the fraction of 1 cM TILES whose strongest window exceeds it
+h2 on 1 cM tiles: the floor, and the value at each cutoff
 
-  trait h2 @W2 h2 @W5 h2 @W7.5 h2 @W10 h2 @W15 % tiles > h2(W5)
- SY10_F   0.59   0.80     0.89    0.97    1.17             29.1
- SY10_M   0.74   0.84     1.03    1.18    1.35             49.3
- SY20_F   0.60   0.84     0.93    0.97    1.05             29.1
- SY20_M   0.66   0.88     0.99    1.06    1.17             42.2
- % tiles > h2(W7.5) % tiles > h2(W15)
-               20.5               5.6
-               32.5              16.0
-               20.9              16.0
-               30.6              22.8
+  trait floor (Wald<2) n tiles at 7.5 at 15 % tiles > 7.5 % tiles > 15
+ SY10_F           0.60     142   0.93  1.22          14.9          5.2
+ SY10_M           0.71      65   1.05  1.49          23.9          7.5
+ SY20_F           0.64     127   0.99  1.21          17.9          7.1
+ SY20_M           0.76      86   1.03  1.32          16.4          7.8
 
-  Wald 5    -> h2 0.80-0.88%;  29-49% of tiles exceed it
-
-  Wald 7.5  -> h2 0.89-1.03%;  20-32% of tiles exceed it
-
-  Wald 15   -> h2 1.05-1.35%;  6-23% of tiles exceed it
-
-floor: h2 at tiles whose own Wald stays below 2
-
-    trt tiles median h2
- SY10_F   142      0.60
- SY10_M    65      0.62
- SY20_F   127      0.62
- SY20_M    86      0.66
+  averaged over the four traits:  floor 0.68   at 7.5 1.00   at 15 1.31
+  ranges: 0.60-0.76, 0.93-1.05, 1.21-1.49
 
 h2 at the peaks in Table S1, per trait
 
