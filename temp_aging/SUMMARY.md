@@ -1,3 +1,5 @@
+> **SUPERSEDED — do not quote.** Written 13 August 2026 against 12 replicates, 75 kb windows and a Wald threshold of 5. The analysis now uses 10 replicates (8 and 9 dropped), 268 one cM tiles, and thresholds of 7.5 and 15. See MANIFEST.md and results_para1-4.md.
+
 # AGE_SY — partitioning heritability into shared, sex and diet components
 
 Working notes for the aging dataset: what we are asking, how the numbers in

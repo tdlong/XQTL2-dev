@@ -1,3 +1,5 @@
+> **SUPERSEDED — do not quote.** Written 13 August 2026 against 12 replicates, 75 kb windows and a Wald threshold of 5. The analysis now uses 10 replicates (8 and 9 dropped), 268 one cM tiles, and thresholds of 7.5 and 15. See MANIFEST.md and results_para1-4.md.
+
 # Methods
 
 **Design.** Lifespan selection on a synthetic outbred population from 8 inbred

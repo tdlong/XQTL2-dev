@@ -1,84 +1,131 @@
-# temp_aging — what is here and where it came from
+# temp_aging — what is here, and what it rests on
 
-AGE_SY lifespan XQTL: figures, the numbers in them, and the scripts that produce
-both. Written so that no file in this folder has to be reverse-engineered.
+AGE_SY lifespan XQTL: the Results prose, the figures, and the scripts that
+produce every number in both. Written so nothing here has to be
+reverse-engineered.
 
-**Read this first.** Every number currently in the prose comes from the
-**12-replicate** dataset (replicates 1–12). The current dataset is the
-**10-replicate** one (replicates 8 and 9 dropped — they are the May 2023 cage,
-see `helpfiles/AGE_2024/population_assignment.txt`). Only `make_figure1.R` and
-`make_figure2.R` can produce it; every other script and every prose file is still
-12-replicate. Status is marked per file below.
+## The dataset
 
-## The data these read
+**Ten replicates.** Replicates 8 and 9 are dropped throughout — they are the May
+2023 source cage, the rest are November 2023
+(`helpfiles/AGE_2024/population_assignment.txt`). Dropping the pair keeps the
+odd/even split balanced at 5 and 5. Every file used here has `no89` in its name;
+the 12-replicate files still exist on disk and nothing current reads them.
 
-Nothing here computes haplotype frequencies or scans; all of that is on HPC3.
-Five files are fetched by scp and everything below reads them.
+    process/AGE_SY/AGE_SY_4scan_no89.txt.gz              the four scans
+    process/AGE_SY/AGE_SY_4snpscan_no89.txt.gz           the four SNP scans
+    process/AGE_SY/AGE_SY_zoom_means.txt.gz              founder freqs at 7 peaks
+    process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz   odd/even halves
 
-| file | made by | what it is |
-|---|---|---|
-| `process/AGE_SY/AGE_SY_4scan.txt.gz` | `make_4scan_df.R` on HPC3 | the four 12-replicate scans, one row per window × treatment |
-| `process/AGE_SY/AGE_SY_4scan_no89.txt.gz` | `scripts_oneoffs/AGE_SY/nov_only/gather.R` | the same at 10 replicates |
-| `process/AGE_SY_splithalf/AGE_SY_splithalf_H2.txt.gz` | `scripts_oneoffs/AGE_SY/splithalf/gather_splithalf_H2.R` | eight scans, 4 treatments × odd/even halves, 6+6 |
-| `process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz` | `nov_only/gather.R` | the same at 5+5 |
-| `process/AGE_SY/AGE_SY_zoom_means.txt.gz` | `make_zoom_means.R` on HPC3 | per-replicate founder frequencies, ±0.6 Mb around seven peaks |
+Produced on HPC3 by `scripts_oneoffs/AGE_SY/nov_only/` — `make_designs.R`,
+`run_scans.sh`, `run_snp_scans.sh` (both chain their own gather).
 
-Derived locally:
+## The unit
 
-| file | made by |
-|---|---|
-| `process/AGE_SY_splithalf/H2_varcomp_by_window.txt.gz` | `scripts_oneoffs/AGE_SY/splithalf/varcomp_H2.R` |
-| `…_no89.txt.gz` | the same, with both paths passed as arguments |
+**268 one cM tiles.** Each arm is cut at 0–1, 1–2, 2–3 cM from its own start. A
+tile is kept if any part of it is euchromatic by
+`pipeline/helpfiles/het_bounds.txt`; 270 tiles, 2 wholly heterochromatic dropped,
+5 straddling kept. Every genome-wide proportion in the prose is a proportion of
+these 268.
 
-## Figures
+**Thresholds are 7.5 and 15**, not 5 and 10. A tile counts as significant if some
+window in it reaches 7.5 in some treatment: 98 of 268, 37%. Above 15: 12%.
 
-| script | reads | writes | status |
-|---|---|---|---|
-| `make_figure1.R` | 4scan, splithalf H2, varcomp | `Figure1_plot.png`; `Figure1b_plot.png` with `no89` | **current** — takes a variant argument |
-| `make_figure2.R` | 4scan, zoom means | `Figure2_plot.png`; `Figure2b_plot.png` with `no89` | **current** — filters replicates 8, 9 locally |
+**Support intervals have nothing to do with tiles.** They are read physically off
+the scan — walk left and right from a peak while within 2 of it — and then
+converted to cM.
 
-Both are the only files here that handle the 10-replicate data.
+## The prose
 
-## Cluster extracts
+Signed off by Tony, in order. These are the current text.
 
-| script | runs on | writes | status |
-|---|---|---|---|
-| `make_4scan_df.R` | HPC3 | `AGE_SY_4scan.txt.gz` | 12-replicate only; the 10-replicate equivalent is `nov_only/gather.R` |
-| `make_zoom_means.R` | HPC3 | `AGE_SY_zoom_means.txt.gz` | **current** — extracts all replicates, so both variants use it |
+    results_para1.md    resolution and power; 268 tiles, 37% / 12%, Table S1
+    results_para2.md    heritability scale; floor 0.68%, 1.00% at 7.5, 1.31% at 15
+    results_para3.md    sex and diet; X vs autosome, the 15.3% / 1.6% partition
+    results_para4.md    the chr3L 9.30 Mb locus; founder B3
 
-## Analysis — each backs a specific claim
+Paragraph 5 onward is not written.
 
-All five print to stdout only; nothing is saved, so a number in the prose is
-reproduced by re-running the script. **All five are hardcoded to the
-12-replicate files.**
+## The scripts, and the numbers they own
 
-| script | reads | backs |
-|---|---|---|
-| `h2_threshold.R` | 4scan | the h²-at-Wald-5 table in `results_draft.md` — "windows above ~0.8% of phenotypic variance are significant" |
-| `scan_resolution.R` | 4scan | paragraph 1 of `results_draft.md` — the twelve peaks above −log10 P 15 and their 2-unit support intervals |
-| `significant_regions.R` | 4scan, splithalf H2 | paragraph 3 — the partition over significant tiles, and the male-vs-female medians by arm |
-| `partition_by_wald_rank.R` | splithalf H2 | **half-live.** Its *ratio* column (sex+diet as a share, 9.4% [5.9, 15.9]) is quoted in `results_draft.md` and is sound — numerator and denominator run over the same windows, so the fifteenfold window overlap cancels. Its *absolute* column, rescaling the genome to total 50%, is **withdrawn**: summing overlapping windows and rescaling to the quantity being estimated is circular. `results_draft.md` now states plainly that no genome-wide total is claimed. `SUMMARY.md` still carries the old table and contradicts it. |
+`run_numbers.sh` runs all five into `numbers/<script>.txt`, each with a header
+naming every input it read, that input's size, mtime and MD5, and the git commit
+of the script. **Any number quoted in the prose should be findable in one of
+those files.** If it is not, it is not sourced.
 
-## Prose
+    h2_threshold.R        the floor (tiles below Wald 2) and the fitted h2 at
+                          7.5 and 15. Not a conversion -- h2 and Wald are
+                          correlated but not monotone; these are averages
+                          through wide scatter.
+    scan_resolution.R     the tiling itself: 268 tiles, 264 cM, 122 Mb, and the
+                          proportion above each threshold.
+    peak_table.R          Table S1. Peaks top-down on the max across traits, 5 cM
+                          exclusion, split at 15. Also writes peak_table.txt.
+    significant_regions.R sex and diet over the 98 significant tiles. Each tile
+                          is taken at ONE window, its peak across the four
+                          treatments, so the eight split-half values describe the
+                          same position.
+    chr3L_peak.R          the 3L locus: the scan there, the founder shifts, and
+                          the founder frequencies in the unselected controls
+                          across the ten cages in order.
 
-| file | status |
-|---|---|
-| `METHODS.md` | mostly replicate-count agnostic — design, the Cutler estimator, the split-half error term, blocking. Needs the replicate counts changed and the rescaling paragraph cut. |
-| `results_draft.md` | three paragraphs plus the numbers behind them and a section on what is deliberately not claimed. All 12-replicate. |
-| `Figure1_legend.md` | Tony's wording. Numbers are 12-replicate. |
-| `Figure2_legend.md` | Tony's wording. Carries a flag that the seven loci are not the seven strongest — how they were chosen still needs stating. |
-| `SUMMARY.md` | the long write-up. Contains the withdrawn 50%-rescaled table. **Most stale of the six.** |
-| `FLOOR_PROBLEM.md` | about the pipeline's `Cutl_H2_bias` term, not about replicate count. Current, and worth reporting upstream to XQTL2. |
+### Two things that are easy to get wrong
 
-## archive/ — untracked
+**The error term is the split halves, not a floor.** Five odd and five even
+replicates give two independent h2 estimates of the same tile; half their squared
+difference is a pure error term, and it is subtracted from every component of the
+partition. The null-window floor in `h2_threshold.R` exists only because a single
+h2 estimate has nowhere else to get an error term.
 
-`pilot_AGE_2024/` the August 2024 pilot and the May/Nov cage follow-up.
-`superseded/` scripts replaced by better ones. Both have their own README.
+**The bias is not common to the four treatments.** `Cutl_H2_bias` is computed per
+pool per window from that pool's own lsei reconstruction error and the
+multinomial sampling of its own flies (XQTL2 #34). It runs 0.73 in SY10 females
+to 0.83 in SY20 males, tracking how many flies were selected and how well each
+pool reconstructs, so a sex contrast on raw h2 contains a sex difference in bias.
+It is subtracted per pool per window before anything is contrasted. Leaving it in
+halves every fraction in paragraph 3 (15.3% becomes 6.5%).
 
-## What has to happen for the 10-replicate dataset
+## The figures
 
-1. Give the five analysis scripts the same variant argument the figures have.
-2. Re-run them against `_no89` and renumber the prose. Known shifts: autosomal
-   sex 7.3 → 7.8%, diet 2.2 → 3.9%, chr3L peak 207.5 → 163.8.
-3. Cut the rescaled column from `partition_by_wald_rank.R` and from `SUMMARY.md`.
-4. Say in `Figure2_legend.md` how the seven loci were chosen.
+PNGs are gitignored repo-wide (`*.png`), so they are not in git and have to be
+regenerated. All read from `process/`; `make_figure3.R` scps its own input if it
+is absent.
+
+    make_figure1.R      3 panels. X_UNIT=cM gives the genetic axis as
+                        Figure1_cM_plot.png, concatenated by linkage group.
+    make_figure2.R      7 zoom cells plus a legend/control cell. DROP_REP c(8,9).
+    make_figure3.R      SNP scan, females and males, both diets overlaid, y split
+                        at 40, alpha a function of Wald.
+    make_figure_rr.R    cM/Mb with mean Wald overlaid; why the base of 3L and 3R
+                        is broad in Mb and not in cM.
+    make_zoom_means.R   RUN ON HPC3. Subsets the 257 MB meansBySample files down
+                        to 1.2 Mb around each of seven peaks.
+
+    Figure1_legend.md, Figure2_legend.md   Tony's text, verbatim. Do not append.
+
+## Superseded — do not quote
+
+Written 13 August against **12 replicates, 75 kb windows and a Wald threshold of
+5**. Every genome-wide proportion and every partition number in them is wrong for
+the current dataset. Each now carries a banner saying so.
+
+    results_draft.md    the old full draft; para1-4 above replace its first four
+    SUMMARY.md          working notes on the partition
+    METHODS.md          says 12 cages; needs rewriting to 10
+    FLOOR_PROBLEM.md    predates the split-half error term and the per-pool bias
+
+`archive/` holds the AGE_2024 pilot figures and superseded scripts. It is
+gitignored, so it exists only on this machine.
+
+## Open
+
+- Paragraph 5 onward not drafted.
+- `METHODS.md` still describes 12 cages, 75 kb tiles and threshold 5.
+- Whether Table S1 becomes a supplement is undecided.
+- The power claim in paragraph 2 — that a 1–2% locus would have gone undetected
+  in several hundred RILs — is asserted, not calculated. No design was named to
+  compute it against.
+- The chr3L support interval is **chr3L:9,280,000–9,335,000**, 55 kb, 0.219 cM
+  (28.091–28.310). What genes are in it has not been checked. An earlier draft
+  named the PGRP complex; that name has never been verified against an
+  annotation and is not in any current file.
