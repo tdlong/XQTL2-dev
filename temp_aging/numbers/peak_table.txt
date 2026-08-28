@@ -1,19 +1,22 @@
 # peak_table.R
-# run:    2026-08-28 12:04
-# script: 
+# run:    2026-08-28 12:09
+# script: c33c3ca
 # reads:
 #   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.5M  2026-08-20 15:46  md5:dabab56e
 #
 # Well-separated peaks, AGE_SY 10-replicate dataset (replicates 8, 9 dropped)
 # peak       = tallest window, taken top-down over the max across the four traits
 # separated  = at least 5 cM from any stronger peak on the same arm
-# threshold  = -log10 P > 15
+# threshold  = -log10 P > 7.5 to appear; set A is > 15, set B is 7.5 to 15
 # interval   = walk left/right from the peak while within 2 of it; physical,
 #              then converted to cM
 # peak_trait = which treatment is highest AT the peak window
 # SY10_F ... = every treatment's -log10 P at that same window
 # source     = process/AGE_SY/AGE_SY_4scan_no89.txt.gz
 #
+
+A: > 15
+
    chr    Mb    cM  peak_trait peak_wald SY10_F SY20_F SY10_M SY20_M int_cM
  chr3L  9.30  28.2   SY20 male     163.8   36.1   61.1  109.4  163.8   0.22
  chr3R  8.63  48.2 SY10 female      39.6   39.6   28.5   23.2   22.2   0.28
@@ -33,5 +36,51 @@
     280       13.71     13.99
     260       23.93     24.20
 
-8 peaks. interval: median 0.39 cM, range 0.16-2.28; 55 kb to 1.49 Mb
+B: 7.5 - 15
+
+   chr    Mb   cM  peak_trait peak_wald SY10_F SY20_F SY10_M SY20_M int_cM
+  chrX 10.08 30.0   SY10 male      14.7    1.4    0.3   14.7    4.9   0.65
+ chr2R 16.54 79.0 SY20 female      14.3    9.4   14.3    2.3    3.2   0.72
+ chr2L  1.23  3.8 SY10 female      14.1   14.1    8.3    6.1    6.4   0.96
+ chr3R 21.09 70.4 SY20 female      13.3    6.0   13.3    0.2    1.3   0.78
+ chr2R 18.14 84.0   SY20 male      12.0    1.3    6.3    7.0   12.0   0.69
+ chr2R 22.12 98.2   SY20 male      11.9    0.5    0.1    8.0   11.9   0.73
+ chr3R 14.64 55.5   SY10 male      11.4    1.7    0.5   11.4    4.4   0.26
+ chr2R 11.69 64.6   SY10 male      10.1    1.4    2.9   10.1    5.0   0.45
+ chr3R 22.40 75.4 SY20 female       9.7    7.6    9.7    2.6    2.2   1.18
+  chrX 15.15 50.5   SY10 male       9.7    1.7    1.5    9.7    8.8   0.61
+  chrX  6.86 17.6   SY10 male       9.6    1.7    0.7    9.6    0.9   0.67
+ chr3R 23.69 80.4   SY10 male       8.6    5.0    6.2    8.6    7.1   3.50
+  chrX  3.98  6.2   SY10 male       8.5    0.8    1.2    8.5    3.7   1.53
+  chrX 21.80 65.1   SY20 male       7.7    1.4    1.5    7.4    7.7   1.30
+  chrX 13.01 41.3   SY10 male       7.6    0.4    0.8    7.6    3.1   1.54
+ int_kb int_from_Mb int_to_Mb
+    175        9.98     10.16
+    205       16.45     16.66
+    450        0.96      1.42
+    245       21.00     21.25
+    255       18.00     18.26
+    240       22.02     22.25
+    140       14.60     14.73
+    220       11.66     11.88
+    275       22.22     22.50
+    165       15.10     15.26
+    215        6.76      6.98
+    955       22.95     23.91
+    365        3.77      4.13
+   1145       20.82     21.96
+    355       12.85     13.20
+
+
+SUMMARY
+
+         set peaks median cM  cM range median kb kb range
+     A: > 15     8      0.39 0.16-2.28       270  55-1485
+ B: 7.5 - 15    15      0.73 0.26-3.50       245 140-1145
+
+traits represented:
+
+         set SY10 female SY10 male SY20 female SY20 male
+     A: > 15           1         3           3         1
+ B: 7.5 - 15           1         8           3         3
 wrote temp_aging/peak_table.txt 

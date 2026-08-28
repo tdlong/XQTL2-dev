@@ -17,13 +17,15 @@
 # EXCL is a choice, not a property of the data, and it sets how many peaks there
 # are. It is written into the output so the number can never be quoted without it.
 #
+# Two sets, same procedure, split by peak height: above 15, and 7.5 to 15.
 # Writes temp_aging/peak_table.txt (and prints it).
 
 suppressMessages(library(tidyverse))
 
 SCAN   <- "process/AGE_SY/AGE_SY_4scan_no89.txt.gz"
 OUT    <- "temp_aging/peak_table.txt"
-THRESH <- 15      # -log10 P a peak must exceed
+THRESH <- 7.5     # -log10 P a peak must exceed to enter the table at all
+STRONG <- 15      # peaks above this are the primary set; 7.5-15 the secondary
 EXCL   <- 5       # cM excluded either side of a peak before looking for the next
 DROP   <- 2       # -log10 P drop defining the support interval
 
@@ -66,25 +68,38 @@ tab <- pk %>% pmap_dfr(function(chr, pos, cM, wald, trait) {
          int_cM = round(y$cM[up] - y$cM[lo], 2),
          int_kb = round((y$pos[up] - y$pos[lo]) / 1e3),
          int_from_Mb = round(y$pos[lo]/1e6, 2), int_to_Mb = round(y$pos[up]/1e6, 2))
-}) %>% arrange(desc(peak_wald))
+}) %>% arrange(desc(peak_wald)) %>%
+  mutate(set = ifelse(peak_wald > STRONG, "A: > 15", "B: 7.5 - 15"))
 
 hdr <- sprintf(paste0(
   "# Well-separated peaks, AGE_SY 10-replicate dataset (replicates 8, 9 dropped)\n",
   "# peak       = tallest window, taken top-down over the max across the four traits\n",
   "# separated  = at least %g cM from any stronger peak on the same arm\n",
-  "# threshold  = -log10 P > %g\n",
+  "# threshold  = -log10 P > %g to appear; set A is > %g, set B is %g to %g\n",
   "# interval   = walk left/right from the peak while within %g of it; physical,\n",
   "#              then converted to cM\n",
   "# peak_trait = which treatment is highest AT the peak window\n",
   "# SY10_F ... = every treatment's -log10 P at that same window\n",
-  "# source     = %s\n#\n"), EXCL, THRESH, DROP, SCAN)
+  "# source     = %s\n#\n"), EXCL, THRESH, STRONG, THRESH, STRONG, DROP, SCAN)
 con <- file(OUT, "w"); writeLines(hdr, con)
 suppressWarnings(write.table(tab, con, sep = "\t", quote = FALSE, row.names = FALSE))
 close(con)
 
 cat(hdr)
-as.data.frame(tab) %>% print(row.names = FALSE)
-cat(sprintf("\n%d peaks. interval: median %.2f cM, range %.2f-%.2f; %.0f kb to %.2f Mb\n",
-            nrow(tab), median(tab$int_cM), min(tab$int_cM), max(tab$int_cM),
-            min(tab$int_kb), max(tab$int_kb)/1e3))
+for (g in sort(unique(tab$set))) {
+  cat("\n", g, "\n\n", sep = "")
+  tab %>% filter(set == g) %>% select(-set) %>% as.data.frame() %>%
+    print(row.names = FALSE)
+}
+cat("\n\nSUMMARY\n\n")
+tab %>% group_by(set) %>%
+  summarise(peaks = n(),
+            `median cM` = round(median(int_cM), 2),
+            `cM range` = sprintf("%.2f-%.2f", min(int_cM), max(int_cM)),
+            `median kb` = round(median(int_kb)),
+            `kb range` = sprintf("%.0f-%.0f", min(int_kb), max(int_kb)),
+            .groups = "drop") %>% as.data.frame() %>% print(row.names = FALSE)
+cat("\ntraits represented:\n\n")
+tab %>% count(set, peak_trait) %>% pivot_wider(names_from = peak_trait,
+       values_from = n, values_fill = 0) %>% as.data.frame() %>% print(row.names = FALSE)
 cat("wrote", OUT, "\n")
