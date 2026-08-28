@@ -116,13 +116,15 @@ for (v in c("int_cM", "int_kb")) {
               v, median(A[[v]]), nrow(A), median(B[[v]]), nrow(B), wt$p.value))
 }
 
-set.seed(1)
-cat("\npooled over all 23 peaks -- mean with an 80% bootstrap CI\n")
-cat("(bootstrap rather than t, because the widths are right-skewed)\n\n")
+cat("\npooled over all 23 peaks -- the interval widths themselves, as quantiles\n")
+cat("(the 10th and 90th percentiles of the observed widths: 80% of peaks lie\n")
+cat(" between them. Not a CI on a mean -- the widths are right-skewed and a mean\n")
+cat(" describes them poorly.)\n\n")
 for (v in c("int_cM", "int_kb")) {
-  x  <- tab[[v]]
-  bs <- replicate(20000, mean(sample(x, length(x), TRUE)))
-  ci <- quantile(bs, c(0.10, 0.90))
-  cat(sprintf("  %-7s  mean %7.2f  80%% CI [%.2f, %.2f]   median %7.2f\n",
-              v, mean(x), ci[1], ci[2], median(x)))
+  x <- sort(tab[[v]])
+  q <- quantile(x, c(0.10, 0.25, 0.50, 0.75, 0.90), type = 7)
+  cat(sprintf("  %-7s  10%% %7.2f   25%% %7.2f   median %7.2f   75%% %7.2f   90%% %7.2f\n",
+              v, q[1], q[2], q[3], q[4], q[5]))
 }
+cat("\n  n = ", nrow(tab), " peaks, so the 10th and 90th rest on the 2nd and 21st\n",
+    "  ordered values -- read them as description, not estimation.\n", sep = "")

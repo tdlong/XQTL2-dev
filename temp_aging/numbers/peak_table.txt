@@ -1,6 +1,6 @@
 # peak_table.R
-# run:    2026-08-28 12:22
-# script: eab92cb
+# run:    2026-08-28 12:24
+# script: 8f83d47
 # reads:
 #   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.5M  2026-08-20 15:46  md5:dabab56e
 #
@@ -92,8 +92,13 @@ Wilcoxon rank-sum, two-sided; widths are skewed so ranks rather than t
   int_cM   A median    0.39 (n=8)   B median    0.73 (n=15)   P = 0.047
   int_kb   A median  270.00 (n=8)   B median  245.00 (n=15)   P = 0.601
 
-pooled over all 23 peaks -- mean with an 80% bootstrap CI
-(bootstrap rather than t, because the widths are right-skewed)
+pooled over all 23 peaks -- the interval widths themselves, as quantiles
+(the 10th and 90th percentiles of the observed widths: 80% of peaks lie
+ between them. Not a CI on a mean -- the widths are right-skewed and a mean
+ describes them poorly.)
 
-  int_cM   mean    0.90  80% CI [0.71, 1.10]   median    0.69
-  int_kb   mean  401.30  80% CI [310.43, 499.35]   median  255.00
+  int_cM   10%    0.26   25%    0.46   median    0.69   75%    1.07   90%    1.54
+  int_kb   10%  167.00   25%  210.00   median  255.00   75%  407.50   90%  919.00
+
+  n = 23 peaks, so the 10th and 90th rest on the 2nd and 21st
+  ordered values -- read them as description, not estimation.
