@@ -1,5 +1,5 @@
 # scan_resolution.R
-# run:    2026-08-28 12:46
+# run:    2026-08-28 12:50
 # script: db157c0
 # reads:
 #   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.5M  2026-08-20 15:46  md5:dabab56e
@@ -13,10 +13,11 @@ fraction of tiles whose strongest window exceeds a threshold
 (max over the four treatments)
 
  threshold   n % of tiles
-         5 151       56.3
-        10  61       22.8
-        15  32       11.9
-        20  24        9.0
+       5.0 151       56.3
+       7.5  98       36.6
+      10.0  61       22.8
+      15.0  32       11.9
+      20.0  24        9.0
 
 tile size in Mb -- the reason a physical tile is the wrong unit
 

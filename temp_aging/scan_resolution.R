@@ -55,7 +55,7 @@ cat(sprintf("%d tiles kept, spanning %d cM and %.0f Mb\n\n",
 
 cat("fraction of tiles whose strongest window exceeds a threshold\n")
 cat("(max over the four treatments)\n\n")
-map_dfr(c(5, 10, 15, 20), function(th)
+map_dfr(c(5, 7.5, 10, 15, 20), function(th)
   tibble(threshold = th, n = sum(tl$wald > th),
          `% of tiles` = round(100 * mean(tl$wald > th), 1))) %>%
   as.data.frame() %>% print(row.names = FALSE)
