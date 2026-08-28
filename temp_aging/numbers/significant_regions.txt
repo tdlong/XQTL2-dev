@@ -1,44 +1,23 @@
 # significant_regions.R
-# run:    2026-08-28 15:25
-# script: e76a62e
+# run:    2026-08-28 15:30
+# script: e992fb6
 # reads:
 #   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.5M  2026-08-20 15:46  md5:dabab56e
 #   process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz     9.3M  2026-08-20 15:47  md5:87da32c5
 #
 268 tiles of 1 cM; 98 reach -log10 P 7.5 in some treatment (37%)
 
-male vs female h2 in significant tiles, by arm (floor removed):
+male vs female h2 in significant tiles, by arm:
 
-   chr tiles med M med F med M/F M>F at
- chr2L    18  0.63  0.14    3.41    83%
- chr2R    26  0.25  0.36    0.45    50%
- chr3L    18  1.14  0.69    1.70    78%
- chr3R    21  0.15  0.36    0.36    10%
-  chrX    15  0.79  0.04   15.35   100%
+   chr tiles med M med F M>F at
+ chr2L    18  1.19  0.70    78%
+ chr2R    26  0.82  0.94    50%
+ chr3L    18  1.71  1.26    78%
+ chr3R    21  0.71  0.93    10%
+  chrX    15  1.36  0.63   100%
 
-same with the floor left in:
+partition over significant tiles, % of the four-treatment sum of squares.
+95% intervals from 2000 bootstraps over 4 cM groups of tiles.
 
-   chr tiles med M med F med M/F M>F at
- chr2L    18  1.19  0.70    1.75    78%
- chr2R    26  0.82  0.94    1.00    50%
- chr3L    18  1.71  1.26    1.51    78%
- chr3R    21  0.71  0.93    0.75    10%
-  chrX    15  1.36  0.63    2.14   100%
-
-partition over significant tiles (% of the four-treatment sum of squares):
-  floor removed  all         98 tiles   main  83.0  sex  15.8  diet  1.6  int  -0.4
-  floor removed  autosomes   83 tiles   main  85.6  sex  13.0  diet  1.7  int  -0.3
-  floor left in  all         98 tiles   main  93.0  sex   6.5  diet  0.7  int  -0.1
-  floor left in  autosomes   83 tiles   main  93.9  sex   5.5  diet  0.7  int  -0.1
-
-  ^ these do NOT agree, and the reason is arithmetic, not biology. Removing the
-    floor subtracts about the same amount from all four treatments, so it shrinks
-    main (8*mean^2, quadratic in the mean) far more than it shrinks any contrast,
-    which is a difference between treatments and barely moves. The sex sum of
-    squares is nearly the same either way; the denominator is not. So the share
-    is a share OF THE h2 ABOVE THE FLOOR, and has to be said that way.
-
-95% intervals, 2000 bootstraps over 4 cM groups of tiles (floor removed):
-
-  all        sex 15.8 [10.9, 27.2]   diet  1.6 [ 0.7,  3.8]   int  -0.4 [ -0.8,  0.2]
-  autosomes  sex 13.0 [ 8.5, 21.1]   diet  1.7 [ 0.8,  4.5]   int  -0.3 [ -0.8,  0.4]
+  all         98 tiles   shared 93.0   sex  6.5 [ 4.2,  8.6]   diet  0.7 [0.3, 1.1]   int  -0.1 [ -0.3,  0.1]
+  autosomes   83 tiles   shared 93.9   sex  5.5 [ 3.0,  7.5]   diet  0.7 [0.3, 1.2]   int  -0.1 [ -0.3,  0.1]

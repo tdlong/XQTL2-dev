@@ -19,12 +19,20 @@
 # same window; taking a maximum separately in each of the eight would pick eight
 # different windows and inflate every difference between them.
 #
-# THE FLOOR. h2 is positive by construction, so a tile where nothing happened
-# still returns a value (0.68% genome-wide, h2_threshold.R). Here it is removed
-# tile by tile: an isotonic fit of h2 on the reported bias over windows whose
-# Wald stays below 2, evaluated at each tile's own bias. Everything is reported
-# both ways -- the floor sits under all four treatments equally, so it should
-# cancel out of a sex or diet contrast, and printing both is the check.
+# THE ERROR TERM comes from the split halves, not from a floor. The ten
+# replicates of a treatment are split into the five odd and the five even, giving
+# two independent h2 estimates of the same quantity; half their squared
+# difference estimates the sampling variance of one treatment mean. That is a
+# pure error term, and it is subtracted from every component below, so each is a
+# sum of squares with its own noise already taken out. Nothing here needs the
+# null-window floor of h2_threshold.R -- that exists because a single h2 estimate
+# has nowhere to get an error term from, and here there is one.
+#
+# The floor is still under the SHARED component: 8*mean^2 is quadratic in a mean
+# that carries the positive bias. It is not under the contrasts, which are
+# differences between treatments and cancel a bias common to all four. So the
+# sex and diet shares below are conservative -- the numerator is unbiased and the
+# denominator is not.
 
 suppressMessages(library(tidyverse))
 
@@ -56,34 +64,21 @@ cat(sprintf("%d tiles of %g cM; %d reach -log10 P %g in some treatment (%.0f%%)\
             nrow(pk), TILE, sum(pk$w > THR), THR, 100 * mean(pk$w > THR)))
 sig <- pk %>% filter(w > THR)
 
-# ── the floor ────────────────────────────────────────────────────────────────
-nullw <- l %>% group_by(chr, pos) %>%
-  summarise(H2 = mean(Cutl_H2), b = mean(Cutl_H2_bias),
-            wald = max(Wald_log10p), .groups = "drop") %>%
-  filter(wald < WNULL) %>% arrange(b)
-F_ <- approxfun(nullw$b, isoreg(nullw$b, nullw$H2)$yf, rule = 2)
-
 # eight values per significant tile, from its peak window
-cell <- function(drop_floor) {
-  l %>% inner_join(sig %>% select(chr, tile, pos), by = c("chr", "pos")) %>%
-    mutate(v = if (drop_floor) Cutl_H2 - F_(Cutl_H2_bias) else Cutl_H2) %>%
-    select(chr, tile, sugar, sex, half, v)
-}
+cell <- l %>% inner_join(sig %>% select(chr, tile, pos), by = c("chr", "pos")) %>%
+  select(chr, tile, sugar, sex, half, v = Cutl_H2)
 
 # ── male vs female, by arm ───────────────────────────────────────────────────
-by_arm <- function(drop_floor) {
-  cell(drop_floor) %>% group_by(chr, tile, sex) %>%
-    summarise(h2 = mean(v), .groups = "drop") %>%
-    pivot_wider(names_from = sex, values_from = h2) %>% group_by(chr) %>%
-    summarise(tiles = n(), `med M` = round(median(M), 2),
-              `med F` = round(median(F), 2),
-              `med M/F` = round(median(M / F), 2),
-              `M>F at` = sprintf("%.0f%%", 100 * mean(M > F)), .groups = "drop")
-}
-cat("male vs female h2 in significant tiles, by arm (floor removed):\n\n")
-by_arm(TRUE) %>% as.data.frame() %>% print(row.names = FALSE)
-cat("\nsame with the floor left in:\n\n")
-by_arm(FALSE) %>% as.data.frame() %>% print(row.names = FALSE)
+cat("male vs female h2 in significant tiles, by arm:
+
+")
+cell %>% group_by(chr, tile, sex) %>%
+  summarise(h2 = mean(v), .groups = "drop") %>%
+  pivot_wider(names_from = sex, values_from = h2) %>% group_by(chr) %>%
+  summarise(tiles = n(), `med M` = round(median(M), 2),
+            `med F` = round(median(F), 2),
+            `M>F at` = sprintf("%.0f%%", 100 * mean(M > F)), .groups = "drop") %>%
+  as.data.frame() %>% print(row.names = FALSE)
 
 # ── the partition ────────────────────────────────────────────────────────────
 # Split halves give the error term: the odd-replicate and even-replicate h2 for
@@ -91,8 +86,8 @@ by_arm(FALSE) %>% as.data.frame() %>% print(row.names = FALSE)
 # the noise in a single treatment mean. Each named term is a sum of squares with
 # that noise subtracted, which is what makes "no detectable interaction" mean
 # something rather than being an artifact of squaring.
-run <- function(drop_floor, lab) {
-  w <- cell(drop_floor) %>%
+terms <- function() {
+  w <- cell %>%
     pivot_wider(names_from = c(sugar, sex, half), values_from = v) %>% drop_na() %>%
     transmute(chr, tile, a = (SY10_F_odd + SY10_F_even)/2, b = (SY20_F_odd + SY20_F_even)/2,
       cc = (SY10_M_odd + SY10_M_even)/2, dd = (SY20_M_odd + SY20_M_even)/2,
@@ -104,20 +99,11 @@ run <- function(drop_floor, lab) {
       diet = 4*((S10-y)^2 + (S20-y)^2) - msr,
       int = 2*((a-F2-S10+y)^2 + (b-F2-S20+y)^2 +
                (cc-M2-S10+y)^2 + (dd-M2-S20+y)^2) - msr)
-  s <- function(z) sum(z, na.rm = TRUE)
-  for (sc in c("all", "autosomes")) {
-    x <- if (sc == "autosomes") w %>% filter(chr != "chrX") else w
-    t <- s(x$main) + s(x$sex) + s(x$diet) + s(x$int)
-    cat(sprintf("  %-14s %-10s %3d tiles   main %5.1f  sex %5.1f  diet %4.1f  int %5.1f\n",
-        lab, sc, nrow(x), 100*s(x$main)/t, 100*s(x$sex)/t,
-        100*s(x$diet)/t, 100*s(x$int)/t))
-  }
-  invisible(w)
+  w
 }
-cat("\npartition over significant tiles (% of the four-treatment sum of squares):\n")
-w <- run(TRUE, "floor removed"); run(FALSE, "floor left in")
-cat('\n  ^ these do NOT agree, and the reason is arithmetic, not biology. Removing the\n    floor subtracts about the same amount from all four treatments, so it shrinks\n    main (8*mean^2, quadratic in the mean) far more than it shrinks any contrast,\n    which is a difference between treatments and barely moves. The sex sum of\n    squares is nearly the same either way; the denominator is not. So the share\n    is a share OF THE h2 ABOVE THE FLOOR, and has to be said that way.\n')
+w <- terms()
 
+# ── the partition, with an interval ──────────────────────────────────────────
 # ── interval on the shares ───────────────────────────────────────────────────
 # Resample 4 cM groups of tiles rather than tiles one at a time, since
 # neighbouring tiles can carry the same peak. The floor is held fixed: whether
@@ -133,10 +119,12 @@ boot_ci <- function(x, nb = 2000) {
   b <- t(replicate(nb, shares(x[unlist(ix[sample(u, length(u), TRUE)]), ])))
   apply(b, 2, quantile, c(.025, .975))
 }
-cat("\n95% intervals, 2000 bootstraps over 4 cM groups of tiles (floor removed):\n\n")
+cat("\npartition over significant tiles, % of the four-treatment sum of squares.\n")
+cat("95% intervals from 2000 bootstraps over 4 cM groups of tiles.\n\n")
 for (sc in c("all", "autosomes")) {
   x <- if (sc == "autosomes") w %>% filter(chr != "chrX") else w
   ci <- boot_ci(x); pt <- shares(x)
-  cat(sprintf("  %-10s sex %4.1f [%4.1f, %4.1f]   diet %4.1f [%4.1f, %4.1f]   int %5.1f [%5.1f, %4.1f]\n",
-      sc, pt[1], ci[1,1], ci[2,1], pt[2], ci[1,2], ci[2,2], pt[3], ci[1,3], ci[2,3]))
+  cat(sprintf("  %-10s %3d tiles   shared %4.1f   sex %4.1f [%4.1f, %4.1f]   diet %4.1f [%3.1f, %3.1f]   int %5.1f [%5.1f, %4.1f]\n",
+      sc, nrow(x), 100 - sum(pt),
+      pt[1], ci[1,1], ci[2,1], pt[2], ci[1,2], ci[2,2], pt[3], ci[1,3], ci[2,3]))
 }
