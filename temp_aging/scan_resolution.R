@@ -85,3 +85,40 @@ tl %>% filter(wald > 15) %>% arrange(chr, tile) %>%
   transmute(chr, cM = paste0(round(cM_lo,1), "-", round(cM_hi,1)),
             Mb = round(Mb, 2), wald = round(wald, 1)) %>%
   as.data.frame() %>% print(row.names = FALSE)
+
+# ── peak widths ──────────────────────────────────────────────────────────────
+# Well-separated peaks: take the tallest window, exclude +/-5 cM around it,
+# repeat. The exclusion is generous on purpose -- the point is to have peaks that
+# cannot be shoulders of each other, not to count loci.
+cat("\n\nWELL-SEPARATED PEAKS above -log10 P = 15 (euchromatin, +/-5 cM exclusion)\n")
+cat("interval = the span within 2 -log10 P of the peak\n\n")
+allw <- w %>% filter(is_eu) %>% group_by(chr, pos, cM) %>%
+  summarise(wald = max(Wald_log10p), .groups = "drop") %>% arrange(chr, pos)
+pk <- list(); x <- allw
+while (nrow(x) && max(x$wald) > 15) {
+  p <- x[which.max(x$wald), ]; pk[[length(pk) + 1]] <- p
+  x <- x %>% filter(!(chr == p$chr & abs(cM - p$cM) <= 5))
+}
+pk <- bind_rows(pk)
+int <- pk %>% pmap_dfr(function(chr, pos, cM, wald) {
+  y <- allw %>% filter(chr == !!chr) %>% arrange(pos); k <- which(y$pos == pos)
+  hi <- wald - 2
+  lo <- k; while (lo > 1  && y$wald[lo - 1] > hi) lo <- lo - 1
+  up <- k; while (up < nrow(y) && y$wald[up + 1] > hi) up <- up + 1
+  tibble(chr, Mb = round(pos/1e6, 2), wald = round(wald, 1),
+         cM_width = round(y$cM[up] - y$cM[lo], 2),
+         kb_width = round((y$pos[up] - y$pos[lo]) / 1e3))
+})
+as.data.frame(int) %>% print(row.names = FALSE)
+cat(sprintf("\n  %d peaks;  cM width median %.2f, range %.2f-%.2f\n",
+            nrow(int), median(int$cM_width), min(int$cM_width), max(int$cM_width)))
+o <- sort(int$cM_width)
+cat(sprintf("  %d of %d between %.2f and %.2f cM\n",
+            nrow(int) - 1, nrow(int), o[1], o[nrow(int) - 1]))
+cat(sprintf("  physical width %.0f kb to %.2f Mb\n",
+            min(int$kb_width), max(int$kb_width) / 1e3))
+
+cat("\nchr3L 9.3 Mb by treatment:\n\n")
+w %>% filter(chr == "chr3L", abs(pos/1e6 - 9.30) < 0.03) %>%
+  group_by(sugar, sex) %>% summarise(wald = round(max(Wald_log10p), 1), .groups = "drop") %>%
+  as.data.frame() %>% print(row.names = FALSE)

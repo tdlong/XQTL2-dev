@@ -1,6 +1,6 @@
 # scan_resolution.R
-# run:    2026-08-28 10:32
-# script: 75b8dbe
+# run:    2026-08-28 10:36
+# script: 6d2ea69
 # reads:
 #   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.5M  2026-08-20 15:46  md5:dabab56e
 #
@@ -76,3 +76,29 @@ tiles above 15, in order:
  chr3R   49.2-50.2 0.95  23.4
  chr3R   50.2-51.2 0.78  23.3
  chr3R   51.2-52.2 0.71  22.9
+
+
+WELL-SEPARATED PEAKS above -log10 P = 15 (euchromatin, +/-5 cM exclusion)
+interval = the span within 2 -log10 P of the peak
+
+   chr    Mb  wald cM_width kb_width
+ chr3L  9.30 163.8     0.22       55
+ chr3R  8.63  39.6     0.28      775
+ chr3L 21.62  33.9     0.16     1485
+ chr2L 11.95  30.5     0.47      180
+ chr2L 14.85  23.6     0.31      220
+ chr3L  7.43  20.5     2.28      570
+ chr2R 13.88  19.9     0.83      280
+ chr2R 24.08  16.1     0.54      260
+
+  8 peaks;  cM width median 0.39, range 0.16-2.28
+  7 of 8 between 0.16 and 0.83 cM
+  physical width 55 kb to 1.49 Mb
+
+chr3L 9.3 Mb by treatment:
+
+ sugar sex  wald
+  SY10   F  36.2
+  SY10   M 109.6
+  SY20   F  61.1
+  SY20   M 163.8
