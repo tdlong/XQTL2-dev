@@ -41,10 +41,11 @@ A_MIN <- 0.02; A_MAX <- 0.9; A_SAT <- 20
 
 CHRS   <- c("chrX", "chr2L", "chr2R", "chr3L", "chr3R")
 CHRLAB <- c(chrX = "X", chr2L = "2L", chr2R = "2R", chr3L = "3L", chr3R = "3R")
-# dm6 euchromatin boundaries (Huynh et al. 2023 PLoS Genet 19:e1010439, Table S2)
-HET <- tribble(~chr, ~eu_start, ~eu_end,
-  "chrX", 2.5, 21.2, "chr2L", 0.5, 22.9, "chr2R", 1.3, 25.1,
-  "chr3L", 0.7, 24.0, "chr3R", 4.5, 32.0)
+# Euchromatin boundaries: read from the pipeline rather than hardcoded. These
+# define the grey bands in the figures; the analysis scripts also use them to
+# restrict to euchromatin.
+HET <- read.table("pipeline/helpfiles/het_bounds.txt", header = TRUE,
+                  comment.char = "#") %>% as_tibble()
 
 # Figure 1's colours
 TRT_LEV <- c("SY10 female", "SY20 female", "SY10 male", "SY20 male")

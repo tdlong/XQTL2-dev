@@ -34,9 +34,11 @@ W_IN <- 7.5; H_IN <- 3.0; DPI <- 300
 
 CHRS   <- c("chrX", "chr2L", "chr2R", "chr3L", "chr3R")
 CHRLAB <- c(chrX = "X", chr2L = "2L", chr2R = "2R", chr3L = "3L", chr3R = "3R")
-HET <- tribble(~chr, ~eu_start, ~eu_end,
-  "chrX", 2.5, 21.2, "chr2L", 0.5, 22.9, "chr2R", 1.3, 25.1,
-  "chr3L", 0.7, 24.0, "chr3R", 4.5, 32.0)
+# Euchromatin boundaries: read from the pipeline rather than hardcoded. These
+# define the grey bands in the figures; the analysis scripts also use them to
+# restrict to euchromatin.
+HET <- read.table("pipeline/helpfiles/het_bounds.txt", header = TRUE,
+                  comment.char = "#") %>% as_tibble()
 
 # ── axis extents taken from the scan, so this overlays Figures 1 and 3 ───────
 sc <- read.table(SCAN, header = TRUE, sep = "\t") %>% as_tibble() %>%

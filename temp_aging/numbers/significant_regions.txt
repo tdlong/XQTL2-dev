@@ -1,34 +1,34 @@
 # significant_regions.R
-# run:    2026-08-21 09:33
+# run:    2026-08-28 10:24
 # script: 8a1dc71
 # reads:
 #   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.5M  2026-08-20 15:46  md5:dabab56e
 #   process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz     9.3M  2026-08-20 15:47  md5:87da32c5
 #
-euchromatic tiles: 1537, of which Wald>5 in some character: 766 (50%)
+euchromatic tiles: 1496, of which Wald>5 in some character: 757 (51%)
 
 partition over SIGNIFICANT tiles only (%):
-  floor removed      all        main  85.2  sex  11.5  diet  3.5  int  -0.2
-  floor removed      autosomes  main  86.6  sex   9.9  diet  3.7  int  -0.1
-  floor left in      all        main  95.0  sex   3.9  diet  1.2  int  -0.1
-  floor left in      autosomes  main  95.4  sex   3.4  diet  1.3  int  -0.0
+  floor removed      all        main  84.8  sex  12.0  diet  3.4  int  -0.2
+  floor removed      autosomes  main  86.3  sex  10.2  diet  3.6  int  -0.1
+  floor left in      all        main  94.9  sex   4.0  diet  1.1  int  -0.1
+  floor left in      autosomes  main  95.3  sex   3.5  diet  1.2  int  -0.0
 
   ^ if these two agree, the floor is irrelevant here, which is the point
 
 male vs female h2 in significant tiles, by arm (floor removed):
 
    chr tiles med M med F   M/F M>F at
- chr2L   169  0.31  0.04  7.70    87%
- chr2R   146  0.21  0.26  0.81    60%
- chr3L   175  0.99  0.57  1.75    88%
- chr3R   224  0.22  0.40  0.54    19%
-  chrX    52  0.68  0.02 30.32   100%
+ chr2L   174  0.31  0.04  7.57    84%
+ chr2R   135  0.23  0.25  0.93    61%
+ chr3L   162  0.84  0.43  1.96    87%
+ chr3R   223  0.22  0.39  0.55    19%
+  chrX    63  0.64  0.03 24.00   100%
 
 same, floor NOT removed (raw), to show it does not matter here:
 
    chr M>F at
- chr2L    87%
- chr2R    60%
- chr3L    88%
+ chr2L    85%
+ chr2R    61%
+ chr3L    87%
  chr3R    19%
   chrX   100%

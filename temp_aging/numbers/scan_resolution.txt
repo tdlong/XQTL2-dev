@@ -1,30 +1,35 @@
 # scan_resolution.R
-# run:    2026-08-21 09:33
-# script: 8a1dc71
+# run:    2026-08-28 10:24
+# script: c6835db
 # reads:
 #   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.5M  2026-08-20 15:46  md5:dabab56e
 #
-fraction of the EUCHROMATIC genome above a threshold (max over 4 scans)
-  -log10P >  5 : 50.0%
-  -log10P > 10 : 25.6%
-  -log10P > 15 : 18.3%
-  -log10P > 20 : 15.1%
+EUCHROMATIC GENOME ABOVE A THRESHOLD -- by cM and, for contrast, by Mb
+(max over the four treatments; 1493 non-overlapping tiles, 267 cM, 112 Mb)
 
-same, within a single scan
- sugar sex   >5  >10  >15
-  SY10   F 24.5 15.0 12.2
-  SY10   M 36.4 18.8 14.6
-  SY20   F 25.6 15.4 11.4
-  SY20   M 29.0 16.0 14.1
+ threshold % of cM % of Mb
+         5    42.8    50.8
+        10    16.2    25.0
+        15    10.0    17.8
 
-distinct euchromatic peaks above 15, +/-5 cM exclusion: 8
+PEAKS: top-down, excluding +/-5 cM around each, euchromatin, Wald > 15
 
-   chr    Mb  wald 2-unit drop kb 2-unit cM half-max kb half-max cM
- chr3L  9.30 163.8             55      0.22         750        2.99
- chr3R  8.63  39.6            775      0.28        9530        2.77
- chr3L 21.62  33.9           1485      0.16        9625        2.71
- chr2L 11.95  30.5            180      0.47         625        1.62
- chr2L 14.85  23.6            220      0.31        1595        2.24
- chr2R 25.10  20.6            110      0.14        1770        3.39
- chr3L  7.43  20.5            570      2.28         815        3.23
- chr2R 13.88  19.9            280      0.83        1235        3.30
+   chr    Mb  wald cM_width kb_width
+ chr3L  9.30 163.8     0.22       55
+ chr3R  8.63  39.6     0.28      775
+ chr3L 21.62  33.9     0.16     1485
+ chr2L 11.95  30.5     0.47      180
+ chr2L 14.85  23.6     0.31      220
+ chr3L  7.43  20.5     2.28      570
+ chr2R 13.88  19.9     0.83      280
+ chr2R 24.08  16.1     0.54      260
+
+  n = 8 peaks;  cM width median 0.39, range 0.16-2.28
+  physical width range 55 kb to 1.49 Mb
+
+  chr3L peak: 163.8  (max over treatments)
+ sugar sex     w
+  SY10   F  36.2
+  SY10   M 109.6
+  SY20   F  61.1
+  SY20   M 163.8

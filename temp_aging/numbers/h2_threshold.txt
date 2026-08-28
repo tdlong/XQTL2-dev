@@ -1,23 +1,23 @@
 # h2_threshold.R
-# run:    2026-08-21 09:33
+# run:    2026-08-28 10:24
 # script: 8a1dc71
 # reads:
 #   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.5M  2026-08-20 15:46  md5:dabab56e
 #
  character windows h2 at Wald 2 h2 at Wald 5    se h2 at Wald 10
-    SY10_F    1537         0.59         0.80 0.008          0.97
-    SY20_F    1537         0.59         0.84 0.010          0.96
-    SY10_M    1537         0.74         0.82 0.011          1.17
-    SY20_M    1537         0.64         0.87 0.011          1.05
+    SY10_F    1496         0.59         0.80 0.008          0.97
+    SY20_F    1496         0.60         0.84 0.010          0.96
+    SY10_M    1496         0.74         0.84 0.012          1.18
+    SY20_M    1496         0.66         0.88 0.011          1.05
  % euchr above h2(Wald 5) % euchr Wald>5
-                     26.3           24.4
-                     24.6           25.5
-                     43.5           36.6
-                     33.5           28.8
+                     26.1           24.4
+                     24.3           25.0
+                     43.4           37.4
+                     34.0           29.7
 
 null windows (this character's own Wald < 2), for the floor:
     trt   n median h2 95th
- SY10_F 887      0.53 0.75
- SY10_M 468      0.57 1.18
- SY20_F 850      0.53 0.78
- SY20_M 633      0.57 1.11
+ SY10_F 861      0.53 0.75
+ SY10_M 465      0.57 1.18
+ SY20_F 824      0.54 0.79
+ SY20_M 593      0.58 1.14

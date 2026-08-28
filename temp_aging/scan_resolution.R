@@ -16,8 +16,11 @@
 # while the physical width tracks local recombination rate.
 
 suppressMessages(library(tidyverse))
-HET <- tribble(~chr,~eu_start,~eu_end,"chrX",2.5,21.2,"chr2L",0.5,22.9,
-               "chr2R",1.3,25.1,"chr3L",0.7,24.0,"chr3R",4.5,32.0)
+# Euchromatin boundaries: read from the pipeline rather than hardcoded. These
+# define the grey bands in the figures; the analysis scripts also use them to
+# restrict to euchromatin.
+HET <- read.table("pipeline/helpfiles/het_bounds.txt", header = TRUE,
+                  comment.char = "#") %>% as_tibble()
 d <- read.table("process/AGE_SY/AGE_SY_4scan_no89.txt.gz",header=TRUE,sep="\t") %>%
   as_tibble() %>% left_join(HET,by="chr") %>%
   filter(pos/1e6>=eu_start, pos/1e6<=eu_end)
