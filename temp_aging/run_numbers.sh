@@ -19,10 +19,10 @@ cd "$(dirname "$0")/.." || exit 1
 OUT=temp_aging/numbers
 mkdir -p "$OUT"
 
-SCRIPTS=(h2_threshold scan_resolution significant_regions peak_table chr3L_peak)
+SCRIPTS=(h2_threshold scan_resolution significant_regions peak_table chr3L_peak coverage)
 
 stamp_inputs() {   # script path -> lines describing each process/ file it reads
-  grep -ohE '"process/[^"]+\.txt\.gz"' "$1" | tr -d '"' | sort -u | while read -r f; do
+  grep -ohE '"process/[^"]+\.txt(\.gz)?"' "$1" | tr -d '"' | sort -u | while read -r f; do
     if [ -f "$f" ]; then
       printf '#   %-52s %8s  %s  md5:%s\n' "$f" \
         "$(du -h "$f" | cut -f1)" \
