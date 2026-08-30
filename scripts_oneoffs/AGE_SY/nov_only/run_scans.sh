@@ -1,8 +1,14 @@
 #!/bin/bash
-# run_scans.sh — the twelve AGE_SY scans without replicates 8 and 9.
+# run_scans.sh — the twelve AGE_SY scans without replicates 8 and 9, and
+# everything downstream of them.
 #
-# Run from the repo root on HPC3, after `git pull`:
+# ONE command, from the repo root on HPC3, after `git pull`:
 #   bash scripts_oneoffs/AGE_SY/nov_only/run_scans.sh
+#
+# It submits the twelve scans, then chains gather, the zoom means and
+# run_numbers on them with SLURM dependencies and returns. There is nothing to
+# run by hand afterwards and nothing to wait around for -- when the last job
+# clears, temp_aging/numbers/ and the three process/ files are current.
 #
 # Replicates 8 and 9 are the May 2023 cage; dropping them leaves a single-cage
 # experiment on 10 replicates, splitting evenly 5/5 into odd and even.
@@ -15,9 +21,6 @@
 # scripts_oneoffs/AGE_SY/splithalf/run_splithalf_scans.sh -- it must already be
 # there, and this script checks.
 #
-# Afterwards, on the cluster:
-#   Rscript scripts_oneoffs/AGE_SY/nov_only/gather.R
-# then fetch the two files it names.
 
 set -euo pipefail
 
@@ -49,11 +52,15 @@ Rscript scripts_oneoffs/AGE_SY/nov_only/make_designs.R
 
 echo
 echo "submitting ..."
+CONCAT_IDS=()
+
 submit() {   # name, dir, design, sex
   [ -f "$3" ] || { echo "ERROR: missing design $3" >&2; exit 1; }
-  local out; out=$(bash pipeline/scripts/run_scan.sh \
+  local out id; out=$(bash pipeline/scripts/run_scan.sh \
       --dir "$2" --scan "$1" --design "$3" --smooth "$SMOOTH" --sex "$4")
-  echo "   $(printf '%-26s' "$1") sex $4  concat $(jobid_from "$out")"
+  id=$(jobid_from "$out")
+  CONCAT_IDS+=("$id")
+  echo "   $(printf '%-26s' "$1") sex $4  concat $id"
 }
 
 for s in "${SCANS[@]}"; do
@@ -65,15 +72,53 @@ for s in "${SCANS[@]}"; do
   done
 done
 
+# ---------------------------------------------------------------------------
+# Everything downstream, chained on the twelve concat jobs. Nothing below needs
+# a human between steps, so it is submitted now and runs when the scans land.
+# ---------------------------------------------------------------------------
+DEP_SCANS="afterok:$(IFS=:; echo "${CONCAT_IDS[*]}")"
+SB="sbatch --parsable -A tdlong_lab -p standard"
+
+# gather: reads the twelve scan tables, writes the two the figures and the
+# numbers scripts read. 2 cores for 12 GB -- standard caps at 6 GB per core.
+JID_GATHER=$($SB --dependency="$DEP_SCANS" \
+    --job-name=age_gather --cpus-per-task=2 --mem-per-cpu=6G --time=02:00:00 \
+    --output=logs/age_gather_%j.out \
+    --wrap="module load R/4.2.2; Rscript scripts_oneoffs/AGE_SY/nov_only/gather.R")
+
+# zoom means: subsets four ~257 MB meansBySample files to 1.2 Mb around seven
+# peaks. Independent of gather, so it runs alongside. 3 cores for 18 GB.
+JID_ZOOM=$($SB --dependency="$DEP_SCANS" \
+    --job-name=age_zoom --cpus-per-task=3 --mem-per-cpu=6G --time=04:00:00 \
+    --output=logs/age_zoom_%j.out \
+    --wrap="module load R/4.2.2; Rscript temp_aging/make_zoom_means.R")
+
+# the numbers: needs gather's two files. Waits on zoom too, so that when this
+# finishes everything the manuscript reads is current.
+JID_NUMBERS=$($SB --dependency="afterok:${JID_GATHER}:${JID_ZOOM}" \
+    --job-name=age_numbers --cpus-per-task=2 --mem-per-cpu=6G --time=02:00:00 \
+    --output=logs/age_numbers_%j.out \
+    --wrap="module load R/4.2.2; bash temp_aging/run_numbers.sh")
+
 cat <<EOF
 
 ------------------------------------------------------------------
-12 scans submitted (4 x 10 reps, 8 x 5 reps). when they finish:
+submitted, chained end to end. nothing else to run.
 
-  Rscript scripts_oneoffs/AGE_SY/nov_only/gather.R
+  12 scans      ${CONCAT_IDS[0]} .. ${CONCAT_IDS[${#CONCAT_IDS[@]}-1]}
+  gather        $JID_GATHER   (after the scans)
+  zoom means    $JID_ZOOM   (after the scans, alongside gather)
+  numbers       $JID_NUMBERS   (after both)
 
-which writes two files to fetch:
-  $FULL_DIR/AGE_SY_4scan_no89.txt.gz
-  $HALF_DIR/AGE_SY_splithalf_H2_no89.txt.gz
+watch:    squeue -u \$USER
+logs:     logs/age_{gather,zoom,numbers}_<jobid>.out
+
+when $JID_NUMBERS finishes, temp_aging/numbers/ is current and these exist:
+  process/AGE_SY/AGE_SY_4scan_no89.txt.gz
+  process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz
+  process/AGE_SY/AGE_SY_zoom_means.txt.gz
+
+then, to bring it back:
+  git add temp_aging/numbers/ && git commit -m "numbers after the chrX sex fix" && git push
 ------------------------------------------------------------------
 EOF
