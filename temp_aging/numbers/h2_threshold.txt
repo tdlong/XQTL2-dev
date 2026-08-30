@@ -1,34 +1,34 @@
 # h2_threshold.R
-# run:    2026-08-30 10:33
-# script: b9bdaf2
+# run:    2026-08-30 11:26
+# script: fc13b14
 # pipeline: a98e3bb 2026-08-30 README: methods-section description of the H2 estim
 # reads:
-#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-29 23:19  md5:7d6b6877
+#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  3.5M  2026-08-30 11:25  md5:8ded8e73
 #
 h2 on 1 cM tiles: the floor, and the value at each cutoff
 
   trait floor (Wald<2) n tiles at 7.5 at 15 % tiles > 7.5 % tiles > 15
- SY10_F           0.59     127   0.93  1.22          14.9          5.2
- SY10_M           0.82      82   1.05  1.38          20.1          7.5
- SY20_F           0.62     115   0.99  1.21          18.3          7.1
- SY20_M           0.79      98   0.97  1.29          14.6          7.8
+ SY10_F           0.06     127   0.38  0.64          14.9          5.2
+ SY10_M           0.07      82   0.38  0.73          20.1          7.5
+ SY20_F           0.07     115   0.39  0.65          18.3          7.1
+ SY20_M           0.08      98   0.36  0.70          14.6          7.8
 
-  averaged over the four traits:  floor 0.70   at 7.5 0.98   at 15 1.27
-  ranges: 0.59-0.82, 0.93-1.05, 1.21-1.38
+  averaged over the four traits:  floor 0.07   at 7.5 0.38   at 15 0.68
+  ranges: 0.06-0.08, 0.36-0.39, 0.64-0.73
 
 h2 at the peaks in Table S1, per trait
 
         peak SY10_F SY10_M SY20_F SY20_M
-   chr3L 9.3   2.21   4.15   3.04   4.48
-  chr3R 8.63   2.30   1.53   1.34   1.43
- chr3L 21.62   1.55   1.89   1.04   1.49
- chr2L 11.95   0.82   2.17   0.79   2.07
- chr2L 14.85   1.12   2.23   0.97   1.46
-  chr3L 7.43   1.03   0.75   1.59   0.95
- chr2R 13.88   1.39   0.92   1.48   1.06
- chr2R 24.08   0.83   0.56   1.39   0.74
+   chr3L 9.3   1.53   3.58   2.10   4.69
+  chr3R 8.63   1.67   1.04   1.05   0.87
+ chr3L 21.62   1.07   1.42   0.72   0.95
+ chr2L 11.95   0.10   1.37   0.14   1.27
+ chr2L 14.85   0.54   1.10   0.05   0.66
+  chr3L 7.43   0.40   0.04   0.91   0.27
+ chr2R 13.88   0.86   0.51   0.85   0.49
+ chr2R 24.08   0.26  -0.03   0.59  -0.02
 
 distribution of tile h2 (max over the four traits)
 
  10%  25%  50%  75%  90% 100% 
-0.68 0.80 0.99 1.29 1.62 4.57 
+0.11 0.17 0.27 0.45 0.88 4.69 

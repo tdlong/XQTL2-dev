@@ -1,9 +1,9 @@
 # scan_resolution.R
-# run:    2026-08-30 10:33
+# run:    2026-08-30 11:26
 # script: a1690f2
 # pipeline: a98e3bb 2026-08-30 README: methods-section description of the H2 estim
 # reads:
-#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-29 23:19  md5:7d6b6877
+#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  3.5M  2026-08-30 11:25  md5:8ded8e73
 #
 270 tiles of 1 cM across the whole map; 2 lie wholly in
 heterochromatin and are dropped, 5 straddle a boundary and are kept.

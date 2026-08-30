@@ -1,9 +1,9 @@
 # peak_table.R
-# run:    2026-08-30 10:34
+# run:    2026-08-30 11:26
 # script: 74a824a
 # pipeline: a98e3bb 2026-08-30 README: methods-section description of the H2 estim
 # reads:
-#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-29 23:19  md5:7d6b6877
+#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  3.5M  2026-08-30 11:25  md5:8ded8e73
 #
 # Well-separated peaks, AGE_SY 10-replicate dataset (replicates 8, 9 dropped)
 # peak       = tallest window, taken top-down over the max across the four traits
