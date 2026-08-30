@@ -28,8 +28,9 @@ or more, in every founder; fixed for the reference allele in at least one founde
 and for the alternate in at least one other; and at least 20 bp from the nearest
 founder indel, a distance chosen from a threshold sweep on these data. Founder B5
 was exempted from these criteria on chromosome 2L, where its coverage is
-insufficient to evaluate them. The catalog comprises 1,207,436 SNPs from
-1,887,667 candidate positions.
+insufficient to evaluate them. Of 1,887,667 initial candidate positions,
+1,207,436 entered the catalog [[confirm against
+process/AGE_SY/Catalog/catalog.stats.txt]].
 
 Reference and alternate read counts for each pooled library were then taken
 directly from the pileup at each catalog position, giving the allele counts from
