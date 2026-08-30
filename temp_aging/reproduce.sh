@@ -170,6 +170,14 @@ if [ "$missing_r2" -eq 1 ]; then
   fail=1
 fi
 
+# 5b. can the partition run on h2_rep? Prints; run_numbers.sh captures it to
+#     numbers/partition_check.txt, which comes back through git. The point of
+#     doing it here is that the per-window per-half h2 is far too large to move,
+#     while the answer is a few dozen lines.
+if [ "$SCOPE" != main ]; then
+  step "partition check" Rscript temp_aging/partition_check.R
+fi
+
 # 6. every number quoted in the prose, each with its input provenance. Skipped
 #    under SCOPE=main: significant_regions.R reads the split-half file, so the
 #    numbers would mix new main scans with stale halves.
