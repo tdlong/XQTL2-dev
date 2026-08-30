@@ -86,6 +86,16 @@ JID_GATHER=$($SB --dependency="$DEP_SCANS" \
     --output=logs/age_gather_%j.out \
     --wrap="module load R/4.2.2; Rscript scripts_oneoffs/AGE_SY/nov_only/gather.R")
 
+# partition: the no89 variance components, Figure 1c. varcomp_H2.R defaults to
+# the TWELVE-replicate paths, so both arguments must be given or it rebuilds the
+# wrong file and Figure 1c keeps reading a stale one with no error (PIPELINE.md).
+JID_VARCOMP=$($SB --dependency="afterok:${JID_GATHER}" \
+    --job-name=age_varcomp --cpus-per-task=2 --mem-per-cpu=6G --time=01:00:00 \
+    --output=logs/age_varcomp_%j.out \
+    --wrap="module load R/4.2.2; Rscript scripts_oneoffs/AGE_SY/splithalf/varcomp_H2.R \
+        process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz \
+        process/AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz")
+
 # zoom means: subsets four ~257 MB meansBySample files to 1.2 Mb around seven
 # peaks. Independent of gather, so it runs alongside. 3 cores for 18 GB.
 JID_ZOOM=$($SB --dependency="$DEP_SCANS" \
@@ -107,6 +117,7 @@ submitted, chained end to end. nothing else to run.
 
   12 scans      ${CONCAT_IDS[0]} .. ${CONCAT_IDS[${#CONCAT_IDS[@]}-1]}
   gather        $JID_GATHER   (after the scans)
+  varcomp       $JID_VARCOMP   (after gather; Figure 1c)
   zoom means    $JID_ZOOM   (after the scans, alongside gather)
   numbers       $JID_NUMBERS   (after both)
 
@@ -117,6 +128,12 @@ when $JID_NUMBERS finishes, temp_aging/numbers/ is current and these exist:
   process/AGE_SY/AGE_SY_4scan_no89.txt.gz
   process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz
   process/AGE_SY/AGE_SY_zoom_means.txt.gz
+  process/AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz
+
+STILL TO RUN BY HAND -- the SNP scans are NOT chained here. They read the
+smoothed haplotypes these scans just rewrote, so they are now stale:
+
+  bash scripts_oneoffs/AGE_SY/nov_only/run_snp_scans.sh
 
 then, to bring it back:
   git add temp_aging/numbers/ && git commit -m "numbers after the chrX sex fix" && git push
