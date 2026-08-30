@@ -42,7 +42,7 @@ with $\hat{p}_f$ the mean control frequency and $s_f^2$ the variance of $e_{fr}$
 
 $$H^2 \approx \frac{100\,k}{n_{\mathrm{eff}}\, i^2}\; T$$
 
-with the constant fixed within a scan by the number of chromosomes sampled and the intensity of selection, and nothing else.
+with the constant fixed within a scan by the number of chromosomes sampled and the intensity of selection, and nothing else. This is the non-centrality parameter for the design: as in a genome-wide association study, where $\chi^2 \approx N \cdot 2p(1-p)\beta^2$ ties the test statistic to sample size and variance explained, the statistic here is the product of the number of chromosomes sequenced and the heritability of the window. The difference is that the effect reaches the data through truncation selection rather than through measured phenotypes, so the selection intensity enters as $i^2$, and that a multi-allelic locus contributes $\sum_f \Delta p_f^2/p_f$ rather than a single $2p(1-p)\beta^2$.
 
 This holds in the data. Over windows with $-\log_{10} P > 5$, the ratio $H^2/T$ is 0.0077 in autosomal females, 0.0076 in autosomal males and 0.0072 on the male X — one constant across arms and sexes, the male X included, where both $k$ and $n$ are halved and cancel. Taken the other way it predicts the heritability at a given significance threshold: $T = 48.3$ at $-\log_{10} P = 7.5$ on seven degrees of freedom gives 0.37%, against 0.38% observed, and $T = 85.6$ at $-\log_{10} P = 15$ gives 0.65% against 0.68%.
 
