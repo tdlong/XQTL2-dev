@@ -1,14 +1,3 @@
-> **NUMBERS PARTLY SUPERSEDED — 30 August 2026.** The Wald of 163.8 and the
-> "exceeds 36 in all four groups" move with the covariance repair, as does the
-> 55 kb / 0.22 cM support interval, which is read off the Wald. The variance
-> explained — 4.5% in high-sugar males, 2.2% in low-sugar females — comes from
-> the old h² estimator and is void; chr3L was 4.71 under the corrected estimator
-> before this last pipeline change. The founder frequency results are unaffected,
-> since they are frequencies rather than heritabilities: B3 at 15.1% in controls,
-> falling 6.3 to 10.3 points, and its flatness across the ten cages all stand.
-> Also: "low yeast females" should read low-sugar, and PGRP-LA has never been
-> checked against an annotation.
-
 A large-effect loci sits on top of the polygenic background. The peak on chromosome 3L at 9.30 Mb reaches a -log10 P of 163.8 in high-sugar males and exceeds 36 in all four groups, in a genome where only 12% of tiles exceed 15 in any group. It accounts for 4.5% of phenotypic variance in high-sugar males and 2.2% in low-sugar females, two to three times the largest of the other regions we detect. It is the most tightly localised of the peaks in Table S1, with a two -log10 P support interval of 55 kb or 0.22 cM. For this region the change in founder haplotype frequencies is dominated by founder B3 (Fig. 2d), whose frequency decrease in selected pools ranges from 6.3% in low yeast females to 10.3% in high sugar males. This is a much larger allele frequency change that is observed at any other peaks. There is no evidence that the haplotype at B3 is unconditionally deleterious as its change in frequency over time in the synthetic population we maintain is typical of other regions and founders (Fig. 2H). B3 represents a naturally occurring allele harboring a factor or factors contributing to poor representation in long lived individuals in both sexes and diets. The interval contains the upstream regulatory region of peptidoglycan recognition protein (PGRP-LA), part of a gene complex that is a component of innate immune signaling in Drosophila, a gene not previously identified as a candidate-gene nor in intervention studies of longevity.
 
 <!-- Tony's note, kept verbatim, not manuscript text:

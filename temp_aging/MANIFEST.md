@@ -43,7 +43,13 @@ converted to cM.
 
 ## The prose
 
-Signed off by Tony, in order. These are the current text.
+Tony's current text, stored clean with no annotations in the prose itself.
+
+**Every number in them predates the h2 and covariance fixes of 30 August
+(XQTL2 #40) and none should be quoted until the rerun lands.** The prose is
+current; the figures in it are not. `NUMBERS_TO_UPDATE.md` lists each quoted
+number, whether it survives, and which `numbers/` file replaces it -- including
+the two places where the argument rather than the value has to change.
 
     results_para1.md    resolution and power; 268 tiles, 37% / 12%, Table S1
     results_para2.md    heritability scale; floor 0.68%, 1.00% at 7.5, 1.31% at 15
