@@ -106,7 +106,7 @@ if (Sys.getenv("H2", "cutler") == "falconer") {
     if (!file.exists(f)) stop("missing ", f, "\nRun reproduce.sh on HPC3, then make_figures.sh.")
     read.table(f, header = TRUE, colClasses = c(sex = "character")) %>% as_tibble() %>%
       transmute(chr = CHROM, pos, sugar = str_extract(sc, "SY[12]0"),
-                sex = str_sub(sc, -1), h2_new = h2_vc, bias_new = h2_bias)
+                sex = str_sub(sc, -1), h2_new = h2_rep, bias_new = h2_bias)
   })
   # The Falconer bias carries a 1/C_f term, so where a founder sits at the lsei
   # floor it diverges -- p99 is 983 on chrX males, against an h2 scale where the
@@ -114,12 +114,14 @@ if (Sys.getenv("H2", "cutler") == "falconer") {
   # which does not just look wrong, it destroys the panel scales and bleeds
   # outside the plot. Those windows carry no information about h2 either way, so
   # they are masked to NA and the line breaks there (XQTL2 #40).
-  # h2_vc, not h2_corr: it fits tau2 per window by ML, so non-negativity is a
-  # boundary solution rather than a clamp. h2_corr is unbiased but unbounded
-  # below and came out negative at 85% of chrX windows (XQTL2 #40).
+  # h2_rep: replicates averaged before squaring, the correction measured from
+  # them as var/n rather than modelled, and the leading constant 100*k rather
+  # than a hardcoded 200 -- so a hemizygous male X is no longer credited with
+  # the additive variance of a diploid locus (XQTL2 #40, 2688cc1 and dd27b45).
+  # h2_vc and h2_corr are kept in the file and superseded.
   scans <- scans %>% inner_join(fal, by = c("chr", "pos", "sugar", "sex")) %>%
     mutate(h2 = h2_new)
-  cat(sprintf("panel B: variance-component h2 (h2_vc), %d windows; %.1f%% at zero\n",
+  cat(sprintf("panel B: replicate-averaged h2 (h2_rep), %d windows; %.1f%% at or below zero\n",
               nrow(scans), 100*mean(scans$h2 <= 0, na.rm = TRUE)))
   scans <- scans %>% select(-h2_new, -bias_new)
 } else {

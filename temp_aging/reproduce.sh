@@ -85,8 +85,10 @@ fail=0
 # variance partition and run_numbers, because both read the split-half file --
 # and pairing freshly rerun main scans with split halves from an older run is
 # exactly the kind of silent mixing that has bitten this project.
+# h2: only re-derive the heritability from the existing smoothed rds. Nothing
+# upstream changes when the h2 estimator does, so a rescan is not needed.
 SCOPE=${1:-main}
-case $SCOPE in main|all) ;; *) echo "usage: reproduce.sh [main|all]" >&2; exit 1 ;; esac
+case $SCOPE in main|all|h2) ;; *) echo "usage: reproduce.sh [main|all|h2]" >&2; exit 1 ;; esac
 echo "scope:    $SCOPE"
 echo "repo:     $(git log -1 --format=%h) $(git log -1 --format=%s | cut -c1-52)"
 echo "pipeline: $(git -C pipeline log -1 --format=%h 2>/dev/null) $(git -C pipeline log -1 --format=%s 2>/dev/null | cut -c1-52)"
@@ -104,7 +106,7 @@ step () {   # label, then the command
 }
 
 # 1. the two gathered tables: Wald/h2 for the 4 scans, and the 8 split halves
-step "gather" Rscript scripts_oneoffs/AGE_SY/nov_only/gather.R
+[ "$SCOPE" = h2 ] || step "gather" Rscript scripts_oneoffs/AGE_SY/nov_only/gather.R
 
 # 2. the variance partition behind Figure 1c. BOTH arguments are required --
 #    varcomp_H2.R defaults to the 12-replicate paths and will otherwise rebuild
@@ -119,7 +121,7 @@ else
 fi
 
 # 3. founder frequencies around the seven zoom peaks, from the means files
-step "zoom means" Rscript temp_aging/make_zoom_means.R
+[ "$SCOPE" = h2 ] || step "zoom means" Rscript temp_aging/make_zoom_means.R
 
 # 4. bias-corrected Falconer h2, one file per scan. The pipeline's own h2 columns
 #    are the uncorrected Cutler ones, whose bias term saturates against the
