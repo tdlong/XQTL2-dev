@@ -45,7 +45,12 @@ OUT       <- sprintf("temp_aging/Figure1%s%s_plot.png",
                      if (toupper(Sys.getenv("PANELS","ABC")) == "AB") "_AB" else "",
                      if (X_UNIT == "cM") "_cM" else "")
 W_IN <- 7.5; H_IN <- 6; DPI <- 300
-SMOOTH_BP_C <- 5e5             # rolling mean on panel C only
+# Extra smoothing on panel C, over and above the pipeline's own +/-100 kb. It
+# was needed when the partition was built on the old h2, whose error term was
+# large; with the corrected estimator ms_rep has a median of 0.013 and the terms
+# are clean, so the default is now off and C is comparable with B. Set
+# SMOOTH_C_KB to reinstate it.
+SMOOTH_BP_C <- as.numeric(Sys.getenv("SMOOTH_C_KB", "0")) * 1000
 YLIM_C <- c(-0.1, 1)
 
 CHRS   <- c("chrX", "chr2L", "chr2R", "chr3L", "chr3R")
@@ -301,8 +306,8 @@ pB <- split_panel(scans, "h2", "trt", TRT_COL, 1.75, c(0, 1.75), c(1.75, 5),
                   c(0, 0.5, 1.0, 1.5), c(2, 3, 4, 5),
                   expression(italic(h)^2), "B", lw = 0.28, xaxis = !want_C)
 pC <- if (!want_C) NULL else
-  split_panel(cmp, "y", "term", CMP_COL, 1.25, c(-0.25, 1.25), c(1.25, 2.9),
-                  c(-0.2, 0, 0.5, 1.0), c(1.5, 2, 2.5),
+  split_panel(cmp, "y", "term", CMP_COL, 1.25, c(-0.25, 1.25), c(1.25, 3.2),
+                  c(-0.2, 0, 0.5, 1.0), c(1.5, 2, 2.5, 3),
                   expression(italic(h)^2), "C", lw = 0.35, zero = TRUE, xaxis = TRUE)
 
 key <- function(lev, col) {
