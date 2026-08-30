@@ -29,7 +29,23 @@
 # fits in far less. See pipeline/Slurm.md -- standard caps at 6 GB per core.
 
 set -uo pipefail
-cd "$(dirname "$0")/.." || exit 1
+# Where the repo is. Under sbatch, $0 is SLURM's spool copy of this script, not
+# this file, so dirname "$0"/.. points somewhere unrelated and every Rscript
+# below fails with "cannot open file". SLURM_SUBMIT_DIR is the directory sbatch
+# was run from, which is the repo root.
+if [ -n "${SLURM_SUBMIT_DIR:-}" ]; then
+  cd "$SLURM_SUBMIT_DIR" || exit 1
+else
+  cd "$(dirname "$0")/.." || exit 1
+fi
+
+# Prove it, however we got here.
+if [ ! -f temp_aging/reproduce.sh ] || [ ! -d scripts_oneoffs/AGE_SY ]; then
+  echo "not at the repo root -- cwd is $(pwd)" >&2
+  echo "sbatch this from the repo root: cd /dfs7/adl/tdlong/fly_pool/XQTL2-dev" >&2
+  exit 1
+fi
+echo "repo: $(pwd)"
 
 # Refuse to run on a login node. This reads four ~257 MB files and takes
 # minutes; run interactively during the day it earns the lab a warning from
