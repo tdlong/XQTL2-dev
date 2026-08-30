@@ -41,7 +41,8 @@ FOURSCAN <- "process/AGE_SY/AGE_SY_4scan_no89.txt.gz"
 # width in cM is the thing that should be roughly constant; in Mb it tracks
 # recombination.
 X_UNIT    <- Sys.getenv("X_UNIT", "Mb")
-OUT       <- sprintf("temp_aging/Figure1%s_plot.png",
+OUT       <- sprintf("temp_aging/Figure1%s%s_plot.png",
+                     if (Sys.getenv("H2","cutler")=="falconer") "_falc" else "",
                      if (X_UNIT == "cM") "_cM" else "")
 W_IN <- 7.5; H_IN <- 6; DPI <- 300
 SMOOTH_BP_C <- 5e5             # rolling mean on panel C only
@@ -72,7 +73,7 @@ long <- read.table(LONG, header = TRUE, sep = "\t") %>% as_tibble()
 vc   <- read.table(VARCOMP, header = TRUE, sep = "\t") %>% as_tibble()
 
 scans <- if (file.exists(FOURSCAN)) {
-  cat("panels A/B: 12-replicate scans from", FOURSCAN, "\n")
+  cat("panels A/B:", basename(FOURSCAN), "\n")
   read.table(FOURSCAN, header = TRUE, sep = "\t") %>% as_tibble() %>%
     transmute(chr, pos, cM, sugar, sex, wald = Wald_log10p, h2 = Cutl_H2)
 } else {
@@ -83,6 +84,28 @@ scans <- if (file.exists(FOURSCAN)) {
     summarise(wald = mean(Wald_log10p), h2 = mean(Cutl_H2),
               cM = NA_real_, .groups = "drop")
 }
+# Panel B source. Default is the pipeline's Cutler h2, uncorrected. H2=falconer
+# swaps in the bias-corrected Falconer h2 from h2_from_scan.R (XQTL2 #40): the
+# Cutler bias saturates against the penetrance clamp and so under-corrects where
+# the variance is largest, which is the male X.
+if (Sys.getenv("H2", "cutler") == "falconer") {
+  fal <- map_dfr(c("SY10_F","SY20_F","SY10_M","SY20_M"), function(sc) {
+    f <- file.path("process/AGE_SY/Scans", paste0("AGE_", sc, "_no89"),
+                   paste0("AGE_", sc, "_no89.h2_falconer.txt"))
+    if (!file.exists(f)) stop("missing ", f, "\nRun reproduce.sh on HPC3, then make_figures.sh.")
+    read.table(f, header = TRUE, colClasses = c(sex = "character")) %>% as_tibble() %>%
+      transmute(chr = CHROM, pos, sugar = str_extract(sc, "SY[12]0"),
+                sex = str_sub(sc, -1), h2_new = h2_corr)
+  })
+  n0 <- nrow(scans)
+  scans <- scans %>% inner_join(fal, by = c("chr", "pos", "sugar", "sex")) %>%
+    mutate(h2 = h2_new) %>% select(-h2_new)
+  cat("panel B: bias-corrected Falconer h2 (", nrow(scans), " of ", n0,
+      " windows matched)\n", sep = "")
+} else {
+  cat("panel B: Cutler h2, uncorrected\n")
+}
+
 scans <- scans %>%
   mutate(trt = factor(paste0(sugar, " ", ifelse(sex == "F", "female", "male")),
                       levels = TRT_LEV))
