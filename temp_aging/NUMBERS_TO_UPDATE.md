@@ -41,21 +41,18 @@ hundred RILs — is now calculable rather than asserted. `H² ≈ 100k·T/(n_eff
 gives the number directly. For this design the 7.5 threshold sits at 0.38%.
 | "~25 thousand selected and control" | **wrong regardless**: 22,896 selected + 13,892 control = 36,788 |
 
-## Paragraph 3 — rewrite, not renumber
+## Paragraph 3 — numbers updated, dead claims removed
 
-The claim was the artefact. h2 squared within each replicate before averaging,
-and the leading constant assumed two allele copies per fly, wrong for a
-hemizygous male X. Corrected, male X h2 falls roughly fivefold and the X stops
-standing out — so "male heritability exceeds female at every one of the 15
-significant tiles on the X" has no basis, and the hemizygosity remark goes with
-it.
+Done. The X sentences went with the artefact they described: "male heritability
+exceeds female at every one of the 15 significant tiles on the X" became two
+tiles, which is not a finding, and the hemizygosity remark was the interpretation
+of the estimator bug. Both cut. The all-tiles and autosomes-only partitions are
+now the same number (13.2 vs 13.1), where the gap between them used to be the
+point, so they are stated together as evidence the X contributes nothing.
 
-Every number moves: 98 tiles, the 15 X tiles, 52% of 83, and the
-15.3% / 1.6% / −0.4% / 12.8% partition. The partition additionally had the old
-bias inside its shared component, so its fractions shift for reasons that are
-not biology — do not read the change as a result.
-
-What survives is the diet finding, which was never X-dependent.
+The paragraph's thesis is unaffected: sex-specific 13.2% against diet-specific
+1.8% still supports "architecture differs between the sexes but is largely
+invariant to diet". What it no longer has is an X story.
 
 ## Paragraph 4 — mostly intact, because most of it is frequencies
 

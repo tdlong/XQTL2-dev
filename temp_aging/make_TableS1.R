@@ -28,20 +28,18 @@ h2 <- pk %>% transmute(chr, pos = round(Mb * 1e6)) %>%
 
 ARMS <- c("chrX", "chr2L", "chr2R", "chr3L", "chr3R")
 
-tab <- pk %>%
+body <- pk %>%
   mutate(pos = round(Mb * 1e6)) %>%
   left_join(h2, by = c("chr", "pos")) %>%
-  # ordered by threshold set, then along the genome within each set
-  mutate(Set = if_else(grepl("^A", set), "-log10 P > 15", "-log10 P 7.5 to 15"),
-         .arm = factor(chr, levels = ARMS)) %>%
-  arrange(desc(grepl("^A", set)), .arm, Mb) %>%
+  mutate(.A = grepl("^A", set), .arm = factor(chr, levels = ARMS)) %>%
+  arrange(desc(.A), .arm, Mb) %>%
   transmute(
-    Set,
+    .A,
     Chromosome        = chr,
     `Position (Mb)`   = sprintf("%.2f", Mb),
     `Position (cM)`   = sprintf("%.1f", cM),
     `Interval (Mb)`   = sprintf("%.2f-%.2f", int_from_Mb, int_to_Mb),
-    `Width (kb)`      = int_kb,
+    `Width (kb)`      = as.character(int_kb),
     `Width (cM)`      = sprintf("%.2f", int_cM),
     `Peak treatment`  = peak_trait,
     `-log10P SY10 F`  = sprintf("%.1f", SY10_F),
@@ -53,8 +51,21 @@ tab <- pk %>%
     `h2 SY10 M`       = sprintf("%.2f", h2_SY10_M),
     `h2 SY20 M`       = sprintf("%.2f", h2_SY20_M))
 
+# a subtitle row: the label in the first column, the rest blank
+subtitle <- function(txt, template) {
+  r <- template[1, , drop = FALSE]
+  r[1, ] <- ""
+  r[1, 1] <- txt
+  r
+}
+cols <- setdiff(names(body), ".A")
+A <- body %>% filter(.A)  %>% select(all_of(cols))
+B <- body %>% filter(!.A) %>% select(all_of(cols))
+
+tab <- bind_rows(
+  subtitle(sprintf("Peaks exceeding -log10 P of 15 (n = %d)", nrow(A)), A), A,
+  subtitle(sprintf("Peaks between -log10 P of 7.5 and 15 (n = %d)", nrow(B)), B), B)
+
 write.table(tab, OUT, sep = "\t", quote = FALSE, row.names = FALSE)
-cat("wrote", OUT, "--", nrow(tab), "peaks:",
-    sum(tab$Set == "-log10 P > 15"), "above 15,",
-    sum(tab$Set != "-log10 P > 15"), "between 7.5 and 15\n\n")
+cat("wrote", OUT, "--", nrow(A), "peaks above 15,", nrow(B), "between 7.5 and 15\n\n")
 print(as.data.frame(tab), row.names = FALSE)
