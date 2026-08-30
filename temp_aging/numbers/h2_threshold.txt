@@ -1,8 +1,9 @@
 # h2_threshold.R
-# run:    2026-08-29 23:25
+# run:    2026-08-30 10:33
 # script: b9bdaf2
+# pipeline: a98e3bb 2026-08-30 README: methods-section description of the H2 estim
 # reads:
-#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  4.6M  2026-08-29 23:19  md5:7d6b6877
+#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-29 23:19  md5:7d6b6877
 #
 h2 on 1 cM tiles: the floor, and the value at each cutoff
 

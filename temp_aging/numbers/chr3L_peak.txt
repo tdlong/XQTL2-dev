@@ -1,9 +1,10 @@
 # chr3L_peak.R
-# run:    2026-08-29 23:26
+# run:    2026-08-30 10:34
 # script: 9dc45d7
+# pipeline: a98e3bb 2026-08-30 README: methods-section description of the H2 estim
 # reads:
 #   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-29 23:19  md5:7d6b6877
-#   process/AGE_SY/AGE_SY_zoom_means.txt.gz                  9.0M  2026-08-29 23:21  md5:154c5a7b
+#   process/AGE_SY/AGE_SY_zoom_means.txt.gz                   11M  2026-08-30 10:33  md5:154c5a7b
 #
 chr3L 9.30 Mb, 10 replicates
 

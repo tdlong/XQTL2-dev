@@ -1,6 +1,7 @@
 # significant_regions.R
-# run:    2026-08-29 23:26
+# run:    2026-08-30 10:33
 # script: f4b8ed9
+# pipeline: a98e3bb 2026-08-30 README: methods-section description of the H2 estim
 # reads:
 #   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-29 23:19  md5:7d6b6877
 #   process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz     9.2M  2026-08-29 23:19  md5:ebe41c68

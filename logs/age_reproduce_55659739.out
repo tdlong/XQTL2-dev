@@ -1,0 +1,182 @@
+using /opt/apps/R/4.2.2/bin/Rscript  [R version 4.2.2 (2022-10-31)]
+scope:    all
+repo:     2cf2bd2 reproduce logs
+pipeline: a98e3bb README: methods-section description of the H2 estima
+
+── gather ──────────────────────────────────────────────
+10-replicate scans:
+Error in `pmap()`:
+ℹ In index: 1.
+Caused by error in `transmute()`:
+ℹ In argument: `Cutl_H2`.
+Caused by error:
+! object 'Cutl_H2' not found
+Backtrace:
+     ▆
+  1. ├─cells %>% ...
+  2. ├─purrr::pmap_dfr(...)
+  3. │ └─purrr::pmap(.l, .f, ...)
+  4. │   └─purrr:::pmap_("list", .l, .f, ..., .progress = .progress)
+  5. │     ├─purrr:::with_indexed_errors(...)
+  6. │     │ └─base::withCallingHandlers(...)
+  7. │     ├─purrr:::call_with_cleanup(...)
+  8. │     └─.f(...)
+  9. │       └─d %>% ...
+ 10. ├─dplyr::transmute(...)
+ 11. ├─dplyr:::transmute.data.frame(...)
+ 12. │ └─dplyr:::mutate_cols(.data, dots, by)
+ 13. │   ├─base::withCallingHandlers(...)
+ 14. │   └─dplyr:::mutate_col(dots[[i]], data, mask, new_columns)
+ 15. │     └─mask$eval_all_mutate(quo)
+ 16. │       └─dplyr (local) eval()
+ 17. └─base::.handleSimpleError(...)
+ 18.   └─dplyr (local) h(simpleError(msg, call))
+ 19.     └─rlang::abort(message, class = error_class, parent = parent, call = error_call)
+Execution halted
+   FAILED: gather
+
+── variance partition ──────────────────────────────────────────────
+floor calibrated on 7270 Wald<2 windows: 0.50-0.64 (raw b was 0.10-6.69)
+Wrote: process/AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz 
+
+Variance partition of Cutler h2
+autosomes (headline)       main  87.9%  sex   8.3%  diet   4.1%  sex:diet  -0.3%  (n=20776)
+whole genome incl. X       main  85.6%  sex  11.2%  diet   3.6%  sex:diet  -0.4%  (n=24988)
+X only                     main  58.7%  sex  45.0%  diet  -1.7%  sex:diet  -2.0%  (n=4212)
+chr3L QTL 9.3-9.6 Mb       main  85.5%  sex  14.2%  diet   0.6%  sex:diet  -0.3%  (n=59)
+
+Below the replicate error at:
+  main       18.7% of windows
+  sex        30.9% of windows
+  diet       43.4% of windows
+  sex:diet   64.6% of windows
+
+Largest terms (h2 percentage points):
+  sexH2 
+   chr   Mb   H2 wald mainH2 sexH2 dietH2
+ chr3L 9.53 2.47 48.5   2.46 1.209  0.256
+ chr3L 9.52 2.49 49.3   2.48 1.209  0.256
+ chr3L 9.53 2.45 47.7   2.45 1.209  0.256
+  dietH2 
+   chr   Mb   H2 wald mainH2 sexH2 dietH2
+ chr3L 8.49 0.84 12.0   0.84 0.151  0.326
+ chr3L 8.50 0.85 12.2   0.85 0.157  0.326
+ chr3L 8.51 0.87 12.5   0.86 0.162  0.325
+   ok
+
+── zoom means ──────────────────────────────────────────────
+Wrote: process/AGE_SY/AGE_SY_zoom_means.txt.gz 
+  1295616 rows; 7 loci x 4 treatments x 8 founders x 2 TRT x 12 REP
+       locus   rows
+ chr2L:10.71 185088
+ chr2L:11.95 185088
+ chr2L:14.85 185088
+ chr2R:13.88 185088
+ chr2R:16.52 185088
+  chr3L:9.31 185088
+  chrX:10.09 185088
+   ok
+
+── h2: AGE_SY10_F_no89 ──────────────────────────────────────────────
+Fatal error: cannot open file 'pipeline/scripts/h2_from_scan.R': No such file or directory
+   FAILED: h2: AGE_SY10_F_no89
+
+── h2: AGE_SY20_F_no89 ──────────────────────────────────────────────
+Fatal error: cannot open file 'pipeline/scripts/h2_from_scan.R': No such file or directory
+   FAILED: h2: AGE_SY20_F_no89
+
+── h2: AGE_SY10_M_no89 ──────────────────────────────────────────────
+Fatal error: cannot open file 'pipeline/scripts/h2_from_scan.R': No such file or directory
+   FAILED: h2: AGE_SY10_M_no89
+
+── h2: AGE_SY20_M_no89 ──────────────────────────────────────────────
+Fatal error: cannot open file 'pipeline/scripts/h2_from_scan.R': No such file or directory
+   FAILED: h2: AGE_SY20_M_no89
+
+── h2: AGE_SY10_F_no89_odd ──────────────────────────────────────────────
+Fatal error: cannot open file 'pipeline/scripts/h2_from_scan.R': No such file or directory
+   FAILED: h2: AGE_SY10_F_no89_odd
+
+── h2: AGE_SY10_F_no89_even ──────────────────────────────────────────────
+Fatal error: cannot open file 'pipeline/scripts/h2_from_scan.R': No such file or directory
+   FAILED: h2: AGE_SY10_F_no89_even
+
+── h2: AGE_SY20_F_no89_odd ──────────────────────────────────────────────
+Fatal error: cannot open file 'pipeline/scripts/h2_from_scan.R': No such file or directory
+   FAILED: h2: AGE_SY20_F_no89_odd
+
+── h2: AGE_SY20_F_no89_even ──────────────────────────────────────────────
+Fatal error: cannot open file 'pipeline/scripts/h2_from_scan.R': No such file or directory
+   FAILED: h2: AGE_SY20_F_no89_even
+
+── h2: AGE_SY10_M_no89_odd ──────────────────────────────────────────────
+Fatal error: cannot open file 'pipeline/scripts/h2_from_scan.R': No such file or directory
+   FAILED: h2: AGE_SY10_M_no89_odd
+
+── h2: AGE_SY10_M_no89_even ──────────────────────────────────────────────
+Fatal error: cannot open file 'pipeline/scripts/h2_from_scan.R': No such file or directory
+   FAILED: h2: AGE_SY10_M_no89_even
+
+── h2: AGE_SY20_M_no89_odd ──────────────────────────────────────────────
+Fatal error: cannot open file 'pipeline/scripts/h2_from_scan.R': No such file or directory
+   FAILED: h2: AGE_SY20_M_no89_odd
+
+── h2: AGE_SY20_M_no89_even ──────────────────────────────────────────────
+Fatal error: cannot open file 'pipeline/scripts/h2_from_scan.R': No such file or directory
+   FAILED: h2: AGE_SY20_M_no89_even
+
+── R2 smoothing correction ──────────────────────────────────
+   AGE_SY10_F         R2 = 0.983351664666227
+   AGE_SY20_F         R2 = 0.983356235652753
+   AGE_SY10_M         R2 = 0.983750127875345
+   AGE_SY20_M         R2 = 0.984151688488713
+
+── partition check ──────────────────────────────────────────────
+   FAILED: partition check
+ℹ In argument: `!is.na(even)`.
+Caused by error:
+! object 'even' not found
+Backtrace:
+     ▆
+  1. ├─... %>% ...
+  2. ├─dplyr::mutate(...)
+  3. ├─dplyr::filter(., !is.na(odd), !is.na(even))
+  4. ├─dplyr:::filter.data.frame(., !is.na(odd), !is.na(even))
+  5. │ └─dplyr:::filter_rows(.data, dots, by)
+  6. │   └─dplyr:::filter_eval(dots, mask = mask, error_call = error_call)
+  7. │     ├─base::withCallingHandlers(...)
+  8. │     └─mask$eval_all_filter(dots, env_filter)
+  9. │       └─dplyr (local) eval()
+ 10. └─base::.handleSimpleError(`<fn>`, "object 'even' not found", base::quote(eval()))
+ 11.   └─dplyr (local) h(simpleError(msg, call))
+ 12.     └─rlang::abort(message, class = error_class, parent = parent, call = error_call)
+Execution halted
+
+── numbers ──────────────────────────────────────────────
+  h2_threshold.R             -> temp_aging/numbers/h2_threshold.txt
+  scan_resolution.R          -> temp_aging/numbers/scan_resolution.txt
+  significant_regions.R      -> temp_aging/numbers/significant_regions.txt
+  peak_table.R               -> temp_aging/numbers/peak_table.txt
+  chr3L_peak.R               -> temp_aging/numbers/chr3L_peak.txt
+  coverage.R                 -> temp_aging/numbers/coverage.txt
+  partition_check.R          -> temp_aging/numbers/partition_check.txt
+
+every number in the prose should be findable in one of these files.
+   ok
+
+════════════════════════════════════════════════════════
+SOMETHING FAILED -- see above. Do not trust the outputs.
+
+current:
+  process/AGE_SY/AGE_SY_4scan_no89.txt.gz                    2026-08-29 23:19
+  process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz   2026-08-29 23:19
+  process/AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz  2026-08-30 10:31
+  process/AGE_SY/AGE_SY_zoom_means.txt.gz                    2026-08-30 10:33
+  process/AGE_SY/Scans/AGE_SY20_M_no89/AGE_SY20_M_no89.h2_falconer.txt 2026-08-30 10:13
+
+NOT rebuilt here -- the SNP scan is imputed from the smoothed haplotype
+rds, so a new scan makes it stale. Resubmit it separately (no --sex: the
+chrX dosage is already in the Num it reads from the rds):
+  bash scripts_oneoffs/AGE_SY/nov_only/run_snp_scans.sh
+
+then: git add temp_aging/numbers/ temp_aging/peak_table.txt && git commit && git push

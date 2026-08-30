@@ -1,0 +1,18 @@
+RefAlt carries all 8 founder columns.
+submitting ...
+   AGE_SY10_F_no89        55661150
+   AGE_SY20_F_no89        55661152
+   AGE_SY10_M_no89        55661154
+   AGE_SY20_M_no89        55661156
+   gather                 55661157   (afterok on the four above)
+
+------------------------------------------------------------------
+4 SNP scans + the gather submitted (55661157).
+
+That is everything on the cluster. When 55661157 has finished, ONE command on your
+laptop, from the XQTL2-dev repo root -- it fetches the file itself:
+
+  Rscript temp_aging/make_figure3.R
+
+Gather log (row count and file size): logs/AGE_SY/snp_gather.out
+------------------------------------------------------------------
