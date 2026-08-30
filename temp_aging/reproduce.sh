@@ -9,8 +9,10 @@
 #
 # reproduce.sh — rebuild EVERY derived result from the scans on disk.
 #
-#   bash temp_aging/reproduce.sh          # now, in the foreground
-#   sbatch temp_aging/reproduce.sh        # or as a job
+#   sbatch temp_aging/reproduce.sh        # THIS. it takes minutes, not seconds.
+#
+# Not `bash` on the head node: the zoom step alone reads four ~257 MB files.
+# The SBATCH headers above are already set for it.
 #
 # RUN ON HPC3 from the repo root. process/ is not on the laptop.
 #

@@ -19,7 +19,7 @@ Every table, number and figure below is a function of those two. So the question
 that matters is not "what is each file" but "given a new scan, how do I rebuild
 everything". The answer is one command:
 
-    bash temp_aging/reproduce.sh        # on HPC3, from the repo root
+    sbatch temp_aging/reproduce.sh      # on HPC3, from the repo root
 
 It gathers, partitions, subsets the zoom peaks and reruns the numbers, in order,
 reporting which step failed rather than dying silently partway. It resubmits
