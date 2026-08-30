@@ -47,7 +47,30 @@ MSG
   echo "ALLOW_HEADNODE=1 set; continuing on $(hostname -s)." >&2
 fi
 
-module load R/4.2.2 2>/dev/null || true
+# Load R and prove it worked. In a batch job `module` may not be initialised the
+# way it is in a login shell, and hiding that behind `2>/dev/null || true` makes
+# every step below fail identically with no clue why.
+if ! command -v module >/dev/null 2>&1; then
+  for init in /opt/rcic/Modules/default/init/bash /usr/share/Modules/init/bash \
+              /etc/profile.d/modules.sh; do
+    [ -r "$init" ] && . "$init" && break
+  done
+fi
+module load R/4.2.2 || echo "module load R/4.2.2 failed" >&2
+
+if ! command -v Rscript >/dev/null 2>&1; then
+  cat >&2 <<MSG
+Rscript is not on PATH, so every step below would fail for that reason alone.
+
+  module list          # what is loaded
+  module avail R       # what R versions exist
+  which Rscript
+
+PATH=$PATH
+MSG
+  exit 1
+fi
+echo "using $(command -v Rscript)  [$(Rscript -e 'cat(R.version.string)' 2>&1 | head -1)]"
 
 SPLITHALF=process/AGE_SY_splithalf
 fail=0
