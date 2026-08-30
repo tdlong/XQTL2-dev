@@ -2,7 +2,7 @@
 #
 #   Rscript temp_aging/coverage.R
 #
-# RUN ON HPC3, from /dfs7/adl/tdlong/fly_pool/XQTL2-dev -- process/ lives there.
+# RUN ON HPC3, from the repo root -- process/ lives there.
 #
 #   Rscript pipeline/scripts/refalt_qc.R \
 #       --dir     process/AGE_SY \
@@ -12,12 +12,8 @@
 # The first writes process/AGE_SY/Calls/refalt_qc.txt (one row per sample per
 # chromosome, median REF+ALT over catalog sites); this reads it. Neither needs a
 # SLURM job -- refalt_qc.R reads the RefAlt tables once, coverage.R reads one
-# small table. To keep the output with the rest, run it through run_numbers.sh
-# instead and scp back numbers/coverage.txt, which is a few hundred bytes:
-#
-#   bash temp_aging/run_numbers.sh          # on HPC3
-#   scp tdlong@hpc3.rcic.uci.edu:/dfs7/adl/tdlong/fly_pool/XQTL2-dev/temp_aging/numbers/coverage.txt \
-#       temp_aging/numbers/
+# small table. Normally you do not run either by hand: reproduce.sh runs the
+# numbers, and they come back through git.
 #
 # The catalog and the counts were built on all 12 replicates. The scans use 10 --
 # 8 and 9 dropped as the May 2023 cage. This reports the 10 that are kept: 60
