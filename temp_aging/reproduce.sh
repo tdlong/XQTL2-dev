@@ -80,6 +80,15 @@ echo "using $(command -v Rscript)  [$(Rscript -e 'cat(R.version.string)' 2>&1 | 
 SPLITHALF=process/AGE_SY_splithalf
 fail=0
 
+# SCOPE main rebuilds only what the four main scans support: the gathered Wald
+# and h2 table, the zoom means, and the corrected h2. It deliberately skips the
+# variance partition and run_numbers, because both read the split-half file --
+# and pairing freshly rerun main scans with split halves from an older run is
+# exactly the kind of silent mixing that has bitten this project.
+SCOPE=${1:-main}
+case $SCOPE in main|all) ;; *) echo "usage: reproduce.sh [main|all]" >&2; exit 1 ;; esac
+echo "scope: $SCOPE"
+
 step () {   # label, then the command
   local label=$1; shift
   echo
@@ -98,10 +107,14 @@ step "gather" Rscript scripts_oneoffs/AGE_SY/nov_only/gather.R
 # 2. the variance partition behind Figure 1c. BOTH arguments are required --
 #    varcomp_H2.R defaults to the 12-replicate paths and will otherwise rebuild
 #    the wrong file, leaving Figure 1c on a stale one with no error.
+if [ "$SCOPE" = all ]; then
 step "variance partition" \
   Rscript scripts_oneoffs/AGE_SY/splithalf/varcomp_H2.R \
     "${SPLITHALF}/AGE_SY_splithalf_H2_no89.txt.gz" \
     "${SPLITHALF}/H2_varcomp_by_window_no89.txt.gz"
+else
+  echo; echo "── variance partition ── skipped (SCOPE=main; needs the split halves)"
+fi
 
 # 3. founder frequencies around the seven zoom peaks, from the means files
 step "zoom means" Rscript temp_aging/make_zoom_means.R
@@ -138,8 +151,14 @@ if [ "$missing_r2" -eq 1 ]; then
   fail=1
 fi
 
-# 6. every number quoted in the prose, each with its input provenance
-step "numbers" bash temp_aging/run_numbers.sh
+# 6. every number quoted in the prose, each with its input provenance. Skipped
+#    under SCOPE=main: significant_regions.R reads the split-half file, so the
+#    numbers would mix new main scans with stale halves.
+if [ "$SCOPE" = all ]; then
+  step "numbers" bash temp_aging/run_numbers.sh
+else
+  echo; echo "── numbers ── skipped (SCOPE=main; several read the split halves)"
+fi
 
 echo
 echo "════════════════════════════════════════════════════════"

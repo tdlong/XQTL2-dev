@@ -24,6 +24,20 @@
 
 set -euo pipefail
 
+# SCOPE. While the h2 estimator is being worked on, the only thing that carries
+# information is the four main scans -- panel B. The eight split halves feed
+# panel C and the partition; the SNP scan feeds Figure 3. Neither says anything
+# about whether an estimator works, and together they triple the compute.
+#
+#   bash .../run_scans.sh         4 scans, gather, zoom, h2      (iteration)
+#   bash .../run_scans.sh all     + 8 half-scans, partition,
+#                                   SNP scans, numbers           (before writing)
+SCOPE=${1:-main}
+case $SCOPE in
+  main|all) ;;
+  *) echo "usage: run_scans.sh [main|all]" >&2; exit 1 ;;
+esac
+
 SMOOTH=100                       # kb -- matches every other AGE_SY scan
 
 # Every AGE_SY pool is one cage x treatment x sex, so each scan is single sex and
@@ -66,11 +80,15 @@ submit() {   # name, dir, design, sex
 for s in "${SCANS[@]}"; do
   submit "${s}_no89" "$FULL_DIR" "$DESIGNS/${s}.no89.txt" "${s##*_}"
 done
-for s in "${SCANS[@]}"; do
-  for h in odd even; do
-    submit "${s}_no89_${h}" "$HALF_DIR" "$DESIGNS/${s}.no89.${h}.txt" "${s##*_}"
+if [ "$SCOPE" = all ]; then
+  for s in "${SCANS[@]}"; do
+    for h in odd even; do
+      submit "${s}_no89_${h}" "$HALF_DIR" "$DESIGNS/${s}.no89.${h}.txt" "${s##*_}"
+    done
   done
-done
+else
+  echo "   (split halves skipped -- SCOPE=main)"
+fi
 
 # ---------------------------------------------------------------------------
 # Everything downstream, chained on the twelve concat jobs. Nothing below needs
@@ -85,25 +103,29 @@ SB="sbatch --parsable -A tdlong_lab -p standard"
 JID_DERIVE=$($SB --dependency="$DEP_SCANS" \
     --job-name=age_reproduce --cpus-per-task=3 --mem-per-cpu=6G --time=06:00:00 \
     --output=logs/age_reproduce_%j.out \
-    --wrap="bash temp_aging/reproduce.sh")
+    --wrap="bash temp_aging/reproduce.sh $SCOPE")
 
 # The SNP scans read the smoothed haplotypes these scans rewrite, so they are
 # stale the moment the scans finish. They were a separate command anyone could
 # forget; submit them here instead. run_snp_scans.sh does its own submitting,
 # so this job exists only to run it once the scans are done.
-JID_SNP=$($SB --dependency="$DEP_SCANS" \
-    --job-name=age_snp_launch --cpus-per-task=1 --mem-per-cpu=6G --time=00:20:00 \
-    --output=logs/age_snp_launch_%j.out \
-    --wrap="bash scripts_oneoffs/AGE_SY/nov_only/run_snp_scans.sh")
+if [ "$SCOPE" = all ]; then
+  JID_SNP=$($SB --dependency="$DEP_SCANS" \
+      --job-name=age_snp_launch --cpus-per-task=1 --mem-per-cpu=6G --time=00:20:00 \
+      --output=logs/age_snp_launch_%j.out \
+      --wrap="bash scripts_oneoffs/AGE_SY/nov_only/run_snp_scans.sh")
+else
+  JID_SNP="skipped"
+fi
 
 cat <<EOF
 
 ------------------------------------------------------------------
 submitted, chained end to end. nothing else to run.
 
-  12 scans      ${CONCAT_IDS[0]} .. ${CONCAT_IDS[${#CONCAT_IDS[@]}-1]}
+  scope         $SCOPE (${#CONCAT_IDS[@]} scans)
   derive        $JID_DERIVE   (after the scans: gather, partition, zoom, h2, numbers)
-  snp scans     $JID_SNP   (after the scans; launches its own array + gather)
+  snp scans     $JID_SNP
 
 watch:    squeue -u \$USER
 log:      logs/age_reproduce_<jobid>.out
