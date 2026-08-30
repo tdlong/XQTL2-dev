@@ -7,12 +7,10 @@ Draft. `[[ ]]` marks facts not recorded in this repo.
 Genomic DNA from each pool — one cage, treatment and sex — was prepared into a
 Nextera library [[kit and catalogue number]] and sequenced paired-end
 [[2 × 150 bp]] on an Illumina NovaSeq X Plus at the University of California,
-Irvine Genomics Research and Technology Hub. Seventy-two libraries were
-sequenced: twelve replicate cages × three groups (unselected control, SY10
-selected, SY20 selected) × two sexes, over [[N]] runs. Libraries for replicates
-8 to 11 were sequenced on two runs and their alignments merged. Analyses use ten
-replicates; replicates 8 and 9 derive from a separate source cage and were
-excluded, leaving sixty libraries.
+Irvine Genomics Research and Technology Hub. Sixty libraries were analysed: ten
+replicate cages × three groups (unselected control, SY10 selected, SY20
+selected) × two sexes, over [[N]] runs. Libraries for replicates 10 and 11 were
+sequenced on two runs and their alignments merged.
 
 ## Alignment
 
@@ -27,7 +25,7 @@ alignments, each a single inbred line, were deduplicated.
 ## SNP calling
 
 A catalog of SNPs segregating among the eight founders of the synthetic
-population was built once and used for every sample. Founders were called jointly
+population was built once and used for every library. Founders were called jointly
 with `bcftools`, and a site entered the catalog if it was biallelic; covered at
 10× or more in every founder; at alternate allele frequency of 3% or less, or 97%
 or more, in every founder; fixed for the reference allele in at least one founder
@@ -44,8 +42,8 @@ which haplotype frequencies were estimated.
 ## Coverage
 
 Sequencing depth was summarised as each library's median reference plus
-alternate read count across catalog SNPs. Over the sixty libraries used,
-autosomal depth averaged 140× per library, with per sex medians of 129× and 127×
+alternate read count across catalog SNPs. Across the sixty libraries, autosomal
+depth averaged 140× per library, with per sex medians of 129× and 127×
 and a range of 49× to 400×. On the X chromosome female libraries averaged 134×
 and male libraries 72×, the latter 0.54 of the former, consistent with male
 hemizygosity. No library fell below the pipeline's coverage or uniformity
@@ -59,6 +57,10 @@ parameters are documented.
 
 ---
 
-**Still needed:** the Nextera kit and read length; the number of sequencing runs;
-and the number of flies per pool and the DNA extraction method, none of which are
-recorded in this repo.
+**Still needed:** the Nextera kit and read length; the number of sequencing runs
+covering these ten replicates; and the number of flies per pool and the DNA
+extraction method, none of which are recorded in this repo.
+
+**Belongs in the Design section, not here:** that two further cages were run and
+excluded as a separate source population. This section describes the ten
+replicates the paper analyses.

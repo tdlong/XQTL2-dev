@@ -48,6 +48,8 @@ Paragraph 5 onward is not written.
 
     methods_sequencing.md   sequencing, alignment, SNP calling, coverage. NOT
                             signed off. Fills what METHODS.md never covered.
+                            Written about the ten replicates only -- 60 libraries,
+                            and R10/R11 the double-sequenced ones, not R8-R11.
                             Needs the Nextera kit, read length, run count, flies
                             per pool and extraction method -- none in this repo.
 
