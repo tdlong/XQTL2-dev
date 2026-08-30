@@ -13,19 +13,40 @@ set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
 
 REMOTE=tdlong@hpc3.rcic.uci.edu:/dfs7/adl/tdlong/fly_pool/XQTL2-dev/process/
-FETCH=1; WANT=()
+FETCH=1; AB=0; WANT=()
 for a in "$@"; do
   case $a in
     --no-fetch) FETCH=0 ;;
+    ab|AB)      AB=1 ;;
     1|2|3|rr)   WANT+=("$a") ;;
-    *) echo "usage: make_figures.sh [--no-fetch] [1] [2] [3] [rr]" >&2; exit 1 ;;
+    *) echo "usage: make_figures.sh [--no-fetch] [ab] [1] [2] [3] [rr]" >&2; exit 1 ;;
   esac
 done
+# ab: the validation loop while a pipeline fix is being checked. Panels A and B
+# only, so it fetches the scan table and the corrected h2 and nothing else --
+# not the 81 MB SNP scan, not the split halves, not the partition.
+if [ "$AB" -eq 1 ]; then
+  WANT=(1); export PANELS=AB
+  : "${H2:=falconer}"; export H2
+fi
 [ ${#WANT[@]} -eq 0 ] && WANT=(1 2 3 rr)
 
 if [ "$FETCH" -eq 1 ]; then
   echo "fetching from HPC3 ..."
   mkdir -p process/AGE_SY/Calls process/AGE_SY_splithalf
+  if [ "$AB" -eq 1 ]; then
+    rsync -av --files-from=- "$REMOTE" process/ <<'LIST'
+AGE_SY/AGE_SY_4scan_no89.txt.gz
+AGE_SY/Scans/AGE_SY10_F_no89/AGE_SY10_F_no89.h2_falconer.txt
+AGE_SY/Scans/AGE_SY20_F_no89/AGE_SY20_F_no89.h2_falconer.txt
+AGE_SY/Scans/AGE_SY10_M_no89/AGE_SY10_M_no89.h2_falconer.txt
+AGE_SY/Scans/AGE_SY20_M_no89/AGE_SY20_M_no89.h2_falconer.txt
+AGE_SY/Scans/AGE_SY10_F_no89/PROVENANCE.txt
+AGE_SY/Scans/AGE_SY20_F_no89/PROVENANCE.txt
+AGE_SY/Scans/AGE_SY10_M_no89/PROVENANCE.txt
+AGE_SY/Scans/AGE_SY20_M_no89/PROVENANCE.txt
+LIST
+  else
   rsync -av --files-from=- "$REMOTE" process/ <<'LIST'
 AGE_SY/AGE_SY_4scan_no89.txt.gz
 AGE_SY/AGE_SY_zoom_means.txt.gz
@@ -38,6 +59,7 @@ AGE_SY/Scans/AGE_SY20_F_no89/AGE_SY20_F_no89.h2_falconer.txt
 AGE_SY/Scans/AGE_SY10_M_no89/AGE_SY10_M_no89.h2_falconer.txt
 AGE_SY/Scans/AGE_SY20_M_no89/AGE_SY20_M_no89.h2_falconer.txt
 LIST
+  fi
   rc=$?
   if [ $rc -ne 0 ]; then
     echo "rsync failed (rc=$rc). On VPN? Missing files are listed above." >&2
@@ -60,6 +82,11 @@ for n in "${WANT[@]}"; do
 done
 
 echo
+for f in process/AGE_SY/Scans/*/PROVENANCE.txt; do
+  [ -f "$f" ] || continue
+  echo "── $(basename "$(dirname "$f")") ──"; sed 's/^/   /' "$f"; break
+done
+
 echo "written:"
 ls -lt temp_aging/*.png 2>/dev/null | awk '{printf "  %-34s %s %s %s\n", $9, $6, $7, $8}' | head
 exit "${fail:-0}"
