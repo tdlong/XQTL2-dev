@@ -77,6 +77,20 @@ xf <- per_sample %>% filter(arm == "chrX", sex == "F")
 cat(sprintf("chrX: females mean %.0fx, males mean %.0fx (%.2f of female)\n",
             mean(xf$depth), mean(xm$depth), mean(xm$depth) / mean(xf$depth)))
 
+# How many libraries sit below a given depth, for the methods sentence. Reported
+# for the autosomes; male chrX is listed separately because hemizygosity puts it
+# near 72x by construction, so counting it against the same threshold would read
+# as a library problem when it is the expected halving.
+cat("\n=== libraries below depth thresholds ===\n")
+for (t in c(75, 100)) {
+  cat(sprintf("  autosomal median < %3dx : %2d of %d libraries\n",
+              t, sum(aut$depth < t), nrow(aut)))
+}
+for (t in c(75, 100)) {
+  cat(sprintf("  male chrX      < %3dx : %2d of %d male libraries\n",
+              t, sum(xm$depth < t), nrow(xm)))
+}
+
 cat("\n=== thin libraries (worst 5 on autosomal depth) ===\n")
 aut %>% arrange(depth) %>% head(5) %>% as.data.frame() %>% print(row.names = FALSE)
 
