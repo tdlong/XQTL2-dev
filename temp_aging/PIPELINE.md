@@ -45,7 +45,7 @@ so there is one definition of "derived", used both ways.
 | `AGE_SY_splithalf_H2_no89.txt.gz` | the 8 half-scan tables | `significant_regions.R`; input to the partition |
 | `H2_varcomp_by_window_no89.txt.gz` | the split-half table | **Fig 1c only** |
 | `AGE_SY_zoom_means.txt.gz` | the means files | Fig 2; `chr3L_peak.R` |
-| `numbers/*.txt`, `TableS1.txt` | the three above | the prose |
+| `numbers/*.txt`, `peak_table.txt` | the three above | the prose |
 
 ## Outside reproduce.sh
 
@@ -82,7 +82,7 @@ not six scp lines -- then draws all four figures and lists what it wrote.
 `--no-fetch` to draw from what is already local; a trailing `1 2 3 rr` to draw
 only some.
 
-`numbers/*.txt` and `TableS1.txt` are NOT fetched: `reproduce.sh` writes them
+`numbers/*.txt` and `peak_table.txt` are NOT fetched: `reproduce.sh` writes them
 on HPC3 and they come back through git.
 
 ## What --sex changes

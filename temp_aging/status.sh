@@ -36,7 +36,7 @@ row "varcomp (Fig 1c)" process/AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz
 row "zoom means (Fig 2)" process/AGE_SY/AGE_SY_zoom_means.txt.gz
 row "SNP scan (Fig 3)" process/AGE_SY/AGE_SY_4snpscan_no89.txt.gz
 row "numbers/coverage" temp_aging/numbers/coverage.txt
-row "TableS1"         temp_aging/TableS1.txt
+row "peak_table"      temp_aging/peak_table.txt
 
 echo
 echo "=== stale? (derived older than the newest scan is a problem) ==="

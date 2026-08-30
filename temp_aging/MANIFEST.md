@@ -77,7 +77,7 @@ those files.** If it is not, it is not sourced.
     scan_resolution.R     the tiling itself: 268 tiles, 264 cM, 122 Mb, and the
                           proportion above each threshold.
     peak_table.R          Table S1. Peaks top-down on the max across traits, 5 cM
-                          exclusion, split at 15. Writes TableS1.txt, the supplementary peak table.
+                          exclusion, split at 15. Also writes peak_table.txt.
     significant_regions.R sex and diet over the 98 significant tiles. Each tile
                           is taken at ONE window, its peak across the four
                           treatments, so the eight split-half values describe the
