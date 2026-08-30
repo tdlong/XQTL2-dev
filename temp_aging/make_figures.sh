@@ -48,6 +48,10 @@ for n in "${WANT[@]}"; do
     *)  script=temp_aging/make_figure${n}.R ;;
   esac
   echo "── figure $n ─────────────────────────────────"
+  # Figure 1 is the genetic axis. make_figure1.R defaults to X_UNIT=Mb, but the
+  # paper uses cM -- Figure1_cM_plot.png, linkage groups concatenated. Set it
+  # here so the default run produces the figure that is actually used.
+  if [ "$n" = "1" ]; then export X_UNIT=cM; else unset X_UNIT; fi
   if Rscript "$script"; then echo "   ok"; else echo "   FAILED: $script" >&2; fail=1; fi
 done
 
