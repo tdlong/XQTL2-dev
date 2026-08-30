@@ -41,8 +41,8 @@ FOURSCAN <- "process/AGE_SY/AGE_SY_4scan_no89.txt.gz"
 # width in cM is the thing that should be roughly constant; in Mb it tracks
 # recombination.
 X_UNIT    <- Sys.getenv("X_UNIT", "Mb")
-OUT       <- sprintf("temp_aging/Figure1%s%s%s_plot.png",
-                     if (toupper(Sys.getenv("PANELS","ABC"))=="AB") "_AB" else "",
+OUT       <- sprintf("temp_aging/Figure1%s%s_plot.png",
+                     if (toupper(Sys.getenv("PANELS","ABC")) == "AB") "_AB" else "",
                      if (X_UNIT == "cM") "_cM" else "")
 W_IN <- 7.5; H_IN <- 6; DPI <- 300
 SMOOTH_BP_C <- 5e5             # rolling mean on panel C only
