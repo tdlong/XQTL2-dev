@@ -120,7 +120,25 @@ for sc in AGE_SY10_F AGE_SY20_F AGE_SY10_M AGE_SY20_M; do
       --rfile "helpfiles/AGE_SY/nov_only/${sc}.no89.txt"
 done
 
-# 5. every number quoted in the prose, each with its input provenance
+# 5. the R2 smoothing correction must exist before the h2 above is trusted:
+#    without <scan>.smooth_r2.txt, hap_scan silently applies R2=1 and the h2
+#    bias over-subtracts by 1/R2. run_scan.sh submits the diagnostic, so a
+#    missing file means that job failed rather than that it was skipped.
+echo
+echo "── R2 smoothing correction ──────────────────────────────────"
+missing_r2=0
+for sc in AGE_SY10_F AGE_SY20_F AGE_SY10_M AGE_SY20_M; do
+  f="process/AGE_SY/Scans/${sc}_no89/${sc}_no89.smooth_r2.txt"
+  if [ -f "$f" ]; then printf '   %-18s R2 = %s\n' "$sc" "$(cat "$f")"
+  else                 printf '   %-18s MISSING\n' "$sc"; missing_r2=1; fi
+done
+if [ "$missing_r2" -eq 1 ]; then
+  echo "   ^ hap_scan applied no correction for these; the h2 bias is too large" >&2
+  echo "     by 1/R2. Check the smooth_r2 job in the run_scan.sh chain." >&2
+  fail=1
+fi
+
+# 6. every number quoted in the prose, each with its input provenance
 step "numbers" bash temp_aging/run_numbers.sh
 
 echo

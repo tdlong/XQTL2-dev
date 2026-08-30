@@ -87,13 +87,23 @@ JID_DERIVE=$($SB --dependency="$DEP_SCANS" \
     --output=logs/age_reproduce_%j.out \
     --wrap="bash temp_aging/reproduce.sh")
 
+# The SNP scans read the smoothed haplotypes these scans rewrite, so they are
+# stale the moment the scans finish. They were a separate command anyone could
+# forget; submit them here instead. run_snp_scans.sh does its own submitting,
+# so this job exists only to run it once the scans are done.
+JID_SNP=$($SB --dependency="$DEP_SCANS" \
+    --job-name=age_snp_launch --cpus-per-task=1 --mem-per-cpu=6G --time=00:20:00 \
+    --output=logs/age_snp_launch_%j.out \
+    --wrap="bash scripts_oneoffs/AGE_SY/nov_only/run_snp_scans.sh")
+
 cat <<EOF
 
 ------------------------------------------------------------------
 submitted, chained end to end. nothing else to run.
 
   12 scans      ${CONCAT_IDS[0]} .. ${CONCAT_IDS[${#CONCAT_IDS[@]}-1]}
-  derive        $JID_DERIVE   (after the scans: gather, partition, zoom, numbers)
+  derive        $JID_DERIVE   (after the scans: gather, partition, zoom, h2, numbers)
+  snp scans     $JID_SNP   (after the scans; launches its own array + gather)
 
 watch:    squeue -u \$USER
 log:      logs/age_reproduce_<jobid>.out
@@ -104,12 +114,5 @@ when $JID_DERIVE finishes, temp_aging/numbers/ is current and these exist:
   process/AGE_SY/AGE_SY_zoom_means.txt.gz
   process/AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz
 
-STILL TO RUN BY HAND -- the SNP scans are NOT chained here. They read the
-smoothed haplotypes these scans just rewrote, so they are now stale:
-
-  bash scripts_oneoffs/AGE_SY/nov_only/run_snp_scans.sh
-
-then, to bring it back:
-  git add temp_aging/numbers/ && git commit -m "numbers after the chrX sex fix" && git push
 ------------------------------------------------------------------
 EOF
