@@ -7,10 +7,9 @@ Draft. `[[ ]]` marks facts not recorded in this repo.
 Genomic DNA from each pool — one cage, treatment and sex — was prepared into a
 Nextera library [[kit and catalogue number]] and sequenced paired-end
 [[2 × 150 bp]] on an Illumina NovaSeq X Plus at the University of California,
-Irvine Genomics Research and Technology Hub. Sixty libraries were analysed: ten
+Irvine Genomics Research and Technology Hub. Sixty libraries were sequenced: ten
 replicate cages × three groups (unselected control, SY10 selected, SY20
-selected) × two sexes, over [[N]] runs. Libraries for replicates 10 and 11 were
-sequenced on two runs and their alignments merged.
+selected) × two sexes.
 
 ## Alignment
 
@@ -57,9 +56,8 @@ parameters are documented.
 
 ---
 
-**Still needed:** the Nextera kit and read length; the number of sequencing runs
-covering these ten replicates; and the number of flies per pool and the DNA
-extraction method, none of which are recorded in this repo.
+**Still needed:** the Nextera kit and read length, and the number of flies per
+pool and the DNA extraction method, neither recorded in this repo.
 
 **Belongs in the Design section, not here:** that two further cages were run and
 excluded as a separate source population. This section describes the ten
