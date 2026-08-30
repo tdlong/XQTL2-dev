@@ -41,7 +41,8 @@ FOURSCAN <- "process/AGE_SY/AGE_SY_4scan_no89.txt.gz"
 # width in cM is the thing that should be roughly constant; in Mb it tracks
 # recombination.
 X_UNIT    <- Sys.getenv("X_UNIT", "Mb")
-OUT       <- sprintf("temp_aging/Figure1%s%s_plot.png",
+OUT       <- sprintf("temp_aging/Figure1%s%s%s_plot.png",
+                     if (toupper(Sys.getenv("PANELS","ABC"))=="AB") "_AB" else "",
                      if (Sys.getenv("H2","cutler")=="falconer") "_falc" else "",
                      if (X_UNIT == "cM") "_cM" else "")
 W_IN <- 7.5; H_IN <- 6; DPI <- 300
@@ -69,8 +70,18 @@ Run scripts_oneoffs/AGE_SY/nov_only/{run_scans.sh,gather.R} on HPC3, scp back,",
   "
 then varcomp_H2.R with the two paths as arguments.", call. = FALSE)
 
-long <- read.table(LONG, header = TRUE, sep = "\t") %>% as_tibble()
-vc   <- read.table(VARCOMP, header = TRUE, sep = "\t") %>% as_tibble()
+# PANELS=AB draws the scan and the heritability only. Panel C is the variance
+# partition, which needs the eight split-half scans and the varcomp file derived
+# from them -- neither of which says anything about whether an h2 estimator is
+# right, and both of which go stale the moment the main scans are rerun. While a
+# fix is being validated, AB is the whole test.
+PANELS <- toupper(Sys.getenv("PANELS", "ABC"))
+want_C <- grepl("C", PANELS, fixed = TRUE)
+
+long <- if (want_C || !file.exists(FOURSCAN))
+  read.table(LONG, header = TRUE, sep = "\t") %>% as_tibble() else NULL
+vc   <- if (want_C)
+  read.table(VARCOMP, header = TRUE, sep = "\t") %>% as_tibble() else NULL
 
 scans <- if (file.exists(FOURSCAN)) {
   cat("panels A/B:", basename(FOURSCAN), "\n")
@@ -141,12 +152,12 @@ if (X_UNIT == "cM") {
     mutate(gx = cM + offset)
 
   # vc carries no cM, so interpolate it from the scan's own pos -> cM per arm
-  vc <- vc %>% group_split(chr) %>% map_dfr(function(v) {
+  if (want_C) vc <- vc %>% group_split(chr) %>% map_dfr(function(v) {
     x <- scans %>% filter(chr == v$chr[1]) %>% arrange(pos)
     if (!nrow(x)) return(v %>% mutate(cM = NA_real_))
     v %>% mutate(cM = approx(x$pos, x$cM, xout = pos, rule = 2)$y)
   })
-  scans <- addx(scans); vcx <- addx(vc)
+  scans <- addx(scans); vcx <- if (want_C) addx(vc) else NULL
 
   # arm extents in cM, taken from the scan itself so they cannot disagree with it
   arms <- scans %>% group_by(chr) %>%
@@ -175,7 +186,7 @@ if (X_UNIT == "cM") {
     left_join(lens %>% select(chr, offset), by = "chr") %>%
     mutate(gx = (pos + offset) / 1e6)
 
-  scans <- addx(scans); vcx <- addx(vc)
+  scans <- addx(scans); vcx <- if (want_C) addx(vc) else NULL
 
   het_bands <- HET %>% mutate(chr = factor(chr, levels = CHRS)) %>%
     left_join(lens, by = "chr") %>%
@@ -193,7 +204,7 @@ if (X_UNIT == "cM") {
 roll <- function(x, k) { n <- length(x); h <- (k-1L) %/% 2L
   vapply(seq_len(n), function(i) mean(x[max(1L,i-h):min(n,i+h)], na.rm=TRUE), numeric(1)) }
 BIN <- 1e5
-cmp <- vcx %>%
+cmp <- if (!want_C) NULL else vcx %>%
   mutate(bin = (pos %/% BIN) * BIN) %>%
   group_by(chr, offset, bin) %>%
   summarise(main = mean(mainH2), sex = mean(sexH2), diet = mean(dietH2),
@@ -309,12 +320,13 @@ pA <- split_panel(scans, "wald", "trt", TRT_COL, 45, c(0, 45), c(45, 215),
 # h2_vc is non-negative by construction, so the panel keeps its zero floor.
 pB <- split_panel(scans, "h2", "trt", TRT_COL, 2.5, c(0, 2.5), c(2.5, 5),
                   c(0, 0.5, 1, 1.5, 2), c(3, 4, 5),
-                  expression(italic(h)^2), "B", lw = 0.28)
+                  expression(italic(h)^2), "B", lw = 0.28, xaxis = !want_C)
 # Break at 1.25, not 0.75: the pericentromeric main plateau runs to ~1.0, and a
 # break below it pushed that whole stretch into the short upper sub-panel. Only
 # 0.3-0.4% of smoothed values exceed 1.25 -- essentially just the chr3L spike --
 # in both the 12- and 10-replicate versions.
-pC <- split_panel(cmp, "y", "term", CMP_COL, 1.25, c(-0.25, 1.25), c(1.25, 2.9),
+pC <- if (!want_C) NULL else
+  split_panel(cmp, "y", "term", CMP_COL, 1.25, c(-0.25, 1.25), c(1.25, 2.9),
                   c(-0.2, 0, 0.5, 1.0), c(1.5, 2, 2.5),
                   expression(italic(h)^2), "C", lw = 0.35, zero = TRUE, xaxis = TRUE)
 
@@ -328,13 +340,17 @@ key <- function(lev, col) {
 
 # one patchwork over all six sub-panels: patchwork aligns the panel areas, so
 # the three groups line up even though their y labels differ in width
-fig <- pA$top / pA$bot / pB$top / pB$bot / pC$top / pC$bot +
-  plot_layout(heights = c(1, 3, 1, 3, 1, 3))
+fig <- if (want_C)
+  pA$top / pA$bot / pB$top / pB$bot / pC$top / pC$bot +
+    plot_layout(heights = c(1, 3, 1, 3, 1, 3)) else
+  pA$top / pA$bot / pB$top / pB$bot +
+    plot_layout(heights = c(1, 3, 1, 3))
 
 g <- cowplot::plot_grid(
   fig,
   cowplot::plot_grid(cowplot::get_legend(key(TRT_LEV, TRT_COL)),
-                     cowplot::get_legend(key(CMP_LEV, CMP_COL)),
+                     if (want_C) cowplot::get_legend(key(CMP_LEV, CMP_COL)) else
+                       ggplot() + theme_void(),
                      nrow = 1, rel_widths = c(2.1, 1)),
   ncol = 1, rel_heights = c(1, 0.075))
 
