@@ -58,7 +58,10 @@ long <- read.table(IN, header = TRUE, sep = "\t") %>% as_tibble()
 # repairing an estimator that no longer exists. The split-half error term below
 # is a different thing and stays: it removes the VARIANCE of the h2 estimate,
 # which the within-window correction says nothing about.
-long <- long %>% mutate(floor_h2 = 0)
+# H2 from hap_scan already carries its own bias correction, measured from the
+# replicates, so nothing is subtracted here. The value entering the decomposition
+# is the heritability as reported.
+long <- long %>% mutate(H2v = H2)
 
 # ── one row per window, four cell means and the within-cell error ────────────
 wald_max <- long %>%
