@@ -319,10 +319,19 @@ pA <- split_panel(scans, "wald", "trt", TRT_COL, 45, c(0, 45), c(45, 215),
 # The corrected h2 is an unbiased estimate of zero at null windows, so it
 # scatters negative and the panel has to show that. The Cutler version cannot go
 # below zero, hence the floor of 0 in the default range.
-# h2_vc is non-negative by construction, so the panel keeps its zero floor.
-pB <- split_panel(scans, "h2", "trt", TRT_COL, 2.5, c(0, 2.5), c(2.5, 5),
-                  c(0, 0.5, 1, 1.5, 2), c(3, 4, 5),
-                  expression(italic(h)^2), "B", lw = 0.28, xaxis = !want_C)
+# Break at 1.75 under h2_rep, not 2.5. The corrected estimator is far smaller:
+# per-treatment 99th percentiles are 1.10, 1.41, 1.58 and 1.64, so 1.75 clears
+# every one of them and no trait has its ordinary range cut in half, while only
+# 0.49% of windows sit above -- essentially chr3L at 4.71 and one SY10_M spike.
+# A break at 2.5 spent a third of the lower panel on 0.26% of the data. The
+# default Cutler scale is left alone.
+pB <- if (Sys.getenv("H2", "cutler") == "falconer")
+  split_panel(scans, "h2", "trt", TRT_COL, 1.75, c(0, 1.75), c(1.75, 5),
+              c(0, 0.5, 1.0, 1.5), c(2, 3, 4, 5),
+              expression(italic(h)^2), "B", lw = 0.28, xaxis = !want_C) else
+  split_panel(scans, "h2", "trt", TRT_COL, 2.5, c(0, 2.5), c(2.5, 5),
+              c(0, 0.5, 1, 1.5, 2), c(3, 4, 5),
+              expression(italic(h)^2), "B", lw = 0.28, xaxis = !want_C)
 # Break at 1.25, not 0.75: the pericentromeric main plateau runs to ~1.0, and a
 # break below it pushed that whole stretch into the short upper sub-panel. Only
 # 0.3-0.4% of smoothed values exceed 1.25 -- essentially just the chr3L spike --
