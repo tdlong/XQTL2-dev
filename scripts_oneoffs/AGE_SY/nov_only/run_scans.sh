@@ -79,36 +79,13 @@ done
 DEP_SCANS="afterok:$(IFS=:; echo "${CONCAT_IDS[*]}")"
 SB="sbatch --parsable -A tdlong_lab -p standard"
 
-# gather: reads the twelve scan tables, writes the two the figures and the
-# numbers scripts read. 2 cores for 12 GB -- standard caps at 6 GB per core.
-JID_GATHER=$($SB --dependency="$DEP_SCANS" \
-    --job-name=age_gather --cpus-per-task=2 --mem-per-cpu=6G --time=02:00:00 \
-    --output=logs/age_gather_%j.out \
-    --wrap="module load R/4.2.2; Rscript scripts_oneoffs/AGE_SY/nov_only/gather.R")
-
-# partition: the no89 variance components, Figure 1c. varcomp_H2.R defaults to
-# the TWELVE-replicate paths, so both arguments must be given or it rebuilds the
-# wrong file and Figure 1c keeps reading a stale one with no error (PIPELINE.md).
-JID_VARCOMP=$($SB --dependency="afterok:${JID_GATHER}" \
-    --job-name=age_varcomp --cpus-per-task=2 --mem-per-cpu=6G --time=01:00:00 \
-    --output=logs/age_varcomp_%j.out \
-    --wrap="module load R/4.2.2; Rscript scripts_oneoffs/AGE_SY/splithalf/varcomp_H2.R \
-        process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz \
-        process/AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz")
-
-# zoom means: subsets four ~257 MB meansBySample files to 1.2 Mb around seven
-# peaks. Independent of gather, so it runs alongside. 3 cores for 18 GB.
-JID_ZOOM=$($SB --dependency="$DEP_SCANS" \
-    --job-name=age_zoom --cpus-per-task=3 --mem-per-cpu=6G --time=04:00:00 \
-    --output=logs/age_zoom_%j.out \
-    --wrap="module load R/4.2.2; Rscript temp_aging/make_zoom_means.R")
-
-# the numbers: needs gather's two files. Waits on zoom too, so that when this
-# finishes everything the manuscript reads is current.
-JID_NUMBERS=$($SB --dependency="afterok:${JID_GATHER}:${JID_ZOOM}" \
-    --job-name=age_numbers --cpus-per-task=2 --mem-per-cpu=6G --time=02:00:00 \
-    --output=logs/age_numbers_%j.out \
-    --wrap="module load R/4.2.2; bash temp_aging/run_numbers.sh")
+# Everything derived is one script, so the definition lives in one place and
+# `bash temp_aging/reproduce.sh` rebuilds the same things without resubmitting
+# scans. 3 cores for 18 GB -- the zoom step reads four ~257 MB files.
+JID_DERIVE=$($SB --dependency="$DEP_SCANS" \
+    --job-name=age_reproduce --cpus-per-task=3 --mem-per-cpu=6G --time=06:00:00 \
+    --output=logs/age_reproduce_%j.out \
+    --wrap="bash temp_aging/reproduce.sh")
 
 cat <<EOF
 
@@ -116,15 +93,12 @@ cat <<EOF
 submitted, chained end to end. nothing else to run.
 
   12 scans      ${CONCAT_IDS[0]} .. ${CONCAT_IDS[${#CONCAT_IDS[@]}-1]}
-  gather        $JID_GATHER   (after the scans)
-  varcomp       $JID_VARCOMP   (after gather; Figure 1c)
-  zoom means    $JID_ZOOM   (after the scans, alongside gather)
-  numbers       $JID_NUMBERS   (after both)
+  derive        $JID_DERIVE   (after the scans: gather, partition, zoom, numbers)
 
 watch:    squeue -u \$USER
-logs:     logs/age_{gather,zoom,numbers}_<jobid>.out
+log:      logs/age_reproduce_<jobid>.out
 
-when $JID_NUMBERS finishes, temp_aging/numbers/ is current and these exist:
+when $JID_DERIVE finishes, temp_aging/numbers/ is current and these exist:
   process/AGE_SY/AGE_SY_4scan_no89.txt.gz
   process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz
   process/AGE_SY/AGE_SY_zoom_means.txt.gz

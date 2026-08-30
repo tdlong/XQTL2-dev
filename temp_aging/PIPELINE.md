@@ -8,27 +8,54 @@ relative to the repo root.
 fetched down. Nothing in the HPC3 column can run here: `process/` is not on
 this machine.
 
-## The chain
+## Two primary products, everything else derived
+
+A scan writes exactly two things that are not a function of something else:
+
+    Scans/<scan>/<scan>.scan.txt                 Wald and h2 per window
+    Scans/<scan>/<scan>.meansBySample.<chr>.txt  founder frequencies per pool
+
+Every table, number and figure below is a function of those two. So the question
+that matters is not "what is each file" but "given a new scan, how do I rebuild
+everything". The answer is one command:
+
+    bash temp_aging/reproduce.sh        # on HPC3, from the repo root
+
+It gathers, partitions, subsets the zoom peaks and reruns the numbers, in order,
+reporting which step failed rather than dying silently partway. It resubmits
+nothing. `run_scans.sh` submits it as the dependent job after the twelve scans,
+so there is one definition of "derived", used both ways.
+
+## Getting to the primary products
 
 | # | Stage | Runs | Command | Writes |
 |---|---|---|---|---|
 | 1 | align | HPC3 | `pipeline/scripts/fq2bam.sh` | `data/bam/AGE_SY/*.bam` |
 | 2 | catalog | HPC3 | `pipeline/scripts/build_catalog.sh` | `process/AGE_SY/Catalog/` |
-| 3 | count | HPC3 | `pipeline/scripts/call_samples.sh` | `process/AGE_SY/Calls/RefAlt.<chr>.txt` |
-| 4 | sample QC | HPC3 | `pipeline/scripts/refalt_qc.R` | `process/AGE_SY/Calls/refalt_qc.txt` |
-| 5 | haplotypes | HPC3 | `pipeline/scripts/run_haps.sh` | `process/AGE_SY/Haps/R.haps.<chr>.out.rds` |
-| 6 | **12 scans** | HPC3 | `scripts_oneoffs/AGE_SY/nov_only/run_scans.sh` | `process/{AGE_SY,AGE_SY_splithalf}/Scans/<scan>/` |
-| 7 | gather | HPC3 | chained on 6 | `AGE_SY_4scan_no89.txt.gz`, `AGE_SY_splithalf_H2_no89.txt.gz` |
-| 8 | partition | HPC3 | chained on 7 | `AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz` |
-| 9 | zoom means | HPC3 | chained on 6 | `AGE_SY/AGE_SY_zoom_means.txt.gz` |
-| 10 | SNP scans | HPC3 | `scripts_oneoffs/AGE_SY/nov_only/run_snp_scans.sh` | `AGE_SY/AGE_SY_4snpscan_no89.txt.gz` |
-| 11 | numbers | HPC3 | chained on 7 and 9 | `temp_aging/numbers/*.txt` |
-| 12 | figures | local | `temp_aging/make_figure*.R` | `figures/*.png` |
+| 3 | count | HPC3 | `pipeline/scripts/call_samples.sh` | `Calls/RefAlt.<chr>.txt` |
+| 4 | sample QC | HPC3 | `pipeline/scripts/refalt_qc.R` | `Calls/refalt_qc.txt` |
+| 5 | haplotypes | HPC3 | `pipeline/scripts/run_haps.sh` | `Haps/R.haps.<chr>.out.rds` |
+| 6 | **12 scans** | HPC3 | `nov_only/run_scans.sh` | **the two primary products** |
 
-Steps 6-9 and 11 are one command: `run_scans.sh` submits them all with SLURM
-dependencies and returns. Step 10 is a **separate submission** — it reads the
-smoothed haplotypes step 6 writes, so it must be run after, and it is not
-chained. Step 12 needs the files fetched down first.
+## Derived, all of it by reproduce.sh
+
+| Product | From | Consumed by |
+|---|---|---|
+| `AGE_SY_4scan_no89.txt.gz` | the 4 scan tables | Fig 1a, 1b; Fig 2 Wald; Fig rr; all five numbers scripts |
+| `AGE_SY_splithalf_H2_no89.txt.gz` | the 8 half-scan tables | `significant_regions.R`; input to the partition |
+| `H2_varcomp_by_window_no89.txt.gz` | the split-half table | **Fig 1c only** |
+| `AGE_SY_zoom_means.txt.gz` | the means files | Fig 2; `chr3L_peak.R` |
+| `numbers/*.txt`, `peak_table.txt` | the three above | the prose |
+
+## Outside reproduce.sh
+
+`AGE_SY_4snpscan_no89.txt.gz` (Fig 3) is the exception. It is imputed from the
+**smoothed haplotypes**, so a new scan makes it stale, but it is a separate
+submission and nothing enforces the order:
+
+    bash scripts_oneoffs/AGE_SY/nov_only/run_snp_scans.sh
+
+Figures are the other exception: they run on the laptop, from files fetched down.
 
 ## What each product feeds
 
@@ -41,22 +68,12 @@ chained. Step 12 needs the files fetched down first.
 | `AGE_SY_4snpscan_no89.txt.gz` | **Fig 3 only** |
 | `Calls/refalt_qc.txt` | `coverage.R` |
 
-## The two that are easy to miss
+## The trap inside the derived chain
 
-**Step 8 is not gather.** `varcomp_H2.R` takes two arguments, input and output,
-and its defaults are the *12-replicate* paths. The no89 partition only exists
-because someone passed both:
-
-    Rscript scripts_oneoffs/AGE_SY/splithalf/varcomp_H2.R \
-        process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz \
-        process/AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz
-
-Run without arguments it silently rebuilds the 12-replicate file instead, and
-Figure 1c goes on reading a stale no89 file with no error anywhere.
-
-**Step 10 depends on step 6 but is not chained to it.** The SNP scan imputes
-per-SNP frequencies *from the smoothed haplotypes*, so rerunning the haplotype
-scans makes the SNP scan stale. Nothing enforces this.
+`varcomp_H2.R` takes input and output as arguments and its defaults are the
+*12-replicate* paths. Run bare it rebuilds the wrong file and Figure 1c goes on
+reading a stale no89 partition, with no error anywhere. `reproduce.sh` always
+passes both. Do not call it by hand without them.
 
 ## Fetching to the laptop
 

@@ -1,5 +1,11 @@
 # temp_aging — what is here, and what it rests on
 
+> **Rebuilding after a new scan: see `PIPELINE.md`, not this file.** A scan
+> produces two primary things -- the Wald/h2 tables and the means -- and
+> everything else is derived from them by `bash temp_aging/reproduce.sh`. This
+> file is an inventory of what each artifact *is*; it is the wrong place to look
+> for what *makes* it.
+
 AGE_SY lifespan XQTL: the Results prose, the figures, and the scripts that
 produce every number in both. Written so nothing here has to be
 reverse-engineered.
