@@ -42,6 +42,11 @@ for s in "${SCRIPTS[@]}"; do
     echo "# $s.R"
     echo "# run:    $(date '+%Y-%m-%d %H:%M')"
     echo "# script: $(git log -1 --format=%h -- "$src" 2>/dev/null || echo uncommitted)"
+    # Which pipeline produced the inputs. Without this a results file cannot be
+    # tied to an XQTL2 version, and when the pipeline changes several times in
+    # an evening there is no way to tell afterwards which run a number came
+    # from -- the input mtime and MD5 below identify the file, not the code.
+    echo "# pipeline: $(git -C pipeline log -1 --format='%h %ad %s' --date=short 2>/dev/null | cut -c1-70 || echo 'no pipeline symlink')"
     echo "# reads:"
     stamp_inputs "$src"
     echo "#"

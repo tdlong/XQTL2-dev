@@ -87,7 +87,9 @@ fail=0
 # exactly the kind of silent mixing that has bitten this project.
 SCOPE=${1:-main}
 case $SCOPE in main|all) ;; *) echo "usage: reproduce.sh [main|all]" >&2; exit 1 ;; esac
-echo "scope: $SCOPE"
+echo "scope:    $SCOPE"
+echo "repo:     $(git log -1 --format=%h) $(git log -1 --format=%s | cut -c1-52)"
+echo "pipeline: $(git -C pipeline log -1 --format=%h 2>/dev/null) $(git -C pipeline log -1 --format=%s 2>/dev/null | cut -c1-52)"
 
 step () {   # label, then the command
   local label=$1; shift
