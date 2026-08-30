@@ -1,10 +1,10 @@
 # significant_regions.R
-# run:    2026-08-30 11:26
+# run:    2026-08-30 11:34
 # script: fc13b14
 # pipeline: a98e3bb 2026-08-30 README: methods-section description of the H2 estim
 # reads:
-#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  3.5M  2026-08-30 11:25  md5:8ded8e73
-#   process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz     5.5M  2026-08-30 11:25  md5:5678bd61
+#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  3.5M  2026-08-30 11:32  md5:8ded8e73
+#   process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz     5.5M  2026-08-30 11:32  md5:5678bd61
 #
 268 tiles of 1 cM; 85 reach -log10 P 7.5 in some treatment (32%)
 

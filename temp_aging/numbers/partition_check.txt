@@ -1,9 +1,9 @@
 # partition_check.R
-# run:    2026-08-30 11:27
+# run:    2026-08-30 11:34
 # script: fc13b14
 # pipeline: a98e3bb 2026-08-30 README: methods-section description of the H2 estim
 # reads:
-#   process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz     5.5M  2026-08-30 11:25  md5:5678bd61
+#   process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz     5.5M  2026-08-30 11:32  md5:5678bd61
 #
 windows x treatment: 99952   (4 scans x 24988 windows)
 
