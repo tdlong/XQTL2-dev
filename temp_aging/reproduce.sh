@@ -78,7 +78,21 @@ step "variance partition" \
 # 3. founder frequencies around the seven zoom peaks, from the means files
 step "zoom means" Rscript temp_aging/make_zoom_means.R
 
-# 4. every number quoted in the prose, each with its input provenance
+# 4. bias-corrected Falconer h2, one file per scan. The pipeline's own h2 columns
+#    are the uncorrected Cutler ones, whose bias term saturates against the
+#    penetrance clamp and so under-corrects exactly where the variance is largest
+#    -- the male X (XQTL2 #40). h2_from_scan.R subtracts the exact Falconer bias
+#    instead. Needs the smoothed rds and the design, so it runs here, not on
+#    meansBySample.
+for sc in AGE_SY10_F AGE_SY20_F AGE_SY10_M AGE_SY20_M; do
+  step "falconer h2: ${sc}_no89" \
+    Rscript pipeline/scripts/h2_from_scan.R \
+      --dir   process/AGE_SY \
+      --scan  "${sc}_no89" \
+      --rfile "helpfiles/AGE_SY/nov_only/${sc}.no89.txt"
+done
+
+# 5. every number quoted in the prose, each with its input provenance
 step "numbers" bash temp_aging/run_numbers.sh
 
 echo
@@ -93,7 +107,8 @@ echo "current:"
 for f in process/AGE_SY/AGE_SY_4scan_no89.txt.gz \
          "${SPLITHALF}/AGE_SY_splithalf_H2_no89.txt.gz" \
          "${SPLITHALF}/H2_varcomp_by_window_no89.txt.gz" \
-         process/AGE_SY/AGE_SY_zoom_means.txt.gz ; do
+         process/AGE_SY/AGE_SY_zoom_means.txt.gz \
+         process/AGE_SY/Scans/AGE_SY20_M_no89/AGE_SY20_M_no89.h2_falconer.txt ; do
   if [ -f "$f" ]; then printf '  %-58s %s\n' "$f" "$(date -r "$f" '+%Y-%m-%d %H:%M')"
   else                 printf '  %-58s MISSING\n' "$f"; fi
 done
