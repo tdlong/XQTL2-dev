@@ -22,6 +22,11 @@
 set -euo pipefail
 
 SMOOTH=100                       # kb -- matches every other AGE_SY scan
+
+# Every AGE_SY pool is one cage x treatment x sex, so each scan is single sex and
+# takes --sex from the last field of its name. Without it run_scan.sh defaults to
+# "mixed" (0.75 X chromosomes per fly), which is right for a 50:50 pool and wrong
+# for these: 1.0 for females, 0.5 for males (XQTL2 #38). chrX only.
 FULL_DIR=process/AGE_SY
 HALF_DIR=process/AGE_SY_splithalf
 DESIGNS=helpfiles/AGE_SY/nov_only
@@ -44,19 +49,19 @@ Rscript scripts_oneoffs/AGE_SY/nov_only/make_designs.R
 
 echo
 echo "submitting ..."
-submit() {   # name, dir, design
+submit() {   # name, dir, design, sex
   [ -f "$3" ] || { echo "ERROR: missing design $3" >&2; exit 1; }
   local out; out=$(bash pipeline/scripts/run_scan.sh \
-      --dir "$2" --scan "$1" --design "$3" --smooth "$SMOOTH")
-  echo "   $(printf '%-26s' "$1") concat $(jobid_from "$out")"
+      --dir "$2" --scan "$1" --design "$3" --smooth "$SMOOTH" --sex "$4")
+  echo "   $(printf '%-26s' "$1") sex $4  concat $(jobid_from "$out")"
 }
 
 for s in "${SCANS[@]}"; do
-  submit "${s}_no89" "$FULL_DIR" "$DESIGNS/${s}.no89.txt"
+  submit "${s}_no89" "$FULL_DIR" "$DESIGNS/${s}.no89.txt" "${s##*_}"
 done
 for s in "${SCANS[@]}"; do
   for h in odd even; do
-    submit "${s}_no89_${h}" "$HALF_DIR" "$DESIGNS/${s}.no89.${h}.txt"
+    submit "${s}_no89_${h}" "$HALF_DIR" "$DESIGNS/${s}.no89.${h}.txt" "${s##*_}"
   done
 done
 
