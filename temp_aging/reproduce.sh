@@ -174,8 +174,21 @@ fi
 #     numbers/partition_check.txt, which comes back through git. The point of
 #     doing it here is that the per-window per-half h2 is far too large to move,
 #     while the answer is a few dozen lines.
+# Written straight to numbers/, not just printed: under scope h2 run_numbers.sh
+# does not run, so relying on it to capture this meant the answer stayed in the
+# job log and never came back through git.
 if [ "$SCOPE" != main ]; then
-  step "partition check" Rscript temp_aging/partition_check.R
+  mkdir -p temp_aging/numbers
+  {
+    echo "# partition_check.R"
+    echo "# run:      $(date '+%Y-%m-%d %H:%M')"
+    echo "# script:   $(git log -1 --format=%h -- temp_aging/partition_check.R 2>/dev/null || echo uncommitted)"
+    echo "# pipeline: $(git -C pipeline log -1 --format=%h 2>/dev/null)"
+    echo "#"
+  } > temp_aging/numbers/partition_check.txt
+  step "partition check" bash -c \
+    'Rscript temp_aging/partition_check.R >> temp_aging/numbers/partition_check.txt 2>&1'
+  sed -n '7,80p' temp_aging/numbers/partition_check.txt
 fi
 
 # 6. every number quoted in the prose, each with its input provenance. Skipped
