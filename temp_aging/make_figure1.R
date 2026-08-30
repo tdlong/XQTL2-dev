@@ -95,13 +95,24 @@ if (Sys.getenv("H2", "cutler") == "falconer") {
     if (!file.exists(f)) stop("missing ", f, "\nRun reproduce.sh on HPC3, then make_figures.sh.")
     read.table(f, header = TRUE, colClasses = c(sex = "character")) %>% as_tibble() %>%
       transmute(chr = CHROM, pos, sugar = str_extract(sc, "SY[12]0"),
-                sex = str_sub(sc, -1), h2_new = h2_corr)
+                sex = str_sub(sc, -1), h2_new = h2_corr, bias_new = h2_bias)
   })
-  n0 <- nrow(scans)
+  # The Falconer bias carries a 1/C_f term, so where a founder sits at the lsei
+  # floor it diverges -- p99 is 983 on chrX males, against an h2 scale where the
+  # strongest locus in the genome is 4.3. Subtracting that gives h2_corr of -40,
+  # which does not just look wrong, it destroys the panel scales and bleeds
+  # outside the plot. Those windows carry no information about h2 either way, so
+  # they are masked to NA and the line breaks there (XQTL2 #40).
+  BIAS_MAX <- 5
   scans <- scans %>% inner_join(fal, by = c("chr", "pos", "sugar", "sex")) %>%
-    mutate(h2 = h2_new) %>% select(-h2_new)
-  cat("panel B: bias-corrected Falconer h2 (", nrow(scans), " of ", n0,
-      " windows matched)\n", sep = "")
+    mutate(h2 = if_else(bias_new > BIAS_MAX, NA_real_, h2_new))
+  cat(sprintf("panel B: bias-corrected Falconer h2; %d of %d windows masked (bias > %g)\n",
+              sum(is.na(scans$h2)), nrow(scans), BIAS_MAX))
+  scans %>% mutate(arm = if_else(chr == "chrX", "chrX", "autosome")) %>%
+    group_by(arm, sex) %>%
+    summarise(masked_pct = round(100*mean(is.na(h2)), 1), .groups = "drop") %>%
+    as.data.frame() %>% print(row.names = FALSE)
+  scans <- scans %>% select(-h2_new, -bias_new)
 } else {
   cat("panel B: Cutler h2, uncorrected\n")
 }
@@ -221,6 +232,15 @@ mask <- function(d, yv, keep_above, brk) {
   d
 }
 
+# clip = "off" is needed for the break marks, and it also stops ggplot clipping
+# out-of-range DATA -- a value below a segment's floor is drawn outside the
+# panel, across the figure and into the legend. mask() only splits at the break,
+# so it does not catch that. NA out anything outside the segment's own range.
+clip_to <- function(d, yv, r) {
+  d[[yv]][!is.na(d[[yv]]) & (d[[yv]] < r[1] | d[[yv]] > r[2])] <- NA_real_
+  d
+}
+
 deco <- function(xaxis = FALSE) {
   th <- theme_classic(base_size = 8) +
     theme(axis.title.x = element_blank(),
@@ -266,14 +286,14 @@ split_panel <- function(d, yv, cv, cols, brk, lo, hi, lo_brk, hi_brk,
   # clip = "off" the other segment would draw it far outside its own panel
   zl <- function(r) if (zero && r[1] <= 0 && r[2] >= 0)
     geom_hline(yintercept = 0, colour = "grey60", linewidth = 0.25) else NULL
-  top <- ggplot() + deco() + zl(hi) + gl(mask(d, yv, TRUE, brk)) +
+  top <- ggplot() + deco() + zl(hi) + gl(clip_to(mask(d, yv, TRUE, brk), yv, hi)) +
     scale_colour_manual(values = cols, drop = FALSE) +
     scale_y_continuous(breaks = hi_brk, expand = expansion(0)) +
     coord_cartesian(xlim = c(0, xmax_all), ylim = hi, clip = "off") + slash(hi, hi[1], 1) +
     labs(y = NULL, tag = tag) +
     theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
           axis.line.x = element_blank(), plot.margin = margin(7, 4, 2, 16))
-  bot <- ggplot() + deco(xaxis) + zl(lo) + gl(mask(d, yv, FALSE, brk)) +
+  bot <- ggplot() + deco(xaxis) + zl(lo) + gl(clip_to(mask(d, yv, FALSE, brk), yv, lo)) +
     scale_colour_manual(values = cols, drop = FALSE) +
     scale_y_continuous(breaks = lo_brk, expand = expansion(0)) +
     coord_cartesian(xlim = c(0, xmax_all), ylim = lo, clip = "off") + slash(lo, lo[2], 3) +
@@ -285,9 +305,16 @@ split_panel <- function(d, yv, cv, cols, brk, lo, hi, lo_brk, hi_brk,
 pA <- split_panel(scans, "wald", "trt", TRT_COL, 45, c(0, 45), c(45, 215),
                   c(0, 10, 20, 30, 40), c(50, 100, 150, 200),
                   expression(-log[10] * italic(P)), "A", lw = 0.28)
-pB <- split_panel(scans, "h2", "trt", TRT_COL, 2.5, c(0, 2.5), c(2.5, 5),
-                  c(0, 0.5, 1, 1.5, 2), c(3, 4, 5),
-                  expression(italic(h)^2), "B", lw = 0.28)
+# The corrected h2 is an unbiased estimate of zero at null windows, so it
+# scatters negative and the panel has to show that. The Cutler version cannot go
+# below zero, hence the floor of 0 in the default range.
+pB <- if (Sys.getenv("H2", "cutler") == "falconer")
+  split_panel(scans, "h2", "trt", TRT_COL, 2.5, c(-0.75, 2.5), c(2.5, 5),
+              c(-0.5, 0, 0.5, 1, 1.5, 2), c(3, 4, 5),
+              expression(italic(h)^2), "B", lw = 0.28, zero = TRUE) else
+  split_panel(scans, "h2", "trt", TRT_COL, 2.5, c(0, 2.5), c(2.5, 5),
+              c(0, 0.5, 1, 1.5, 2), c(3, 4, 5),
+              expression(italic(h)^2), "B", lw = 0.28)
 # Break at 1.25, not 0.75: the pericentromeric main plateau runs to ~1.0, and a
 # break below it pushed that whole stretch into the short upper sub-panel. Only
 # 0.3-0.4% of smoothed values exceed 1.25 -- essentially just the chr3L spike --
