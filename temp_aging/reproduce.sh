@@ -130,12 +130,27 @@ fi
 #    instead. Needs the smoothed rds and the design, so it runs here, not on
 #    meansBySample.
 for sc in AGE_SY10_F AGE_SY20_F AGE_SY10_M AGE_SY20_M; do
-  step "falconer h2: ${sc}_no89" \
+  step "h2: ${sc}_no89" \
     Rscript pipeline/scripts/h2_from_scan.R \
       --dir   process/AGE_SY \
       --scan  "${sc}_no89" \
       --rfile "helpfiles/AGE_SY/nov_only/${sc}.no89.txt"
 done
+
+# The eight half-scans, which the variance partition consumes. h2_rep must be
+# computed per half on 5 replicates -- the partition cannot take the 10-replicate
+# value and split it. Skipped under SCOPE=main, where the halves are not rerun.
+if [ "$SCOPE" != main ]; then
+  for sc in AGE_SY10_F AGE_SY20_F AGE_SY10_M AGE_SY20_M; do
+    for hf in odd even; do
+      step "h2: ${sc}_no89_${hf}" \
+        Rscript pipeline/scripts/h2_from_scan.R \
+          --dir   process/AGE_SY_splithalf \
+          --scan  "${sc}_no89_${hf}" \
+          --rfile "helpfiles/AGE_SY/nov_only/${sc}.no89.${hf}.txt"
+    done
+  done
+fi
 
 # 5. the R2 smoothing correction must exist before the h2 above is trusted:
 #    without <scan>.smooth_r2.txt, hap_scan silently applies R2=1 and the h2
