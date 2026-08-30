@@ -14,17 +14,14 @@ selected) × two sexes.
 ## Alignment
 
 Reads were aligned to the *Drosophila melanogaster* dm6 reference genome with
-`bwa mem` (Li 2013) and coordinate sorted. Analysis was restricted to the five
-major chromosome arms, X, 2L, 2R, 3L and 3R. Duplicate reads were retained: at
-this depth, reads from a pooled Nextera library share start sites both by chance
-and through transposase insertion preference, so removing them would discard
-genuine molecules and bias the allele frequency estimates. The eight founder
-alignments, each a single inbred line, were deduplicated.
+`bwa mem` (Li 2013), coordinate sorted and indexed. Sample alignments were not
+deduplicated; the eight founder alignments were.
 
 ## SNP calling
 
-A catalog of SNPs segregating among the eight founders of the synthetic
-population was built once and used for every library. Founders were called jointly
+SNPs were called on the five major chromosome arms, X, 2L, 2R, 3L and 3R. A
+catalog of SNPs segregating among the eight founders of the synthetic population
+was built once and used for every library. Founders were called jointly
 with `bcftools`, and a site entered the catalog if it was biallelic; covered at
 10× or more in every founder; at alternate allele frequency of 3% or less, or 97%
 or more, in every founder; fixed for the reference allele in at least one founder
