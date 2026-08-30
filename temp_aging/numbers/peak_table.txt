@@ -1,8 +1,8 @@
 # peak_table.R
-# run:    2026-08-28 15:58
+# run:    2026-08-29 17:07
 # script: 74a824a
 # reads:
-#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.5M  2026-08-20 15:46  md5:dabab56e
+#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-20 15:45  md5:dabab56e
 #
 # Well-separated peaks, AGE_SY 10-replicate dataset (replicates 8, 9 dropped)
 # peak       = tallest window, taken top-down over the max across the four traits
@@ -90,7 +90,7 @@ INTERVAL WIDTH: set A (>15) against set B (7.5-15)
 Wilcoxon rank-sum, two-sided; widths are skewed so ranks rather than t
 
   int_cM   A median    0.39 (n=8)   B median    0.73 (n=15)   P = 0.047
-  int_kb   A median  270.00 (n=8)   B median  245.00 (n=15)   P = 0.601
+  int_kb   A median  270.00 (n=8)   B median  245.00 (n=15)   P = 0.605
 
 pooled over all 23 peaks -- the interval widths themselves, as quantiles
 (the 10th and 90th percentiles of the observed widths: 80% of peaks lie

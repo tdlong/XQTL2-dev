@@ -1,0 +1,44 @@
+# coverage.R
+# run:    2026-08-29 17:08
+# script: bcf841b
+# reads:
+#   process/AGE_SY/Calls/refalt_qc.txt                        512  2026-08-29 17:07  md5:56a1d341
+#
+libraries: 60 (10 replicates x 3 groups x 2 sexes)
+
+=== median depth at catalog SNPs, across the 60 libraries ===
+      arm sex  n  mean median min   max
+ autosome   F 30 137.2  128.8  56 305.5
+ autosome   M 30 143.4  126.5  49 400.5
+     chrX   F 30 133.8  125.0  55 299.0
+     chrX   M 30  72.2   64.5  25 201.0
+
+=== by group ===
+      arm sex   group  n  mean  min   max
+ autosome   F AgeSY10 10 140.8 61.5 220.5
+ autosome   F AgeSY20 10 116.8 60.5 191.0
+ autosome   F     Con 10 154.2 56.0 305.5
+ autosome   M AgeSY10 10 128.7 49.0 210.8
+ autosome   M AgeSY20 10 147.0 59.0 311.0
+ autosome   M     Con 10 154.3 61.0 400.5
+     chrX   F AgeSY10 10 137.6 58.0 217.0
+     chrX   F AgeSY20 10 114.2 58.0 189.0
+     chrX   F     Con 10 149.6 55.0 299.0
+     chrX   M AgeSY10 10  65.2 25.0 106.0
+     chrX   M AgeSY20 10  73.6 29.0 156.0
+     chrX   M     Con 10  77.8 30.0 201.0
+
+=== the number for the methods ===
+autosomal median depth per library: mean 140x, range 49-400x (n=60)
+chrX: females mean 134x, males mean 72x (0.54 of female)
+
+=== thin libraries (worst 5 on autosomal depth) ===
+       sample   group sex      arm depth
+ AgeSY10_R7_M AgeSY10   M autosome  49.0
+     Con_R2_F     Con   F autosome  56.0
+ AgeSY20_R1_M AgeSY20   M autosome  59.0
+ AgeSY10_R1_M AgeSY10   M autosome  60.5
+ AgeSY20_R1_F AgeSY20   F autosome  60.5
+
+=== anything the pipeline flagged ===
+none of the 60 flagged on any chromosome.

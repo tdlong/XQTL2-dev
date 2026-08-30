@@ -1,8 +1,8 @@
 # chr3L_peak.R
-# run:    2026-08-28 15:58
-# script: 
+# run:    2026-08-29 17:07
+# script: 9dc45d7
 # reads:
-#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.5M  2026-08-20 15:46  md5:dabab56e
+#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-20 15:45  md5:dabab56e
 #   process/AGE_SY/AGE_SY_zoom_means.txt.gz                   15M  2026-08-17 09:52  md5:154c5a7b
 #
 chr3L 9.30 Mb, 10 replicates
