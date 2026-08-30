@@ -46,6 +46,11 @@ Signed off by Tony, in order. These are the current text.
 
 Paragraph 5 onward is not written.
 
+    methods_sequencing.md   sequencing, alignment, SNP calling, coverage. NOT
+                            signed off. Fills what METHODS.md never covered.
+                            Needs the Nextera kit, read length, run count, flies
+                            per pool and extraction method -- none in this repo.
+
 ## The scripts, and the numbers they own
 
 `run_numbers.sh` runs all five into `numbers/<script>.txt`, each with a header
@@ -65,6 +70,11 @@ those files.** If it is not, it is not sourced.
                           is taken at ONE window, its peak across the four
                           treatments, so the eight split-half values describe the
                           same position.
+    coverage.R            depth at catalog SNPs over the 60 libraries the scans
+                          use. Reads Calls/refalt_qc.txt, which the pipeline's
+                          own refalt_qc.R writes -- RUN BOTH ON HPC3, process/ is
+                          there. chrX is kept apart from the autosomes: males are
+                          hemizygous, so a single genome-wide depth would hide it.
     chr3L_peak.R          the 3L locus: the scan there, the founder shifts, and
                           the founder frequencies in the unselected controls
                           across the ten cages in order.
@@ -76,6 +86,14 @@ replicates give two independent h2 estimates of the same tile; half their square
 difference is a pure error term, and it is subtracted from every component of the
 partition. The null-window floor in `h2_threshold.R` exists only because a single
 h2 estimate has nowhere else to get an error term.
+
+**Coverage bins in the old logs are not the coverage.**
+`logs/AGE_SY/compare_summary.out` carries depth bins that put 76% of
+observations in 50-199x. They are per (SNP, sample) pooled over all 72 libraries,
+at SNPs shared between the old and new callers, with male chrX folded into the
+autosomes -- a caller-comparison by-product. The real per-library medians average
+140x on the autosomes. An early draft of methods_sequencing.md quoted the bins;
+do not reinstate them.
 
 **The bias is not common to the four treatments.** `Cutl_H2_bias` is computed per
 pool per window from that pool's own lsei reconstruction error and the
@@ -120,7 +138,9 @@ gitignored, so it exists only on this machine.
 ## Open
 
 - Paragraph 5 onward not drafted.
-- `METHODS.md` still describes 12 cages, 75 kb tiles and threshold 5.
+- `METHODS.md` still describes 12 cages, 75 kb tiles and threshold 5, and its
+  SNP calling describes the joint-QUAL caller that the founder-catalog caller
+  replaced. `methods_sequencing.md` covers the calling; the rest is unrewritten.
 - Whether Table S1 becomes a supplement is undecided.
 - The power claim in paragraph 2 — that a 1–2% locus would have gone undetected
   in several hundred RILs — is asserted, not calculated. No design was named to
