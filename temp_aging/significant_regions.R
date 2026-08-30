@@ -29,7 +29,6 @@
 # has nowhere to get an error term from, and here there is one.
 #
 # THE BIAS IS NOT COMMON TO THE FOUR TREATMENTS, so it cannot be left in and
-# argued away. hap_scan reports Cutl_H2_bias per pool per window: the upward
 # offset from squaring a noisy frequency estimate, computed from that pool's own
 # lsei reconstruction error and the multinomial sampling of its own flies
 # (scan_functions.R, XQTL2 #34). It is reported and not subtracted. Averaged over
@@ -70,21 +69,14 @@ cat(sprintf("%d tiles of %g cM; %d reach -log10 P %g in some treatment (%.0f%%)\
 sig <- pk %>% filter(w > THR)
 
 # eight values per significant tile, from its peak window
-cell <- function(debias) {
+cell <- function() {
   l %>% inner_join(sig %>% select(chr, tile, pos), by = c("chr", "pos")) %>%
-    mutate(v = if (debias) Cutl_H2 - Cutl_H2_bias else Cutl_H2) %>%
+    mutate(v = H2) %>%
     select(chr, tile, sugar, sex, half, v)
 }
 
-cat("mean Cutl_H2_bias per pool, over all windows -- this is why it is subtracted:\n\n")
-l %>% group_by(sugar, sex, half) %>%
-  summarise(`mean h2` = round(mean(Cutl_H2), 2),
-            `mean bias` = round(mean(Cutl_H2_bias), 2), .groups = "drop") %>%
-  as.data.frame() %>% print(row.names = FALSE)
-cat("\n")
-
 # ── male vs female, by arm ───────────────────────────────────────────────────
-by_arm <- function(debias) cell(debias) %>% group_by(chr, tile, sex) %>%
+by_arm <- function() cell() %>% group_by(chr, tile, sex) %>%
   summarise(h2 = mean(v), .groups = "drop") %>%
   pivot_wider(names_from = sex, values_from = h2) %>% group_by(chr) %>%
   summarise(tiles = n(), `med M` = round(median(M), 2),
@@ -94,7 +86,7 @@ by_arm <- function(debias) cell(debias) %>% group_by(chr, tile, sex) %>%
 # X vs autosome is the contrast that has a mechanism behind it; the per-arm split
 # is here because the autosomes are not homogeneous, not because any one arm is
 # being claimed.
-xa <- function(debias) cell(debias) %>% group_by(chr, tile, sex) %>%
+xa <- function() cell() %>% group_by(chr, tile, sex) %>%
   summarise(h2 = mean(v), .groups = "drop") %>%
   pivot_wider(names_from = sex, values_from = h2) %>%
   mutate(g = ifelse(chr == "chrX", "X", "autosomes")) %>% group_by(g) %>%
@@ -102,12 +94,10 @@ xa <- function(debias) cell(debias) %>% group_by(chr, tile, sex) %>%
             `med F` = round(median(F), 2),
             `M>F at` = sprintf("%.0f%%", 100 * mean(M > F)), .groups = "drop")
 cat("X versus the autosomes (bias subtracted):\n\n")
-xa(TRUE) %>% as.data.frame() %>% print(row.names = FALSE)
+xa() %>% as.data.frame() %>% print(row.names = FALSE)
 
 cat("\nthe same split by arm (bias subtracted):\n\n")
-by_arm(TRUE) %>% as.data.frame() %>% print(row.names = FALSE)
-cat("\nsame on raw h2, bias left in:\n\n")
-by_arm(FALSE) %>% as.data.frame() %>% print(row.names = FALSE)
+by_arm() %>% as.data.frame() %>% print(row.names = FALSE)
 
 # ── the partition ────────────────────────────────────────────────────────────
 # Split halves give the error term: the odd-replicate and even-replicate h2 for
@@ -115,8 +105,8 @@ by_arm(FALSE) %>% as.data.frame() %>% print(row.names = FALSE)
 # the noise in a single treatment mean. Each named term is a sum of squares with
 # that noise subtracted, which is what makes "no detectable interaction" mean
 # something rather than being an artifact of squaring.
-terms <- function(debias) {
-  w <- cell(debias) %>%
+terms <- function() {
+  w <- cell() %>%
     pivot_wider(names_from = c(sugar, sex, half), values_from = v) %>% drop_na() %>%
     transmute(chr, tile, a = (SY10_F_odd + SY10_F_even)/2, b = (SY20_F_odd + SY20_F_even)/2,
       cc = (SY10_M_odd + SY10_M_even)/2, dd = (SY20_M_odd + SY20_M_even)/2,
@@ -146,13 +136,11 @@ boot_ci <- function(x, nb = 2000) {
 }
 cat("\npartition over significant tiles, % of the four-treatment sum of squares.\n")
 cat("95% intervals from 2000 bootstraps over 4 cM groups of tiles.\n\n")
-for (cfg in list(list(TRUE, "bias out"), list(FALSE, "bias in"))) {
- w <- terms(cfg[[1]])
- for (sc in c("all", "autosomes")) {
+w <- terms()
+for (sc in c("all", "autosomes")) {
   x <- if (sc == "autosomes") w %>% filter(chr != "chrX") else w
   ci <- boot_ci(x); pt <- shares(x)
-  cat(sprintf("  %-9s %-10s %3d tiles   shared %4.1f   sex %4.1f [%4.1f, %4.1f]   diet %4.1f [%4.1f, %4.1f]   int %5.1f [%5.1f, %4.1f]\n",
-      cfg[[2]], sc, nrow(x), 100 - sum(pt),
+  cat(sprintf("  %-10s %3d tiles   shared %4.1f   sex %4.1f [%4.1f, %4.1f]   diet %4.1f [%4.1f, %4.1f]   int %5.1f [%5.1f, %4.1f]\n",
+      sc, nrow(x), 100 - sum(pt),
       pt[1], ci[1,1], ci[2,1], pt[2], ci[1,2], ci[2,2], pt[3], ci[1,3], ci[2,3]))
- }
 }

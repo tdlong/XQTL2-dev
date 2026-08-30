@@ -52,29 +52,13 @@ if (!file.exists(IN)) stop("input not found: ", IN)
 long <- read.table(IN, header = TRUE, sep = "\t") %>% as_tibble()
 
 # ── floor: calibrate the reported bias against Wald-null windows ─────────────
-HAVE_BIAS <- "Cutl_H2_bias" %in% names(long) && !all(is.na(long$Cutl_H2_bias))
-if (HAVE_BIAS) {
-  nullw <- long %>%
-    group_by(chr, pos) %>%
-    summarise(H2 = mean(Cutl_H2), b = mean(Cutl_H2_bias),
-              wald = max(Wald_log10p), .groups = "drop") %>%
-    filter(wald < WALD_NULL) %>% arrange(b)
-  if (nrow(nullw) > 200) {
-    bcal <- approxfun(nullw$b, isoreg(nullw$b, nullw$H2)$yf, rule = 2)
-    long <- long %>% mutate(floor_h2 = bcal(Cutl_H2_bias))
-    cat(sprintf("floor calibrated on %d Wald<%g windows: %.2f-%.2f (raw b was %.2f-%.2f)\n",
-                nrow(nullw), WALD_NULL, min(long$floor_h2), max(long$floor_h2),
-                min(long$Cutl_H2_bias), max(long$Cutl_H2_bias)))
-  } else {
-    cat("too few null windows to calibrate; using the raw floor\n")
-    long <- long %>% mutate(floor_h2 = Cutl_H2_bias)
-  }
-} else {
-  cat("NOTE: no Cutl_H2_bias column -- scans predate XQTL2 #34.\n",
-      "      The main term keeps its floor, so sex and diet read LOW.\n", sep = "")
-  long <- long %>% mutate(floor_h2 = 0)
-}
-long <- long %>% mutate(H2v = Cutl_H2 - floor_h2)
+# No floor calibration. H2 from hap_scan (XQTL2 #40) averages replicates before
+# squaring and takes its correction from them, so it carries no squaring bias to
+# calibrate away -- the isotonic fit of h2 on b that used to live here was
+# repairing an estimator that no longer exists. The split-half error term below
+# is a different thing and stays: it removes the VARIANCE of the h2 estimate,
+# which the within-window correction says nothing about.
+long <- long %>% mutate(floor_h2 = 0)
 
 # ── one row per window, four cell means and the within-cell error ────────────
 wald_max <- long %>%

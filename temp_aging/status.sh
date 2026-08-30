@@ -26,7 +26,6 @@ for sc in AGE_SY10_F AGE_SY20_F AGE_SY10_M AGE_SY20_M; do
   d=process/AGE_SY/Scans/${sc}_no89
   row "${sc}_no89 scan.txt"    "$d/${sc}_no89.scan.txt"
   row "${sc}_no89 smooth_r2"   "$d/${sc}_no89.smooth_r2.txt"
-  row "${sc}_no89 h2_falconer" "$d/${sc}_no89.h2_falconer.txt"
 done
 
 echo

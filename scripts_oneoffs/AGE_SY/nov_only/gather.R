@@ -8,11 +8,11 @@
 # scripts read them unchanged:
 #
 #   process/AGE_SY/AGE_SY_4scan_no89.txt.gz
-#       chr pos cM sugar sex Wald_log10p Cutl_H2 Falc_H2 <bias cols>
+#       chr pos cM sugar sex Wald_log10p H2 H2_vc
 #       -- panels A and B of Figure 1, and the Wald panels of Figure 2
 #
 #   process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz
-#       chr pos sex sugar half Cutl_H2 Falc_H2 Wald_log10p <bias cols>
+#       chr pos sex sugar half H2 H2_vc Wald_log10p
 #       -- the split-half error term, hence panel C of Figure 1
 #
 # Fetch both:
@@ -28,7 +28,7 @@ OUT_HALF <- file.path(HALF_DIR, "AGE_SY_splithalf_H2_no89.txt.gz")
 
 # bias columns exist only in scans made after XQTL2 #34; cM comes from the
 # pipeline's add_genetic(). Carry whichever are present, NA otherwise.
-OPTIONAL <- c("Cutl_H2_bias", "Falc_H2_bias", "Cutl_clamp_frac", "cM")
+OPTIONAL <- c("cM")
 fill <- function(d) { for (v in OPTIONAL) if (!v %in% names(d)) d[[v]] <- NA_real_; d }
 
 read_scan <- function(dir, scan) {
@@ -45,8 +45,7 @@ cat("10-replicate scans:\n")
 full <- cells %>% pmap_dfr(function(sugar, sex, scan) {
   d <- read_scan(FULL_DIR, paste0(scan, "_no89")); if (is.null(d)) return(NULL)
   d %>% transmute(chr, pos = as.integer(pos), cM, sugar, sex,
-                  Wald_log10p, Cutl_H2, Falc_H2,
-                  Cutl_H2_bias, Falc_H2_bias, Cutl_clamp_frac)
+                  Wald_log10p, H2, H2_vc)
 })
 if (!nrow(full)) stop("none of the four 10-replicate scans were found")
 
@@ -58,8 +57,7 @@ half <- expand_grid(sugar = c("SY10", "SY20"), sex = c("F", "M"),
     scan <- paste0("AGE_", sugar, "_", sex, "_no89_", half)
     d <- read_scan(HALF_DIR, scan); if (is.null(d)) return(NULL)
     d %>% transmute(chr, pos = as.integer(pos), sex, sugar, half,
-                    Cutl_H2, Falc_H2, Wald_log10p,
-                    Cutl_H2_bias, Falc_H2_bias, Cutl_clamp_frac)
+                    H2, H2_vc, Wald_log10p)
   })
 if (!nrow(half)) stop("none of the eight halves were found")
 
@@ -71,7 +69,7 @@ write.table(half, gzfile(OUT_HALF), row.names = FALSE, quote = FALSE, sep = "\t"
 cat("\nWrote:\n  ", OUT_FULL, "\n  ", OUT_HALF, "\n\n", sep = "")
 full %>% group_by(sugar, sex) %>%
   summarise(windows = n(), max_wald = round(max(Wald_log10p, na.rm = TRUE), 1),
-            median_h2 = round(median(Cutl_H2, na.rm = TRUE), 3), .groups = "drop") %>%
+            median_h2 = round(median(H2, na.rm = TRUE), 3), .groups = "drop") %>%
   as.data.frame() %>% print(row.names = FALSE)
 cat("\nhalves:\n")
 half %>% count(sugar, sex, half, name = "windows") %>%

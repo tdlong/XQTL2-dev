@@ -27,7 +27,6 @@ done
 # not the 81 MB SNP scan, not the split halves, not the partition.
 if [ "$AB" -eq 1 ]; then
   WANT=(1); export PANELS=AB
-  : "${H2:=falconer}"; export H2
 fi
 [ ${#WANT[@]} -eq 0 ] && WANT=(1 2 3 rr)
 
@@ -37,10 +36,6 @@ if [ "$FETCH" -eq 1 ]; then
   if [ "$AB" -eq 1 ]; then
     rsync -av --files-from=- "$REMOTE" process/ <<'LIST'
 AGE_SY/AGE_SY_4scan_no89.txt.gz
-AGE_SY/Scans/AGE_SY10_F_no89/AGE_SY10_F_no89.h2_falconer.txt
-AGE_SY/Scans/AGE_SY20_F_no89/AGE_SY20_F_no89.h2_falconer.txt
-AGE_SY/Scans/AGE_SY10_M_no89/AGE_SY10_M_no89.h2_falconer.txt
-AGE_SY/Scans/AGE_SY20_M_no89/AGE_SY20_M_no89.h2_falconer.txt
 AGE_SY/Scans/AGE_SY10_F_no89/PROVENANCE.txt
 AGE_SY/Scans/AGE_SY20_F_no89/PROVENANCE.txt
 AGE_SY/Scans/AGE_SY10_M_no89/PROVENANCE.txt
@@ -54,10 +49,6 @@ AGE_SY/AGE_SY_4snpscan_no89.txt.gz
 AGE_SY/Calls/refalt_qc.txt
 AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz
 AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz
-AGE_SY/Scans/AGE_SY10_F_no89/AGE_SY10_F_no89.h2_falconer.txt
-AGE_SY/Scans/AGE_SY20_F_no89/AGE_SY20_F_no89.h2_falconer.txt
-AGE_SY/Scans/AGE_SY10_M_no89/AGE_SY10_M_no89.h2_falconer.txt
-AGE_SY/Scans/AGE_SY20_M_no89/AGE_SY20_M_no89.h2_falconer.txt
 LIST
   fi
   rc=$?

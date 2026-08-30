@@ -44,7 +44,7 @@ w <- w %>% semi_join(keep, by = c("chr", "tile")) %>% filter(is_eu)
 # significance implies.
 tl <- w %>% mutate(trt = paste0(sugar, "_", sex)) %>%
   group_by(trt, chr, tile) %>%
-  summarise(h2 = max(Cutl_H2), wald = max(Wald_log10p), .groups = "drop")
+  summarise(h2 = max(H2), wald = max(Wald_log10p), .groups = "drop")
 
 cat("h2 on 1 cM tiles: the floor, and the value at each cutoff\n\n")
 res <- map_dfr(sort(unique(tl$trt)), function(t) {
@@ -72,12 +72,12 @@ PK <- tribble(~chr, ~Mb,
   "chr2L", 14.85, "chr3L", 7.43, "chr2R", 13.88, "chr2R", 24.08)
 PK %>% pmap_dfr(function(chr, Mb) {
   w %>% filter(chr == !!chr, abs(pos/1e6 - Mb) < 0.03) %>%
-    group_by(trt) %>% summarise(h2 = max(Cutl_H2), .groups = "drop") %>%
+    group_by(trt) %>% summarise(h2 = max(H2), .groups = "drop") %>%
     pivot_wider(names_from = trt, values_from = h2) %>%
     mutate(peak = paste0(chr, " ", Mb), .before = 1)
 }) %>% mutate(across(where(is.numeric), ~round(.x, 2))) %>%
   as.data.frame() %>% print(row.names = FALSE)
 
 cat("\ndistribution of tile h2 (max over the four traits)\n\n")
-tl <- w %>% group_by(chr, tile) %>% summarise(h2 = max(Cutl_H2), .groups = "drop")
+tl <- w %>% group_by(chr, tile) %>% summarise(h2 = max(H2), .groups = "drop")
 print(round(quantile(tl$h2, c(.1,.25,.5,.75,.9,1)), 2))

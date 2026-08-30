@@ -85,10 +85,8 @@ fail=0
 # variance partition and run_numbers, because both read the split-half file --
 # and pairing freshly rerun main scans with split halves from an older run is
 # exactly the kind of silent mixing that has bitten this project.
-# h2: only re-derive the heritability from the existing smoothed rds. Nothing
-# upstream changes when the h2 estimator does, so a rescan is not needed.
 SCOPE=${1:-main}
-case $SCOPE in main|all|h2) ;; *) echo "usage: reproduce.sh [main|all|h2]" >&2; exit 1 ;; esac
+case $SCOPE in main|all) ;; *) echo "usage: reproduce.sh [main|all]" >&2; exit 1 ;; esac
 echo "scope:    $SCOPE"
 echo "repo:     $(git log -1 --format=%h) $(git log -1 --format=%s | cut -c1-52)"
 echo "pipeline: $(git -C pipeline log -1 --format=%h 2>/dev/null) $(git -C pipeline log -1 --format=%s 2>/dev/null | cut -c1-52)"
@@ -106,7 +104,7 @@ step () {   # label, then the command
 }
 
 # 1. the two gathered tables: Wald/h2 for the 4 scans, and the 8 split halves
-[ "$SCOPE" = h2 ] || step "gather" Rscript scripts_oneoffs/AGE_SY/nov_only/gather.R
+step "gather" Rscript scripts_oneoffs/AGE_SY/nov_only/gather.R
 
 # 2. the variance partition behind Figure 1c. BOTH arguments are required --
 #    varcomp_H2.R defaults to the 12-replicate paths and will otherwise rebuild
@@ -121,54 +119,11 @@ else
 fi
 
 # 3. founder frequencies around the seven zoom peaks, from the means files
-[ "$SCOPE" = h2 ] || step "zoom means" Rscript temp_aging/make_zoom_means.R
+step "zoom means" Rscript temp_aging/make_zoom_means.R
 
-# 4. bias-corrected Falconer h2, one file per scan. The pipeline's own h2 columns
-#    are the uncorrected Cutler ones, whose bias term saturates against the
-#    penetrance clamp and so under-corrects exactly where the variance is largest
-#    -- the male X (XQTL2 #40). h2_from_scan.R subtracts the exact Falconer bias
-#    instead. Needs the smoothed rds and the design, so it runs here, not on
-#    meansBySample.
-for sc in AGE_SY10_F AGE_SY20_F AGE_SY10_M AGE_SY20_M; do
-  step "h2: ${sc}_no89" \
-    Rscript pipeline/scripts/h2_from_scan.R \
-      --dir   process/AGE_SY \
-      --scan  "${sc}_no89" \
-      --rfile "helpfiles/AGE_SY/nov_only/${sc}.no89.txt"
-done
-
-# The eight half-scans, which the variance partition consumes. h2_rep must be
-# computed per half on 5 replicates -- the partition cannot take the 10-replicate
-# value and split it. Skipped under SCOPE=main, where the halves are not rerun.
-if [ "$SCOPE" != main ]; then
-  for sc in AGE_SY10_F AGE_SY20_F AGE_SY10_M AGE_SY20_M; do
-    for hf in odd even; do
-      step "h2: ${sc}_no89_${hf}" \
-        Rscript pipeline/scripts/h2_from_scan.R \
-          --dir   process/AGE_SY_splithalf \
-          --scan  "${sc}_no89_${hf}" \
-          --rfile "helpfiles/AGE_SY/nov_only/${sc}.no89.${hf}.txt"
-    done
-  done
-fi
-
-# 5. the R2 smoothing correction must exist before the h2 above is trusted:
-#    without <scan>.smooth_r2.txt, hap_scan silently applies R2=1 and the h2
-#    bias over-subtracts by 1/R2. run_scan.sh submits the diagnostic, so a
-#    missing file means that job failed rather than that it was skipped.
-echo
-echo "── R2 smoothing correction ──────────────────────────────────"
-missing_r2=0
-for sc in AGE_SY10_F AGE_SY20_F AGE_SY10_M AGE_SY20_M; do
-  f="process/AGE_SY/Scans/${sc}_no89/${sc}_no89.smooth_r2.txt"
-  if [ -f "$f" ]; then printf '   %-18s R2 = %s\n' "$sc" "$(cat "$f")"
-  else                 printf '   %-18s MISSING\n' "$sc"; missing_r2=1; fi
-done
-if [ "$missing_r2" -eq 1 ]; then
-  echo "   ^ hap_scan applied no correction for these; the h2 bias is too large" >&2
-  echo "     by 1/R2. Check the smooth_r2 job in the run_scan.sh chain." >&2
-  fail=1
-fi
+# H2 and H2_vc now come straight out of hap_scan.R in scan.txt (XQTL2 b93b98b);
+# h2_from_scan.R was deleted upstream, so there is no separate h2 step here any
+# more. gather.R picks the columns up.
 
 # 5b. can the partition run on h2_rep? Prints; run_numbers.sh captures it to
 #     numbers/partition_check.txt, which comes back through git. The point of
@@ -213,7 +168,7 @@ for f in process/AGE_SY/AGE_SY_4scan_no89.txt.gz \
          "${SPLITHALF}/AGE_SY_splithalf_H2_no89.txt.gz" \
          "${SPLITHALF}/H2_varcomp_by_window_no89.txt.gz" \
          process/AGE_SY/AGE_SY_zoom_means.txt.gz \
-         process/AGE_SY/Scans/AGE_SY20_M_no89/AGE_SY20_M_no89.h2_falconer.txt ; do
+         ; do
   if [ -f "$f" ]; then printf '  %-58s %s\n' "$f" "$(date -r "$f" '+%Y-%m-%d %H:%M')"
   else                 printf '  %-58s MISSING\n' "$f"; fi
 done

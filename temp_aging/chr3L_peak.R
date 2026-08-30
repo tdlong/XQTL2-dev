@@ -35,7 +35,7 @@ cat(sprintf("chr3L %.2f Mb, %d replicates\n\n", POS/1e6, n_distinct(z$REP)))
 cat("the scan at this window:\n\n")
 d %>% filter(chr == "chr3L", pos == POS) %>%
   transmute(trt = paste0(sugar, "_", sex), `-log10 P` = round(Wald_log10p, 1),
-            `h2 %` = round(Cutl_H2, 2)) %>%
+            `h2 %` = round(H2, 2)) %>%
   as.data.frame() %>% print(row.names = FALSE)
 
 # ── which founders move ──────────────────────────────────────────────────────

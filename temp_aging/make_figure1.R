@@ -43,7 +43,6 @@ FOURSCAN <- "process/AGE_SY/AGE_SY_4scan_no89.txt.gz"
 X_UNIT    <- Sys.getenv("X_UNIT", "Mb")
 OUT       <- sprintf("temp_aging/Figure1%s%s%s_plot.png",
                      if (toupper(Sys.getenv("PANELS","ABC"))=="AB") "_AB" else "",
-                     if (Sys.getenv("H2","cutler")=="falconer") "_falc" else "",
                      if (X_UNIT == "cM") "_cM" else "")
 W_IN <- 7.5; H_IN <- 6; DPI <- 300
 SMOOTH_BP_C <- 5e5             # rolling mean on panel C only
@@ -86,47 +85,20 @@ vc   <- if (want_C)
 scans <- if (file.exists(FOURSCAN)) {
   cat("panels A/B:", basename(FOURSCAN), "\n")
   read.table(FOURSCAN, header = TRUE, sep = "\t") %>% as_tibble() %>%
-    transmute(chr, pos, cM, sugar, sex, wald = Wald_log10p, h2 = Cutl_H2)
+    transmute(chr, pos, cM, sugar, sex, wald = Wald_log10p, h2 = H2)
 } else {
   cat("panels A/B: FALLING BACK to the split-half scans averaged over halves.\n",
       "  Run temp_aging/make_4scan_df.R on hpc3 and fetch", basename(FOURSCAN), "\n", sep = "")
   # the split-half file has no cM, so this fallback cannot draw the genetic axis
   long %>% group_by(chr, pos, sugar, sex) %>%
-    summarise(wald = mean(Wald_log10p), h2 = mean(Cutl_H2),
+    summarise(wald = mean(Wald_log10p), h2 = mean(H2),
               cM = NA_real_, .groups = "drop")
 }
-# Panel B source. Default is the pipeline's Cutler h2, uncorrected. H2=falconer
-# swaps in the bias-corrected Falconer h2 from h2_from_scan.R (XQTL2 #40): the
-# Cutler bias saturates against the penetrance clamp and so under-corrects where
-# the variance is largest, which is the male X.
-if (Sys.getenv("H2", "cutler") == "falconer") {
-  fal <- map_dfr(c("SY10_F","SY20_F","SY10_M","SY20_M"), function(sc) {
-    f <- file.path("process/AGE_SY/Scans", paste0("AGE_", sc, "_no89"),
-                   paste0("AGE_", sc, "_no89.h2_falconer.txt"))
-    if (!file.exists(f)) stop("missing ", f, "\nRun reproduce.sh on HPC3, then make_figures.sh.")
-    read.table(f, header = TRUE, colClasses = c(sex = "character")) %>% as_tibble() %>%
-      transmute(chr = CHROM, pos, sugar = str_extract(sc, "SY[12]0"),
-                sex = str_sub(sc, -1), h2_new = h2_rep, bias_new = h2_bias)
-  })
-  # The Falconer bias carries a 1/C_f term, so where a founder sits at the lsei
-  # floor it diverges -- p99 is 983 on chrX males, against an h2 scale where the
-  # strongest locus in the genome is 4.3. Subtracting that gives h2_corr of -40,
-  # which does not just look wrong, it destroys the panel scales and bleeds
-  # outside the plot. Those windows carry no information about h2 either way, so
-  # they are masked to NA and the line breaks there (XQTL2 #40).
-  # h2_rep: replicates averaged before squaring, the correction measured from
-  # them as var/n rather than modelled, and the leading constant 100*k rather
-  # than a hardcoded 200 -- so a hemizygous male X is no longer credited with
-  # the additive variance of a diploid locus (XQTL2 #40, 2688cc1 and dd27b45).
-  # h2_vc and h2_corr are kept in the file and superseded.
-  scans <- scans %>% inner_join(fal, by = c("chr", "pos", "sugar", "sex")) %>%
-    mutate(h2 = h2_new)
-  cat(sprintf("panel B: replicate-averaged h2 (h2_rep), %d windows; %.1f%% at or below zero\n",
-              nrow(scans), 100*mean(scans$h2 <= 0, na.rm = TRUE)))
-  scans <- scans %>% select(-h2_new, -bias_new)
-} else {
-  cat("panel B: Cutler h2, uncorrected\n")
-}
+# Panel B is H2 from the scan table -- hap_scan.R computes it directly since
+# XQTL2 b93b98b, averaging replicates before squaring, taking the correction from
+# them, and using 100*k so a hemizygous male X is not credited with a diploid
+# locus's additive variance. H2_vc is the same estimator made non-negative.
+cat("panel B: H2 from the scan table\n")
 
 scans <- scans %>%
   mutate(trt = factor(paste0(sugar, " ", ifelse(sex == "F", "female", "male")),
@@ -325,17 +297,9 @@ pA <- split_panel(scans, "wald", "trt", TRT_COL, 45, c(0, 45), c(45, 215),
 # 0.49% of windows sit above -- essentially chr3L at 4.71 and one SY10_M spike.
 # A break at 2.5 spent a third of the lower panel on 0.26% of the data. The
 # default Cutler scale is left alone.
-pB <- if (Sys.getenv("H2", "cutler") == "falconer")
-  split_panel(scans, "h2", "trt", TRT_COL, 1.75, c(0, 1.75), c(1.75, 5),
-              c(0, 0.5, 1.0, 1.5), c(2, 3, 4, 5),
-              expression(italic(h)^2), "B", lw = 0.28, xaxis = !want_C) else
-  split_panel(scans, "h2", "trt", TRT_COL, 2.5, c(0, 2.5), c(2.5, 5),
-              c(0, 0.5, 1, 1.5, 2), c(3, 4, 5),
-              expression(italic(h)^2), "B", lw = 0.28, xaxis = !want_C)
-# Break at 1.25, not 0.75: the pericentromeric main plateau runs to ~1.0, and a
-# break below it pushed that whole stretch into the short upper sub-panel. Only
-# 0.3-0.4% of smoothed values exceed 1.25 -- essentially just the chr3L spike --
-# in both the 12- and 10-replicate versions.
+pB <- split_panel(scans, "h2", "trt", TRT_COL, 1.75, c(0, 1.75), c(1.75, 5),
+                  c(0, 0.5, 1.0, 1.5), c(2, 3, 4, 5),
+                  expression(italic(h)^2), "B", lw = 0.28, xaxis = !want_C)
 pC <- if (!want_C) NULL else
   split_panel(cmp, "y", "term", CMP_COL, 1.25, c(-0.25, 1.25), c(1.25, 2.9),
                   c(-0.2, 0, 0.5, 1.0), c(1.5, 2, 2.5),

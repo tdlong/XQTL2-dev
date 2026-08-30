@@ -2,8 +2,8 @@
 #
 #   Rscript temp_aging/partition_check.R
 #
-# RUN ON HPC3 (via reproduce.sh / run_numbers.sh). Reads the eight half-scan
-# h2_falconer files, which reproduce.sh writes under scope h2 or all.
+# RUN ON HPC3 (via reproduce.sh). Reads the gathered split-half table, which
+# carries H2 for all eight half-scans since XQTL2 b93b98b put H2 in scan.txt.
 #
 # The partition decomposes h2 across 8 measures (4 treatments x 2 halves) and
 # subtracts the within-cell odd-even difference as a pure error term. Two
@@ -22,19 +22,12 @@
 
 suppressMessages(library(tidyverse))
 
-SCANS <- c("AGE_SY10_F","AGE_SY20_F","AGE_SY10_M","AGE_SY20_M")
-HALF  <- "process/AGE_SY_splithalf/Scans"
+LONG <- "process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz"
+if (!file.exists(LONG)) stop("missing ", LONG, " -- run reproduce.sh all first")
+d <- read.table(LONG, header = TRUE, sep = "\t") %>% as_tibble() %>%
+  mutate(sex = ifelse(sex %in% c("FALSE", "F"), "F", "M")) %>%
+  transmute(chr, pos, sugar, sex, half, h2 = H2)
 
-read_half <- function(sc, hf) {
-  f <- file.path(HALF, paste0(sc, "_no89_", hf), paste0(sc, "_no89_", hf, ".h2_falconer.txt"))
-  if (!file.exists(f)) return(NULL)
-  read.table(f, header = TRUE, colClasses = c(sex = "character")) %>% as_tibble() %>%
-    transmute(chr = CHROM, pos, sugar = str_extract(sc, "SY[12]0"),
-              sex = str_sub(sc, -1), half = hf, h2 = h2_rep)
-}
-d <- expand_grid(sc = SCANS, hf = c("odd","even")) %>%
-  pmap_dfr(function(sc, hf) read_half(sc, hf))
-if (!nrow(d)) stop("no half-scan h2_falconer files; run reproduce.sh h2 first")
 
 w <- d %>% pivot_wider(names_from = half, values_from = h2) %>%
   filter(!is.na(odd), !is.na(even)) %>%
