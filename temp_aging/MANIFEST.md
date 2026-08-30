@@ -132,14 +132,8 @@ is absent.
 
 ## Superseded — do not quote
 
-Written 13 August against **12 replicates, 75 kb windows and a Wald threshold of
-5**. Every genome-wide proportion and every partition number in them is wrong for
-the current dataset. Each now carries a banner saying so.
-
-    results_draft.md    the old full draft; para1-4 above replace its first four
-    SUMMARY.md          working notes on the partition
-    METHODS.md          says 12 cages; needs rewriting to 10
-    FLOOR_PROBLEM.md    predates the split-half error term and the per-pool bias
+Moved to `superseded/`, with a README saying why. Nothing there is read by any
+script, and no number in it is current.
 
 `archive/` holds the AGE_2024 pilot figures and superseded scripts. It is
 gitignored, so it exists only on this machine.

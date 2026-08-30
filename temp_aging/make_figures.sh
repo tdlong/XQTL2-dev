@@ -52,6 +52,6 @@ for n in "${WANT[@]}"; do
 done
 
 echo
-echo "figures in figures/ :"
-ls -lt figures/*.png 2>/dev/null | head -10 || echo "  none written"
+echo "written:"
+ls -lt temp_aging/*.png 2>/dev/null | awk '{printf "  %-34s %s %s %s\n", $9, $6, $7, $8}' | head
 exit "${fail:-0}"
