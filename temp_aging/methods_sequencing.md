@@ -32,9 +32,12 @@ coverage collapses on chr2L, so B5 was exempted from these rules on that arm
 alone. This gave **1,207,436 catalog SNPs** from 1,887,667 candidate positions,
 the largest single loss (294k) being proximity to an indel.
 
-**Coverage.** [[NOT YET SOURCED — run `temp_aging/coverage.R`. Wanted: mean
-median-depth per library at catalog SNPs over the 60 kept libraries, autosomes
-and chrX reported apart.]]
+**Coverage.** Depth was taken as each library's median REF+ALT count over
+catalog SNPs. Across the 60 libraries the scans use, autosomal depth averaged
+140× per library (per-sex medians 129× and 127×; range 49–400×). On chrX female
+libraries averaged 134× and male libraries 72×, the latter 0.54 of the former, as
+hemizygosity predicts; X and autosomes are therefore not pooled into a single
+figure. No library was flagged low-coverage or patchy by the pipeline's QC.
 
 **Code.** Alignment, calling and everything downstream used the XQTL2 pipeline
 (github.com/tdlong/XQTL2), which documents the tool versions and parameters.
@@ -51,22 +54,18 @@ thresholds (`logs/AGE_SY/clean_v6_filter.out`); B5's chr2L depth collapse
 (`logs/AGE_SY/compare_v3_v4_54375203.out`); 72 sample + 8 founder BAMs
 (`helpfiles/AGE_SY/AGE_SY.bams`).
 
-**Coverage is not sourced yet.** An earlier draft of this file quoted depth bins
-from `logs/AGE_SY/compare_summary.out`. Those are real, but they are per (SNP,
-sample) pooled over all 72 libraries at SNPs *shared between the old and new
-callers* — a caller-comparison by-product. Wrong sample set (includes replicates
-8 and 9), wrong SNP set (blind to the ~26k chr2L SNPs only the current caller
-has), and no separation of male chrX. They have been removed; do not reinstate
-them.
+Coverage is sourced: `temp_aging/coverage.R` -> `numbers/coverage.txt`, reading
+`process/AGE_SY/Calls/refalt_qc.txt` from the pipeline's own `refalt_qc.R`. It
+restricts to the 60 libraries the scans use, and reports chrX apart from the
+autosomes because males are hemizygous. Both were run on HPC3 on 2026-08-29.
 
-The right number is the median depth per library at catalog SNPs, over the 60
-libraries the scans actually use, with chrX apart from the autosomes because
-males are hemizygous. `pipeline/scripts/refalt_qc.R` computes the per-sample
-depths; `temp_aging/coverage.R` restricts them to the 60 and prints the summary.
-Neither has been run against the current `process/AGE_SY` — refalt_qc.R must run
-on HPC3 and the table be fetched back. The commands are in the header of
-`coverage.R`, which is registered in `run_numbers.sh`, so once the input is in
-place the number lands in `numbers/coverage.txt` like every other.
+An earlier draft of this file quoted depth bins from
+`logs/AGE_SY/compare_summary.out` instead. Those are real but describe something
+else — per (SNP, sample) pooled over all 72 libraries, at SNPs shared between the
+old and new callers, with male chrX folded into the autosomes. **Do not reinstate
+them.** They put 76% of observations in 50–199×; the actual per-library medians
+average 140× on the autosomes, so the old figures understated depth as well as
+mixing the wrong samples.
 
 **Needs Tony:** Nextera kit and read length; number of runs; flies per pool and
 DNA extraction, which are nowhere in this repo; and whether to report 72
