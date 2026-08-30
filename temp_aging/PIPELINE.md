@@ -55,18 +55,14 @@ submission and nothing enforces the order:
 
     bash scripts_oneoffs/AGE_SY/nov_only/run_snp_scans.sh
 
+It takes no `--sex` of its own and must not be given one. The chrX dosage is
+already in the `Num` it reads: `smooth_haps.R:200` scales `Num` before writing
+the rds, and `snp_scan.R` pulls `Num` from that rds, never from the design file.
+Applying `--sex` again would square the factor. Which sex an rds was built under
+is recorded -- `readRDS(f)$sex` -- so a stale SNP scan is detectable rather than
+inferred (XQTL2 #39).
+
 Figures are the other exception: they run on the laptop, from files fetched down.
-
-## What each product feeds
-
-| Product | Consumed by |
-|---|---|
-| `AGE_SY_4scan_no89.txt.gz` | Fig 1a, 1b; Fig 2 Wald panels; Fig rr; **all five** numbers scripts |
-| `AGE_SY_splithalf_H2_no89.txt.gz` | `significant_regions.R`; input to step 8 |
-| `H2_varcomp_by_window_no89.txt.gz` | **Fig 1c only** |
-| `AGE_SY_zoom_means.txt.gz` | Fig 2; `chr3L_peak.R` |
-| `AGE_SY_4snpscan_no89.txt.gz` | **Fig 3 only** |
-| `Calls/refalt_qc.txt` | `coverage.R` |
 
 ## The trap inside the derived chain
 
@@ -99,8 +95,5 @@ to the byte. That is the check on any rerun: if an autosomal number moves,
 something other than the sex flag changed.
 
 It enters at step 6, so everything from 6 downward is stale until rerun —
-including step 10, which is not chained.
-
-`snp_scan.R` has **no** X dosage handling at all, not even the old fixed 0.75,
-so Figure 3 on chrX is wrong independently of this fix. Rerunning step 10 does
-not correct it.
+including the SNP scan, which is not chained. The SNP scan picks the correction
+up through the rds, so rerunning it is sufficient; it needs no flag of its own.

@@ -79,8 +79,9 @@ for f in process/AGE_SY/AGE_SY_4scan_no89.txt.gz \
   else                 printf '  %-58s MISSING\n' "$f"; fi
 done
 echo
-echo "NOT rebuilt here -- the SNP scan reads the smoothed haplotypes, so it is"
-echo "stale after a new scan and must be resubmitted separately:"
+echo "NOT rebuilt here -- the SNP scan is imputed from the smoothed haplotype"
+echo "rds, so a new scan makes it stale. Resubmit it separately (no --sex: the"
+echo "chrX dosage is already in the Num it reads from the rds):"
 echo "  bash scripts_oneoffs/AGE_SY/nov_only/run_snp_scans.sh"
 echo
 echo "then: git add temp_aging/numbers/ temp_aging/peak_table.txt && git commit && git push"
