@@ -9,7 +9,8 @@
 #
 # reproduce.sh — rebuild EVERY derived result from the scans on disk.
 #
-#   sbatch temp_aging/reproduce.sh        # THIS. it takes minutes, not seconds.
+#   sbatch temp_aging/reproduce.sh all      # everything: derive, numbers, figures
+#   sbatch temp_aging/reproduce.sh figures  # redraw only -- seconds, no re-derivation
 #
 # Not `bash` on the head node: the zoom step alone reads four ~257 MB files.
 # The SBATCH headers above are already set for it.
@@ -86,10 +87,26 @@ fail=0
 # and pairing freshly rerun main scans with split halves from an older run is
 # exactly the kind of silent mixing that has bitten this project.
 SCOPE=${1:-main}
-case $SCOPE in main|all) ;; *) echo "usage: reproduce.sh [main|all]" >&2; exit 1 ;; esac
+case $SCOPE in main|all|figures) ;; *) echo "usage: reproduce.sh [main|all|figures]" >&2; exit 1 ;; esac
 echo "scope:    $SCOPE"
 echo "repo:     $(git log -1 --format=%h) $(git log -1 --format=%s | cut -c1-52)"
 echo "pipeline: $(git -C pipeline log -1 --format=%h 2>/dev/null) $(git -C pipeline log -1 --format=%s 2>/dev/null | cut -c1-52)"
+
+# Skip a step whose output is already newer than the newest scan it derives from.
+# Without this every run redid gather and re-subset four ~257 MB meansBySample
+# files, minutes of work to reproduce a file that had not changed. FORCE=1 to
+# rebuild regardless.
+newest_scan=$(ls -t process/AGE_SY/Scans/*/*.scan.txt 2>/dev/null | head -1)
+current () {   # output path -> true if it postdates the newest scan
+  [ "${FORCE:-0}" != "1" ] && [ -n "$newest_scan" ] && [ -f "$1" ] && [ "$1" -nt "$newest_scan" ]
+}
+skip_or () {   # label, output, then the command
+  if current "$2"; then
+    echo; echo "── $1 ── already current ($(date -r "$2" '+%H:%M')), skipping"
+  else
+    local lbl=$1; shift 2; step "$lbl" "$@"
+  fi
+}
 
 step () {   # label, then the command
   local label=$1; shift
@@ -104,7 +121,8 @@ step () {   # label, then the command
 }
 
 # 1. the two gathered tables: Wald/h2 for the 4 scans, and the 8 split halves
-step "gather" Rscript scripts_oneoffs/AGE_SY/nov_only/gather.R
+[ "$SCOPE" = figures ] || skip_or "gather" process/AGE_SY/AGE_SY_4scan_no89.txt.gz \
+  Rscript scripts_oneoffs/AGE_SY/nov_only/gather.R
 
 # 2. the variance partition behind Figure 1c. BOTH arguments are required --
 #    varcomp_H2.R defaults to the 12-replicate paths and will otherwise rebuild
@@ -119,7 +137,8 @@ else
 fi
 
 # 3. founder frequencies around the seven zoom peaks, from the means files
-step "zoom means" Rscript temp_aging/make_zoom_means.R
+[ "$SCOPE" = figures ] || skip_or "zoom means" process/AGE_SY/AGE_SY_zoom_means.txt.gz \
+  Rscript temp_aging/make_zoom_means.R
 
 # H2 and H2_vc now come straight out of hap_scan.R in scan.txt (XQTL2 b93b98b);
 # h2_from_scan.R was deleted upstream, so there is no separate h2 step here any
@@ -132,7 +151,7 @@ step "zoom means" Rscript temp_aging/make_zoom_means.R
 # Written straight to numbers/, not just printed: under scope h2 run_numbers.sh
 # does not run, so relying on it to capture this meant the answer stayed in the
 # job log and never came back through git.
-if [ "$SCOPE" != main ]; then
+if [ "$SCOPE" = all ]; then
   mkdir -p temp_aging/numbers
   {
     echo "# partition_check.R"
