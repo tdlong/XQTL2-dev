@@ -95,7 +95,7 @@ if (Sys.getenv("H2", "cutler") == "falconer") {
     if (!file.exists(f)) stop("missing ", f, "\nRun reproduce.sh on HPC3, then make_figures.sh.")
     read.table(f, header = TRUE, colClasses = c(sex = "character")) %>% as_tibble() %>%
       transmute(chr = CHROM, pos, sugar = str_extract(sc, "SY[12]0"),
-                sex = str_sub(sc, -1), h2_new = h2_corr, bias_new = h2_bias)
+                sex = str_sub(sc, -1), h2_new = h2_vc, bias_new = h2_bias)
   })
   # The Falconer bias carries a 1/C_f term, so where a founder sits at the lsei
   # floor it diverges -- p99 is 983 on chrX males, against an h2 scale where the
@@ -103,15 +103,13 @@ if (Sys.getenv("H2", "cutler") == "falconer") {
   # which does not just look wrong, it destroys the panel scales and bleeds
   # outside the plot. Those windows carry no information about h2 either way, so
   # they are masked to NA and the line breaks there (XQTL2 #40).
-  BIAS_MAX <- 5
+  # h2_vc, not h2_corr: it fits tau2 per window by ML, so non-negativity is a
+  # boundary solution rather than a clamp. h2_corr is unbiased but unbounded
+  # below and came out negative at 85% of chrX windows (XQTL2 #40).
   scans <- scans %>% inner_join(fal, by = c("chr", "pos", "sugar", "sex")) %>%
-    mutate(h2 = if_else(bias_new > BIAS_MAX, NA_real_, h2_new))
-  cat(sprintf("panel B: bias-corrected Falconer h2; %d of %d windows masked (bias > %g)\n",
-              sum(is.na(scans$h2)), nrow(scans), BIAS_MAX))
-  scans %>% mutate(arm = if_else(chr == "chrX", "chrX", "autosome")) %>%
-    group_by(arm, sex) %>%
-    summarise(masked_pct = round(100*mean(is.na(h2)), 1), .groups = "drop") %>%
-    as.data.frame() %>% print(row.names = FALSE)
+    mutate(h2 = h2_new)
+  cat(sprintf("panel B: variance-component h2 (h2_vc), %d windows; %.1f%% at zero\n",
+              nrow(scans), 100*mean(scans$h2 <= 0, na.rm = TRUE)))
   scans <- scans %>% select(-h2_new, -bias_new)
 } else {
   cat("panel B: Cutler h2, uncorrected\n")
@@ -308,13 +306,10 @@ pA <- split_panel(scans, "wald", "trt", TRT_COL, 45, c(0, 45), c(45, 215),
 # The corrected h2 is an unbiased estimate of zero at null windows, so it
 # scatters negative and the panel has to show that. The Cutler version cannot go
 # below zero, hence the floor of 0 in the default range.
-pB <- if (Sys.getenv("H2", "cutler") == "falconer")
-  split_panel(scans, "h2", "trt", TRT_COL, 2.5, c(-0.75, 2.5), c(2.5, 5),
-              c(-0.5, 0, 0.5, 1, 1.5, 2), c(3, 4, 5),
-              expression(italic(h)^2), "B", lw = 0.28, zero = TRUE) else
-  split_panel(scans, "h2", "trt", TRT_COL, 2.5, c(0, 2.5), c(2.5, 5),
-              c(0, 0.5, 1, 1.5, 2), c(3, 4, 5),
-              expression(italic(h)^2), "B", lw = 0.28)
+# h2_vc is non-negative by construction, so the panel keeps its zero floor.
+pB <- split_panel(scans, "h2", "trt", TRT_COL, 2.5, c(0, 2.5), c(2.5, 5),
+                  c(0, 0.5, 1, 1.5, 2), c(3, 4, 5),
+                  expression(italic(h)^2), "B", lw = 0.28)
 # Break at 1.25, not 0.75: the pericentromeric main plateau runs to ~1.0, and a
 # break below it pushed that whole stretch into the short upper sub-panel. Only
 # 0.3-0.4% of smoothed values exceed 1.25 -- essentially just the chr3L spike --
