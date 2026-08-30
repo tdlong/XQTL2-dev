@@ -1,0 +1,8 @@
+  h2_threshold.R             -> temp_aging/numbers/h2_threshold.txt
+  scan_resolution.R          -> temp_aging/numbers/scan_resolution.txt
+  significant_regions.R      -> temp_aging/numbers/significant_regions.txt
+  peak_table.R               -> temp_aging/numbers/peak_table.txt
+  chr3L_peak.R               -> temp_aging/numbers/chr3L_peak.txt
+  coverage.R                 -> temp_aging/numbers/coverage.txt
+
+every number in the prose should be findable in one of these files.

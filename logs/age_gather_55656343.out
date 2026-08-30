@@ -1,0 +1,23 @@
+10-replicate scans:
+5-replicate halves:
+
+Wrote:
+  process/AGE_SY/AGE_SY_4scan_no89.txt.gz
+  process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz
+
+ sugar sex windows max_wald median_h2
+  SY10   F   24988     39.6     0.615
+  SY10   M   24988    109.6     0.794
+  SY20   F   24988     61.1     0.645
+  SY20   M   24988    163.8     0.742
+
+halves:
+ sugar sex half windows
+  SY10   F even   24988
+  SY10   F  odd   24988
+  SY10   M even   24988
+  SY10   M  odd   24988
+  SY20   F even   24988
+  SY20   F  odd   24988
+  SY20   M even   24988
+  SY20   M  odd   24988

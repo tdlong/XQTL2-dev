@@ -1,23 +1,23 @@
 # significant_regions.R
-# run:    2026-08-29 20:42
+# run:    2026-08-29 23:26
 # script: f4b8ed9
 # reads:
-#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-29 20:37  md5:9e91a4f9
-#   process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz     9.2M  2026-08-29 20:37  md5:788fd414
+#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-29 23:19  md5:7d6b6877
+#   process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz     9.2M  2026-08-29 23:19  md5:ebe41c68
 #
 268 tiles of 1 cM; 85 reach -log10 P 7.5 in some treatment (32%)
 
 mean Cutl_H2_bias per pool, over all windows -- this is why it is subtracted:
 
  sugar sex half mean h2 mean bias
-  SY10   F even    0.79      0.71
-  SY10   F  odd    0.82      0.74
-  SY10   M even    0.96      0.77
-  SY10   M  odd    0.97      0.81
-  SY20   F even    0.73      0.72
-  SY20   F  odd    0.72      0.76
-  SY20   M even    0.81      0.78
-  SY20   M  odd    0.93      0.86
+  SY10   F even    0.79      0.66
+  SY10   F  odd    0.82      0.69
+  SY10   M even    0.96      0.71
+  SY10   M  odd    0.97      0.75
+  SY20   F even    0.73      0.67
+  SY20   F  odd    0.72      0.71
+  SY20   M even    0.81      0.73
+  SY20   M  odd    0.93      0.80
 
 X versus the autosomes (bias subtracted):
 
@@ -29,7 +29,7 @@ the same split by arm (bias subtracted):
 
    chr tiles med M med F M>F at
  chr2L    18  0.69  0.24    78%
- chr2R    26  0.18  0.33    50%
+ chr2R    26  0.20  0.33    50%
  chr3L    18  1.13  0.74    72%
  chr3R    21  0.12  0.31    14%
   chrX     2  1.14  0.15   100%
@@ -46,7 +46,7 @@ same on raw h2, bias left in:
 partition over significant tiles, % of the four-treatment sum of squares.
 95% intervals from 2000 bootstraps over 4 cM groups of tiles.
 
-  bias out  all         85 tiles   shared 85.3   sex 13.3 [ 8.6, 20.0]   diet  1.7 [ 0.8,  4.4]   int  -0.3 [ -0.8,  0.4]
-  bias out  autosomes   83 tiles   shared 85.9   sex 12.8 [ 8.0, 19.0]   diet  1.6 [ 0.7,  4.4]   int  -0.3 [ -0.7,  0.4]
-  bias in   all         85 tiles   shared 93.5   sex  5.9 [ 3.4,  8.1]   diet  0.7 [ 0.3,  1.2]   int  -0.1 [ -0.3,  0.1]
+  bias out  all         85 tiles   shared 85.3   sex 13.3 [ 8.6, 20.1]   diet  1.7 [ 0.8,  4.5]   int  -0.3 [ -0.8,  0.4]
+  bias out  autosomes   83 tiles   shared 85.8   sex 12.8 [ 8.0, 19.0]   diet  1.6 [ 0.8,  4.5]   int  -0.3 [ -0.7,  0.4]
+  bias in   all         85 tiles   shared 93.5   sex  5.9 [ 3.4,  8.1]   diet  0.7 [ 0.3,  1.2]   int  -0.2 [ -0.3,  0.1]
   bias in   autosomes   83 tiles   shared 93.9   sex  5.5 [ 3.0,  7.5]   diet  0.7 [ 0.4,  1.2]   int  -0.1 [ -0.3,  0.1]

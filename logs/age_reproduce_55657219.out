@@ -1,0 +1,225 @@
+using /opt/apps/R/4.2.2/bin/Rscript  [R version 4.2.2 (2022-10-31)]
+
+── gather ──────────────────────────────────────────────
+10-replicate scans:
+5-replicate halves:
+
+Wrote:
+  process/AGE_SY/AGE_SY_4scan_no89.txt.gz
+  process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz
+
+ sugar sex windows max_wald median_h2
+  SY10   F   24988     39.6     0.615
+  SY10   M   24988    109.6     0.794
+  SY20   F   24988     61.1     0.645
+  SY20   M   24988    163.8     0.742
+
+halves:
+ sugar sex half windows
+  SY10   F even   24988
+  SY10   F  odd   24988
+  SY10   M even   24988
+  SY10   M  odd   24988
+  SY20   F even   24988
+  SY20   F  odd   24988
+  SY20   M even   24988
+  SY20   M  odd   24988
+   ok
+
+── variance partition ──────────────────────────────────────────────
+floor calibrated on 7270 Wald<2 windows: 0.50-0.64 (raw b was 0.10-6.69)
+Wrote: process/AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz 
+
+Variance partition of Cutler h2
+autosomes (headline)       main  87.9%  sex   8.3%  diet   4.1%  sex:diet  -0.3%  (n=20776)
+whole genome incl. X       main  85.6%  sex  11.2%  diet   3.6%  sex:diet  -0.4%  (n=24988)
+X only                     main  58.7%  sex  45.0%  diet  -1.7%  sex:diet  -2.0%  (n=4212)
+chr3L QTL 9.3-9.6 Mb       main  85.5%  sex  14.2%  diet   0.6%  sex:diet  -0.3%  (n=59)
+
+Below the replicate error at:
+  main       18.7% of windows
+  sex        30.9% of windows
+  diet       43.4% of windows
+  sex:diet   64.6% of windows
+
+Largest terms (h2 percentage points):
+  sexH2 
+   chr   Mb   H2 wald mainH2 sexH2 dietH2
+ chr3L 9.53 2.47 48.5   2.46 1.209  0.256
+ chr3L 9.52 2.49 49.3   2.48 1.209  0.256
+ chr3L 9.53 2.45 47.7   2.45 1.209  0.256
+  dietH2 
+   chr   Mb   H2 wald mainH2 sexH2 dietH2
+ chr3L 8.49 0.84 12.0   0.84 0.151  0.326
+ chr3L 8.50 0.85 12.2   0.85 0.157  0.326
+ chr3L 8.51 0.87 12.5   0.86 0.162  0.325
+   ok
+
+── zoom means ──────────────────────────────────────────────
+Wrote: process/AGE_SY/AGE_SY_zoom_means.txt.gz 
+  1295616 rows; 7 loci x 4 treatments x 8 founders x 2 TRT x 12 REP
+       locus   rows
+ chr2L:10.71 185088
+ chr2L:11.95 185088
+ chr2L:14.85 185088
+ chr2R:13.88 185088
+ chr2R:16.52 185088
+  chr3L:9.31 185088
+  chrX:10.09 185088
+   ok
+
+── falconer h2: AGE_SY10_F_no89 ──────────────────────────────────────────────
+Smoothing R2: 0.9834 (variance of the smoothed estimate is 0.9834 of a single window's)
+Reading AGE_SY10_F_no89.smooth.chr2L.rds 
+  repaired 2356 / 738400 founder-windows (0.3%) with unresolvable covariance
+Reading AGE_SY10_F_no89.smooth.chr2R.rds 
+  repaired 7450 / 757920 founder-windows (1.0%) with unresolvable covariance
+Reading AGE_SY10_F_no89.smooth.chr3L.rds 
+  repaired 3250 / 856160 founder-windows (0.4%) with unresolvable covariance
+Reading AGE_SY10_F_no89.smooth.chr3R.rds 
+  repaired 7022 / 971680 founder-windows (0.7%) with unresolvable covariance
+Reading AGE_SY10_F_no89.smooth.chrX.rds 
+  repaired 27460 / 673920 founder-windows (4.1%) with unresolvable covariance
+
+Bias breakdown (medians): mult = multinomial half, rec = lsei reconstruction half
+ CHROM    h2_raw   h2_bias from_mult from_recon founders_at_floor
+ chr2L 0.5972956 0.6791290 0.5455046 0.15172930               1.4
+ chr2R 0.5737727 0.8456764 0.5736003 0.31070396               0.0
+ chr3L 0.7659264 0.6704119 0.5797634 0.09990425               0.1
+ chr3R 0.8187667 0.6594396 0.5829397 0.09942627               0.1
+  chrX 0.5869609 0.7831572 0.4489782 0.31058561               2.6
+
+ CHROM sex xfactor windows       raw      bias        corr
+ chr2L   F       1    4615 0.5972956 0.6791290 -0.08592933
+ chr2R   F       1    4737 0.5737727 0.8456764 -0.28898047
+ chr3L   F       1    5351 0.7659264 0.6704119  0.07694083
+ chr3R   F       1    6073 0.8187667 0.6594396  0.10241530
+  chrX   F       1    4212 0.5869609 0.7831572 -0.22551396
+
+Writing process/AGE_SY/Scans/AGE_SY10_F_no89/AGE_SY10_F_no89.h2_falconer.txt 
+Done.
+   ok
+
+── falconer h2: AGE_SY20_F_no89 ──────────────────────────────────────────────
+Smoothing R2: 0.9834 (variance of the smoothed estimate is 0.9834 of a single window's)
+Reading AGE_SY20_F_no89.smooth.chr2L.rds 
+  repaired 2354 / 738400 founder-windows (0.3%) with unresolvable covariance
+Reading AGE_SY20_F_no89.smooth.chr2R.rds 
+  repaired 7374 / 757920 founder-windows (1.0%) with unresolvable covariance
+Reading AGE_SY20_F_no89.smooth.chr3L.rds 
+  repaired 3214 / 856160 founder-windows (0.4%) with unresolvable covariance
+Reading AGE_SY20_F_no89.smooth.chr3R.rds 
+  repaired 7032 / 971680 founder-windows (0.7%) with unresolvable covariance
+Reading AGE_SY20_F_no89.smooth.chrX.rds 
+  repaired 27328 / 673920 founder-windows (4.1%) with unresolvable covariance
+
+Bias breakdown (medians): mult = multinomial half, rec = lsei reconstruction half
+ CHROM    h2_raw   h2_bias from_mult from_recon founders_at_floor
+ chr2L 0.5349639 0.6793080 0.5218903  0.1719449               1.4
+ chr2R 0.5654448 0.8513195 0.5562593  0.3368194               0.0
+ chr3L 0.8091633 0.6596007 0.5637433  0.1089737               0.1
+ chr3R 0.8164590 0.6550300 0.5636860  0.1132200               0.1
+  chrX 0.5997970 0.8138398 0.4386658  0.3534878               2.6
+
+ CHROM sex xfactor windows       raw      bias       corr
+ chr2L   F       1    4615 0.5349639 0.6793080 -0.1045862
+ chr2R   F       1    4737 0.5654448 0.8513195 -0.3903249
+ chr3L   F       1    5351 0.8091633 0.6596007  0.1624364
+ chr3R   F       1    6073 0.8164590 0.6550300  0.0976222
+  chrX   F       1    4212 0.5997970 0.8138398 -0.2320257
+
+Writing process/AGE_SY/Scans/AGE_SY20_F_no89/AGE_SY20_F_no89.h2_falconer.txt 
+Done.
+   ok
+
+── falconer h2: AGE_SY10_M_no89 ──────────────────────────────────────────────
+Smoothing R2: 0.9838 (variance of the smoothed estimate is 0.9838 of a single window's)
+Reading AGE_SY10_M_no89.smooth.chr2L.rds 
+  repaired 2350 / 738400 founder-windows (0.3%) with unresolvable covariance
+Reading AGE_SY10_M_no89.smooth.chr2R.rds 
+  repaired 7384 / 757920 founder-windows (1.0%) with unresolvable covariance
+Reading AGE_SY10_M_no89.smooth.chr3L.rds 
+  repaired 3184 / 856160 founder-windows (0.4%) with unresolvable covariance
+Reading AGE_SY10_M_no89.smooth.chr3R.rds 
+  repaired 7036 / 971680 founder-windows (0.7%) with unresolvable covariance
+Reading AGE_SY10_M_no89.smooth.chrX.rds 
+  repaired 28152 / 673920 founder-windows (4.2%) with unresolvable covariance
+
+Bias breakdown (medians): mult = multinomial half, rec = lsei reconstruction half
+ CHROM    h2_raw   h2_bias from_mult from_recon founders_at_floor
+ chr2L 0.8361364 0.6811105 0.5158834  0.1688451               1.3
+ chr2R 0.6488386 0.8726865 0.5530156  0.3463910               0.0
+ chr3L 0.8708206 0.6626228 0.5648089  0.1093704               0.1
+ chr3R 0.7646253 0.6559248 0.5623390  0.1188609               0.1
+  chrX 1.1184349 1.4808075 0.8883159  0.5653970               2.6
+
+ CHROM sex xfactor windows       raw      bias        corr
+ chr2L   M     1.0    4615 0.8361364 0.6811105  0.13192871
+ chr2R   M     1.0    4737 0.6488386 0.8726865 -0.16178080
+ chr3L   M     1.0    5351 0.8708206 0.6626228  0.22563554
+ chr3R   M     1.0    6073 0.7646253 0.6559248  0.08816642
+  chrX   M     0.5    4212 1.1184349 1.4808075 -0.36168595
+
+Writing process/AGE_SY/Scans/AGE_SY10_M_no89/AGE_SY10_M_no89.h2_falconer.txt 
+Done.
+   ok
+
+── falconer h2: AGE_SY20_M_no89 ──────────────────────────────────────────────
+Smoothing R2: 0.9842 (variance of the smoothed estimate is 0.9842 of a single window's)
+Reading AGE_SY20_M_no89.smooth.chr2L.rds 
+  repaired 2358 / 738400 founder-windows (0.3%) with unresolvable covariance
+Reading AGE_SY20_M_no89.smooth.chr2R.rds 
+  repaired 7420 / 757920 founder-windows (1.0%) with unresolvable covariance
+Reading AGE_SY20_M_no89.smooth.chr3L.rds 
+  repaired 3208 / 856160 founder-windows (0.4%) with unresolvable covariance
+Reading AGE_SY20_M_no89.smooth.chr3R.rds 
+  repaired 7020 / 971680 founder-windows (0.7%) with unresolvable covariance
+Reading AGE_SY20_M_no89.smooth.chrX.rds 
+  repaired 27968 / 673920 founder-windows (4.2%) with unresolvable covariance
+
+Bias breakdown (medians): mult = multinomial half, rec = lsei reconstruction half
+ CHROM    h2_raw   h2_bias from_mult from_recon founders_at_floor
+ chr2L 0.6665580 0.6716979 0.5052199  0.1860049               1.3
+ chr2R 0.6011740 0.9010213 0.5489485  0.3862189               0.0
+ chr3L 0.8467597 0.6621072 0.5578331  0.1178017               0.1
+ chr3R 0.7202369 0.6582581 0.5587971  0.1265528               0.1
+  chrX 1.0505447 1.4942703 0.8643699  0.5949223               2.6
+
+ CHROM sex xfactor windows       raw      bias        corr
+ chr2L   M     1.0    4615 0.6665580 0.6716979 -0.01079209
+ chr2R   M     1.0    4737 0.6011740 0.9010213 -0.29951692
+ chr3L   M     1.0    5351 0.8467597 0.6621072  0.16476987
+ chr3R   M     1.0    6073 0.7202369 0.6582581  0.01442981
+  chrX   M     0.5    4212 1.0505447 1.4942703 -0.46196066
+
+Writing process/AGE_SY/Scans/AGE_SY20_M_no89/AGE_SY20_M_no89.h2_falconer.txt 
+Done.
+   ok
+
+── numbers ──────────────────────────────────────────────
+  h2_threshold.R             -> temp_aging/numbers/h2_threshold.txt
+  scan_resolution.R          -> temp_aging/numbers/scan_resolution.txt
+  significant_regions.R      -> temp_aging/numbers/significant_regions.txt
+  peak_table.R               -> temp_aging/numbers/peak_table.txt
+  chr3L_peak.R               -> temp_aging/numbers/chr3L_peak.txt
+  coverage.R                 -> temp_aging/numbers/coverage.txt
+
+every number in the prose should be findable in one of these files.
+   ok
+
+════════════════════════════════════════════════════════
+all derived results rebuilt.
+
+current:
+  process/AGE_SY/AGE_SY_4scan_no89.txt.gz                    2026-08-29 23:19
+  process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz   2026-08-29 23:19
+  process/AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz  2026-08-29 23:19
+  process/AGE_SY/AGE_SY_zoom_means.txt.gz                    2026-08-29 23:21
+  process/AGE_SY/Scans/AGE_SY20_M_no89/AGE_SY20_M_no89.h2_falconer.txt 2026-08-29 23:25
+
+NOT rebuilt here -- the SNP scan is imputed from the smoothed haplotype
+rds, so a new scan makes it stale. Resubmit it separately (no --sex: the
+chrX dosage is already in the Num it reads from the rds):
+  bash scripts_oneoffs/AGE_SY/nov_only/run_snp_scans.sh
+
+then: git add temp_aging/numbers/ temp_aging/peak_table.txt && git commit && git push

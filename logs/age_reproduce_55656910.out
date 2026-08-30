@@ -1,0 +1,169 @@
+using /opt/apps/R/4.2.2/bin/Rscript  [R version 4.2.2 (2022-10-31)]
+
+── gather ──────────────────────────────────────────────
+10-replicate scans:
+5-replicate halves:
+
+Wrote:
+  process/AGE_SY/AGE_SY_4scan_no89.txt.gz
+  process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz
+
+ sugar sex windows max_wald median_h2
+  SY10   F   24988     39.6     0.615
+  SY10   M   24988    109.6     0.794
+  SY20   F   24988     61.1     0.645
+  SY20   M   24988    163.8     0.742
+
+halves:
+ sugar sex half windows
+  SY10   F even   24988
+  SY10   F  odd   24988
+  SY10   M even   24988
+  SY10   M  odd   24988
+  SY20   F even   24988
+  SY20   F  odd   24988
+  SY20   M even   24988
+  SY20   M  odd   24988
+   ok
+
+── variance partition ──────────────────────────────────────────────
+floor calibrated on 7260 Wald<2 windows: 0.50-0.76 (raw b was 0.10-8.32)
+Wrote: process/AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz 
+
+Variance partition of Cutler h2
+autosomes (headline)       main  88.2%  sex   8.0%  diet   4.0%  sex:diet  -0.3%  (n=20776)
+whole genome incl. X       main  86.0%  sex  10.9%  diet   3.6%  sex:diet  -0.4%  (n=24988)
+X only                     main  58.6%  sex  45.4%  diet  -1.8%  sex:diet  -2.2%  (n=4212)
+chr3L QTL 9.3-9.6 Mb       main  85.8%  sex  13.9%  diet   0.6%  sex:diet  -0.3%  (n=59)
+
+Below the replicate error at:
+  main       18.7% of windows
+  sex        31.1% of windows
+  diet       43.7% of windows
+  sex:diet   64.5% of windows
+
+Largest terms (h2 percentage points):
+  sexH2 
+   chr   Mb   H2 wald mainH2 sexH2 dietH2
+ chr3L 9.53 2.48 48.5   2.47 1.200  0.256
+ chr3L 9.52 2.50 49.3   2.49 1.200  0.256
+ chr3L 9.53 2.46 47.7   2.46 1.199  0.256
+  dietH2 
+   chr   Mb   H2 wald mainH2 sexH2 dietH2
+ chr3L 8.50 0.87 12.2   0.86 0.157  0.322
+ chr3L 8.49 0.85 12.0   0.85 0.152  0.322
+ chr3L 8.51 0.88 12.5   0.88 0.162  0.322
+   ok
+
+── zoom means ──────────────────────────────────────────────
+Wrote: process/AGE_SY/AGE_SY_zoom_means.txt.gz 
+  1295616 rows; 7 loci x 4 treatments x 8 founders x 2 TRT x 12 REP
+       locus   rows
+ chr2L:10.71 185088
+ chr2L:11.95 185088
+ chr2L:14.85 185088
+ chr2R:13.88 185088
+ chr2R:16.52 185088
+  chr3L:9.31 185088
+  chrX:10.09 185088
+   ok
+
+── falconer h2: AGE_SY10_F_no89 ──────────────────────────────────────────────
+Reading AGE_SY10_F_no89.smooth.chr2L.rds 
+Reading AGE_SY10_F_no89.smooth.chr2R.rds 
+Reading AGE_SY10_F_no89.smooth.chr3L.rds 
+Reading AGE_SY10_F_no89.smooth.chr3R.rds 
+Reading AGE_SY10_F_no89.smooth.chrX.rds 
+
+ CHROM sex xfactor windows       raw      bias        corr
+ chr2L   F       1    4615 0.5972956 0.6985985 -0.10419100
+ chr2R   F       1    4737 0.5737727 0.8760116 -0.33317603
+ chr3L   F       1    5351 0.7659264 0.6817621  0.04947380
+ chr3R   F       1    6073 0.8187667 0.6717436  0.08312948
+  chrX   F       1    4212 0.5869609 0.7966969 -0.24515393
+
+Writing process/AGE_SY/Scans/AGE_SY10_F_no89/AGE_SY10_F_no89.h2_falconer.txt 
+Done.
+   ok
+
+── falconer h2: AGE_SY20_F_no89 ──────────────────────────────────────────────
+Reading AGE_SY20_F_no89.smooth.chr2L.rds 
+Reading AGE_SY20_F_no89.smooth.chr2R.rds 
+Reading AGE_SY20_F_no89.smooth.chr3L.rds 
+Reading AGE_SY20_F_no89.smooth.chr3R.rds 
+Reading AGE_SY20_F_no89.smooth.chrX.rds 
+
+ CHROM sex xfactor windows       raw      bias        corr
+ chr2L   F       1    4615 0.5349639 0.6964533 -0.13011528
+ chr2R   F       1    4737 0.5654448 0.8851270 -0.42469238
+ chr3L   F       1    5351 0.8091633 0.6707647  0.14389451
+ chr3R   F       1    6073 0.8164590 0.6675891  0.07264119
+  chrX   F       1    4212 0.5997970 0.8276504 -0.24932693
+
+Writing process/AGE_SY/Scans/AGE_SY20_F_no89/AGE_SY20_F_no89.h2_falconer.txt 
+Done.
+   ok
+
+── falconer h2: AGE_SY10_M_no89 ──────────────────────────────────────────────
+Reading AGE_SY10_M_no89.smooth.chr2L.rds 
+Reading AGE_SY10_M_no89.smooth.chr2R.rds 
+Reading AGE_SY10_M_no89.smooth.chr3L.rds 
+Reading AGE_SY10_M_no89.smooth.chr3R.rds 
+Reading AGE_SY10_M_no89.smooth.chrX.rds 
+
+ CHROM sex xfactor windows       raw      bias        corr
+ chr2L   M     1.0    4615 0.8361364 0.6984821  0.11945750
+ chr2R   M     1.0    4737 0.6488386 0.8894443 -0.18380726
+ chr3L   M     1.0    5351 0.8708206 0.6735682  0.21065415
+ chr3R   M     1.0    6073 0.7646253 0.6677848  0.07025204
+  chrX   M     0.5    4212 1.1184349 1.5052679 -0.41411596
+
+Writing process/AGE_SY/Scans/AGE_SY10_M_no89/AGE_SY10_M_no89.h2_falconer.txt 
+Done.
+   ok
+
+── falconer h2: AGE_SY20_M_no89 ──────────────────────────────────────────────
+Reading AGE_SY20_M_no89.smooth.chr2L.rds 
+Reading AGE_SY20_M_no89.smooth.chr2R.rds 
+Reading AGE_SY20_M_no89.smooth.chr3L.rds 
+Reading AGE_SY20_M_no89.smooth.chr3R.rds 
+Reading AGE_SY20_M_no89.smooth.chrX.rds 
+
+ CHROM sex xfactor windows       raw      bias         corr
+ chr2L   M     1.0    4615 0.6665580 0.6950801 -0.022671674
+ chr2R   M     1.0    4737 0.6011740 0.9259760 -0.331369020
+ chr3L   M     1.0    5351 0.8467597 0.6727695  0.146684067
+ chr3R   M     1.0    6073 0.7202369 0.6698383 -0.002173681
+  chrX   M     0.5    4212 1.0505447 1.5183333 -0.495955855
+
+Writing process/AGE_SY/Scans/AGE_SY20_M_no89/AGE_SY20_M_no89.h2_falconer.txt 
+Done.
+   ok
+
+── numbers ──────────────────────────────────────────────
+  h2_threshold.R             -> temp_aging/numbers/h2_threshold.txt
+  scan_resolution.R          -> temp_aging/numbers/scan_resolution.txt
+  significant_regions.R      -> temp_aging/numbers/significant_regions.txt
+  peak_table.R               -> temp_aging/numbers/peak_table.txt
+  chr3L_peak.R               -> temp_aging/numbers/chr3L_peak.txt
+  coverage.R                 -> temp_aging/numbers/coverage.txt
+
+every number in the prose should be findable in one of these files.
+   ok
+
+════════════════════════════════════════════════════════
+all derived results rebuilt.
+
+current:
+  process/AGE_SY/AGE_SY_4scan_no89.txt.gz                    2026-08-29 21:57
+  process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz   2026-08-29 21:57
+  process/AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz  2026-08-29 21:57
+  process/AGE_SY/AGE_SY_zoom_means.txt.gz                    2026-08-29 21:59
+  process/AGE_SY/Scans/AGE_SY20_M_no89/AGE_SY20_M_no89.h2_falconer.txt 2026-08-29 22:02
+
+NOT rebuilt here -- the SNP scan is imputed from the smoothed haplotype
+rds, so a new scan makes it stale. Resubmit it separately (no --sex: the
+chrX dosage is already in the Num it reads from the rds):
+  bash scripts_oneoffs/AGE_SY/nov_only/run_snp_scans.sh
+
+then: git add temp_aging/numbers/ temp_aging/peak_table.txt && git commit && git push

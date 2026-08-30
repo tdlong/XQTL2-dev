@@ -1,0 +1,5 @@
+"bam" "samples" "Num" "TRT" "REP" "REPrep" "Proportion"
+"9" "R5con" "Con_5_1" 640 "C" 5 1 NA
+"10" "R5age" "Age_5_1" 542 "Z" 5 1 0.045
+"11" "R6con" "Con_6_1" 610 "C" 6 1 NA
+"12" "R6age" "Age_6_1" 647 "Z" 6 1 0.053

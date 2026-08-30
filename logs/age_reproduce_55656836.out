@@ -1,0 +1,49 @@
+
+── gather ──────────────────────────────────────────────
+Fatal error: cannot open file 'scripts_oneoffs/AGE_SY/nov_only/gather.R': No such file or directory
+   FAILED: gather
+
+── variance partition ──────────────────────────────────────────────
+Fatal error: cannot open file 'scripts_oneoffs/AGE_SY/splithalf/varcomp_H2.R': No such file or directory
+   FAILED: variance partition
+
+── zoom means ──────────────────────────────────────────────
+Fatal error: cannot open file 'temp_aging/make_zoom_means.R': No such file or directory
+   FAILED: zoom means
+
+── falconer h2: AGE_SY10_F_no89 ──────────────────────────────────────────────
+Fatal error: cannot open file 'pipeline/scripts/h2_from_scan.R': No such file or directory
+   FAILED: falconer h2: AGE_SY10_F_no89
+
+── falconer h2: AGE_SY20_F_no89 ──────────────────────────────────────────────
+Fatal error: cannot open file 'pipeline/scripts/h2_from_scan.R': No such file or directory
+   FAILED: falconer h2: AGE_SY20_F_no89
+
+── falconer h2: AGE_SY10_M_no89 ──────────────────────────────────────────────
+Fatal error: cannot open file 'pipeline/scripts/h2_from_scan.R': No such file or directory
+   FAILED: falconer h2: AGE_SY10_M_no89
+
+── falconer h2: AGE_SY20_M_no89 ──────────────────────────────────────────────
+Fatal error: cannot open file 'pipeline/scripts/h2_from_scan.R': No such file or directory
+   FAILED: falconer h2: AGE_SY20_M_no89
+
+── numbers ──────────────────────────────────────────────
+bash: temp_aging/run_numbers.sh: No such file or directory
+   FAILED: numbers
+
+════════════════════════════════════════════════════════
+SOMETHING FAILED -- see above. Do not trust the outputs.
+
+current:
+  process/AGE_SY/AGE_SY_4scan_no89.txt.gz                    MISSING
+  process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz   MISSING
+  process/AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz  MISSING
+  process/AGE_SY/AGE_SY_zoom_means.txt.gz                    MISSING
+  process/AGE_SY/Scans/AGE_SY20_M_no89/AGE_SY20_M_no89.h2_falconer.txt MISSING
+
+NOT rebuilt here -- the SNP scan is imputed from the smoothed haplotype
+rds, so a new scan makes it stale. Resubmit it separately (no --sex: the
+chrX dosage is already in the Num it reads from the rds):
+  bash scripts_oneoffs/AGE_SY/nov_only/run_snp_scans.sh
+
+then: git add temp_aging/numbers/ temp_aging/peak_table.txt && git commit && git push

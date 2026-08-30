@@ -1,0 +1,24 @@
+Wrote: process/AGE_SY_splithalf/AGE_SY_splithalf_H2.txt.gz 
+  199904 rows = 24988 windows x 8 cells
+# A tibble: 8 × 4
+  sex   sugar half  n_windows
+  <chr> <chr> <chr>     <int>
+1 F     SY10  even      24988
+2 F     SY10  odd       24988
+3 F     SY20  even      24988
+4 F     SY20  odd       24988
+5 M     SY10  even      24988
+6 M     SY10  odd       24988
+7 M     SY20  even      24988
+8 M     SY20  odd       24988
+
+Cutl_H2 by cell (bias = the reported floor, XQTL2 #34):
+ sex sugar half    median median_bias median_corrected clamp_frac frac_negative
+   F  SY10 even 0.6142744   0.6235890     -0.003694749 0.06527902             0
+   F  SY10  odd 0.6342879   0.6527863     -0.009068367 0.07591249             0
+   F  SY20 even 0.6003607   0.6213082     -0.018951255 0.06541406             0
+   F  SY20  odd 0.6896554   0.6475543      0.070266812 0.06844705             0
+   M  SY10 even 0.7442827   0.6185692      0.098215160 0.06346733             0
+   M  SY10  odd 0.7693826   0.6406287      0.119065786 0.06696764             0
+   M  SY20 even 0.6913755   0.6195694      0.069339607 0.06079002             0
+   M  SY20  odd 0.7292554   0.6650206      0.058171297 0.06386455             0

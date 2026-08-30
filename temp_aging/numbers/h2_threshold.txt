@@ -1,19 +1,19 @@
 # h2_threshold.R
-# run:    2026-08-29 20:42
+# run:    2026-08-29 23:25
 # script: b9bdaf2
 # reads:
-#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  3.1M  2026-08-29 20:37  md5:9e91a4f9
+#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  4.6M  2026-08-29 23:19  md5:7d6b6877
 #
 h2 on 1 cM tiles: the floor, and the value at each cutoff
 
   trait floor (Wald<2) n tiles at 7.5 at 15 % tiles > 7.5 % tiles > 15
- SY10_F           0.59     128   0.93  1.22          14.9          5.2
- SY10_M           0.84      85   1.06  1.37          19.8          7.5
- SY20_F           0.62     115   0.99  1.21          17.9          7.1
- SY20_M           0.79      98   0.97  1.28          14.6          7.8
+ SY10_F           0.59     127   0.93  1.22          14.9          5.2
+ SY10_M           0.82      82   1.05  1.38          20.1          7.5
+ SY20_F           0.62     115   0.99  1.21          18.3          7.1
+ SY20_M           0.79      98   0.97  1.29          14.6          7.8
 
-  averaged over the four traits:  floor 0.71   at 7.5 0.99   at 15 1.27
-  ranges: 0.59-0.84, 0.93-1.06, 1.21-1.37
+  averaged over the four traits:  floor 0.70   at 7.5 0.98   at 15 1.27
+  ranges: 0.59-0.82, 0.93-1.05, 1.21-1.38
 
 h2 at the peaks in Table S1, per trait
 

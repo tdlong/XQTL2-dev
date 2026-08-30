@@ -1,8 +1,8 @@
 # scan_resolution.R
-# run:    2026-08-29 20:42
+# run:    2026-08-29 23:26
 # script: a1690f2
 # reads:
-#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-29 20:37  md5:9e91a4f9
+#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-29 23:19  md5:7d6b6877
 #
 270 tiles of 1 cM across the whole map; 2 lie wholly in
 heterochromatin and are dropped, 5 straddle a boundary and are kept.
@@ -13,7 +13,7 @@ fraction of tiles whose strongest window exceeds a threshold
 (max over the four treatments)
 
  threshold   n % of tiles
-       5.0 138       51.5
+       5.0 139       51.9
        7.5  85       31.7
       10.0  58       21.6
       15.0  32       11.9
@@ -39,7 +39,7 @@ by arm:
  chr2L 52    52     15           0.25
  chr2R 50    70      6           0.33
  chr3L 47    60     34           0.30
- chr3R 54    69      9           0.36
+ chr3R 54    70      9           0.36
   chrX 65    17      0           0.26
 
 tiles above 15, in order:

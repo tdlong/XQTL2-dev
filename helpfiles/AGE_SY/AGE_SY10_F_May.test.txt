@@ -1,0 +1,5 @@
+"filesize" "bam" "longTRT" "Replicate" "Sex" "TRT" "REP" "REPrep" "Num" "Proportion"
+"8" 0 "AgeSY10_R8_F" "AgeSY10" "R8" "F" "Z" 8 1 701 0.0717
+"9" 0 "AgeSY10_R9_F" "AgeSY10" "R9" "F" "Z" 9 1 417 0.0401
+"20" 0 "Con_R8_F" "Con" "R8" "F" "C" 8 1 631 NA
+"21" 0 "Con_R9_F" "Con" "R9" "F" "C" 9 1 607 NA
