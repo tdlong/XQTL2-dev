@@ -26,10 +26,17 @@ h2 <- pk %>% transmute(chr, pos = round(Mb * 1e6)) %>%
   left_join(sc %>% select(chr, pos, trt, H2), by = c("chr", "pos")) %>%
   pivot_wider(names_from = trt, values_from = H2, names_prefix = "h2_")
 
+ARMS <- c("chrX", "chr2L", "chr2R", "chr3L", "chr3R")
+
 tab <- pk %>%
   mutate(pos = round(Mb * 1e6)) %>%
   left_join(h2, by = c("chr", "pos")) %>%
+  # ordered by threshold set, then along the genome within each set
+  mutate(Set = if_else(grepl("^A", set), "-log10 P > 15", "-log10 P 7.5 to 15"),
+         .arm = factor(chr, levels = ARMS)) %>%
+  arrange(desc(grepl("^A", set)), .arm, Mb) %>%
   transmute(
+    Set,
     Chromosome        = chr,
     `Position (Mb)`   = sprintf("%.2f", Mb),
     `Position (cM)`   = sprintf("%.1f", cM),
@@ -44,9 +51,10 @@ tab <- pk %>%
     `h2 SY10 F`       = sprintf("%.2f", h2_SY10_F),
     `h2 SY20 F`       = sprintf("%.2f", h2_SY20_F),
     `h2 SY10 M`       = sprintf("%.2f", h2_SY10_M),
-    `h2 SY20 M`       = sprintf("%.2f", h2_SY20_M)) %>%
-  arrange(desc(as.numeric(`-log10P SY20 M`) * 0 + suppressWarnings(as.numeric(pk$peak_wald))))
+    `h2 SY20 M`       = sprintf("%.2f", h2_SY20_M))
 
 write.table(tab, OUT, sep = "\t", quote = FALSE, row.names = FALSE)
-cat("wrote", OUT, "--", nrow(tab), "peaks\n\n")
+cat("wrote", OUT, "--", nrow(tab), "peaks:",
+    sum(tab$Set == "-log10 P > 15"), "above 15,",
+    sum(tab$Set != "-log10 P > 15"), "between 7.5 and 15\n\n")
 print(as.data.frame(tab), row.names = FALSE)
