@@ -69,3 +69,7 @@ repro_error.tar.gz
 # ── added: agent workspace ──
 .claude/
 temp_aging/archive/
+
+# Figures are generated on HPC3 by reproduce.sh and returned through git --
+# they are the deliverable, and fetching them over ssh has been unreliable.
+!temp_aging/*.png

@@ -146,6 +146,17 @@ if [ "$SCOPE" != main ]; then
   sed -n '7,80p' temp_aging/numbers/partition_check.txt
 fi
 
+# 5c. the figures. Drawn here rather than on the laptop: they read process/,
+#     which is only here, and they are committed so they come back through git
+#     with the numbers instead of over a connection that keeps failing.
+if [ "$SCOPE" != main ]; then
+  for fg in 1 2 3 rr; do
+    case $fg in rr) scr=temp_aging/make_figure_rr.R ;; *) scr=temp_aging/make_figure${fg}.R ;; esac
+    if [ "$fg" = 1 ]; then export X_UNIT=cM; else unset X_UNIT; fi
+    step "figure ${fg}" Rscript "$scr"
+  done
+fi
+
 # 6. every number quoted in the prose, each with its input provenance. Skipped
 #    under SCOPE=main: significant_regions.R reads the split-half file, so the
 #    numbers would mix new main scans with stale halves.
