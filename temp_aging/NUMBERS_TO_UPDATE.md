@@ -34,6 +34,11 @@ clamp. So the premise is gone and the sentence has to be rewritten from it.
 | 1.00% at 7.5, 1.31% at 15 | **changes**; h2 of 1% now sits near Wald 15–30, not 7.5 |
 | "slightly more than 1%" | rests on the above, revisit |
 | ~100,000 screened per treatment | stands |
+
+The power claim — that a 1–2% locus would have gone undetected in several
+hundred RILs — is now calculable rather than asserted. `H² ≈ 100k·T/(n_eff i²)`
+(Methods) inverts to `n_eff = 100k·T/(H² i²)`, so naming a comparison design
+gives the number directly. For this design the 7.5 threshold sits at 0.38%.
 | "~25 thousand selected and control" | **wrong regardless**: 22,896 selected + 13,892 control = 36,788 |
 
 ## Paragraph 3 — rewrite, not renumber

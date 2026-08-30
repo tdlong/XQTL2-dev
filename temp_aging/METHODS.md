@@ -38,6 +38,20 @@ $$\hat{H}^2 = 100\,k \sum_f \frac{\bar{e}_f^{\,2} - s_f^2/n}{\hat{p}_f}$$
 
 with $\hat{p}_f$ the mean control frequency and $s_f^2$ the variance of $e_{fr}$ across replicates. The bias correction is measured from the replicates, so the estimator requires no model of the sampling or reconstruction covariances. Being unbiased it takes negative values where the true value is near zero; we therefore also report $H^2_{\mathrm{vc}}$, in which a single variance component is fitted per window by maximum likelihood on the scale $\bar{e}_f/\sqrt{\hat{p}_f}$ with known per-founder noise, so that non-negativity is a boundary solution of the likelihood rather than a truncation.
 
+**Relation between the test and the effect size.** The Wald statistic and $H^2$ are the same quadratic form in the founder frequency shifts and differ only in their weighting. Where the covariance is dominated by multinomial sampling, $V \approx p_f(1-p_f)/n$, so $T \approx n \sum_f \Delta p_f^2 / [p_f(1-p_f)]$, against $H^2 = (100k/i^2)\sum_f \Delta p_f^2/p_f$. The two are therefore proportional,
+
+$$H^2 \approx \frac{100\,k}{n_{\mathrm{eff}}\, i^2}\; T$$
+
+with the constant fixed within a scan by the number of chromosomes sampled and the intensity of selection, and nothing else.
+
+This holds in the data. Over windows with $-\log_{10} P > 5$, the ratio $H^2/T$ is 0.0077 in autosomal females, 0.0076 in autosomal males and 0.0072 on the male X — one constant across arms and sexes, the male X included, where both $k$ and $n$ are halved and cancel. Taken the other way it predicts the heritability at a given significance threshold: $T = 48.3$ at $-\log_{10} P = 7.5$ on seven degrees of freedom gives 0.37%, against 0.38% observed, and $T = 85.6$ at $-\log_{10} P = 15$ gives 0.65% against 0.68%.
+
+Inverted, it states what a design can resolve. Detecting a window of heritability $H^2$ at a threshold $T$ requires
+
+$$n_{\mathrm{eff}} \approx \frac{100\,k\,T}{H^2 i^2}$$
+
+so the detectable effect falls in inverse proportion to the number of chromosomes sequenced and in inverse proportion to the square of the selection intensity. $n_{\mathrm{eff}}$ is smaller than the raw chromosome count — here by a factor of about 1.75 — because the haplotype reconstruction error enters the covariance alongside the sampling term, and because the exact weighting is $1/p_f$ rather than $1/[p_f(1-p_f)]$. For the present design the threshold of $-\log_{10} P = 7.5$ corresponds to 0.38% of phenotypic variance.
+
 **Partitioning.** The ten replicate contrasts per treatment were split into odd and even sets of five, giving two independent estimates of heritability at every window in each of the four sex $\times$ diet groups. Writing $y_{sdh}$ for the estimate in sex $s$, diet $d$ and half $h$, the eight values were decomposed as a balanced $2 \times 2$ with two replicates per cell, uncorrected for the mean,
 
 $$\sum y^2 = 8\bar{y}^2 + SS_{\mathrm{sex}} + SS_{\mathrm{diet}} + SS_{\mathrm{sex:diet}} + SS_{\mathrm{rep}}$$
