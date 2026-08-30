@@ -71,21 +71,19 @@ Figures are the other exception: they run on the laptop, from files fetched down
 reading a stale no89 partition, with no error anywhere. `reproduce.sh` always
 passes both. Do not call it by hand without them.
 
-## Fetching to the laptop
+## Figures
 
-Every figure input, from the repo root, on VPN:
+One command on the laptop, on VPN, from the repo root:
 
-    R=tdlong@hpc3.rcic.uci.edu:/dfs7/adl/tdlong/fly_pool/XQTL2-dev/process
-    mkdir -p process/AGE_SY/Calls process/AGE_SY_splithalf
-    scp $R/AGE_SY/AGE_SY_4scan_no89.txt.gz                   process/AGE_SY/
-    scp $R/AGE_SY/AGE_SY_zoom_means.txt.gz                   process/AGE_SY/
-    scp $R/AGE_SY/AGE_SY_4snpscan_no89.txt.gz                process/AGE_SY/
-    scp $R/AGE_SY/Calls/refalt_qc.txt                        process/AGE_SY/Calls/
-    scp $R/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz  process/AGE_SY_splithalf/
-    scp $R/AGE_SY_splithalf/H2_varcomp_by_window_no89.txt.gz process/AGE_SY_splithalf/
+    bash temp_aging/make_figures.sh
 
-`numbers/*.txt` do NOT need fetching — `run_numbers.sh` runs on HPC3 and they
-come back through git.
+It rsyncs the six `process/` files the figure scripts read -- one connection,
+not six scp lines -- then draws all four figures and lists what it wrote.
+`--no-fetch` to draw from what is already local; a trailing `1 2 3 rr` to draw
+only some.
+
+`numbers/*.txt` and `peak_table.txt` are NOT fetched: `reproduce.sh` writes them
+on HPC3 and they come back through git.
 
 ## What --sex changes
 
