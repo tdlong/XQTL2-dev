@@ -189,5 +189,5 @@ echo "rds, so a new scan makes it stale. Resubmit it separately (no --sex: the"
 echo "chrX dosage is already in the Num it reads from the rds):"
 echo "  bash scripts_oneoffs/AGE_SY/nov_only/run_snp_scans.sh"
 echo
-echo "then: git add temp_aging/numbers/ temp_aging/peak_table.txt && git commit && git push"
+echo "then: git add temp_aging/numbers/ temp_aging/TableS1.txt && git commit && git push"
 exit "$fail"

@@ -18,12 +18,12 @@
 # are. It is written into the output so the number can never be quoted without it.
 #
 # Two sets, same procedure, split by peak height: above 15, and 7.5 to 15.
-# Writes temp_aging/peak_table.txt (and prints it).
+# Writes temp_aging/TableS1.txt (and prints it). The supplementary peak table.
 
 suppressMessages(library(tidyverse))
 
 SCAN   <- "process/AGE_SY/AGE_SY_4scan_no89.txt.gz"
-OUT    <- "temp_aging/peak_table.txt"
+OUT    <- "temp_aging/TableS1.txt"
 THRESH <- 7.5     # -log10 P a peak must exceed to enter the table at all
 STRONG <- 15      # peaks above this are the primary set; 7.5-15 the secondary
 EXCL   <- 5       # cM excluded either side of a peak before looking for the next
