@@ -60,9 +60,12 @@ jobid_from() {
 [ -d "$FULL_DIR/Haps" ] || { echo "ERROR: no haplotypes at $FULL_DIR/Haps" >&2; exit 1; }
 [ -e "$HALF_DIR/Haps" ] || { echo "ERROR: no Haps symlink at $HALF_DIR/Haps" >&2; exit 1; }
 
-echo "building designs ..."
+# The design files are committed and change only when the fly counts do. Building
+# them on every run rewrote tracked files, so the working tree was dirty after
+# every scan and the next `git pull` refused. Rebuild them deliberately, with
+#   Rscript scripts_oneoffs/AGE_SY/nov_only/make_designs.R
+# after editing summary_info_v1.xlsx, and commit the result.
 module load R/4.2.2 2>/dev/null || true
-Rscript scripts_oneoffs/AGE_SY/nov_only/make_designs.R
 
 echo
 echo "submitting ..."

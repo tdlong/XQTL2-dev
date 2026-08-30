@@ -1,6 +1,6 @@
 # What changes when the rerun lands
 
-The prose in `results_para1-4.md` is Tony's current text, stored clean. This is
+The prose in `RESULTS.md` is Tony's current text, stored clean. This is
 the checklist for updating it against the new `numbers/`. Nothing here is a
 judgement about the writing — only about which figures are still valid after the
 h2 estimator and covariance fixes (XQTL2 #40).
