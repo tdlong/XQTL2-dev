@@ -39,10 +39,11 @@ which haplotype frequencies were estimated.
 ## Coverage
 
 Sequencing depth was summarised as each library's median reference plus
-alternate read count across catalog SNPs. Across the sixty libraries, autosomal
-depth averaged 140× per library, with per sex medians of 129× and 127×
-and a range of 49× to 400×. On the X chromosome female libraries averaged 134×
-and male libraries 72×, the latter 0.54 of the former, consistent with male
+alternate read count across catalog SNPs. Across the sixty libraries,
+autosomal depth averaged 140× per library, with per sex medians of 129× and
+127× and a range of 49× to 400×; fifteen libraries fell below 75× and twenty
+below 100×. On the X chromosome female libraries averaged 134× and male
+libraries 72×, the latter 0.54 of the former, consistent with male
 hemizygosity. No library fell below the pipeline's coverage or uniformity
 thresholds.
 
