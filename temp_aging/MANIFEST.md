@@ -104,6 +104,26 @@ autosomes -- a caller-comparison by-product. The real per-library medians averag
 140x on the autosomes. An early draft of methods_sequencing.md quoted the bins;
 do not reinstate them.
 
+**The partition's error term survives the h2 fix; the per-pool bias correction
+does not.** Two different corrections were being applied and only one is
+superseded. `h2_rep` (XQTL2 #40) removes the BIAS -- the inflation from squaring
+noisy frequency estimates -- which is what subtracting `Cutl_H2_bias` per pool
+used to do, badly. That path is now redundant and must not also be applied. The
+split-half term removes the VARIANCE of the h2 estimate: subtracting `var(d)/n`
+inside a window says nothing about how much that window's h2 would move on a
+rerun, which is what the odd-even difference measures. It stays.
+
+Expect the fractions to move anyway, for a reason that is not biology. The old
+bias was ~0.5-1.2 and common to both halves, so it never entered the odd-even
+difference -- it went into the SHARED component, 85.3%. Removing it from every
+cell should cut shared and mechanically raise the sex (15.3%, then 13.3%) and
+diet (1.6%) fractions. Do not compare those numbers across the change as though
+they were like for like.
+
+Open: whether to run the partition on `h2_rep` per half -- 5 replicates, so the
+`var/n` correction is noisier -- or restructure it. This is ours to decide;
+`varcomp_H2.R` is in `scripts_oneoffs/`, not the pipeline.
+
 **The bias is not common to the four treatments.** `Cutl_H2_bias` is computed per
 pool per window from that pool's own lsei reconstruction error and the
 multinomial sampling of its own flies (XQTL2 #34). It runs 0.73 in SY10 females
