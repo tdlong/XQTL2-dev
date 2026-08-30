@@ -1,8 +1,8 @@
 # coverage.R
-# run:    2026-08-29 17:08
-# script: bcf841b
+# run:    2026-08-29 17:30
+# script: d300345
 # reads:
-#   process/AGE_SY/Calls/refalt_qc.txt                        512  2026-08-29 17:07  md5:56a1d341
+#   process/AGE_SY/Calls/refalt_qc.txt                        20K  2026-08-29 17:07  md5:56a1d341
 #
 libraries: 60 (10 replicates x 3 groups x 2 sexes)
 
@@ -31,6 +31,12 @@ libraries: 60 (10 replicates x 3 groups x 2 sexes)
 === the number for the methods ===
 autosomal median depth per library: mean 140x, range 49-400x (n=60)
 chrX: females mean 134x, males mean 72x (0.54 of female)
+
+=== libraries below depth thresholds ===
+  autosomal median <  75x : 15 of 60 libraries
+  autosomal median < 100x : 20 of 60 libraries
+  male chrX      <  75x : 18 of 30 male libraries
+  male chrX      < 100x : 24 of 30 male libraries
 
 === thin libraries (worst 5 on autosomal depth) ===
        sample   group sex      arm depth
