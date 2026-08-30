@@ -68,8 +68,29 @@ echo
 echo "submitting ..."
 CONCAT_IDS=()
 
+# Provenance, written BEFORE anything is submitted. Both repos move -- the
+# pipeline has changed several times in an evening -- and no pipeline output
+# records the commit that produced it, so without this a scan.txt on disk cannot
+# be attributed to a version of the code afterwards.
+DEV_SHA=$(git rev-parse --short HEAD)
+PIPE_SHA=$(git -C pipeline rev-parse --short HEAD 2>/dev/null || echo unknown)
+DEV_DIRTY=$(git status --porcelain | grep -q . && echo " +uncommitted" || echo "")
+echo "XQTL2-dev ${DEV_SHA}${DEV_DIRTY} | pipeline ${PIPE_SHA} | scope ${SCOPE}"
+
+stamp () {   # scan dir
+  mkdir -p "$1"
+  { echo "submitted:   $(date '+%Y-%m-%d %H:%M:%S')"
+    echo "XQTL2-dev:   ${DEV_SHA}${DEV_DIRTY}  $(git log -1 --format=%s | cut -c1-60)"
+    echo "pipeline:    ${PIPE_SHA}  $(git -C pipeline log -1 --format=%s 2>/dev/null | cut -c1-60)"
+    echo "scope:       ${SCOPE}"
+    echo "smooth_kb:   ${SMOOTH}"
+    echo "by:          $USER on $(hostname -s)"
+  } > "$1/PROVENANCE.txt"
+}
+
 submit() {   # name, dir, design, sex
   [ -f "$3" ] || { echo "ERROR: missing design $3" >&2; exit 1; }
+  stamp "$2/Scans/$1"
   local out id; out=$(bash pipeline/scripts/run_scan.sh \
       --dir "$2" --scan "$1" --design "$3" --smooth "$SMOOTH" --sex "$4")
   id=$(jobid_from "$out")
