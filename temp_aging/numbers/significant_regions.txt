@@ -1,9 +1,9 @@
 # significant_regions.R
-# run:    2026-08-29 18:40
+# run:    2026-08-29 20:42
 # script: f4b8ed9
 # reads:
-#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-29 18:38  md5:9e91a4f9
-#   process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz     7.0M  2026-08-29 18:38  md5:788fd414
+#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-29 20:37  md5:9e91a4f9
+#   process/AGE_SY_splithalf/AGE_SY_splithalf_H2_no89.txt.gz     9.2M  2026-08-29 20:37  md5:788fd414
 #
 268 tiles of 1 cM; 85 reach -log10 P 7.5 in some treatment (32%)
 

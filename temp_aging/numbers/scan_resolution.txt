@@ -1,8 +1,8 @@
 # scan_resolution.R
-# run:    2026-08-29 18:40
+# run:    2026-08-29 20:42
 # script: a1690f2
 # reads:
-#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-29 18:38  md5:9e91a4f9
+#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-29 20:37  md5:9e91a4f9
 #
 270 tiles of 1 cM across the whole map; 2 lie wholly in
 heterochromatin and are dropped, 5 straddle a boundary and are kept.

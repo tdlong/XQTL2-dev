@@ -1,8 +1,8 @@
 # h2_threshold.R
-# run:    2026-08-29 18:40
+# run:    2026-08-29 20:42
 # script: b9bdaf2
 # reads:
-#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  4.1M  2026-08-29 18:38  md5:9e91a4f9
+#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  3.1M  2026-08-29 20:37  md5:9e91a4f9
 #
 h2 on 1 cM tiles: the floor, and the value at each cutoff
 

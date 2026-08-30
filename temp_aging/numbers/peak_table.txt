@@ -1,8 +1,8 @@
 # peak_table.R
-# run:    2026-08-29 18:40
+# run:    2026-08-29 20:42
 # script: 74a824a
 # reads:
-#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-29 18:38  md5:9e91a4f9
+#   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  5.6M  2026-08-29 20:37  md5:9e91a4f9
 #
 # Well-separated peaks, AGE_SY 10-replicate dataset (replicates 8, 9 dropped)
 # peak       = tallest window, taken top-down over the max across the four traits
