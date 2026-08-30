@@ -30,6 +30,23 @@
 
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
+
+# Refuse to run on a login node. This reads four ~257 MB files and takes
+# minutes; run interactively during the day it earns the lab a warning from
+# RCIC. If SLURM_JOB_ID is unset we are not in a job.
+if [ -z "${SLURM_JOB_ID:-}" ] && [[ "$(hostname -s)" == login* ]]; then
+  cat >&2 <<'MSG'
+refusing to run on a login node.
+
+  sbatch temp_aging/reproduce.sh
+
+The SBATCH headers in this file are already set (3 cores, 6 GB each, 6 h).
+To override deliberately -- a tiny test, off-hours -- set ALLOW_HEADNODE=1.
+MSG
+  [ "${ALLOW_HEADNODE:-0}" = "1" ] || exit 1
+  echo "ALLOW_HEADNODE=1 set; continuing on $(hostname -s)." >&2
+fi
+
 module load R/4.2.2 2>/dev/null || true
 
 SPLITHALF=process/AGE_SY_splithalf
