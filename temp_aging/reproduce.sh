@@ -189,5 +189,28 @@ echo "rds, so a new scan makes it stale. Resubmit it separately (no --sex: the"
 echo "chrX dosage is already in the Num it reads from the rds):"
 echo "  bash scripts_oneoffs/AGE_SY/nov_only/run_snp_scans.sh"
 echo
-echo "then: git add temp_aging/numbers/ temp_aging/peak_table.txt && git commit && git push"
+# Return everything through git, so a finished run is visible without anyone
+# having to stage, commit and push it by hand. The job's own SLURM log goes too:
+# without it a failed step can only be diagnosed by asking someone to paste it.
+# NO_GIT=1 to skip.
+if [ "${NO_GIT:-0}" != "1" ]; then
+  echo
+  echo "── returning results through git ─────────────────────────────"
+  git add -A temp_aging 2>/dev/null
+  for lg in logs/age_reproduce_${SLURM_JOB_ID:-*}.out; do
+    [ -f "$lg" ] && git add -f "$lg" 2>/dev/null
+  done
+  if git diff --cached --quiet; then
+    echo "   nothing changed"
+  else
+    git commit -q -m "reproduce ${SCOPE}: numbers, figures and log (job ${SLURM_JOB_ID:-manual})" \
+      && echo "   committed" || echo "   commit failed" >&2
+    if git pull --rebase -q && git push -q; then
+      echo "   pushed"
+    else
+      echo "   PUSH FAILED -- committed locally, push by hand" >&2
+      fail=1
+    fi
+  fi
+fi
 exit "$fail"
