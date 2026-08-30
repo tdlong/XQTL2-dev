@@ -51,10 +51,7 @@ current; the figures in it are not. `NUMBERS_TO_UPDATE.md` lists each quoted
 number, whether it survives, and which `numbers/` file replaces it -- including
 the two places where the argument rather than the value has to change.
 
-    results_para1.md    resolution and power; 268 tiles, 37% / 12%, Table S1
-    results_para2.md    heritability scale; floor 0.68%, 1.00% at 7.5, 1.31% at 15
-    results_para3.md    sex and diet; X vs autosome, the 15.3% / 1.6% partition
-    results_para4.md    the chr3L 9.30 Mb locus; founder B3
+    RESULTS.md              all four paragraphs, in order
 
 Paragraph 5 onward is not written.
 
