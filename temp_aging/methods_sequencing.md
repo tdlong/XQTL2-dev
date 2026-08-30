@@ -65,7 +65,7 @@ estimated by constrained least squares (`lsei`, R package `limSolve`),
 minimising the squared deviation between observed and predicted allele frequency
 subject to the frequencies summing to one and each being non-negative. The fit
 also returns a covariance matrix for the estimates; this was averaged over the
-ten windows either side of each position and carried into the tests.
+ten windows either side of each position, ±50 kb, and carried into the tests.
 
 Founders cannot always be told apart. Where two or more carry the same haplotype
 across a window their individual frequencies are unidentifiable and only their
@@ -74,7 +74,8 @@ hierarchical clustering of their genotypes, cut at a height of 2.5, and any
 founder sharing a cluster with another was masked. Masked windows, together with
 the few in which the fit failed to satisfy its own constraints, were filled by
 linear interpolation between the means of the flanking resolved windows. The
-filled series was then smoothed with a running mean of ±100 kb.
+filled series was then smoothed with a running mean spanning ±100 kb, that is
+the twenty estimation windows either side of each position.
 
 ## Software
 
