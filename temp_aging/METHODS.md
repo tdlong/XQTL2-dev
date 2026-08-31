@@ -12,7 +12,7 @@ $$
 T = \frac{1}{\rho}\,(\hat{c} - \hat{z})^{\top}(V_c + V_z)^{-}(\hat{c} - \hat{z})
 $$
 
-on seven degrees of freedom, since the eight haplotype frequencies sum to one. That constraint also makes $V_c + V_z$ singular, so $(\cdot)^{-}$ is a generalised inverse, obtained by eigendecomposition: the null direction is discarded and the remaining eigenvalues floored at one per cent of their mean, so that near-degenerate directions cannot inflate $T$. Significance is reported as $-\log_{10} P$.
+on seven degrees of freedom, since the eight haplotype frequencies sum to one. That constraint also makes $V_c + V_z$ singular, so $(\cdot)^{-}$ is a generalised inverse, obtained by eigendecomposition with the null direction discarded and the remaining eigenvalues floored at one per cent of their mean, so that near-degenerate directions cannot inflate $T$. Significance is reported as $-\log_{10} P$.
 
 Each pool's covariance is $V = M + \Sigma$, where $M$ is the multinomial sampling covariance on sampled chromosomes,
 
@@ -20,21 +20,25 @@ $$
 M_{ff} = \frac{\bar{p}_f(1-\bar{p}_f)}{n_{\mathrm{eff}}}, \qquad M_{fg} = -\frac{\bar{p}_f \bar{p}_g}{n_{\mathrm{eff}}}
 $$
 
-evaluated at the frequency $\bar{p}$ pooled across the selected and control samples, and $\Sigma$ is the haplotype reconstruction covariance returned by the constrained least squares fit above, averaged over the ten windows either side. A pool of $n$ flies each carrying $k$ copies of the locus supplies $kn$ chromosomes, where $k$ is one for male X chromosomes and two otherwise. Reconstruction error reduces this to an effective count
+evaluated at the frequency $\bar{p}$ pooled across the selected and control samples, and $\Sigma$ is the haplotype reconstruction covariance returned by the constrained least squares fit above, averaged over the ten windows either side. A pool of $n$ flies each carrying $k$ copies of the locus supplies $kn$ chromosomes, where $k$ is one for male X chromosomes and two otherwise, resulting in and effective count
 
 $$
 n_{\mathrm{eff}} = \frac{kn \sum_f \bar{p}_f(1-\bar{p}_f)}{\sum_f \bar{p}_f(1-\bar{p}_f) + kn \operatorname{tr}(\Sigma)}
 $$
 
-Replicate cages were combined as a weighted mean of $\hat{c}$ and $\hat{z}$ with weights $n_{\mathrm{eff}}$, their covariances pooled to match. The frequencies entering $T$ have been smoothed, so their variance is smaller than $V$ describes; $\rho$ is that reduction, measured as the squared correlation between raw and smoothed frequencies averaged over pools and founders, and dividing by it returns $T$ to the scale of $V$.
+Replicate cages were combined as a weighted mean of $\hat{c}$ and $\hat{z}$ with weights $n_{\mathrm{eff}}$, their covariances pooled to match. The haplotype frequencies entering $T$ have been smoothed, so their variance is smaller than non-smoothed estimates, $\rho$ quantifies that reduction as the squared correlation between raw and smoothed frequencies averaged over pools and founders.  (then perhaps we should use rho sqaured? as it is weird to define a common thing and then make the units wrong.  But it is also unclear if rho is local or global????)
 
-**Heritability.** Under truncation selection for any given replicate retaining the top proportion $P$ of individuals corresponds to a standardised selection intensity $i$ (cite Falconer for example), and for some window a founder haplotype at frequency $p_f$ with additive effect $a_f$ has a difference in frequency between selected and control pools of $\Delta p_f = p_f (a_f - \bar{a}) i$, where $\bar{a}$ is the mean effect. Effects are in phenotypic standard deviations and an individual carries $k$ copies of the locus, so the heritability of the window, as a percentage of phenotypic variance, is
+**Heritability.** Under truncation selection for any given replicate retaining the top proportion $P$ of individuals corresponds to a standardised selection intensity $i$ (cite Falconer for example), and for a window with founder haplotype frequency $p_f$ the heritability of the window is
 
 $$
 h^2 = \frac{100\,k}{i^2} \sum_f \frac{\Delta p_f^2}{p_f}
 $$
 
-$\Delta p_f/i$ is a property of the window rather than of the replicate, so all $R$ replicates estimate the same quantity however stringently each was selected. Writing $e_{fr} = (\hat{z}_{fr} - \hat{c}_{fr})/i_r$, with mean $\bar{e}_f$ and variance $s^2_f$ over replicates, the same expression across the experiment is
+(with k defined as above)
+
+You totally lose me below.  I mean h2 is define for a window and a replicate I guess.  Then you go and develop new nomenclature below.  So we either need to define the h2  over replicates in terms of h2 per replicate.  Or the initial expression has to include the "r" subscription for i and p and just bang it fucking out.
+
+ $\Delta p_f/i$ is a property of the window rather than of the replicate, so all $R$ replicates estimate the same quantity however stringently each was selected. Writing $e_{fr} = (\hat{z}_{fr} - \hat{c}_{fr})/i_r$, with mean $\bar{e}_f$ and variance $s^2_f$ over replicates, the same expression across the experiment is
 
 $$
 \hat{h}^2 = 100\,k \sum_f \frac{\bar{e}_f^{\,2} - s_f^2/R}{\hat{p}_f}
@@ -42,13 +46,19 @@ $$
 
 where $\hat{p}_f$ is the mean control frequency and $s^2_f/R$ removes the inflation from squaring an estimate. It is measured from the replicates, so no model of the sampling or reconstruction covariance is needed. Being unbiased, $\hat{h}^2$ goes negative where the true value is near zero; we also report $h^2_{\mathrm{vc}}$, a variance component fitted per window by maximum likelihood on the scale $\bar{e}_f/\sqrt{\hat{p}_f}$, which is non-negative by construction.
 
-**The relationship between the Wald test and $h^2$.** $T$ and $\hat{h}^2$ are both quadratic in the founder frequency shifts and differ only in their weighting, so they are proportional. In a case-control genome-wide association study the same argument gives the familiar non-centrality parameter, $\chi^2 \approx N \cdot 2p(1-p)\beta^2$, the number of individuals times the variance a locus explains. Arranged the same way, this design gives
+**The relationship between the Wald test and $h^2$.** In a case-control genome-wide association study we can express the expected value of the Chi-squared test in terms of the number of individuals and the variance explained by the causative factor as  $\chi^2 \approx N \cdot 2p(1-p)\beta^2$ . In a similar manner, as  $T$ and $\hat{h}^2$ are both quadratic in the founder frequency shifts we can express the expected value of the Wald statistic as
 
 $$
 T \approx \frac{n_{\mathrm{eff}}\, \bar{\imath}^{\,2}}{100\,k}\; \hat{h}^2
 $$
 
-with $n_{\mathrm{eff}}$ pooled over replicates and $\bar{\imath}$ their mean selection intensity. The effect reaches the data through the frequency shift truncation selection produces rather than through a measured phenotype, which is why the intensity enters, and a multi-allelic locus contributes $\sum_f \Delta p_f^2/p_f$ in place of $2p(1-p)\beta^2$.
+with $n_{\mathrm{eff}}$ pooled over replicates and $\bar{\imath}$ their mean selection intensity. 
+
+It is totally not clear what pooled mean above.  Is it just the sum of per replicate neff.  and then it i bar straight up mean or somehow weighted?
+
+Now below.... you have to simplify this.  We have a plot of predicted T as a function of h2 and we have observed quantiles, so we can just state as much and refer to the figure.
+
+The effect reaches the data through the frequency shift truncation selection produces rather than through a measured phenotype, which is why the intensity enters, and a multi-allelic locus contributes $\sum_f \Delta p_f^2/p_f$ in place of $2p(1-p)\beta^2$.
 
 The relation holds in the data. Over windows with $-\log_{10} P > 5$ the ratio $\hat{h}^2/T$ is 0.0077 in autosomal females, 0.0076 in autosomal males and 0.0072 on the male X, one constant across arms and sexes including the male X, where $k$ and $n_{\mathrm{eff}}$ both halve and cancel (Fig. S1).
 

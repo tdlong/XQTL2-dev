@@ -1,70 +1,56 @@
-# make_FigS1.R — Supplementary Figure 1: heritability against the Wald statistic.
+# make_FigS1.R — Supplementary Figure 1: heritability as a function of the Wald.
 #
 #   Rscript temp_aging/make_FigS1.R
 #
-# The Methods claim that T and h2 are proportional, with the constant fixed by
-# the chromosomes sampled and the selection intensity. This shows it: h2 against
-# T for every window, in each of the four treatments and separately for the X,
-# with the proportional relation drawn through them.
-#
-# Run from the repo root; needs process/AGE_SY/AGE_SY_4scan_no89.txt.gz.
+# The Methods give h2 as a function of the Wald statistic, the chromosomes
+# sampled and the selection intensity. The relation is general, so this pools
+# every window in every treatment: the curve is the prediction, the points are
+# the h2 estimated from the data. Run from the repo root.
 
-suppressMessages({library(tidyverse); library(patchwork)})
+suppressMessages(library(tidyverse))
 
 SCAN <- "process/AGE_SY/AGE_SY_4scan_no89.txt.gz"
 OUT  <- "temp_aging/FigureS1_plot.png"
 stopifnot(file.exists(SCAN))
 
-TRT_LEV <- c("SY10 female", "SY20 female", "SY10 male", "SY20 male")
-TRT_COL <- c("#F48FB1", "#C62828", "#81D4FA", "#1A448E")
-
 d <- read.table(SCAN, header = TRUE, sep = "\t") %>% as_tibble() %>%
-  mutate(sex = ifelse(sex %in% c("FALSE", "F"), "F", "M"),
-         trt = factor(paste0(sugar, " ", ifelse(sex == "F", "female", "male")),
-                      levels = TRT_LEV),
-         arm = ifelse(chr == "chrX", "X", "autosome"),
-         # the chi-square behind the reported -log10 P, on m-1 = 7 df
-         T   = qchisq(-Wald_log10p * log(10), df = 7, lower.tail = FALSE, log.p = TRUE)) %>%
+  mutate(T = qchisq(-Wald_log10p * log(10), df = 7, lower.tail = FALSE, log.p = TRUE)) %>%
   filter(is.finite(T), T > 0)
 
-# one proportional constant, fitted through the origin on autosomal windows
-cslope <- coef(lm(H2 ~ 0 + T, data = d %>% filter(arm == "autosome")))[[1]]
-cat(sprintf("slope h2/T = %.5f  (1/slope = %.0f)\n", cslope, 1/cslope))
+# h2 = c (T - df): under the null T averages df, so heritability tracks the
+# non-centrality rather than T itself. One constant, fitted over all windows.
+cslope <- coef(lm(H2 ~ 0 + I(T - 7), data = d))[[1]]
+cat(sprintf("h2 = %.5f (T - 7)\n", cslope))
 
-bin <- function(x) x %>%
-  mutate(b = cut(T, breaks = c(0, 2^(seq(1, 9, by = 0.5))), labels = FALSE)) %>%
-  group_by(trt, arm, b) %>%
+# binned on T, log-spaced: nearly every window sits at low T, so a linear axis
+# stacks them all on the origin
+obs <- d %>% filter(T > 7, H2 > 0) %>%
+  mutate(b = cut(log10(T), breaks = seq(0.8, 3.0, by = 0.06), labels = FALSE)) %>%
+  group_by(b) %>%
   summarise(T = median(T), h2 = median(H2), n = n(), .groups = "drop") %>%
-  filter(n >= 20)
+  filter(n >= 50)
 
-pts <- bin(d)
-line <- tibble(T = seq(0, max(pts$T) * 1.05, length.out = 100)) %>% mutate(h2 = cslope * T)
+pred <- tibble(T = 10^seq(log10(8), log10(max(obs$T) * 1.1), length.out = 400)) %>%
+  mutate(h2 = cslope * (T - 7))
 
-base <- function(p, xmax) p +
-  geom_line(data = line %>% filter(T <= xmax), aes(T, h2), inherit.aes = FALSE,
-            colour = "grey35", linewidth = 0.4, linetype = "22") +
-  coord_cartesian(xlim = c(0, xmax), ylim = c(NA, cslope * xmax * 1.1)) +
-  scale_colour_manual(values = setNames(TRT_COL, TRT_LEV), name = NULL) +
+# LWP is monotone in T, so the same axis carries both
+lwp_ticks <- c(1, 2, 5, 7.5, 15, 40, 100)
+T_at <- qchisq(-lwp_ticks * log(10), df = 7, lower.tail = FALSE, log.p = TRUE)
+
+fig <- ggplot(obs, aes(T, h2)) +
+  geom_line(data = pred, colour = "grey45", linewidth = 0.6) +
+  geom_point(size = 1.5, colour = "#1A448E") +
+  scale_x_log10(breaks = c(10, 20, 50, 100, 200, 500),
+                sec.axis = dup_axis(breaks = T_at, labels = lwp_ticks, name = "LWP")) +
+  scale_y_log10(breaks = c(0.03, 0.1, 0.3, 1, 3)) +
+  annotation_logticks(sides = "bl", linewidth = 0.2,
+                      short = unit(2,"pt"), mid = unit(3,"pt"), long = unit(4,"pt")) +
   labs(x = expression(Wald~statistic~italic(T)), y = expression(italic(h)^2~("%"))) +
-  theme_classic(base_size = 9) +
-  theme(legend.position = "bottom", legend.key.width = unit(14, "pt"))
+  theme_classic(base_size = 9)
 
-xa <- max(pts$T[pts$arm == "autosome"]) * 1.05
-xx <- max(pts$T[pts$arm == "X"]) * 1.05
-pA <- base(ggplot(pts %>% filter(arm == "autosome"), aes(T, h2, colour = trt)) +
-             geom_point(size = 1.3), xa) +
-  ggtitle("autosomes") + theme(plot.title = element_text(size = 9, face = "bold"))
-
-pB <- base(ggplot(pts %>% filter(arm == "X"), aes(T, h2, colour = trt)) +
-             geom_point(size = 1.3), xx) +
-  ggtitle("X chromosome (note the axis range)") + theme(plot.title = element_text(size = 9, face = "bold"))
-
-fig <- (pA | pB) + plot_layout(guides = "collect") &
-  theme(legend.position = "bottom")
-
-ggsave(OUT, fig, width = 7.0, height = 3.4, dpi = 300)
+ggsave(OUT, fig, width = 4.8, height = 3.6, dpi = 300)
 cat("wrote", OUT, "\n\n")
-
-d %>% group_by(trt, arm) %>%
-  summarise(windows = n(), `median h2/T` = signif(median(H2/T), 3), .groups = "drop") %>%
-  as.data.frame() %>% print(row.names = FALSE)
+for (l in c(2, 5, 7.5, 15)) {
+  Tv <- qchisq(-l * log(10), df = 7, lower.tail = FALSE, log.p = TRUE)
+  cat(sprintf("  LWP %5.1f -> T %6.1f -> h2 %.2f%%\n", l, Tv, cslope * (Tv - 7)))
+}
