@@ -44,20 +44,20 @@ $$
 
 where $\hat{p}_f$ is the mean control frequency and $s^2_f/R$ removes the inflation from squaring an estimate. It is measured from the replicates, so no model of the sampling or reconstruction covariance is needed. Being unbiased, $\hat{h}^2$ goes negative where the true value is near zero; we also report $h^2_{\mathrm{vc}}$, a variance component fitted per window by maximum likelihood on the scale $\bar{e}_f/\sqrt{\hat{p}_f}$, which is non-negative by construction.
 
-**The relationship between the Wald test and $h^2$.** In a case-control genome-wide association study we can express the expected value of the Chi-squared test in terms of the number of individuals and the variance explained by the causative factor as  $\chi^2 \approx N \cdot 2p(1-p)\beta^2$ . In a similar manner, as  $T$ and $\hat{h}^2$ are both quadratic in the founder frequency shifts we can express the expected value of the Wald statistic as
+**The relationship between the Wald test and $h^2$.** In a case-control genome-wide association study the non-centrality of the chi-squared test is the number of individuals times the variance explained by the causative factor, $N \cdot 2p(1-p)\beta^2$. In the same way, since $T$ and $\hat{h}^2$ are both quadratic in the founder frequency shifts, the non-centrality of the Wald statistic is
 
 $$
-T \approx \frac{n_{\mathrm{eff}}\, \bar{\imath}^{\,2}}{100\,k}\; \hat{h}^2
+T - \mathrm{df} \;\approx\; \frac{n_{\mathrm{eff}}\, \bar{\imath}^{\,2}}{100\,k}\; \hat{h}^2
 $$
 
-where $n_{\mathrm{eff}} = \sum_r n_{\mathrm{eff},r}$ and $\bar{\imath}^{\,2}$ is the $n_{\mathrm{eff}}$-weighted mean of $i_r^2$, the same weighting by which the replicates were pooled. The effect reaches the data through the frequency shift truncation selection produces rather than through a measured phenotype, which is why the intensity enters, and a multi-allelic locus contributes $\sum_f \Delta p_f^2/p_f$ in place of $2p(1-p)\beta^2$.
+where $\mathrm{df} = 7$ — a chi-squared statistic averages its degrees of freedom where nothing is happening — $n_{\mathrm{eff}} = \sum_r n_{\mathrm{eff},r}$ and $\bar{\imath}^{\,2}$ is the $n_{\mathrm{eff}}$-weighted mean of $i_r^2$, the same weighting by which the replicates were pooled. The effect reaches the data through the frequency shift truncation selection produces rather than through a measured phenotype, which is why the intensity enters, and a multi-allelic locus contributes $\sum_f \Delta p_f^2/p_f$ in place of $2p(1-p)\beta^2$.
 
 Predicted and observed $\hat{h}^2$ agree over the range that carries signal (Fig. S1).
 
 Inverted, it states what a design can resolve: detecting a window of heritability $h^2$ at a threshold $T$ requires
 
 $$
-n_{\mathrm{eff}} \approx \frac{100\,k\,T}{h^2 \bar{\imath}^{\,2}}
+n_{\mathrm{eff}} \approx \frac{100\,k\,(T - \mathrm{df})}{h^2\, \bar{\imath}^{\,2}}
 $$
 
 so the detectable effect falls in inverse proportion to the chromosomes sequenced and to the square of the selection intensity. $n_{\mathrm{eff}}$ is below the raw count $kn$ — here by a factor of about 1.75 — because reconstruction error enters the covariance alongside the sampling term, and because the exact weighting is $1/p_f$ rather than $1/[p_f(1-p_f)]$.
