@@ -44,37 +44,21 @@ $$
 
 where $\hat{p}_f$ is the mean control frequency and $s^2_f/R$ removes the inflation from squaring an estimate. Being unbiased, $\hat{h}^2$ can be negative where the true value is near zero
 
-OK I am good to here.  And now I have a problem below.  I mean if this is our estimate of h2, this other variance component thing below is out of place?  I think it belong in the variance componet estimation section???
+.
 
- we also report $h^2_{\mathrm{vc}}$, a variance component fitted per window by maximum likelihood on the scale $\bar{e}_f/\sqrt{\hat{p}_f}$, which is non-negative by construction.
-
-**The relationship between the Wald test and $h^2$.** 
-
-OK, in this section what is the obsession with the non-centrality parameter.  I get that this is what is is.  But for our purposes it is easier to just talk about the relationship between the expected value of the test statistic and underlying causative stuff.  Then the writing is easier to read.  I mean the first equation can be written as the expected value of the X squred statistics.  Then the Wald h2 relationship is just an relationship.  And we never need to belabour the df term.  I mean it is an estimator.  Then you writing is not so forces and defensive.  And it can be short a sweet.  try it.
-
-In a case-control genome-wide association study the non-centrality of the chi-squared test is the number of individuals times the variance explained by the causative factor, that is $N \cdot 2p(1-p)\beta^2$. In the same way, since $T$ and $\hat{h}^2$ are both quadratic in the founder frequency shifts, the non-centrality of the Wald statistic is
+**The relationship between the Wald test and $h^2$.** In a case-control genome-wide association study the expected value of the chi-squared statistic is the number of individuals times the variance explained by the causative factor, $E[\chi^2] \approx N \cdot 2p(1-p)\beta^2$. $T$ and $\hat{h}^2$ are likewise both quadratic in the founder frequency shifts, so
 
 $$
-T - \mathrm{df} \;\approx\; \frac{n_{\mathrm{eff}}\, \bar{\imath}^{\,2}}{100\,k}\; \hat{h}^2
+E[T] \;\approx\; \frac{n_{\mathrm{eff}}\, \bar{\imath}^{\,2}}{100\,k}\; \hat{h}^2
 $$
 
-where $\mathrm{df} = 7$ — a chi-squared statistic averages its degrees of freedom where nothing is happening — $n_{\mathrm{eff}} = \sum_r n_{\mathrm{eff},r}$ and $\bar{\imath}^{\,2}$ is the $n_{\mathrm{eff}}$-weighted mean of $i_r^2$, the same weighting by which the replicates were pooled. The effect reaches the data through the frequency shift truncation selection produces rather than through a measured phenotype, which is why the intensity enters, and a multi-allelic locus contributes $\sum_f \Delta p_f^2/p_f$ in place of $2p(1-p)\beta^2$.
+where $n_{\mathrm{eff}} = \sum_r n_{\mathrm{eff},r}$ and $\bar{\imath}^{\,2}$ is the $n_{\mathrm{eff}}$-weighted mean of $i_r^2$. The effect reaches the data through the frequency shift truncation selection produces rather than through a measured phenotype, which is why the intensity enters, and a multi-allelic locus contributes $\sum_f \Delta p_f^2/p_f$ in place of $2p(1-p)\beta^2$.
 
-Predicted and observed $\hat{h}^2$ track one another over the range that carries signal (Fig. S1). Between $-\log_{10} P$ of 5 and 15 the observed values run about 0.05 percentage points above the prediction, some 16 to 17% in relative terms, and the two converge above 15.  (This sentence as written as inpentrable ... Just state in Supp Figure 1 we plot predicts h2 against wald statistics as well as out LWP, for non significant regions we over-estimate heritabilty, in the range of LWP of 5 - 15 (significant regions) we over-estimate heritabilty by an average of 0.05 percent (a 16-17% relative inflation), and very accurately estimate h2 for highly signicant regions.
+In Supplementary Figure 1 we plot predicted $\hat{h}^2$ against the Wald statistic and against LWP. For non-significant regions we over-estimate heritability; over an LWP of 5 to 15 we over-estimate it by an average of 0.05 percentage points, a 16 to 17% relative inflation; and for highly significant regions the estimate is accurate.
 
+Read as a power calculation, the same expression says what an experiment of a given size can see. Sequencing the 5,700 selected and 6,900 control flies per treatment used here, a window contributing 0.75% of phenotypic variance is detected at an LWP of 15 with 80% power. Since the requirement scales as $1/h^2$, detecting 2% needs about 4,800 flies per treatment, 1% about 9,600, and 0.5% about 19,100.
 
-
-As neff under-estimates kn by a factor of about 1.75 -- this is weird as you expect neff to under-estimate 2N by a factor of 2, so this is confusing.  Like if we are going to do this, why not just state how many individual (n) are required to detect a region contributing 0.5, 1, 2, 4 percent of variation at a LWP of 15 with 80% power?  Like why rearrange A=B/C to AC = B (duh ..) and not really help with intution.
-
-Inverted, it states what a design can resolve: detecting a window of heritability $h^2$ at a threshold $T$ requires
-
-$$
-n_{\mathrm{eff}} \approx \frac{100\,k\,(T - \mathrm{df})}{h^2\, \bar{\imath}^{\,2}}
-$$
-
-so the detectable effect falls in inverse proportion to the chromosomes sequenced and to the square of the selection intensity. $n_{\mathrm{eff}}$ is below the raw count $kn$ — here by a factor of about 1.75 — because reconstruction error enters the covariance alongside the sampling term, and because the exact weighting is $1/p_f$ rather than $1/[p_f(1-p_f)]$.
-
-**Partitioning.** The ten replicate contrasts per treatment were split into two halves (1 & 2) , giving two independent estimates of heritability at every window in each of the four sex $\times$ diet groups. Writing $y_{sdh}$ for the estimate of heritability for some window in sex $s$, diet $d$ and half $h$, we can express
+**Partitioning.** Because $\hat{h}^2$ is unbiased it scatters below zero at windows carrying no signal, which is awkward to decompose, so the partition uses $h^2_{\mathrm{vc}}$: a variance component fitted per window by maximum likelihood on the scale $\bar{e}_f/\sqrt{\hat{p}_f}$, non-negative by construction. The ten replicate contrasts per treatment were split into two halves (1 & 2) , giving two independent estimates of heritability at every window in each of the four sex $\times$ diet groups. Writing $y_{sdh}$ for the estimate of heritability for some window in sex $s$, diet $d$ and half $h$, we can express
 
 $$
 \sum y^2 = 8\bar{y}^2 + SS_{\mathrm{sex}} + SS_{\mathrm{diet}} + SS_{\mathrm{sex:diet}} + SS_{\mathrm{rep}}
