@@ -6,35 +6,35 @@ SNP calling: SNPs were called on the five major chromosome arms for the eight fo
 
 Haplotype estimation: The sythetic population is derived from eight inbred founders, so a pool's allele frequency at any SNP is the sum over founders of each founder's frequency in the pool weighted by its genotype. The founder genotypes are known, so over a local window consisting of many SNPs the eight founder frequencies can be estimated via constrained least squares (lsei, R package limSolve) subject to the frequencies summing to one and each being non-negative. Those frequencies were estimated at 5 kb steps, with each step given an initial window of ±75 kb, widened in inverse proportion to the local recombination rate so that windows span comparable genetic rather than physical distance. The fit returns a covariance matrix for the estimates which was averaged over the ten windows either side of each position and used in the Wald test (below). Founders genotypes were hierachically clustered within each window, cut at a height of 2.5, and indistingusihable founders filled by linear interpolation between the means of the flanking resolved windows. The haplotype frequencies were smoothed with a running mean of ±100 kb (41 steps).
 
-**Wald test.** At each window let $\hat{c}$ and $\hat{z}$ be the eight-vectors of estimated founder frequencies in the control and selected pools, and $V_c$, $V_z$ their covariance matrices. The Wald statistic is
+**Wald test.** At each window let $\hat{c}$ and $\hat{z}$ be the eight-vectors of estimated founder frequencies in the control and selected pools, and $V_c$, $V_z$ their covariance matrices. The Wald-statistic is
 
 $$
 T = \frac{1}{\rho}\,(\hat{c} - \hat{z})^{\top}(V_c + V_z)^{-}(\hat{c} - \hat{z})
 $$
 
-where $(\cdot)^{-}$ is a generalised inverse and $\rho$ accounts for the smoothing of the frequencies, both defined below. Because the eight haplotype frequencies sum to one, $V_c + V_z$ is singular and $T$ carries seven degrees of freedom. The generalized inverse is taken by eigendecomposition, discarding the null direction and flooring the remaining eigenvalues at one per cent of their mean so that near-degenerate directions cannot inflate $T$. Under the null $T$ is $\chi^2_7$, and significance is reported as $-\log_{10} P$.
+on seven degrees of freedom, since the eight haplotype frequencies sum to one. That constraint also makes $V_c + V_z$ singular, so $(\cdot)^{-}$ is a generalised inverse, obtained by eigendecomposition: the null direction is discarded and the remaining eigenvalues floored at one per cent of their mean, so that near-degenerate directions cannot inflate $T$. Significance is reported as $-\log_{10} P$.
 
-Each pool's covariance is $V = M + \Sigma$. $M$ is the multinomial covariance of the chromosomes sampled,
-
-$$
-M_{ff} = \frac{\bar{p}_f(1-\bar{p}_f)}{n_{\mathrm{eff}}}, \qquad M_{fg} = -\frac{\bar{p}_f\bar{p}_g}{n_{\mathrm{eff}}}
-$$
-
-evaluated at the frequency $\bar{p}$ pooled across the selected and control samples, and $\Sigma$ is the haplotype reconstruction covariance returned by the constrained least squares fit above, averaged over the ten windows either side. A pool of $n$ flies carrying $k$ copies of the locus each supplies $kn$ chromosomes (where $k$ is one for male X chromsomes and two otherwise), which reconstruction error reduces to an effective count
+Each pool's covariance is $V = M + \Sigma$, where $M$ is the multinomial sampling covariance on sampled chromosomes,
 
 $$
-n_{\mathrm{eff}} = \frac{kn \sum_f \bar{p}_f(1-\bar{p}_f)}{\sum_f \bar{p}_f(1-\bar{p}_f) + kn\operatorname{tr}(\Sigma)}
+M_{ff} = \frac{\bar{p}_f(1-\bar{p}_f)}{n_{\mathrm{eff}}}, \qquad M_{fg} = -\frac{\bar{p}_f \bar{p}_g}{n_{\mathrm{eff}}}
 $$
 
-Replicate cages were combined as a weighted mean of $\hat{c}$ and $\hat{z}$ with weights $n_{\mathrm{eff}}$, their covariances pooled to match. The frequencies entering $T$ have been smoothed, so their variance is smaller than $V$ describes. $\rho$ is that reduction, the squared correlation between raw and smoothed frequencies averaged over pools and founders, and dividing by it returns $T$ to the scale of $V$.
+evaluated at the frequency $\bar{p}$ pooled across the selected and control samples, and $\Sigma$ is the haplotype reconstruction covariance returned by the constrained least squares fit above, averaged over the ten windows either side. A pool of $n$ flies each carrying $k$ copies of the locus supplies $kn$ chromosomes, where $k$ is one for male X chromosomes and two otherwise. Reconstruction error reduces this to an effective count
 
-**Heritability.** For a replicate retaining the longest-lived proportion $P$ of individuals, the standardised selection intensity is $i$ (Falconer and Mackay), and for some window a founder haplotype at frequency $p_f$ with additive effect $a_f$ has a difference in frequency between selected and control pools of $\Delta p_f = p_f (a_f - \bar{a}) i$, where $\bar{a}$ is the mean effect. Effects are in phenotypic standard deviations and an individual carries $k$ copies of the locus, so the heritability of the window as a percentage is
+$$
+n_{\mathrm{eff}} = \frac{kn \sum_f \bar{p}_f(1-\bar{p}_f)}{\sum_f \bar{p}_f(1-\bar{p}_f) + kn \operatorname{tr}(\Sigma)}
+$$
+
+Replicate cages were combined as a weighted mean of $\hat{c}$ and $\hat{z}$ with weights $n_{\mathrm{eff}}$, their covariances pooled to match. The frequencies entering $T$ have been smoothed, so their variance is smaller than $V$ describes; $\rho$ is that reduction, measured as the squared correlation between raw and smoothed frequencies averaged over pools and founders, and dividing by it returns $T$ to the scale of $V$.
+
+**Heritability.** Under truncation selection for any given replicate retaining the top proportion $P$ of individuals corresponds to a standardised selection intensity $i$ (cite Falconer for example), and for some window a founder haplotype at frequency $p_f$ with additive effect $a_f$ has a difference in frequency between selected and control pools of $\Delta p_f = p_f (a_f - \bar{a}) i$, where $\bar{a}$ is the mean effect. Effects are in phenotypic standard deviations and an individual carries $k$ copies of the locus, so the heritability of the window, as a percentage of phenotypic variance, is
 
 $$
 h^2 = \frac{100\,k}{i^2} \sum_f \frac{\Delta p_f^2}{p_f}
 $$
 
-Since $\Delta p_f/i$ is a property of the window and not of the replicate, all $R$ replicates estimate the same quantity however stringently each was selected. Writing $e_{fr} = (\hat{z}_{fr} - \hat{c}_{fr})/i_r$, with mean $\bar{e}_f$ and variance $s^2_f$ over replicates, the same expression across the experiment is
+$\Delta p_f/i$ is a property of the window rather than of the replicate, so all $R$ replicates estimate the same quantity however stringently each was selected. Writing $e_{fr} = (\hat{z}_{fr} - \hat{c}_{fr})/i_r$, with mean $\bar{e}_f$ and variance $s^2_f$ over replicates, the same expression across the experiment is
 
 $$
 \hat{h}^2 = 100\,k \sum_f \frac{\bar{e}_f^{\,2} - s_f^2/R}{\hat{p}_f}
@@ -42,15 +42,15 @@ $$
 
 where $\hat{p}_f$ is the mean control frequency and $s^2_f/R$ removes the inflation from squaring an estimate. It is measured from the replicates, so no model of the sampling or reconstruction covariance is needed. Being unbiased, $\hat{h}^2$ goes negative where the true value is near zero; we also report $h^2_{\mathrm{vc}}$, a variance component fitted per window by maximum likelihood on the scale $\bar{e}_f/\sqrt{\hat{p}_f}$, which is non-negative by construction.
 
-**The relationship between the Wald test and $h^2$.** $T$ and $h^2$ are both quadratic in the founder frequency shifts and differ only in their weighting: where the covariance is dominated by multinomial sampling $T \approx n_{\mathrm{eff}}\sum_f \Delta p_f^2/[p_f(1-p_f)]$, against $h^2 = (100k/i^2)\sum_f \Delta p_f^2/p_f$. In a case-control genome-wide association study the same argument gives the non-centrality parameter $\chi^2 \approx N\cdot 2p(1-p)\beta^2$, the number of individuals times the variance the locus explains. Arranged the same way, this design gives
+**The relationship between the Wald test and $h^2$.** $T$ and $\hat{h}^2$ are both quadratic in the founder frequency shifts and differ only in their weighting, so they are proportional. In a case-control genome-wide association study the same argument gives the familiar non-centrality parameter, $\chi^2 \approx N \cdot 2p(1-p)\beta^2$, the number of individuals times the variance a locus explains. Arranged the same way, this design gives
 
 $$
-T \approx \frac{n_{\mathrm{eff}}\, \bar{\imath}^{\,2}}{100\,k}\; h^2
+T \approx \frac{n_{\mathrm{eff}}\, \bar{\imath}^{\,2}}{100\,k}\; \hat{h}^2
 $$
 
-with $n_{\mathrm{eff}}$ the effective chromosome count pooled over replicates and $\bar{\imath}$ their mean selection intensity. The effect reaches the data through the frequency shift truncation selection produces rather than through a measured phenotype, which is why the intensity enters, and a multi-allelic locus contributes $\sum_f \Delta p_f^2/p_f$ in place of $2p(1-p)\beta^2$.
+with $n_{\mathrm{eff}}$ pooled over replicates and $\bar{\imath}$ their mean selection intensity. The effect reaches the data through the frequency shift truncation selection produces rather than through a measured phenotype, which is why the intensity enters, and a multi-allelic locus contributes $\sum_f \Delta p_f^2/p_f$ in place of $2p(1-p)\beta^2$.
 
-The relation holds in the data: over windows with $-\log_{10} P > 5$ the ratio $h^2/T$ is 0.0077 in autosomal females, 0.0076 in autosomal males and 0.0072 on the male X, one constant across arms and sexes including the male X, where $k$ and $n_{\mathrm{eff}}$ both halve and cancel.
+The relation holds in the data. Over windows with $-\log_{10} P > 5$ the ratio $\hat{h}^2/T$ is 0.0077 in autosomal females, 0.0076 in autosomal males and 0.0072 on the male X, one constant across arms and sexes including the male X, where $k$ and $n_{\mathrm{eff}}$ both halve and cancel (Fig. S1).
 
 Inverted, it states what a design can resolve: detecting a window of heritability $h^2$ at a threshold $T$ requires
 
@@ -58,7 +58,7 @@ $$
 n_{\mathrm{eff}} \approx \frac{100\,k\,T}{h^2 \bar{\imath}^{\,2}}
 $$
 
-so the detectable effect falls in inverse proportion to the chromosomes sequenced and to the square of the selection intensity. $n_{\mathrm{eff}}$ is below the raw count $kn$ — here by a factor of about 1.75 — because reconstruction error enters the covariance alongside the sampling term, and because the exact weighting is $1/p_f$ rather than $1/[p_f(1-p_f)]$. For the present design $-\log_{10} P = 7.5$ corresponds to 0.38% of phenotypic variance.
+so the detectable effect falls in inverse proportion to the chromosomes sequenced and to the square of the selection intensity. $n_{\mathrm{eff}}$ is below the raw count $kn$ — here by a factor of about 1.75 — because reconstruction error enters the covariance alongside the sampling term, and because the exact weighting is $1/p_f$ rather than $1/[p_f(1-p_f)]$.
 
 **Partitioning.** The ten replicate contrasts per treatment were split into odd and even sets of five, giving two independent estimates of heritability at every window in each of the four sex $\times$ diet groups. Writing $y_{sdh}$ for the estimate in sex $s$, diet $d$ and half $h$, the eight values were decomposed as a balanced $2 \times 2$ with two replicates per cell, uncorrected for the mean,
 
