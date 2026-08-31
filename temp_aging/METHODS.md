@@ -28,13 +28,13 @@ $$
 
 Replicate cages were combined as a weighted mean of $\hat{c}$ and $\hat{z}$ with weights $n_{\mathrm{eff}}$, their covariances pooled to match. The frequencies entering $T$ have been smoothed, so their variance is smaller than $V$ describes. $\rho$ is that reduction, the squared correlation between raw and smoothed frequencies averaged over pools and founders, and dividing by it returns $T$ to the scale of $V$.
 
-**Heritability.** For a replicate retaining the longest-lived proportion $P$ of individuals, the standardised selection intensity is $i$ (Falconer and Mackay). At a window a founder haplotype at frequency $p_f$, with additive effect $a_f$ in phenotypic standard deviations, shifts between the selected and control pools by $\Delta p_f = p_f(a_f - \bar{a})\,i$, where $\bar{a}$ is the mean effect. An individual carries $k$ copies of the locus, so the heritability of the window, as a percentage of phenotypic variance, is
+**Heritability.** For a replicate retaining the longest-lived proportion $P$ of individuals, the standardised selection intensity is $i$ (Falconer and Mackay), and for some window a founder haplotype at frequency $p_f$ with additive effect $a_f$ has a difference in frequency between selected and control pools of $\Delta p_f = p_f (a_f - \bar{a}) i$, where $\bar{a}$ is the mean effect. Effects are in phenotypic standard deviations and an individual carries $k$ copies of the locus, so the heritability of the window as a percentage is
 
 $$
 h^2 = \frac{100\,k}{i^2} \sum_f \frac{\Delta p_f^2}{p_f}
 $$
 
-$\Delta p_f/i$ is a property of the window rather than of the replicate, so all $R$ replicates estimate it however stringently each was selected. Writing $e_{fr} = (\hat{z}_{fr} - \hat{c}_{fr})/i_r$, with mean $\bar{e}_f$ and variance $s^2_f$ across replicates,
+Since $\Delta p_f/i$ is a property of the window and not of the replicate, all $R$ replicates estimate the same quantity however stringently each was selected. Writing $e_{fr} = (\hat{z}_{fr} - \hat{c}_{fr})/i_r$, with mean $\bar{e}_f$ and variance $s^2_f$ over replicates, the same expression across the experiment is
 
 $$
 \hat{h}^2 = 100\,k \sum_f \frac{\bar{e}_f^{\,2} - s_f^2/R}{\hat{p}_f}
