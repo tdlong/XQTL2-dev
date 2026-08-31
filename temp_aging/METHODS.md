@@ -12,7 +12,7 @@ $$
 T = \frac{1}{\rho}\,(\hat{c} - \hat{z})^{\top}(V_c + V_z)^{-}(\hat{c} - \hat{z})
 $$
 
-where $(\cdot)^{-}$ is a generalised inverse and $\rho$ corrects for smoothing, both defined below. Because the eight haplotype frequencies sum to one, $V_c + V_z$ is singular and $T$ carries seven degrees of freedom. The generalized inverse is taken by eigendecomposition, discarding the null direction and flooring the remaining eigenvalues at one per cent of their mean so that near-degenerate directions cannot inflate $T$. Under the null $T$ is $\chi^2_7$, and significance is reported as $-\log_{10} P$.
+where $(\cdot)^{-}$ is a generalised inverse and $\rho$ accounts for the smoothing of the frequencies, both defined below. Because the eight haplotype frequencies sum to one, $V_c + V_z$ is singular and $T$ carries seven degrees of freedom. The generalized inverse is taken by eigendecomposition, discarding the null direction and flooring the remaining eigenvalues at one per cent of their mean so that near-degenerate directions cannot inflate $T$. Under the null $T$ is $\chi^2_7$, and significance is reported as $-\log_{10} P$.
 
 Each pool's covariance is $V = M + \Sigma$. $M$ is the multinomial covariance of the chromosomes sampled,
 
@@ -26,7 +26,7 @@ $$
 n_{\mathrm{eff}} = \frac{kn \sum_f \bar{p}_f(1-\bar{p}_f)}{\sum_f \bar{p}_f(1-\bar{p}_f) + kn\operatorname{tr}(\Sigma)}
 $$
 
-Replicate cages were combined as a weighted mean of $\hat{c}$ and $\hat{z}$ with weights $n_{\mathrm{eff}}$, their covariances pooled to match. Our smoothing of the founder frequencies removes variance from them, and $\rho$, the mean squared correlation between the raw and smoothed frequencies, restores it.
+Replicate cages were combined as a weighted mean of $\hat{c}$ and $\hat{z}$ with weights $n_{\mathrm{eff}}$, their covariances pooled to match. The frequencies entering $T$ have been smoothed, so their variance is smaller than $V$ describes. $\rho$ is that reduction, the squared correlation between raw and smoothed frequencies averaged over pools and founders, and dividing by it returns $T$ to the scale of $V$.
 
 **Heritability.** For a replicate retaining the longest-lived proportion $P$ of individuals, the standardised selection intensity is $i$ (Falconer and Mackay). At a window, a founder haplotype at frequency $p_f$ whose additive effect on the trait is $a_f$, expressed in phenotypic standard deviations, differs in frequency between the selected and control pools by
 
