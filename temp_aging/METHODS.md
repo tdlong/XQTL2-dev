@@ -9,7 +9,7 @@ Haplotype estimation: The sythetic population is derived from eight inbred found
 **Wald test.** At each window let $\hat{c}$ and $\hat{z}$ be the eight-vectors of estimated founder frequencies in the control and selected pools, and $V_c$, $V_z$ their covariance matrices. The Wald-statistic is
 
 $$
-T = \frac{1}{\rho}\,(\hat{c} - \hat{z})^{\top}(V_c + V_z)^{-}(\hat{c} - \hat{z})
+T = \frac{1}{R^2}\,(\hat{c} - \hat{z})^{\top}(V_c + V_z)^{-}(\hat{c} - \hat{z})
 $$
 
 on seven degrees of freedom, since the eight haplotype frequencies sum to one. That constraint also makes $V_c + V_z$ singular, so $(\cdot)^{-}$ is a generalised inverse, obtained by eigendecomposition with the null direction discarded and the remaining eigenvalues floored at one per cent of their mean, so that near-degenerate directions cannot inflate $T$. Significance is reported as $-\log_{10} P$.
@@ -26,19 +26,17 @@ $$
 n_{\mathrm{eff}} = \frac{kn \sum_f \bar{p}_f(1-\bar{p}_f)}{\sum_f \bar{p}_f(1-\bar{p}_f) + kn \operatorname{tr}(\Sigma)}
 $$
 
-Replicate cages were combined as a weighted mean of $\hat{c}$ and $\hat{z}$ with weights $n_{\mathrm{eff}}$, their covariances pooled to match. The haplotype frequencies entering $T$ have been smoothed, so their variance is smaller than non-smoothed estimates, $\rho$ quantifies that reduction as the squared correlation between raw and smoothed frequencies averaged over pools and founders.  (then perhaps we should use rho sqaured? as it is weird to define a common thing and then make the units wrong.  But it is also unclear if rho is local or global????)
+Replicate cages were combined as a weighted mean of $\hat{c}$ and $\hat{z}$ with weights $n_{\mathrm{eff}}$, their covariances pooled to match. The haplotype frequencies entering $T$ have been smoothed, so their variance is smaller than that of the unsmoothed estimates $V$ describes. $R^2$ is that reduction, the squared correlation between raw and smoothed frequencies; it is a single value per scan, taken over all windows, pools and founders, and applied genome-wide.
 
-**Heritability.** Under truncation selection for any given replicate retaining the top proportion $P$ of individuals corresponds to a standardised selection intensity $i$ (cite Falconer for example), and for a window with founder haplotype frequency $p_f$ the heritability of the window is
+**Heritability.** Under truncation selection, retaining the top proportion $P_r$ of individuals in replicate $r$ corresponds to a standardised selection intensity $i_r$ (cite Falconer for example). For a window whose founder haplotype frequencies are $p_f$, that replicate gives
 
 $$
-h^2 = \frac{100\,k}{i^2} \sum_f \frac{\Delta p_f^2}{p_f}
+h^2_r = \frac{100\,k}{i_r^2} \sum_f \frac{\Delta p_{fr}^2}{p_f}
 $$
 
-(with k defined as above)
+with $k$ as defined above and $\Delta p_{fr} = \hat{z}_{fr} - \hat{c}_{fr}$.
 
-You totally lose me below.  I mean h2 is define for a window and a replicate I guess.  Then you go and develop new nomenclature below.  So we either need to define the h2  over replicates in terms of h2 per replicate.  Or the initial expression has to include the "r" subscription for i and p and just bang it fucking out.
-
- $\Delta p_f/i$ is a property of the window rather than of the replicate, so all $R$ replicates estimate the same quantity however stringently each was selected. Writing $e_{fr} = (\hat{z}_{fr} - \hat{c}_{fr})/i_r$, with mean $\bar{e}_f$ and variance $s^2_f$ over replicates, the same expression across the experiment is
+Averaging $h^2_r$ over replicates would not do, because the square of a noisy shift exceeds the square of its mean, so the scatter between replicates would be carried into the estimate. The replicates are therefore averaged before squaring. Since $\Delta p_{fr}/i_r$ estimates the same quantity in every replicate however stringently each was selected, writing $e_{fr} = \Delta p_{fr}/i_r$ with mean $\bar{e}_f$ and variance $s^2_f$ over the $R$ replicates gives
 
 $$
 \hat{h}^2 = 100\,k \sum_f \frac{\bar{e}_f^{\,2} - s_f^2/R}{\hat{p}_f}
@@ -52,15 +50,9 @@ $$
 T \approx \frac{n_{\mathrm{eff}}\, \bar{\imath}^{\,2}}{100\,k}\; \hat{h}^2
 $$
 
-with $n_{\mathrm{eff}}$ pooled over replicates and $\bar{\imath}$ their mean selection intensity. 
+where $n_{\mathrm{eff}} = \sum_r n_{\mathrm{eff},r}$ and $\bar{\imath}^{\,2}$ is the $n_{\mathrm{eff}}$-weighted mean of $i_r^2$, the same weighting by which the replicates were pooled. The effect reaches the data through the frequency shift truncation selection produces rather than through a measured phenotype, which is why the intensity enters, and a multi-allelic locus contributes $\sum_f \Delta p_f^2/p_f$ in place of $2p(1-p)\beta^2$.
 
-It is totally not clear what pooled mean above.  Is it just the sum of per replicate neff.  and then it i bar straight up mean or somehow weighted?
-
-Now below.... you have to simplify this.  We have a plot of predicted T as a function of h2 and we have observed quantiles, so we can just state as much and refer to the figure.
-
-The effect reaches the data through the frequency shift truncation selection produces rather than through a measured phenotype, which is why the intensity enters, and a multi-allelic locus contributes $\sum_f \Delta p_f^2/p_f$ in place of $2p(1-p)\beta^2$.
-
-The relation holds in the data. Over windows with $-\log_{10} P > 5$ the ratio $\hat{h}^2/T$ is 0.0077 in autosomal females, 0.0076 in autosomal males and 0.0072 on the male X, one constant across arms and sexes including the male X, where $k$ and $n_{\mathrm{eff}}$ both halve and cancel (Fig. S1).
+Predicted and observed $\hat{h}^2$ agree over the range that carries signal (Fig. S1).
 
 Inverted, it states what a design can resolve: detecting a window of heritability $h^2$ at a threshold $T$ requires
 
