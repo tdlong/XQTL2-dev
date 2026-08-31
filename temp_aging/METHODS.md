@@ -28,25 +28,19 @@ $$
 
 Replicate cages were combined as a weighted mean of $\hat{c}$ and $\hat{z}$ with weights $n_{\mathrm{eff}}$, their covariances pooled to match. The frequencies entering $T$ have been smoothed, so their variance is smaller than $V$ describes. $\rho$ is that reduction, the squared correlation between raw and smoothed frequencies averaged over pools and founders, and dividing by it returns $T$ to the scale of $V$.
 
-**Heritability.** For a replicate retaining the longest-lived proportion $P$ of individuals, the standardised selection intensity is $i$ (Falconer and Mackay). At a window, a founder haplotype at frequency $p_f$ whose additive effect on the trait is $a_f$, expressed in phenotypic standard deviations, differs in frequency between the selected and control pools by
-
-$$
-\Delta p_f = p_f (a_f - \bar{a})\, i
-$$
-
-with $\bar{a}$ the mean effect over founders. An individual's genotypic value at the locus is the sum over the $k$ copies it carries, so the window contributes additive variance $k\sum_f p_f (a_f - \bar{a})^2$, and because $a_f$ is in phenotypic standard deviations this is already a fraction of the phenotypic variance. Substituting $a_f - \bar{a} = \Delta p_f/(p_f i)$, the heritability of the window as a percentage is
+**Heritability.** For a replicate retaining the longest-lived proportion $P$ of individuals, the standardised selection intensity is $i$ (Falconer and Mackay). At a window a founder haplotype at frequency $p_f$, with additive effect $a_f$ in phenotypic standard deviations, shifts between the selected and control pools by $\Delta p_f = p_f(a_f - \bar{a})\,i$, where $\bar{a}$ is the mean effect. An individual carries $k$ copies of the locus, so the heritability of the window, as a percentage of phenotypic variance, is
 
 $$
 h^2 = \frac{100\,k}{i^2} \sum_f \frac{\Delta p_f^2}{p_f}
 $$
 
-$\Delta p_f / i = p_f(a_f - \bar{a})$ is a property of the window and not of the replicate, so every replicate estimates the same quantity however stringently it was selected. Writing $e_{fr} = (\hat{z}_{fr} - \hat{c}_{fr})/i_r$ for replicate $r$, and $\bar{e}_f$ and $s^2_f$ for the mean and variance of $e_{fr}$ over the $R$ replicates, the expression above becomes $h^2 = 100k\sum_f \bar{e}_f^{\,2}/\hat{p}_f$. Squaring an estimate inflates it by its own sampling variance, $s^2_f/R$, and subtracting that gives
+$\Delta p_f/i$ is a property of the window rather than of the replicate, so all $R$ replicates estimate it however stringently each was selected. Writing $e_{fr} = (\hat{z}_{fr} - \hat{c}_{fr})/i_r$, with mean $\bar{e}_f$ and variance $s^2_f$ across replicates,
 
 $$
 \hat{h}^2 = 100\,k \sum_f \frac{\bar{e}_f^{\,2} - s_f^2/R}{\hat{p}_f}
 $$
 
-with $\hat{p}_f$ the mean control frequency. The correction is measured from the replicates, so the estimator needs no model of the sampling or reconstruction covariances. Being unbiased it takes negative values where the true value is near zero; we therefore also report $h^2_{\mathrm{vc}}$, in which a single variance component is fitted per window by maximum likelihood on the scale $\bar{e}_f/\sqrt{\hat{p}_f}$ with known per-founder noise, so that non-negativity is a boundary solution of the likelihood rather than a truncation.
+where $\hat{p}_f$ is the mean control frequency and $s^2_f/R$ removes the inflation from squaring an estimate. It is measured from the replicates, so no model of the sampling or reconstruction covariance is needed. Being unbiased, $\hat{h}^2$ goes negative where the true value is near zero; we also report $h^2_{\mathrm{vc}}$, a variance component fitted per window by maximum likelihood on the scale $\bar{e}_f/\sqrt{\hat{p}_f}$, which is non-negative by construction.
 
 **The relationship between the Wald test and $h^2$.** $T$ and $h^2$ are both quadratic in the founder frequency shifts and differ only in their weighting: where the covariance is dominated by multinomial sampling $T \approx n_{\mathrm{eff}}\sum_f \Delta p_f^2/[p_f(1-p_f)]$, against $h^2 = (100k/i^2)\sum_f \Delta p_f^2/p_f$. In a case-control genome-wide association study the same argument gives the non-centrality parameter $\chi^2 \approx N\cdot 2p(1-p)\beta^2$, the number of individuals times the variance the locus explains. Arranged the same way, this design gives
 
