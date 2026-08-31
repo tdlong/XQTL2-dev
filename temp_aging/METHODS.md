@@ -52,7 +52,7 @@ $$
 
 where $\mathrm{df} = 7$ — a chi-squared statistic averages its degrees of freedom where nothing is happening — $n_{\mathrm{eff}} = \sum_r n_{\mathrm{eff},r}$ and $\bar{\imath}^{\,2}$ is the $n_{\mathrm{eff}}$-weighted mean of $i_r^2$, the same weighting by which the replicates were pooled. The effect reaches the data through the frequency shift truncation selection produces rather than through a measured phenotype, which is why the intensity enters, and a multi-allelic locus contributes $\sum_f \Delta p_f^2/p_f$ in place of $2p(1-p)\beta^2$.
 
-Predicted and observed $\hat{h}^2$ agree over the range that carries signal (Fig. S1).
+Predicted and observed $\hat{h}^2$ track one another over the range that carries signal (Fig. S1). Between $-\log_{10} P$ of 5 and 15 the observed values run about 0.05 percentage points above the prediction, some 16 to 17% in relative terms, and the two converge above 15.
 
 Inverted, it states what a design can resolve: detecting a window of heritability $h^2$ at a threshold $T$ requires
 
