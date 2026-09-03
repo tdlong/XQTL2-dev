@@ -4,7 +4,7 @@ Library preparation and sequencing: DNA was prepared on pools of several hundred
 
 SNP calling: SNPs were called on the five major chromosome arms for the eight founder samples and a catalog of SNPs segregating among the eight founders of the synthetic population created. Founders were called jointly with bcftools (cite): a site entered the catalog if it was biallelic, covered at 10× or more in every founder, had a minor allele frequency of 3% or less in every founder, segregating an alternate allele in at least one founder, and was at least 20 bp from the nearest founder indel. The final catalog comprises 1,207,436 SNPs from 1,887,667 initial candidate positions. For each of the 60 experimental samples reference and alternate read counts were then taken directly from the pileup at each catalog position, and these counts used to infer founder haplotype frequencies. At called SNPs autosomal depth averaged 140× per library and a range of 49× to 400×; fifteen libraries fell below 75× and twenty below 100×. In prior work we have shown 50X coverage is sufficient for high quality haplotype estimation.
 
-Haplotype estimation: The sythetic population is derived from eight inbred founders, so a pool's allele frequency at any SNP is the sum over founders of each founder's frequency in the pool weighted by its genotype. The founder genotypes are known, so over a local window consisting of many SNPs the eight founder frequencies can be estimated via constrained least squares (lsei, R package limSolve) subject to the frequencies summing to one and each being non-negative. Those frequencies were estimated at 5 kb steps, with each step given an initial window of ±75 kb, widened in inverse proportion to the local recombination rate so that windows span comparable genetic rather than physical distance. The fit returns a covariance matrix for the estimates which was averaged over the ten windows either side of each position and used in the Wald test (below). Founders genotypes were hierachically clustered within each window, cut at a height of 2.5, and indistingusihable founders filled by linear interpolation between the means of the flanking resolved windows. The haplotype frequencies were smoothed with a running mean of ±100 kb (41 steps).
+Haplotype estimation: The synthetic population is derived from eight inbred founders, so a pool's allele frequency at any SNP is the sum over founders of each founder's frequency in the pool weighted by its genotype. The founder genotypes are known, so over a local window consisting of many SNPs the eight founder frequencies can be estimated via constrained least squares (lsei, R package limSolve) subject to the frequencies summing to one and each being non-negative. Those frequencies were estimated at 5 kb steps, with each step given an initial window of ±75 kb, widened in inverse proportion to the local recombination rate so that windows span comparable genetic rather than physical distance. The fit returns a covariance matrix for the estimates which was averaged over the ten windows either side of each position and used in the Wald test (below). Founders genotypes were hierarchically clustered within each window, cut at a height of 2.5, and indistinguishable founders filled by linear interpolation between the means of the flanking resolved windows. The haplotype frequencies were smoothed with a running mean of ±100 kb (41 steps).
 
 **Wald test.** At each window let $\hat{c}$ and $\hat{z}$ be the eight-vectors of estimated founder frequencies in the control and selected pools, and $V_c$, $V_z$ their covariance matrices. The Wald-statistic is
 
@@ -20,13 +20,13 @@ $$
 M_{ff} = \frac{\bar{p}_f(1-\bar{p}_f)}{n_{\mathrm{eff}}}, \qquad M_{fg} = -\frac{\bar{p}_f \bar{p}_g}{n_{\mathrm{eff}}}
 $$
 
-evaluated at the frequency $\bar{p}$ pooled across the selected and control samples, and $\Sigma$ is the smoothed haplotype reconstruction covariance returned by the constrained least squares fit above. The effective number of individuals is obtained estimated from a pool of $n$ flies (where $k$ is one for male X chromosomes and two otherwise) as
+evaluated at the frequency $\bar{p}$ pooled across the selected and control samples, and $\Sigma$ is the smoothed haplotype reconstruction covariance returned by the constrained least squares fit above. The effective number of individuals is estimated from a pool of $n$ flies (where $k$ is one for male X chromosomes and two otherwise) as
 
 $$
 n_{\mathrm{eff}} = \frac{kn \sum_f \bar{p}_f(1-\bar{p}_f)}{\sum_f \bar{p}_f(1-\bar{p}_f) + kn \operatorname{tr}(\Sigma)}
 $$
 
-The 10 replicates were combined as a weighted using $n_{\mathrm{eff}}$ mean of $\hat{c}$ and $\hat{z}$ with covariances similarly pooled. As the haplotype frequencies entering $T$ are smoothed, their variance is reduced relative unsmoothed estimates. $R^2$ , the squared correlation between raw and smoothed frequencies taken over all windows, pools and founders corrects for this reduction.
+The 10 replicates were combined as an $n_{\mathrm{eff}}$-weighted mean of $\hat{c}$ and $\hat{z}$, with covariances similarly pooled. As the haplotype frequencies entering $T$ are smoothed, their variance is reduced relative to unsmoothed estimates. $R^2$, the squared correlation between raw and smoothed frequencies taken over all windows, pools and founders, corrects for this reduction.
 
 **Heritability.** Under truncation selection, retaining the top proportion $P_r$ of individuals in replicate $r$ corresponds to a standardised selection intensity $i_r$ (cite Falconer for example). The heritability in the rth replicate, given haplotype frequencies for f founder alleles
 
@@ -42,9 +42,7 @@ $$
 \hat{h}^2 = 100\,k \sum_f \frac{\bar{e}_f^{\,2} - s_f^2/R}{\hat{p}_f}
 $$
 
-where $\hat{p}_f$ is the mean control frequency and $s^2_f/R$ removes the inflation from squaring an estimate. Being unbiased, $\hat{h}^2$ can be negative where the true value is near zero
-
-.
+where $\hat{p}_f$ is the mean control frequency and $s^2_f/R$ removes the inflation from squaring an estimate. Being unbiased, $\hat{h}^2$ can be negative where the true value is near zero.
 
 **The relationship between the Wald test and $h^2$.** In a case-control genome-wide association study the expected value of the chi-squared statistic is the number of individuals times the variance explained by the causative factor, $E[\chi^2] \approx N \cdot 2p(1-p)\beta^2$. $T$ and $\hat{h}^2$ are likewise both quadratic in the founder frequency shifts, so
 
@@ -54,9 +52,9 @@ $$
 
 where $n_{\mathrm{eff}} = \sum_r n_{\mathrm{eff},r}$ and $\bar{\imath}^{\,2}$ is the $n_{\mathrm{eff}}$-weighted mean of $i_r^2$. In Supplementary Figure 1 we plot observed and predicted $\hat{h}^2$ against the Wald statistic and against LWP. For non-significant regions we over-estimate heritability; over moderately significant LWPs of 5 to 15 we over-estimate it by an average of 0.05 percentage points (16-17% relative inflation); and for highly significant regions the estimate is accurate.
 
-The above relationship can also be used the calculate the power of X-QTL experiments. To detect a window contributing 1% of phenotypic variance at an LWP of 15 with 80% power, selecting the longest-lived 5%, one need screen 75,000 flies per treatment. Halving the target heritability to 0.5% doubles the experiment to150,000 individuals screened.
+The above relationship can also be used the calculate the power of X-QTL experiments. To detect a window contributing 1% of phenotypic variance at an LWP of 15 with 80% power, selecting the longest-lived 5%, one need screen 75,000 flies per treatment. Halving the target heritability to 0.5% doubles the experiment to 150,000 individuals screened.
 
-**Partitioning.** Because $\hat{h}^2$ is unbiased it scatters below zero at windows carrying no signal, which is awkward for variance component decompostion. (The is suddenly not so clear), not clear how the variance estimator changes after we went to so much work to create the estimator ... and maximum likelihood estimators can go negative), so the partition uses $h^2_{\mathrm{vc}}$: a variance component fitted per window by maximum likelihood on the scale $\bar{e}_f/\sqrt{\hat{p}_f}$, non-negative by construction. The ten replicate contrasts per treatment were split into two halves (1 & 2) , giving two independent estimates of heritability at every window in each of the four sex $\times$ diet groups. Writing $y_{sdh}$ for the estimate of heritability for some window in sex $s$, diet $d$ and half $h$, we can express
+**Partitioning.** The partition asks how $\hat{h}^2$ itself varies across the design; the estimator is unchanged. Splitting the ten replicate contrasts in each treatment into two halves gives eight independent estimates of $\hat{h}^2$ at every window — two sexes $\times$ two diets $\times$ two halves — and it is these eight numbers that are decomposed. Writing $y_{sdh}$ for the estimate of heritability for some window in sex $s$, diet $d$ and half $h$, we can express
 
 $$
 \sum y^2 = 8\bar{y}^2 + SS_{\mathrm{sex}} + SS_{\mathrm{diet}} + SS_{\mathrm{sex:diet}} + SS_{\mathrm{rep}}
@@ -68,4 +66,4 @@ $$
 SS_{\mathrm{sex}} = 2(\bar{y}_M - \bar{y}_F)^2, \qquad SS_{\mathrm{diet}} = 2(\bar{y}_{SY20} - \bar{y}_{SY10})^2, \qquad SS_{\mathrm{rep}} = \tfrac{1}{2}\sum_{\mathrm{cells}} (y_{\mathrm{odd}} - y_{\mathrm{even}})^2
 $$
 
-with the treatment terms on one degree of freedom each and $SS_{\mathrm{rep}}$, which is pure error, on four. Each term is reported as $MS - MS_{\mathrm{rep}}$, with $MS_{\mathrm{rep}} = SS_{\mathrm{rep}}/4$, and on the heritability scale as $\operatorname{sign}(MS - MS_{\mathrm{rep}})\sqrt{|MS - MS_{\mathrm{rep}}|/8}$ . Confidence intervals are percentile bootstrap over contiguous groups of tiles.
+The treatment terms carry one degree of freedom each. $SS_{\mathrm{rep}}$ carries four and is pure error: the two halves differ only in which replicates they contain. Each term is reported as $MS - MS_{\mathrm{rep}}$, with $MS_{\mathrm{rep}} = SS_{\mathrm{rep}}/4$, and on the heritability scale as $\operatorname{sign}(\cdot)\sqrt{|MS - MS_{\mathrm{rep}}|/8}$, which returns each level's deviation from the window mean. Terms are not floored at zero; one falling below the replicate error goes negative, which is how a window carrying no signal reports. The shared term takes its sign from $\bar{y}$ rather than from the term itself, because $8\bar{y}^2$ is a square and a window with strongly negative $\hat{h}^2$ would otherwise read as a large positive shared effect. Confidence intervals are percentile bootstrap, 2000 resamples over 4 cM groups of tiles.
