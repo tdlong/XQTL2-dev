@@ -140,12 +140,28 @@ terms <- function() {
 #   0.05 cM  0.999     0.5 cM  0.957     2 cM  0.695
 #   0.10 cM  0.997     1.0 cM  0.877     4 cM  0.378
 #
-# So a 1 cM tile is NOT an independent unit -- adjacent tiles sit at r = 0.88.
-# The tile is a summarisation scale, not an independence scale; independence is
-# what the 4-tile block buys, and 4 cM is where r has dropped to ~0.4. The
-# +/-100 kb smoothing only spans 0.4-0.6 cM (2.0-3.1 cM/Mb by arm), so it
-# accounts for the correlation to ~0.5 cM and real peak width for the rest.
-# Mean h2 autocorrelates slightly higher throughout (0.91 at 1 cM).
+# A 1 cM tile is NOT an independent unit. The tile is a summarisation scale,
+# not an independence scale; independence is what the 4-tile block buys, and
+# 4 cM is where r has dropped to ~0.4. The +/-100 kb smoothing only spans
+# 0.4-0.6 cM (2.0-3.1 cM/Mb by arm), so it accounts for the correlation to
+# ~0.5 cM and real peak width for the rest. Mean h2 autocorrelates slightly
+# higher throughout (0.91 at 1 cM).
+#
+# WHY 1 cM AND NOT 0.5 OR 2. Correlation between the summary values of ADJACENT
+# tiles, against what each size costs in resolution:
+#
+#   size    tiles  sig@7.5  adj-tile r   separately resolved sig regions
+#   0.5 cM    535      152       0.965        20
+#   1.0 cM    268       84       0.901        14
+#   2.0 cM    135       48       0.773        11
+#   4.0 cM     69       29       0.565         9
+#
+# 1 cM is where adjacent tiles first reach r = 0.90. Below it they are near
+# duplicates; above it the correlation keeps falling but distinct peaks merge,
+# 2 cM already costing three of the fourteen resolved regions. (sig@7.5 reads
+# 84 here against the 85 this script reports -- the tradeoff table tiles the
+# euchromatic steps directly, while the analysis below tiles before filtering,
+# so the arm-start offsets differ by one tile. Immaterial to the comparison.)
 set.seed(1)
 shares <- function(x) {
   s <- function(z) sum(z, na.rm = TRUE)
