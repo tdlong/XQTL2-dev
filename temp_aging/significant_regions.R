@@ -133,6 +133,19 @@ terms <- function() {
 
 # Resample 4 cM groups of tiles rather than tiles one at a time, since
 # neighbouring tiles can carry the same peak.
+#
+# MEASURED 2026-09-03, autocorrelation of the max-over-treatments Wald against
+# genetic separation, euchromatic steps:
+#
+#   0.05 cM  0.999     0.5 cM  0.957     2 cM  0.695
+#   0.10 cM  0.997     1.0 cM  0.877     4 cM  0.378
+#
+# So a 1 cM tile is NOT an independent unit -- adjacent tiles sit at r = 0.88.
+# The tile is a summarisation scale, not an independence scale; independence is
+# what the 4-tile block buys, and 4 cM is where r has dropped to ~0.4. The
+# +/-100 kb smoothing only spans 0.4-0.6 cM (2.0-3.1 cM/Mb by arm), so it
+# accounts for the correlation to ~0.5 cM and real peak width for the rest.
+# Mean h2 autocorrelates slightly higher throughout (0.91 at 1 cM).
 set.seed(1)
 shares <- function(x) {
   s <- function(z) sum(z, na.rm = TRUE)
