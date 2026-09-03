@@ -150,15 +150,19 @@ terms <- function() {
 # WHY 1 cM AND NOT 0.5 OR 2. Correlation between the summary values of ADJACENT
 # tiles, against what each size costs in resolution:
 #
-#   size    tiles  sig@7.5  adj-tile r   separately resolved sig regions
-#   0.5 cM    535      152       0.965        20
-#   1.0 cM    268       84       0.901        14
-#   2.0 cM    135       48       0.773        11
-#   4.0 cM     69       29       0.565         9
+#   size    tiles  sig@7.5  adj-tile r   adj R^2   separately resolved sig regions
+#   0.4 cM    670        -       0.975     0.951        -
+#   0.5 cM    535      152       0.965     0.931       20
+#   0.6 cM    448        -       0.953     0.909        -     <- R^2 = 90%
+#   1.0 cM    268       84       0.901     0.813       14
+#   2.0 cM    135       48       0.773     0.597       11
+#   4.0 cM     69       29       0.565     0.319        9
 #
-# 1 cM is where adjacent tiles first reach r = 0.90. Below it they are near
-# duplicates; above it the correlation keeps falling but distinct peaks merge,
-# 2 cM already costing three of the fourteen resolved regions. (sig@7.5 reads
+# Adjacent-tile R^2 crosses 90% at 0.6 cM, not 1 cM; at 1 cM it is 81%. The
+# Methods quotes R^2 (Tony's preference): 81% at 1 cM, 93% at 0.5, 60% at 2.
+# Going coarser keeps lowering it but merges distinct peaks, 2 cM already
+# costing three of the fourteen resolved regions -- that trade-off, not a
+# threshold on R^2, is what picks 1 cM. (sig@7.5 reads
 # 84 here against the 85 this script reports -- the tradeoff table tiles the
 # euchromatic steps directly, while the analysis below tiles before filtering,
 # so the arm-start offsets differ by one tile. Immaterial to the comparison.)
