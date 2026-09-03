@@ -42,9 +42,15 @@ w <- w %>% semi_join(keep, by = c("chr", "tile")) %>% filter(is_eu)
 # to 1.35 between the 10th and 90th percentiles. These are averages through wide
 # scatter: the h2 a tile at that significance carries on average, not the h2 that
 # significance implies.
+# A tile is read at ONE step -- the one with the largest Wald -- as in
+# significant_regions.R and scan_resolution.R. Taking max(H2) and max(Wald)
+# separately would let them come from different steps. It moves the numbers by
+# ~0.003 percentage points, but the tile rule has to mean one thing.
 tl <- w %>% mutate(trt = paste0(sugar, "_", sex)) %>%
   group_by(trt, chr, tile) %>%
-  summarise(h2 = max(H2), wald = max(Wald_log10p), .groups = "drop")
+  slice_max(Wald_log10p, n = 1, with_ties = FALSE) %>%
+  ungroup() %>%
+  transmute(trt, chr, tile, h2 = H2, wald = Wald_log10p)
 
 cat("h2 on 1 cM tiles: the floor, and the value at each cutoff\n\n")
 res <- map_dfr(sort(unique(tl$trt)), function(t) {
