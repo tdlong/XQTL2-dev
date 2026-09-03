@@ -52,21 +52,29 @@ $$
 
 where $n_{\mathrm{eff}} = \sum_r n_{\mathrm{eff},r}$ and $\bar{\imath}^{\,2}$ is the $n_{\mathrm{eff}}$-weighted mean of $i_r^2$. In Supplementary Figure 1 we plot observed and predicted $\hat{h}^2$ against the Wald statistic and against LWP. At non-significant steps we over-estimate heritability; over moderately significant LWPs of 5 to 15 we over-estimate it by an average of 0.05 percentage points (a 16-17% relative inflation); and at highly significant steps the estimate is accurate.
 
-The above relationship can also be used to calculate the power of X-QTL experiments. To detect a step contributing 1% of phenotypic variance at an LWP of 15 with 80% power, selecting the longest-lived 5%, one need screen 75,000 flies per treatment. Halving the target heritability to 0.5% doubles the experiment to 150,000 individuals screened.  (This paragraph is incomplete, as we don;t show the rerrangement that gives us power)
-
-**Partitioning.** We split the ten replicate contrasts in each treatment into two halves to give eight unbiased estimates of $\hat{h}^2$ at every step — two sexes $\times$ two diets $\times$ two halves. An orthogonal transformation of those eight numbers separates the heritability shared by all four treatments from the parts specific to sex, to diet, and to their interaction, one degree of freedom each, leaving the difference between the two halves of a treatment as pure error on four degrees of freedom. Writing $\overline{\hat{h}^2}$ for the mean of all eight and $\hat{h}^2_M$, $\hat{h}^2_F$, $\hat{h}^2_{SY10}$, $\hat{h}^2_{SY20}$ for the marginal means,
+The above relationship also gives the power of an X-QTL experiment. Under the alternative $T$ is non-central $\chi^2_7$ with non-centrality $\lambda = n_{\mathrm{eff}}\bar{\imath}^{\,2}h^2/100k$, so detecting a heritability $h^2$ at threshold $T_\alpha$ with power $1-\beta$ requires $\lambda$ to reach the value $\lambda_{\beta}$ at which $\Pr(\chi^2_7(\lambda) > T_\alpha) = 1-\beta$, that is
 
 $$
-SS_{\mathrm{shared}} = 8\,\overline{\hat{h}^2}^{\,2}, \qquad
-SS_{\mathrm{sex}} = 2\big(\hat{h}^2_M - \hat{h}^2_F\big)^2, \qquad
-SS_{\mathrm{diet}} = 2\big(\hat{h}^2_{SY20} - \hat{h}^2_{SY10}\big)^2, \qquad
-SS_{\mathrm{rep}} = \tfrac{1}{2}\sum_{\mathrm{cells}} \big(\hat{h}^2_{\mathrm{odd}} - \hat{h}^2_{\mathrm{even}}\big)^2
+n_{\mathrm{eff}} \;=\; \frac{100\,k\,\lambda_{\beta}}{\bar{\imath}^{\,2}\,h^2}, \qquad N \;=\; n_{\mathrm{eff}}/P
 $$
 
-the odd-even is introduced here, but the word ony talk about two halves.  So back to inconsistent notation being used.  I think the odd even replicates is convenient for code, but is odd to write about (it only works because of the way we happen to number the replicates).  I would talk about slitting into two interleaved halves. and use some notation that makes sense for that.
+flies screened per treatment at selected proportion $P$, since $\bar{\imath}$ is itself fixed by $P$. An LWP of 15 puts $T_\alpha = 85.6$ and $\lambda_{0.2} = 95.6$; selecting the longest-lived 5% gives $\bar{\imath} = 2.06$, so a step contributing 1% of phenotypic variance needs $n_{\mathrm{eff}} = 4{,}500$ and 90,000 flies screened. Requirement scales as $1/h^2$, so halving the target to 0.5% doubles the experiment.
 
-with $SS_{\mathrm{sex:diet}}$ the remaining contrast. Each effect is reported as its sum of squares less the pure error mean square $SS_{\mathrm{rep}}/4$, and on the heritability scale as $\operatorname{sign}(\cdot)\sqrt{|\cdot|/8}$. Because the eight estimates are unbiased so is each contrast, and an effect near zero falls negative about half the time; an effect is taken as present only where its bootstrap interval excludes zero.
+**Partitioning.** We split the ten replicate contrasts in each treatment into two interleaved halves to give eight unbiased estimates of $\hat{h}^2$ at every step — two sexes $\times$ two diets $\times$ two halves. An orthogonal transformation of those eight numbers gives the heritability shared by all four treatments and the parts specific to sex, to diet, and to their interaction, one degree of freedom each, with the difference between the halves of a treatment as pure error on four. Writing $\overline{\hat{h}^2}$ for the mean of all eight, $\hat{h}^2_M$, $\hat{h}^2_F$, $\hat{h}^2_{SY10}$, $\hat{h}^2_{SY20}$ for the marginal means, and $\hat{h}^2_{(1)}$, $\hat{h}^2_{(2)}$ for the two halves of a treatment,
 
-Again you refuse to make it simpler.  Why give the SS when you estimate something else.  we end of with variance in h^2 due to shared, sex, diet, dietXsex, pure-error.  Just give the 5 estimates.  Done.  No words needed.
+$$
+d_{\mathrm{shared}} = \overline{\hat{h}^2}, \qquad
+d_{\mathrm{sex}} = \tfrac{1}{2}\big(\hat{h}^2_M - \hat{h}^2_F\big), \qquad
+d_{\mathrm{diet}} = \tfrac{1}{2}\big(\hat{h}^2_{SY20} - \hat{h}^2_{SY10}\big), \qquad
+s^2 = \tfrac{1}{8}\sum_{\mathrm{cells}} \big(\hat{h}^2_{(1)} - \hat{h}^2_{(2)}\big)^2
+$$
 
-The partitioning is carried out at every step. To describe genome-wide patterns we also summarize this partitioning and other statistics over 268 non-overlapping one-cM wide tiles spanning the euchromatic genome, with each tile is summarised by the step with the largest Wald statistic maximised over the four treatments. The 1cM tile width is chosen to match the mapping resolution of the synthetic population as two-LWP support intervals on peaks (Table S1) have medians of 0.39 cM above an LWP of 15 and 0.76 cM between 7.5 and 15. Furthermore, 1-cM tiles results in adjacent tiles sharing an $R^2 = 81\%$ of their variance in the Wald statistic. In several cases we summarize statistics over the 85 tiles whose LWP exceeds 7.5, as patterns of variation for non-significant regions are not meaningful. Confidence intervals are percentile bootstrap over contiguous groups of four tiles, 2000 resamples.  (I have no idea what the CIs are or if they have any meaning), like why would one bootstrap over four contiguous tiles.  Like they have terrible properties for a bootstrap, as they have an R2 of 80%, so they are neither measuring the same thing, nor independent.)
+with $d_{\mathrm{sex:diet}}$ the remaining contrast, and each component estimated as
+
+$$
+\hat{\sigma}_{\mathrm{term}} = \operatorname{sign}(d_{\mathrm{term}})\sqrt{\big|\,d_{\mathrm{term}}^2 - s^2/8\,\big|}
+$$
+
+A component whose true value is near zero falls below the pure error and is returned negative, which is how a step with nothing there reports.
+
+The partitioning is carried out at every step. To describe genome-wide patterns we also summarize this partitioning and other statistics over 268 non-overlapping one-cM wide tiles spanning the euchromatic genome, with each tile is summarised by the step with the largest Wald statistic maximised over the four treatments. The 1cM tile width is chosen to match the mapping resolution of the synthetic population as two-LWP support intervals on peaks (Table S1) have medians of 0.39 cM above an LWP of 15 and 0.76 cM between 7.5 and 15. Furthermore, 1-cM tiles results in adjacent tiles sharing an $R^2 = 81\%$ of their variance in the Wald statistic. In several cases we summarize statistics over the 85 tiles whose LWP exceeds 7.5, as patterns of variation for non-significant regions are not meaningful.
