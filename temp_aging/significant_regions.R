@@ -19,6 +19,16 @@
 # same window; taking a maximum separately in each of the eight would pick eight
 # different windows and inflate every difference between them.
 #
+# CHECKED 2026-09-03: does the choice of representative window matter? Reran the
+# partition on the same 85 significant tiles with the tile mean and with the
+# window nearest the tile midpoint instead of the max-Wald window. Point
+# estimates all land inside each other's 95% CIs (main 85-86%, sex 12-13%, diet
+# 1.6-1.8%, int -0.4 to -0.5%), and per-tile the sex and main terms correlate
+# 0.97-1.00 across the three rules. The choice does not change the answer;
+# max-Wald is kept because it picks a real peak rather than an arbitrary point.
+# (ad hoc check, not a retained script -- rerun by swapping the window-picking
+# step above for a per-tile mean or nearest-to-midpoint window if needed again.)
+#
 # THE ERROR TERM comes from the split halves, not from a floor. The ten
 # replicates of a treatment are split into the five odd and the five even, giving
 # two independent h2 estimates of the same quantity; half their squared
