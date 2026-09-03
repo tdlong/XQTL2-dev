@@ -36,11 +36,11 @@ average).
 
 Refitted just now against the current scan, 89,680 step x treatment values:
 
-| | c | LWP 2 | LWP 7.5 | LWP 15 |
-|---|---|---|---|---|
+|                         | c           | LWP 2     | LWP 7.5   | LWP 15    |
+| ----------------------- | ----------- | --------- | --------- | --------- |
 | **refit, current data** | **0.00774** | **0.09%** | **0.32%** | **0.61%** |
-| previous fit | 0.00789 | 0.09 | 0.33 | 0.62 |
-| RESULTS as written | — | 0.14 | 0.37 | 0.65 |
+| previous fit            | 0.00789     | 0.09      | 0.33      | 0.62      |
+| RESULTS as written      | —           | 0.14      | 0.37      | 0.65      |
 
 **Proposed:** "...predicts heritabilities of 0.09%, 0.32% and 0.61% at LWP
 thresholds of 2, 7.5 and 15 respectively."
@@ -48,7 +48,7 @@ thresholds of 2, 7.5 and 15 respectively."
 `make_FigS1.R` refits this constant each run rather than hardcoding it, so the
 figure already uses 0.00774 and needs no change.
 
-`[ ] approve   [ ] deny   [ ] modify:`
+`[X] approve   [ ] deny   [ ] modify:`
 
 ## B2. The peak width range — recalculated
 
@@ -58,10 +58,10 @@ figure already uses 0.00774 and needs no change.
 Recalculated with `quantile()` on the 18 Table S1 peaks, which reproduces what
 `peak_table.R` prints:
 
-| | 10th | median | 90th |
-|---|---|---|---|
-| cM | **0.25** | 0.71 | **1.51** |
-| kb | **168** | 252 | **828** |
+|     | 10th     | median | 90th     |
+| --- | -------- | ------ | -------- |
+| cM  | **0.25** | 0.71   | **1.51** |
+| kb  | **168**  | 252    | **828**  |
 
 So both pairs in the text are stale. My round-1 point about the two ranges was
 a separate and smaller thing: they are quantiles of two different distributions,
@@ -75,7 +75,7 @@ One loose end: `peak_table.R` labels this output "pooled over all 23 peaks"
 while Table S1 and the RESULTS text both say 18. The numbers match the 18, so
 the label looks stale, but worth confirming which is right.
 
-`[ ] approve   [ ] deny   [ ] modify:`
+`[] approve   [ ] deny   [X] modify:`Clearly the number of peaks considered has to match Table S1.
 
 ## B3. "Most tightly localised" — the context you asked for
 
@@ -94,7 +94,7 @@ resolution is genetic, not physical, which invites exactly that reading.
 **Proposed:** "It has the narrowest support interval of any peak in Table S1 in
 physical terms, 55 kb, or 0.22 cM."
 
-`[ ] approve   [ ] deny   [ ] modify:`
+`[ ] approve   [ ] deny   [X] modify:`It has the narrowest support interval in physical terms of any peak in Table S1 at 55kb.
 
 ## B4. The 2% claim — the context you asked for, and a number
 
@@ -112,11 +112,11 @@ variance in n RILs gives a non-centrality of n*h2. So the smallest detectable
 effect is 22.4/n:
 
 | RILs | smallest detectable |
-|---|---|
-| 200 | 11.2% |
-| 300 | 7.5% |
-| 500 | 4.5% |
-| 1000 | 2.2% |
+| ---- | ------------------- |
+| 200  | 11.2%               |
+| 300  | 7.5%                |
+| 500  | 4.5%                |
+| 1000 | 2.2%                |
 
 So 2% is much too generous: at several hundred RILs the real floor is roughly
 5–11%, and 2% is only reached at about a thousand lines. The claim is right in
@@ -126,7 +126,7 @@ direction and understated in magnitude.
 gone undetected in prior work employing modestly sized mapping panels consisting
 of several hundred RILs (cites)..."
 
-`[ ] approve 5%   [ ] use a different figure:   [ ] leave as 2%`
+`[ ] approve 5%   [ ] use a different figure:   [X] leave as 2%`I say this work has to be done, or we have to look at the literature.  I think the power calculations are in a King et al paper for the DSPR RILs.  There is an older Mackay paper that has the numbers for DGRP ... or we could rederived any of this with a common framework.  The thresholds have to be higher for a GWAS type scan that may test 3M or more SNPs vs a linkage based scan (that could use 10^-4).  The other approach is just outbred diploid individuals (there as a paper that did this for longevity in something like 1000 outbred flies, but the sampling of flies is funny).  So this is perhaps a place holder for work to be done and could be started parenthetically as such.
 
 ## B5. The 0.4%
 
@@ -136,7 +136,7 @@ value becomes 0.32%, so this should follow it rather than stay at 0.4%.
 **Proposed:** "Despite 0.32% being a subtle heritability estimate at the scale
 of the experiment we carried out..."
 
-`[ ] approve   [ ] deny   [ ] modify:`
+`[X] approve   [ ] deny   [ ] modify:`
 
 ---
 
