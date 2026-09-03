@@ -158,11 +158,11 @@ terms <- function() {
 #   2.0 cM    135       48       0.773     0.597       11
 #   4.0 cM     69       29       0.565     0.319        9
 #
-# Adjacent-tile R^2 crosses 90% at 0.6 cM, not 1 cM; at 1 cM it is 81%. The
-# Methods quotes R^2 (Tony's preference): 81% at 1 cM, 93% at 0.5, 60% at 2.
-# Going coarser keeps lowering it but merges distinct peaks, 2 cM already
-# costing three of the fourteen resolved regions -- that trade-off, not a
-# threshold on R^2, is what picks 1 cM. (sig@7.5 reads
+# 1 cM puts adjacent tiles at R^2 = 0.81, i.e. the conventional R^2 > 0.8 cut
+# long used for LD blocks and tag-SNP selection. (r = 0.90 and R^2 = 0.81 are
+# the same statement.) Going coarser keeps lowering it but merges distinct
+# peaks, 2 cM already costing three of the fourteen resolved regions, so both
+# the convention and the resolution cost point at 1 cM. (sig@7.5 reads
 # 84 here against the 85 this script reports -- the tradeoff table tiles the
 # euchromatic steps directly, while the analysis below tiles before filtering,
 # so the arm-start offsets differ by one tile. Immaterial to the comparison.)
