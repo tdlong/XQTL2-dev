@@ -28,15 +28,15 @@ $$
 
 The 10 replicates were combined as a weighted using $n_{\mathrm{eff}}$ mean of $\hat{c}$ and $\hat{z}$ with covariances similarly pooled. As the haplotype frequencies entering $T$ are smoothed, their variance is reduced relative unsmoothed estimates. $R^2$ , the squared correlation between raw and smoothed frequencies taken over all windows, pools and founders corrects for this reduction.
 
-**Heritability.** Under truncation selection, retaining the top proportion $P_r$ of individuals in replicate $r$ corresponds to a standardised selection intensity $i_r$ (cite Falconer for example). For a window whose founder haplotype frequencies are $p_f$, that replicate gives
+**Heritability.** Under truncation selection, retaining the top proportion $P_r$ of individuals in replicate $r$ corresponds to a standardised selection intensity $i_r$ (cite Falconer for example). The heritability in the rth replicate, given haplotype frequencies for f founder alleles
 
 $$
-h^2_r = \frac{100\,k}{i_r^2} \sum_f \frac{\Delta p_{fr}^2}{p_f}
+h^2_r = \frac{100\,k}{i_r^2} \sum_f \frac{\Delta p_{fr}^2}{p_{fr}}
 $$
 
 with $k$ as defined above and $\Delta p_{fr} = \hat{z}_{fr} - \hat{c}_{fr}$.
 
-To obtain an estimate of heritability over all ten replicates we write $e_{fr} = \Delta p_{fr}/i_r$ with mean $\bar{e}_f$ and variance $s^2_f$ , which over the $R$ replicates gives
+To obtain an estimate of heritability over all ten replicates we write $e_{fr} = \Delta p_{fr}/i_r$ with mean $\bar{e}_f$ and variance $s^2_f$ 
 
 $$
 \hat{h}^2 = 100\,k \sum_f \frac{\bar{e}_f^{\,2} - s_f^2/R}{\hat{p}_f}
@@ -52,15 +52,11 @@ $$
 E[T] \;\approx\; \frac{n_{\mathrm{eff}}\, \bar{\imath}^{\,2}}{100\,k}\; \hat{h}^2
 $$
 
-where $n_{\mathrm{eff}} = \sum_r n_{\mathrm{eff},r}$ and $\bar{\imath}^{\,2}$ is the $n_{\mathrm{eff}}$-weighted mean of $i_r^2$. The effect reaches the data through the frequency shift truncation selection produces rather than through a measured phenotype, which is why the intensity enters, and a multi-allelic locus contributes $\sum_f \Delta p_f^2/p_f$ in place of $2p(1-p)\beta^2$.
+where $n_{\mathrm{eff}} = \sum_r n_{\mathrm{eff},r}$ and $\bar{\imath}^{\,2}$ is the $n_{\mathrm{eff}}$-weighted mean of $i_r^2$. In Supplementary Figure 1 we plot observed and predicted $\hat{h}^2$ against the Wald statistic and against LWP. For non-significant regions we over-estimate heritability; over moderately significant LWPs of 5 to 15 we over-estimate it by an average of 0.05 percentage points (16-17% relative inflation); and for highly significant regions the estimate is accurate.
 
-In Supplementary Figure 1 we plot predicted $\hat{h}^2$ against the Wald statistic and against LWP. For non-significant regions we over-estimate heritability; over an LWP of 5 to 15 we over-estimate it by an average of 0.05 percentage points, a 16 to 17% relative inflation; and for highly significant regions the estimate is accurate.
+The above relationship can also be used the calculate the power of X-QTL experiments. To detect a window contributing 1% of phenotypic variance at an LWP of 15 with 80% power, selecting the longest-lived 5%, one need screen 75,000 flies per treatment. Halving the target heritability to 0.5% doubles the experiment to150,000 individuals screened.
 
-Read backwards, the expression says what experiment a given target requires. To detect a window contributing 1% of phenotypic variance at an LWP of 15 with 80% power, selecting the longest-lived 5%, one screens 75,000 flies per treatment and sequences 3,800 of them together with 4,600 controls. The requirement scales as $1/h^2$, so halving the target doubles the experiment: 0.5% takes 150,000 screened, 0.25% takes 300,000. The design used here, at the same selected fraction and 5,700 selected flies per treatment, resolves 0.75%.
-
-The selected fraction is the other lever, and it cuts both ways. Taking the top 1% would need only 2,300 flies sequenced to resolve 1%, but 226,000 screened to find them; taking the top 50% needs 25,000 sequenced, because $\bar{\imath}$ falls to 0.80 and power falls with it. The total effort is near its minimum between roughly 5 and 20% selected.
-
-**Partitioning.** Because $\hat{h}^2$ is unbiased it scatters below zero at windows carrying no signal, which is awkward to decompose, so the partition uses $h^2_{\mathrm{vc}}$: a variance component fitted per window by maximum likelihood on the scale $\bar{e}_f/\sqrt{\hat{p}_f}$, non-negative by construction. The ten replicate contrasts per treatment were split into two halves (1 & 2) , giving two independent estimates of heritability at every window in each of the four sex $\times$ diet groups. Writing $y_{sdh}$ for the estimate of heritability for some window in sex $s$, diet $d$ and half $h$, we can express
+**Partitioning.** Because $\hat{h}^2$ is unbiased it scatters below zero at windows carrying no signal, which is awkward for variance component decompostion. (The is suddenly not so clear), not clear how the variance estimator changes after we went to so much work to create the estimator ... and maximum likelihood estimators can go negative), so the partition uses $h^2_{\mathrm{vc}}$: a variance component fitted per window by maximum likelihood on the scale $\bar{e}_f/\sqrt{\hat{p}_f}$, non-negative by construction. The ten replicate contrasts per treatment were split into two halves (1 & 2) , giving two independent estimates of heritability at every window in each of the four sex $\times$ diet groups. Writing $y_{sdh}$ for the estimate of heritability for some window in sex $s$, diet $d$ and half $h$, we can express
 
 $$
 \sum y^2 = 8\bar{y}^2 + SS_{\mathrm{sex}} + SS_{\mathrm{diet}} + SS_{\mathrm{sex:diet}} + SS_{\mathrm{rep}}
