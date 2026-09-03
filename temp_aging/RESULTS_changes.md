@@ -1,165 +1,153 @@
-# Proposed changes to RESULTS.md
+# Proposed changes to RESULTS.md — round 2
 
-Against the version current 3 Sep 2026. **Nothing here is applied.** Mark each
-one — approve / deny / modify — and I will make the ones you approve.
-
----
-
-## A. Forced by the Methods revision
-
-The tile bootstrap was removed from the analysis: resampling tiles measures how
-much genomic locations differ from one another, and we were reporting that as
-uncertainty about the value at a location. The error term is now the sex:diet
-interaction pooled with the split-half replicate difference — five degrees of
-freedom, entirely within a tile.
-
-### A1. Paragraph 3 — delete the three intervals
-
-**Current:** "Over the tiles with LWP exceeding 7.5, 13.2% (95% CI 10.0-19.1) of
-the variation among the four groups is sex-specific and 1.8% (1.1-3.6)
-diet-specific, with no detectable interaction (-0.4%, -0.8 to 0.1)."
-
-**Proposed:** "Over the tiles with LWP exceeding 7.5, 13.2% of the variation
-among the four groups is sex-specific and 1.8% diet-specific. Against that error
-the sex component is present at 44% of those tiles individually and the diet
-component at 13%."
-
-The 13.2% and 1.8% are unchanged. Only the parentheticals go.
-
-`[ ] approve   [ ] deny   [ ] modify:`
-
-### A2. Paragraph 3 — say what the error term now is
-
-**Insert** after "...after subtracting the pure error componet the subsetting
-allowed us to estimate.":
-
-"The sex by diet interaction is nowhere detectable, exceeding its 5% critical
-value at 6% of tiles, so it is pooled with the replicate difference into an
-error term on five degrees of freedom."
-
-Also "pure error" in the preceding sentence is no longer accurate on its own.
-
-`[ ] approve   [ ] deny   [ ] modify:`
-
-### A3. Paragraph 3 — "sets of five" to "two interleaved sets of five"
-
-Methods now says interleaved throughout. Odd/even was a coding artifact of how
-the replicates happen to be numbered.
-
-`[ ] approve   [ ] deny   [ ] modify:`
+Round 1 items A (all three) and C (typos) are **applied**. What follows is the
+B set, recalculated as you asked. **None of B is applied.** Mark each and I
+will make the ones you approve.
 
 ---
 
-## B. Statements I could not support
+## Applied in this round, for the record
 
-### B1. Paragraph 2 — the three heritability thresholds
+- **A1** the three bootstrap intervals deleted; 13.2% and 1.8% kept; added
+  "Against that error the sex component is present at 44% of those tiles
+  individually and the diet component at 13%."
+- **A2** inserted "The sex by diet interaction is nowhere detectable, exceeding
+  its 5% critical value at 6% of tiles, so it is pooled with the replicate
+  difference into an error term on five degrees of freedom." and changed
+  "pure error componet" to "error component".
+- **A3** "sets of five" -> "two interleaved sets of five".
+- **C** contemporaneus -> contemporaneous; repectively -> respectively;
+  partititoned -> partitioned; componet -> component; "change that is observed
+  at any other peaks" -> "change than is observed at any other peak";
+  "A large-effect loci sits" -> "A large-effect locus sits".
+
+---
+
+## B1. The three heritability thresholds — recalculated
 
 **Current:** "This function predicts heritabilities of 0.14%, 0.37% and 0.65% at
-LWP thresholds of 2, 7.5 and 15 repectively."
+LWP thresholds of 2, 7.5 and 15 respectively."
 
-Neither source produces those numbers:
+You are right that when two sources disagree we recalculate. The sentence says
+*this function predicts*, so the source has to be the function in the Methods —
+`h2 = c(T - 7)`, not the empirical tile averages of `h2_threshold.R`, which
+answer a different question (what heritability does a tile at that Wald carry on
+average).
 
-| source | LWP 2 | LWP 7.5 | LWP 15 |
-|---|---|---|---|
-| `h2_threshold.R`, current | 0.06 (floor, Wald<2) | 0.38 | 0.67 |
-| fitted line of Supp Fig 1, `0.00789(T-7)` | 0.09 | 0.33 | 0.62 |
-| **RESULTS as written** | **0.14** | **0.37** | **0.65** |
+Refitted just now against the current scan, 89,680 step x treatment values:
 
-Two separate problems. The 7.5 and 15 figures look like an older run of
-`h2_threshold.R`; I changed that script on 3 Sep so a tile is read at its
-max-Wald step rather than taking `max(H2)` and `max(Wald)` independently, which
-moved LWP 15 from 0.68 to 0.67 — a 0.01 shift that does not explain 0.65. And
-`h2_threshold.R` emits nothing at LWP 2: its first column is a floor over tiles
-whose Wald never reaches 2, a different quantity from the fitted curve read off
-at 2.
+| | c | LWP 2 | LWP 7.5 | LWP 15 |
+|---|---|---|---|---|
+| **refit, current data** | **0.00774** | **0.09%** | **0.32%** | **0.61%** |
+| previous fit | 0.00789 | 0.09 | 0.33 | 0.62 |
+| RESULTS as written | — | 0.14 | 0.37 | 0.65 |
 
-**Needs a decision on which source the sentence means**, then all three numbers
-quoted from that one source. I can produce either set.
+**Proposed:** "...predicts heritabilities of 0.09%, 0.32% and 0.61% at LWP
+thresholds of 2, 7.5 and 15 respectively."
 
-`[ ] use h2_threshold.R   [ ] use the fitted line   [ ] leave, I will check`
+`make_FigS1.R` refits this constant each run rather than hardcoding it, so the
+figure already uses 0.00774 and needs no change.
 
-### B2. Paragraph 1 — the two width ranges are not the same interval
+`[ ] approve   [ ] deny   [ ] modify:`
+
+## B2. The peak width range — recalculated
 
 **Current:** "an 80% confidence interval on width of 0.22 to 1.18 cM (140 kb to
 775 kb)."
 
-Both pairs are correct as 10th/90th percentiles, but they are percentiles of two
-different distributions and describe different peaks. The 0.22 cM peak is chr3L
-9.30 Mb, which is 55 kb. The 140 kb peak is chr3R 14.64 Mb, which is 0.26 cM.
-Written with the kb in parentheses it reads as one interval converted to other
-units, which it is not.
+Recalculated with `quantile()` on the 18 Table S1 peaks, which reproduces what
+`peak_table.R` prints:
 
-**Proposed:** "...an 80% range on width of 0.22 to 1.18 cM, or equivalently 140
-to 775 kb." — or drop the kb figures.
+| | 10th | median | 90th |
+|---|---|---|---|
+| cM | **0.25** | 0.71 | **1.51** |
+| kb | **168** | 252 | **828** |
+
+So both pairs in the text are stale. My round-1 point about the two ranges was
+a separate and smaller thing: they are quantiles of two different distributions,
+so the 0.25 cM peak and the 168 kb peak are not the same peak. That is fine as
+long as the sentence does not read as one interval converted into other units.
+
+**Proposed:** "...results in an 80% range on width of 0.25 to 1.51 cM, and of
+168 to 828 kb."
+
+One loose end: `peak_table.R` labels this output "pooled over all 23 peaks"
+while Table S1 and the RESULTS text both say 18. The numbers match the 18, so
+the label looks stale, but worth confirming which is right.
 
 `[ ] approve   [ ] deny   [ ] modify:`
 
-### B3. Paragraph 4 — "most tightly localised" holds in kb but not cM
+## B3. "Most tightly localised" — the context you asked for
 
 **Current:** "It is the most tightly localised of the peaks in Table S1, with a
 two LWP support interval of 55 kb or 0.22 cM."
 
-55 kb is the narrowest in Table S1. But in cM it is not: chr3L 21.62 Mb has a
-support interval of 0.16 cM against this peak's 0.22 cM. Since the paper argues
-resolution is genetic, a reader may check the cM column.
+Table S1 gives every peak's support interval twice, once in kb and once in cM.
+The chr3L 9.30 Mb peak is 55 kb, and 55 kb is the smallest number in the kb
+column — so in physical distance it is indeed the most tightly localised.
+
+But it is 0.22 cM, and the chr3L 21.62 Mb peak is 0.16 cM. In genetic distance
+that peak is tighter, so "most tightly localised" is not true if the reader
+reads the cM column. It matters because the paper argues elsewhere that mapping
+resolution is genetic, not physical, which invites exactly that reading.
 
 **Proposed:** "It has the narrowest support interval of any peak in Table S1 in
 physical terms, 55 kb, or 0.22 cM."
 
 `[ ] approve   [ ] deny   [ ] modify:`
 
-### B4. Paragraph 2 — the 2% claim is asserted, not calculated
+## B4. The 2% claim — the context you asked for, and a number
 
 **Current:** "Regions contributing less than 2% to heritable variation would
 have gone undetected in prior work employing modestly sized mapping panels
 consisting of several hundred RILs (cites)..."
 
-Nothing in the analysis establishes the 2% figure or the RIL comparison. The
-Methods now carry the machinery to compute it — the non-centrality relation
-gives the heritability detectable at a given power for a given design — so this
-could be made a real number for a few hundred RILs rather than an assertion.
+The claim is that a study with a few hundred RILs could not have found what we
+find. Nothing in our analysis produces the 2% figure — it is asserted. Since the
+Methods now carry the power relation, it can be computed instead.
 
-`[ ] compute it   [ ] soften the wording   [ ] leave as is`
+For a one-degree-of-freedom test at a LOD-3 threshold with 80% power, the
+non-centrality needed is 22.4, and a QTL explaining a fraction h2 of line
+variance in n RILs gives a non-centrality of n*h2. So the smallest detectable
+effect is 22.4/n:
 
-### B5. Paragraph 2 — where 0.4% comes from
+| RILs | smallest detectable |
+|---|---|
+| 200 | 11.2% |
+| 300 | 7.5% |
+| 500 | 4.5% |
+| 1000 | 2.2% |
 
-**Current:** "Despite 0.4% being a subtle heritability estimate at the scale of
-the experiment we carried out..."
+So 2% is much too generous: at several hundred RILs the real floor is roughly
+5–11%, and 2% is only reached at about a thousand lines. The claim is right in
+direction and understated in magnitude.
 
-0.4% does not match either figure quoted in the preceding sentence (0.37% at LWP
-7.5). Probably meant as a round number for that, but it reads as a third value.
-Resolves itself once B1 is settled.
+**Proposed:** "Regions contributing less than roughly 5% of variation would have
+gone undetected in prior work employing modestly sized mapping panels consisting
+of several hundred RILs (cites)..."
 
-`[ ] approve tying it to the B1 number   [ ] deny   [ ] modify:`
+`[ ] approve 5%   [ ] use a different figure:   [ ] leave as 2%`
+
+## B5. The 0.4%
+
+You are right, it is a rounding of the LWP 7.5 value. If B1 is approved that
+value becomes 0.32%, so this should follow it rather than stay at 0.4%.
+
+**Proposed:** "Despite 0.32% being a subtle heritability estimate at the scale
+of the experiment we carried out..."
+
+`[ ] approve   [ ] deny   [ ] modify:`
 
 ---
 
-## C. Typos
+## Checked and correct, no change
 
-- P1: "an contemporaneus" -> "contemporaneous"
-- P2: "repectively" -> "respectively"
-- P3: "partititoned" -> "partitioned"
-- P3: "componet" -> "component"
-- P4: "a much larger allele frequency change that is observed" -> "than is observed"
-- P4: "A large-effect loci sits" -> "locus" (or "Large-effect loci sit")
-
-`[ ] approve all   [ ] deny   [ ] modify:`
-
----
-
-## D. Checked against the data, correct as written
-
-No change needed. Verified 3 Sep 2026 against the current scan and split-half
-files:
-
-- 268 tiles; 32% above LWP 7.5 (85/268), 12% above 15 (32/268).
-- Selected proportions 3–11% (measured 3.1% to 10.8%), mean ~5%.
-- X is 24% of the map; 3% of its tiles above 7.5 (2/65); none above 15;
-  autosomes 41% and 16%.
-- 83 of 203 autosomal tiles above 7.5.
-- Males higher at 52% of those tiles.
-- 18 peaks in Table S1 (8 above LWP 15, 10 between 7.5 and 15).
-- r = 0.98 between LWP and heritability (0.979).
-- chr3L 9.30 Mb: LWP 163.8 in SY20 males, minimum 36.1 across the four groups;
-  h2 4.69% SY20 male and 1.53% SY10 female; next largest peak 1.67%, so
-  "two to three times" holds at 2.8x.
+Verified 3 Sep 2026 against the current scan and split-half files: 268 tiles;
+32% above LWP 7.5 and 12% above 15; selected proportions 3–11% (3.1 to 10.8),
+mean ~5%; X is 24% of the map with 3% of its tiles above 7.5 and none above 15,
+against 41% and 16% for the autosomes; 83 of 203 autosomal tiles above 7.5;
+males higher at 52% of those; 18 peaks (8 above 15, 10 between 7.5 and 15);
+r = 0.98 between LWP and heritability (0.979); chr3L 9.30 Mb reaching LWP 163.8
+in SY20 males with a minimum of 36.1 across the four groups, h2 of 4.69% in SY20
+males and 1.53% in SY10 females, and "two to three times the largest of the
+other regions" holding at 2.8x against the next largest peak at 1.67%.
