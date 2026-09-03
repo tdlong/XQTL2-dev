@@ -116,7 +116,7 @@ for (v in c("int_cM", "int_kb")) {
               v, median(A[[v]]), nrow(A), median(B[[v]]), nrow(B), wt$p.value))
 }
 
-cat("\npooled over all 23 peaks -- the interval widths themselves, as quantiles\n")
+cat(sprintf("\npooled over all %d peaks -- the interval widths themselves, as quantiles\n", nrow(tab)))
 cat("(the 10th and 90th percentiles of the observed widths: 80% of peaks lie\n")
 cat(" between them. Not a CI on a mean -- the widths are right-skewed and a mean\n")
 cat(" describes them poorly.)\n\n")
@@ -126,5 +126,6 @@ for (v in c("int_cM", "int_kb")) {
   cat(sprintf("  %-7s  10%% %7.2f   25%% %7.2f   median %7.2f   75%% %7.2f   90%% %7.2f\n",
               v, q[1], q[2], q[3], q[4], q[5]))
 }
-cat("\n  n = ", nrow(tab), " peaks, so the 10th and 90th rest on the 2nd and 21st\n",
-    "  ordered values -- read them as description, not estimation.\n", sep = "")
+cat(sprintf("\n  n = %d peaks, so the 10th and 90th fall between ordered values %d and %d,\n  and %d and %d -- description, not estimation.\n",
+    nrow(tab), floor(0.1*(nrow(tab)-1))+1, floor(0.1*(nrow(tab)-1))+2,
+    floor(0.9*(nrow(tab)-1))+1, floor(0.9*(nrow(tab)-1))+2))
