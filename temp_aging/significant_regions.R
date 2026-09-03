@@ -131,59 +131,50 @@ terms <- function() {
   w
 }
 
-# Resample 4 cM groups of tiles rather than tiles one at a time, since
-# neighbouring tiles can carry the same peak.
+# NO BOOTSTRAP OVER TILES. Removed 2026-09-03. Resampling tiles treats the
+# genome as a sample drawn from a population, which it is not -- we have the
+# genome we have, and one point estimate per step. Worse, neighbouring tiles
+# are not replicates of the tile in question: they are different places with
+# genuinely different values, so resampling them measures how much locations
+# differ from one another and reports it as uncertainty about the value at a
+# location. That is real heterogeneity dressed as sampling error.
 #
-# MEASURED 2026-09-03, autocorrelation of the max-over-treatments Wald against
-# genetic separation, euchromatic steps:
+# The uncertainty that IS real here is within a place -- the split-half pure
+# error -- and it is already subtracted from every component below, which is
+# what makes a component that is not there come back negative.
 #
-#   0.05 cM  0.999     0.5 cM  0.957     2 cM  0.695
-#   0.10 cM  0.997     1.0 cM  0.877     4 cM  0.378
+# For the record, the intervals were also unstable in block length, never
+# converging (sex share 95%% CI: [11.3,15.8] at 1 cM blocks, [10.0,19.6] at 4,
+# [9.0,22.4] at 8, [7.6,23.1] at 12), so the reported 4 cM interval was an
+# arbitrary point on a rising curve.
 #
-# A 1 cM tile is NOT an independent unit. The tile is a summarisation scale,
-# not an independence scale; independence is what the 4-tile block buys, and
-# 4 cM is where r has dropped to ~0.4. The +/-100 kb smoothing only spans
-# 0.4-0.6 cM (2.0-3.1 cM/Mb by arm), so it accounts for the correlation to
-# ~0.5 cM and real peak width for the rest. Mean h2 autocorrelates slightly
-# higher throughout (0.91 at 1 cM).
-#
-# WHY 1 cM AND NOT 0.5 OR 2. Correlation between the summary values of ADJACENT
-# tiles, against what each size costs in resolution:
+# WHY 1 cM TILES. Correlation between the summary values of ADJACENT tiles,
+# against what each width costs in resolution:
 #
 #   size    tiles  sig@7.5  adj-tile r   adj R^2   separately resolved sig regions
-#   0.4 cM    670        -       0.975     0.951        -
 #   0.5 cM    535      152       0.965     0.931       20
-#   0.6 cM    448        -       0.953     0.909        -     <- R^2 = 90%
 #   1.0 cM    268       84       0.901     0.813       14
 #   2.0 cM    135       48       0.773     0.597       11
 #   4.0 cM     69       29       0.565     0.319        9
 #
-# 1 cM puts adjacent tiles at R^2 = 0.81, i.e. the conventional R^2 > 0.8 cut
-# long used for LD blocks and tag-SNP selection. (r = 0.90 and R^2 = 0.81 are
-# the same statement.) Going coarser keeps lowering it but merges distinct
-# peaks, 2 cM already costing three of the fourteen resolved regions, so both
-# the convention and the resolution cost point at 1 cM. (sig@7.5 reads
-# 84 here against the 85 this script reports -- the tradeoff table tiles the
-# euchromatic steps directly, while the analysis below tiles before filtering,
-# so the arm-start offsets differ by one tile. Immaterial to the comparison.)
-set.seed(1)
+# 1 cM puts adjacent tiles at R^2 = 0.81, the conventional R^2 > 0.8 cut used
+# for LD blocks and tag-SNP selection, and matches the measured 2-LWP support
+# intervals (medians 0.39 cM above LWP 15, 0.76 cM between 7.5 and 15). Going
+# coarser merges distinct peaks, 2 cM already costing three of fourteen.
+# (sig@7.5 reads 84 here against the 85 this script reports -- the tradeoff
+# table tiles euchromatic steps directly while the analysis tiles before
+# filtering, so arm-start offsets differ by one tile.)
 shares <- function(x) {
   s <- function(z) sum(z, na.rm = TRUE)
   t <- s(x$main) + s(x$sex) + s(x$diet) + s(x$int)
   100 * c(s(x$sex), s(x$diet), s(x$int)) / t
 }
-boot_ci <- function(x, nb = 2000) {
-  ix <- split(seq_len(nrow(x)), paste0(x$chr, "_", x$tile %/% 4)); u <- names(ix)
-  b <- t(replicate(nb, shares(x[unlist(ix[sample(u, length(u), TRUE)]), ])))
-  apply(b, 2, quantile, c(.025, .975))
-}
 cat("\npartition over significant tiles, % of the four-treatment sum of squares.\n")
-cat("95% intervals from 2000 bootstraps over 4 cM groups of tiles.\n\n")
+cat("Point estimates. No interval -- see the note above.\n\n")
 w <- terms()
 for (sc in c("all", "autosomes")) {
   x <- if (sc == "autosomes") w %>% filter(chr != "chrX") else w
-  ci <- boot_ci(x); pt <- shares(x)
-  cat(sprintf("  %-10s %3d tiles   shared %4.1f   sex %4.1f [%4.1f, %4.1f]   diet %4.1f [%4.1f, %4.1f]   int %5.1f [%5.1f, %4.1f]\n",
-      sc, nrow(x), 100 - sum(pt),
-      pt[1], ci[1,1], ci[2,1], pt[2], ci[1,2], ci[2,2], pt[3], ci[1,3], ci[2,3]))
+  pt <- shares(x)
+  cat(sprintf("  %-10s %3d tiles   shared %4.1f   sex %4.1f   diet %4.1f   int %5.1f\n",
+      sc, nrow(x), 100 - sum(pt), pt[1], pt[2], pt[3]))
 }
