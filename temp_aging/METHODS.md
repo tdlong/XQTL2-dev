@@ -60,21 +60,15 @@ $$
 
 flies screened per treatment at selected proportion $P$, since $\bar{\imath}$ is itself fixed by $P$. An LWP of 15 puts $T_\alpha = 85.6$ and $\lambda_{0.2} = 95.6$; selecting the longest-lived 5% gives $\bar{\imath} = 2.06$, so a step contributing 1% of phenotypic variance needs $n_{\mathrm{eff}} = 4{,}500$ and 90,000 flies screened. Requirement scales as $1/h^2$, so halving the target to 0.5% doubles the experiment.
 
-**Partitioning.** We split the ten replicate contrasts in each treatment into two interleaved halves to give eight unbiased estimates of $\hat{h}^2$ at every step — two sexes $\times$ two diets $\times$ two halves. An orthogonal transformation of those eight numbers gives the heritability shared by all four treatments and the parts specific to sex, to diet, and to their interaction, one degree of freedom each, with the difference between the halves of a treatment as pure error on four. Writing $\overline{\hat{h}^2}$ for the mean of all eight, $\hat{h}^2_M$, $\hat{h}^2_F$, $\hat{h}^2_{SY10}$, $\hat{h}^2_{SY20}$ for the marginal means, and $\hat{h}^2_{(1)}$, $\hat{h}^2_{(2)}$ for the two halves of a treatment,
+**Partitioning.** We split the ten replicate contrasts in each treatment into two interleaved halves to give eight unbiased estimates of $\hat{h}^2$ at every step — two sexes $\times$ two diets $\times$ two halves. An orthogonal transformation of those eight numbers gives the heritability shared by all four treatments and the parts specific to sex, to diet, and to their interaction, one degree of freedom each, with the difference between the halves of a treatment carrying four. The five terms are orthogonal, so their sums of squares and degrees of freedom add. The interaction is nowhere detectable — it exceeds its 5% critical value at 6% of significant tiles, the rate expected by chance — so it is pooled with the replicate difference, giving an error variance on five degrees of freedom. Writing $\overline{\hat{h}^2}$ for the mean of all eight, $\hat{h}^2_M$, $\hat{h}^2_F$, $\hat{h}^2_{SY10}$, $\hat{h}^2_{SY20}$ for the marginal means, $\hat{h}^2_{(1)}$, $\hat{h}^2_{(2)}$ for the two halves of a treatment and $d_{\mathrm{sex:diet}}$ for the interaction contrast,
 
 $$
 d_{\mathrm{shared}} = \overline{\hat{h}^2}, \qquad
 d_{\mathrm{sex}} = \tfrac{1}{2}\big(\hat{h}^2_M - \hat{h}^2_F\big), \qquad
 d_{\mathrm{diet}} = \tfrac{1}{2}\big(\hat{h}^2_{SY20} - \hat{h}^2_{SY10}\big), \qquad
-s^2 = \tfrac{1}{8}\sum_{\mathrm{cells}} \big(\hat{h}^2_{(1)} - \hat{h}^2_{(2)}\big)^2
+s^2 = \tfrac{1}{5}\Big[\tfrac{1}{2}\sum_{\mathrm{cells}} \big(\hat{h}^2_{(1)} - \hat{h}^2_{(2)}\big)^2 + 8\,d_{\mathrm{sex:diet}}^2\Big]
 $$
 
-with $d_{\mathrm{sex:diet}}$ the remaining contrast, and each component estimated as
-
-$$
-\hat{\sigma}_{\mathrm{term}} = \operatorname{sign}(d_{\mathrm{term}})\sqrt{\big|\,d_{\mathrm{term}}^2 - s^2/8\,\big|}
-$$
-
-A component whose true value is near zero falls below the pure error and is returned negative, which is how a step with nothing there reports.
+Each component is estimated as $\hat{\sigma} = \operatorname{sign}(d)\sqrt{|d^2 - s^2/8|}$ and tested against the error variance as $F_{1,5} = 8d^2/s^2$, with $\operatorname{Var}(d) = s^2/8$ giving the interval $d \pm t_{0.975,5}\sqrt{s^2/8}$. A component below the error is returned negative, which is how a step with nothing there reports.
 
 The partitioning is carried out at every step. To describe genome-wide patterns we also summarize this partitioning and other statistics over 268 non-overlapping one-cM wide tiles spanning the euchromatic genome, with each tile is summarised by the step with the largest Wald statistic maximised over the four treatments. The 1cM tile width is chosen to match the mapping resolution of the synthetic population as two-LWP support intervals on peaks (Table S1) have medians of 0.39 cM above an LWP of 15 and 0.76 cM between 7.5 and 15. Furthermore, 1-cM tiles results in adjacent tiles sharing an $R^2 = 81\%$ of their variance in the Wald statistic. In several cases we summarize statistics over the 85 tiles whose LWP exceeds 7.5, as patterns of variation for non-significant regions are not meaningful.

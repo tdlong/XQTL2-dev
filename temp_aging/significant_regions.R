@@ -170,7 +170,7 @@ shares <- function(x) {
   100 * c(s(x$sex), s(x$diet), s(x$int)) / t
 }
 cat("\npartition over significant tiles, % of the four-treatment sum of squares.\n")
-cat("Point estimates. No interval -- see the note above.\n\n")
+cat("Point estimates. No interval over tiles -- see the note above.\n\n")
 w <- terms()
 for (sc in c("all", "autosomes")) {
   x <- if (sc == "autosomes") w %>% filter(chr != "chrX") else w
@@ -178,3 +178,31 @@ for (sc in c("all", "autosomes")) {
   cat(sprintf("  %-10s %3d tiles   shared %4.1f   sex %4.1f   diet %4.1f   int %5.1f\n",
       sc, nrow(x), 100 - sum(pt), pt[1], pt[2], pt[3]))
 }
+
+# ── per-tile parametric inference, pooled error on 5 df ──────────────────────
+# The interaction is nowhere detectable (median MS_int/MS_rep = 0.46 against an
+# F(1,4) median of 0.55; 6% of significant tiles exceed the 5% critical value,
+# the chance rate), so it is pooled with the replicate difference. That is the
+# error term: 5 df, within a tile, from this tile's own flies. The terms are
+# orthogonal, so SS and df simply add -- pooling is exact, not an approximation.
+# Each component is a variance term, tested F(1,5) = 8*d^2/s2.
+tt <- cell() %>%
+  pivot_wider(names_from = c(sugar, sex, half), values_from = v) %>% drop_na() %>%
+  transmute(chr, tile, a = (SY10_F_odd + SY10_F_even)/2, b = (SY20_F_odd + SY20_F_even)/2,
+    cc = (SY10_M_odd + SY10_M_even)/2, dd = (SY20_M_odd + SY20_M_even)/2,
+    ss_rep = ((SY10_F_odd - SY10_F_even)^2 + (SY20_F_odd - SY20_F_even)^2 +
+              (SY10_M_odd - SY10_M_even)^2 + (SY20_M_odd - SY20_M_even)^2)/2) %>%
+  mutate(y = (a+b+cc+dd)/4, F2 = (a+b)/2, M2 = (cc+dd)/2, S10 = (a+cc)/2, S20 = (b+dd)/2,
+    d_sex = (M2-F2)/2, d_diet = (S20-S10)/2,
+    ss_int = 2*((a-F2-S10+y)^2 + (b-F2-S20+y)^2 + (cc-M2-S10+y)^2 + (dd-M2-S20+y)^2),
+    s2 = (ss_rep + ss_int)/5, se = sqrt(s2/8),
+    F_int = (ss_int/1)/(ss_rep/4))
+tc <- qt(.975, 5)
+cat(sprintf("\npooling check: median MS_int/MS_rep = %.2f (F(1,4) median %.2f); %.0f%% exceed F_.05\n",
+    median(tt$F_int), qf(.5,1,4), 100*mean(tt$F_int > qf(.95,1,4))))
+Fc <- qf(.95, 1, 5)
+cat(sprintf("per-tile F(1,5) against the pooled error, %d significant tiles:\n", nrow(tt)))
+cat(sprintf("  sex  present at 95%%: %d (%.0f%%)\n",
+    sum(8*tt$d_sex^2/tt$s2 > Fc), 100*mean(8*tt$d_sex^2/tt$s2 > Fc)))
+cat(sprintf("  diet present at 95%%: %d (%.0f%%)\n",
+    sum(8*tt$d_diet^2/tt$s2 > Fc), 100*mean(8*tt$d_diet^2/tt$s2 > Fc)))
