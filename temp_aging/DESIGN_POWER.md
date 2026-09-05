@@ -46,12 +46,12 @@ threshold used throughout this paper.
 
 ## Power at the sizes these designs are run at
 
-| Design | $n$ | $\nu$ | $h^2 = 2\%$ | $h^2 = 1\%$ | $h^2 = 0.5\%$ |
-|:---------------|--------:|---:|-----:|-----:|------:|
-| Outbred panel  |   1,000 |  1 | 0.35 | 0.04 | 0.004 |
-| Inbred lines   |     200 |  1 | 0.02 | 0.00 | 0.000 |
-| Eight-way RILs |     750 |  7 | 0.70 | 0.16 | 0.022 |
-| X-QTL          | 114,000 |  7 | 1.00 | 1.00 | 0.894 |
+| Design | $n$ | $h^2 = 2\%$ | $1\%$ | $0.5\%$ |
+|:---------------|--------:|-----:|-----:|------:|
+| Outbred panel  |   1,000 | 0.35 | 0.04 | 0.004 |
+| Inbred lines   |     200 | 0.02 | 0.00 | 0.000 |
+| Eight-way RILs |     750 | 0.70 | 0.16 | 0.022 |
+| X-QTL          | 114,000 | 1.00 | 1.00 | 0.894 |
 
 The 750-line RIL panel is the strongest of the three conventional designs, and at
 $h^2 = 2\%$ it has 0.70 power — good, but still missing one such region in three,

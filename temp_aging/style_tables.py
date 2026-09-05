@@ -39,14 +39,17 @@ def widen(xml):
                        '<w:top w:w="40" w:type="dxa"/><w:bottom w:w="40" w:type="dxa"/>'
                        '</w:tblCellMar>')
             new = re.sub(r'(<w:tblPr>)', r'\1' + borders, new, count=1)
-            # underline the header row
+            # underline the header row. pandoc emits no <w:tcPr> in header
+            # cells, so one has to be inserted rather than modified.
+            BB = ('<w:tcBorders><w:bottom w:val="single" w:sz="8" w:space="0" '
+                  'w:color="000000"/></w:tcBorders>')
             first = re.search(r'<w:tr\b.*?</w:tr>', new, re.S)
             if first:
                 hdr = first.group(0)
-                hdr2 = hdr.replace('<w:tcPr>',
-                    '<w:tcPr><w:tcBorders>'
-                    '<w:bottom w:val="single" w:sz="8" w:space="0" w:color="000000"/>'
-                    '</w:tcBorders>')
+                if '<w:tcPr>' in hdr:
+                    hdr2 = hdr.replace('<w:tcPr>', '<w:tcPr>' + BB)
+                else:
+                    hdr2 = hdr.replace('<w:tc>', '<w:tc><w:tcPr>' + BB + '</w:tcPr>')
                 new = new.replace(hdr, hdr2, 1)
             out.append(xml[pos:m.start()]); out.append(new); pos = m.end(); n += 1
     out.append(xml[pos:])
