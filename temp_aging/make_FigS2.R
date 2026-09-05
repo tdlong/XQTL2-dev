@@ -99,10 +99,10 @@ g <- ggplot(d, aes(n, power, colour = design)) +
   scale_x_log10(breaks = c(100, 300, 1000, 3000, 10000, 30000, 100000),
                 labels = c("100","300","1,000","3,000","10,000","30,000","100,000")) +
   scale_y_continuous(limits = c(0,1), breaks = seq(0,1,0.2), expand = expansion(0.015)) +
-  scale_colour_manual(values = COL, name = NULL) +
+  scale_colour_manual(values = COL, name = "Approach") +
   scale_linetype_manual(values = c(run = "solid", reach = "22"), name = NULL,
                         breaks = c("run", "reach"),
-                        labels = c("run to date", "hypothetical")) +
+                        labels = c("current applications", "extensions")) +
   labs(x = "individuals/lines phenotyped", y = "power") +
   theme_bw(base_size = 9) +
   theme(panel.grid.minor = element_blank(),
