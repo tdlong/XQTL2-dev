@@ -86,5 +86,6 @@ PY
 
 pandoc "$MD" --reference-doc=temp_aging/reference.docx -o "$OUT"
 python3 temp_aging/style_tables.py "$OUT"
+
 rm -f "$MD"
 echo "Wrote $OUT"
