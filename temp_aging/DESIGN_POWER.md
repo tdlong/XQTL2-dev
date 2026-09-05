@@ -17,11 +17,13 @@ But the flies are nearly free. The trait is phenotyped **in bulk** — no
 individual is ever measured, one lets the cage age and collects the survivors —
 and genotyping is on pools rather than individuals.
 
-What limits the other designs is not statistical efficiency but mechanics. Lines
-have to be constructed and maintained; individuals have to be handled, genotyped
-and phenotyped one at a time. Those panels are more efficient per fly and are
-struggling to scale for exactly that reason — a RIL panel is not expected to
-exceed 750 lines however large the budget. Bulk phenotyping and pooled
+What limits the other designs is not statistical efficiency but mechanics. The
+RIL panels largely exist already; the barrier is that every line has to be
+acquired, reared and measured separately, and in an association panel every
+individual has to be genotyped and phenotyped separately. Those panels are more
+efficient per fly and are struggling to scale for exactly that reason — the
+expectation that a RIL study will not exceed 750 lines is about what people will
+acquire and measure, not about what lines are available. Bulk phenotyping and pooled
 sequencing remove that barrier, which is why 10^5 individuals is routine here
 where 10^3 is a major undertaking elsewhere.
 
