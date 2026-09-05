@@ -1,70 +1,121 @@
 #!/usr/bin/env python3
 """style_tables.py FILE.docx [target_twips]
 
-Pandoc hardcodes docx tables to 7920 twips (5.5 in) whatever the reference
-document's page size, so every column is squeezed and cells wrap. This rescales
-each table to the real text width (default 9360 twips = 6.5 in at 1 in margins),
-preserving pandoc's relative widths, and adds what pandoc omits: cell padding so
-columns do not touch, and rules above the table, under the header and below the
-last row.
-"""
-import re, sys, zipfile, shutil, os
+Turn pandoc's docx tables into scientific tables, following the booktabs
+conventions (Fear, _Publication quality tables in LaTeX_):
 
-path = sys.argv[1]
+  - never a vertical rule
+  - never a double rule
+  - rules of graded weight: heavy above and below the table, lighter under the
+    column headers, lighter still over a column group
+  - a group rule spans only the columns it refers to
+  - generous space above and below each rule
+
+and two things pandoc gets wrong for docx output:
+
+  - it hardcodes tables to 7920 twips (5.5 in) whatever the reference document's
+    page size, so cells wrap; rescaled here to the real text width
+  - it emits no cell padding, so columns touch
+
+GROUP HEADERS. pandoc allows one header row, so put the group labels there and
+the column labels in the first body row:
+
+    |      |     | h^2  |      |        |
+    |:-----|----:|-----:|-----:|-------:|
+    | Design | n | 2%   | 1%   | 0.5%   |
+
+A non-empty cell in the group row spans forward over the empty cells after it
+and takes a rule over exactly that span; leading empty cells stay bare.
+"""
+import re, sys, zipfile, os
+
+path   = sys.argv[1]
 target = int(sys.argv[2]) if len(sys.argv) > 2 else 9360
 
-def widen(xml):
-    out, pos, n = [], 0, 0
-    for m in re.finditer(r"<w:tbl>.*?</w:tbl>", xml, re.S):
-        tbl = m.group(0)
-        cols = [int(x) for x in re.findall(r'<w:gridCol w:w="(\d+)"', tbl)]
-        if cols and sum(cols):
-            f = target / sum(cols)
-            new = tbl
-            new = re.sub(r'(<w:gridCol w:w=")(\d+)(")',
-                         lambda g: g.group(1) + str(round(int(g.group(2)) * f)) + g.group(3), new)
-            new = re.sub(r'(<w:tcW w:w=")(\d+)(")',
-                         lambda g: g.group(1) + str(round(int(g.group(2)) * f)) + g.group(3), new)
-            new = re.sub(r'<w:tblW w:w="\d+" w:type="\w+"\s*/>',
-                         '<w:tblW w:w="%d" w:type="dxa"/>' % target, new)
-            # rules top / under header / bottom, and padding so columns breathe
-            borders = ('<w:tblBorders>'
-                       '<w:top w:val="single" w:sz="8" w:space="0" w:color="000000"/>'
-                       '<w:bottom w:val="single" w:sz="8" w:space="0" w:color="000000"/>'
-                       '<w:insideH w:val="nil"/><w:insideV w:val="nil"/>'
-                       '<w:left w:val="nil"/><w:right w:val="nil"/>'
-                       '</w:tblBorders>'
-                       '<w:tblCellMar>'
-                       '<w:left w:w="108" w:type="dxa"/><w:right w:w="108" w:type="dxa"/>'
-                       '<w:top w:w="40" w:type="dxa"/><w:bottom w:w="40" w:type="dxa"/>'
-                       '</w:tblCellMar>')
-            new = re.sub(r'(<w:tblPr>)', r'\1' + borders, new, count=1)
-            # underline the header row. pandoc emits no <w:tcPr> in header
-            # cells, so one has to be inserted rather than modified.
-            BB = ('<w:tcBorders><w:bottom w:val="single" w:sz="8" w:space="0" '
-                  'w:color="000000"/></w:tcBorders>')
-            first = re.search(r'<w:tr\b.*?</w:tr>', new, re.S)
-            if first:
-                hdr = first.group(0)
-                if '<w:tcPr>' in hdr:
-                    hdr2 = hdr.replace('<w:tcPr>', '<w:tcPr>' + BB)
-                else:
-                    hdr2 = hdr.replace('<w:tc>', '<w:tc><w:tcPr>' + BB + '</w:tcPr>')
-                new = new.replace(hdr, hdr2, 1)
-            out.append(xml[pos:m.start()]); out.append(new); pos = m.end(); n += 1
-    out.append(xml[pos:])
-    return "".join(out), n
+# w:sz is eighths of a point. booktabs: heavy .08em, light .05em, cmidrule .03em
+HEAVY, LIGHT, GROUP = 12, 8, 6
 
-tmp = path + ".tmp"
-zin = zipfile.ZipFile(path)
+def rule(sz):
+    return '<w:bottom w:val="single" w:sz="%d" w:space="0" w:color="000000"/>' % sz
+
+BORDERS = ('<w:tblBorders>'
+           '<w:top w:val="single" w:sz="%d" w:space="0" w:color="000000"/>'
+           '<w:bottom w:val="single" w:sz="%d" w:space="0" w:color="000000"/>'
+           '<w:insideH w:val="nil"/><w:insideV w:val="nil"/>'
+           '<w:left w:val="nil"/><w:right w:val="nil"/>'
+           '</w:tblBorders>') % (HEAVY, HEAVY)
+CELLMAR = ('<w:tblCellMar>'
+           '<w:left w:w="108" w:type="dxa"/><w:right w:w="108" w:type="dxa"/>'
+           '<w:top w:w="60" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/>'
+           '</w:tblCellMar>')
+
+cells   = lambda tr: re.findall(r'<w:tc>.*?</w:tc>', tr, re.S)
+# <m:t> as well as <w:t>: a header that is an equation, such as $h^2$, puts its
+# text in the math run and would otherwise read as an empty cell
+text_of = lambda tc: "".join(re.findall(r'<[wm]:t[^>]*>([^<]*)</[wm]:t>', tc)).strip()
+
+def with_props(tc, extra):
+    """pandoc emits no <w:tcPr>, so insert one rather than assume it exists."""
+    if '<w:tcPr>' in tc:
+        return tc.replace('<w:tcPr>', '<w:tcPr>' + extra, 1)
+    return tc.replace('<w:tc>', '<w:tc><w:tcPr>' + extra + '</w:tcPr>', 1)
+
+def rebuild(tr, new_cells):
+    return re.sub(r'(<w:tr\b[^>]*>).*(</w:tr>)',
+                  lambda m: m.group(1) + "".join(new_cells) + m.group(2), tr, flags=re.S)
+
+def style(tbl):
+    rows = re.findall(r'<w:tr\b.*?</w:tr>', tbl, re.S)
+    if not rows:
+        return tbl
+    hdr, cs = rows[0], cells(rows[0])
+    txt = [text_of(c) for c in cs]
+
+    if any(t == "" for t in txt) and any(t for t in txt):     # group-header row
+        out, i = [], 0
+        while i < len(cs):
+            if txt[i] == "":
+                out.append(cs[i]); i += 1; continue
+            j = i + 1
+            while j < len(cs) and txt[j] == "":
+                j += 1
+            span  = j - i
+            extra = ('<w:gridSpan w:val="%d"/>' % span if span > 1 else '') \
+                    + '<w:tcBorders>' + rule(GROUP) + '</w:tcBorders>'
+            out.append(with_props(cs[i], extra))
+            i = j
+        tbl = tbl.replace(hdr, rebuild(hdr, out), 1)
+        label_row = rows[1] if len(rows) > 1 else None
+    else:
+        label_row = rows[0]
+
+    if label_row:                                             # rule under labels
+        tbl = tbl.replace(label_row, rebuild(label_row,
+              [with_props(c, '<w:tcBorders>' + rule(LIGHT) + '</w:tcBorders>')
+               for c in cells(label_row)]), 1)
+
+    cols = [int(x) for x in re.findall(r'<w:gridCol w:w="(\d+)"', tbl)]
+    if cols and sum(cols):
+        f = target / sum(cols)
+        tbl = re.sub(r'(<w:gridCol w:w=")(\d+)(")',
+                     lambda g: g.group(1) + str(round(int(g.group(2)) * f)) + g.group(3), tbl)
+        tbl = re.sub(r'(<w:tcW w:w=")(\d+)(")',
+                     lambda g: g.group(1) + str(round(int(g.group(2)) * f)) + g.group(3), tbl)
+    tbl = re.sub(r'<w:tblW w:w="\d+" w:type="\w+"\s*/>',
+                 '<w:tblW w:w="%d" w:type="dxa"/>' % target, tbl)
+    return re.sub(r'(<w:tblPr>)', r'\1' + BORDERS + CELLMAR, tbl, count=1)
+
+tmp, n = path + ".tmp", 0
+zin  = zipfile.ZipFile(path)
 zout = zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED)
-total = 0
 for it in zin.infolist():
     data = zin.read(it.filename)
     if it.filename == "word/document.xml":
-        t, total = widen(data.decode("utf-8"))
-        data = t.encode("utf-8")
+        xml, parts, pos = data.decode("utf-8"), [], 0
+        for m in re.finditer(r"<w:tbl>.*?</w:tbl>", xml, re.S):
+            parts += [xml[pos:m.start()], style(m.group(0))]; pos = m.end(); n += 1
+        parts.append(xml[pos:])
+        data = "".join(parts).encode("utf-8")
     zout.writestr(it, data)
-zout.close(); zin.close()
-os.replace(tmp, path)
-print("  widened %d tables to %.2f in" % (total, target / 1440))
+zout.close(); zin.close(); os.replace(tmp, path)
+print("  styled %d tables at %.2f in" % (n, target / 1440))

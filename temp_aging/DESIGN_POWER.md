@@ -46,8 +46,9 @@ threshold used throughout this paper.
 
 ## Power at the sizes these designs are run at
 
-| Design | $n$ | $h^2 = 2\%$ | $1\%$ | $0.5\%$ |
+|                |         | $h^2$ |      |       |
 |:---------------|--------:|-----:|-----:|------:|
+| Design         | $n$     | $2\%$ | $1\%$ | $0.5\%$ |
 | Outbred panel  |   1,000 | 0.35 | 0.04 | 0.004 |
 | Inbred lines   |     200 | 0.02 | 0.00 | 0.000 |
 | Eight-way RILs |     750 | 0.70 | 0.16 | 0.022 |
