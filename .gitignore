@@ -74,3 +74,4 @@ temp_aging/archive/
 # they are the deliverable, and fetching them over ssh has been unreliable.
 !temp_aging/*.png
 temp_aging/*.docx
+!temp_aging/reference.docx
