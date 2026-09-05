@@ -1,58 +1,52 @@
 # What conventional designs could have detected
 
-Autosomes only. Computed by `design_power.R`; the figure is `make_FigS2.R`.
-
 ## The designs
 
-Each design detects a locus explaining a fraction of phenotypic variance in a base
-population with `Vp = 1` and `h2 = 50%`, so `Vg = Ve = 0.5`. Power is
+Four ways to map a locus explaining a given fraction of phenotypic variance, in a
+base population with `Vp = 1` and `h2 = 50%`, so `Vg = Ve = 0.5`. Autosomes only.
 
-    power = P( chi2_df(lambda) > T )      lambda = n R^2 / (1 - R^2)
+**Outbred panel.** `n` individuals genotyped and phenotyped once, testing a
+biallelic SNP at MAF 0.15 on one degree of freedom.
 
-with `n` the number of units measured and `R^2` the locus contribution to the
-variance of one such unit. Inbreeding doubles both the locus variance and the
-unlinked background, so those cancel; the gain from lines is replication, which
-cuts the environmental term to `Ve/10`. Hence `Var(line mean) = 2Vg + Ve/10 = 1.05`
-and a locus explaining 2% of individual variance is `R^2 = 0.038` of line variance.
+**Inbred lines.** `n` lines, ten measures each, the same one-degree-of-freedom
+SNP test on line means.
 
-| Design | Unit | df | Threshold | `R^2` at a 2% locus |
-|:-------------------|:-------------------------|---:|:-----------|--------:|
-| Outbred panel      | individual, one measure  |  1 | LWP 6      |  0.0200 |
-| Inbred lines       | line, ten measures       |  1 | LWP 6      |  0.0381 |
-| Eight-way RILs     | line, ten measures       |  7 | LWP 4      |  0.0381 |
-| X-QTL              | fly screened             |  7 | LWP 7.5    |       — |
+**Eight-way RILs.** `n` lines, ten measures each, testing eight founder alleles on
+seven degrees of freedom.
 
-The two SNP designs test a biallelic locus at MAF 0.15 on one degree of freedom;
-the eight-way designs test eight founder alleles on seven. Thresholds are LWP 6
-for the SNP panels given the number of tests, LWP 4 for a RIL linkage scan as
-established, and LWP 7.5 for X-QTL because that is the threshold used throughout
-this paper. For X-QTL the non-centrality is the relation given in the Methods,
-`lambda = N P ibar^2 h^2 / (100 k)`, with `N` flies screened at selected
-proportion `P`.
+**X-QTL.** `N` flies screened, the longest-lived proportion `P` selected and
+sequenced in pools against a control, testing eight founder haplotypes on seven
+degrees of freedom.
+
+## How power is calculated
+
+For the first three, `lambda = n R^2 / (1 - R^2)` with `R^2` the locus
+contribution to the variance of one measured unit. For X-QTL the non-centrality
+is the relation given in the Methods, `lambda = N P ibar^2 h^2 / (100 k)`. Power
+in every case is `P( chi2_df(lambda) > T )`.
+
+For the line-based designs, inbreeding doubles both the locus variance and the
+unlinked background, so those cancel; the gain is replication, cutting the
+environmental term to `Ve/10`. Hence `Var(line mean) = 2Vg + Ve/10 = 1.05`, and a
+locus explaining 2% of individual variance is `R^2 = 0.038` of line variance
+against 0.020 for an individual.
+
+Thresholds are LWP 6 for the two SNP panels given the number of tests, LWP 4 for
+a RIL linkage scan as established, and LWP 7.5 for X-QTL because that is the
+threshold used throughout this paper.
 
 ## Power at the sizes these designs are run at
 
-| Design | n | Power, 2% locus | Power, 1% locus | Power, 0.5% locus |
-|:-------------------|--------:|-----:|-----:|------:|
-| Outbred panel      |   1,000 | 0.35 | 0.04 | 0.004 |
-| Inbred lines       |     200 | 0.02 | 0.00 | 0.000 |
-| Eight-way RILs     |     750 | 0.70 | 0.16 | 0.022 |
-| X-QTL              | 114,000 | 1.00 | 1.00 | 0.894 |
-
-## Supplementary Figure 2
-
-Power against experiment size, at a locus explaining 2% of phenotypic variance
-(left) and 0.5%, the size resolved here (right). The x axis is individuals
-phenotyped, or lines for the inbred-line and RIL panels. Solid segments span the
-sizes these experiments are run at; dotted segments are hypothetical extensions
-that nobody has run — 2,000 inbred lines, 3,000 genotyped outbred individuals.
-The eight-way RIL panel is not expected to exceed 750 lines and X-QTL is drawn to
-114,000, this experiment. Points mark each design as currently practised, and the
-dashed horizontal line is 80% power.
+| Design | n | df | Threshold | 2% locus | 1% locus | 0.5% locus |
+|:---------------|--------:|---:|:--------|-----:|-----:|------:|
+| Outbred panel  |   1,000 |  1 | LWP 6   | 0.35 | 0.04 | 0.004 |
+| Inbred lines   |     200 |  1 | LWP 6   | 0.02 | 0.00 | 0.000 |
+| Eight-way RILs |     750 |  7 | LWP 4   | 0.70 | 0.16 | 0.022 |
+| X-QTL          | 114,000 |  7 | LWP 7.5 | 1.00 | 1.00 | 0.894 |
 
 The 750-line RIL panel is the strongest of the three conventional designs, and at
 a 2% locus it has 0.70 power — good, but still missing one such region in three,
-and on an idealised calculation that assumes a single homogeneous panel.
+on a calculation that assumes a single homogeneous panel.
 
 ## The point
 
