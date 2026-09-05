@@ -8,17 +8,24 @@ Computed by `temp_aging/design_power.R`; the figure is
 
 ## The point
 
-X-QTL is much **less efficient per fly** than any design that genotypes and
+Per fly, X-QTL is much **less efficient** than any design that genotypes and
 phenotypes individuals. Pooling and sequencing only the selected tail discards
 what a replicated line mean keeps: 750 RILs phenotyped ten times each is 7,500
 flies for power 0.46, while X-QTL screening the same 7,500 flies gets 0.008.
 
-Its advantage is that screening flies for longevity is cheap and effectively
-unlimited, so the experiment can be two orders of magnitude larger. RILs must be
-constructed and maintained and that panel is not expected to exceed 750 lines;
-this experiment screened 114,000 flies per treatment.
+But the flies are nearly free. The trait is phenotyped **in bulk** — no
+individual is ever measured, one lets the cage age and collects the survivors —
+and genotyping is on pools rather than individuals. Neither cost scales the way
+it does when every individual must be phenotyped and genotyped separately, so
+10^5 individuals is routine here where 10^3 is a major undertaking elsewhere.
+Meanwhile a RIL panel must be constructed and maintained, and is not expected to
+exceed 750 lines however large the budget.
 
-**Less efficient per fly, but far easier to do more of.**
+**So the design is inefficient per fly and efficient per unit of effort, and it
+is the second that decides what can be detected.** The condition is that the
+trait admits bulk selection. Longevity does: survivors select themselves. For a
+trait that requires measuring individuals one at a time the argument collapses
+and the conventional designs are the better choice.
 
 ## Framework
 
