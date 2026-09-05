@@ -60,6 +60,15 @@ def with_props(tc, extra):
         return tc.replace('<w:tcPr>', '<w:tcPr>' + extra, 1)
     return tc.replace('<w:tc>', '<w:tc><w:tcPr>' + extra + '</w:tcPr>', 1)
 
+def centre(tc):
+    """Centre every paragraph in a cell, inserting <w:pPr> where absent."""
+    def fix(m):
+        p = m.group(0)
+        if '<w:pPr>' in p:
+            return p.replace('<w:pPr>', '<w:pPr><w:jc w:val="center"/>', 1)
+        return p.replace('<w:p>', '<w:p><w:pPr><w:jc w:val="center"/></w:pPr>', 1)
+    return re.sub(r'<w:p\b.*?</w:p>', fix, tc, flags=re.S)
+
 def rebuild(tr, new_cells):
     return re.sub(r'(<w:tr\b[^>]*>).*(</w:tr>)',
                   lambda m: m.group(1) + "".join(new_cells) + m.group(2), tr, flags=re.S)
@@ -82,7 +91,9 @@ def style(tbl):
             span  = j - i
             extra = ('<w:gridSpan w:val="%d"/>' % span if span > 1 else '') \
                     + '<w:tcBorders>' + rule(GROUP) + '</w:tcBorders>'
-            out.append(with_props(cs[i], extra))
+            cell = with_props(cs[i], extra)
+            cell = centre(cell)          # a group label sits over its columns
+            out.append(cell)
             i = j
         tbl = tbl.replace(hdr, rebuild(hdr, out), 1)
         label_row = rows[1] if len(rows) > 1 else None
