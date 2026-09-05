@@ -56,10 +56,10 @@ $E[T]$ is the non-centrality parameter for the X-QTL design.  Thus the power to 
 
 $$
 \mathrm{power} \;=\; \Pr\!\left(\chi^2_7(\lambda) > T_\alpha\right), \qquad
-\lambda = \frac{n_{\mathrm{eff}}\,\bar{\imath}^{\,2}}{100\,k}\,h^2
+\lambda = \frac{N P\, i^{\,2}}{100\,k}\,h^2
 $$
 
-we substitute $n_{\mathrm{eff}} = NP$ for $N$ flies screened at selected proportion $P$, and $\bar{\imath}$ fixed by $P$, with $T_\alpha = 85.6$ for an LWP threshold of 15. (OK, but I think the above equation is referring to a power calculation for a hypothetic experiment, so you just write i^2, and you write N P instead of neff)  Thus, screening 90,000 flies per treatment and selecting the longest-lived 5% gives 80% power at an LWP of 15 to detect a region contributing 1% of phenotypic variance. $\lambda$ is linear in $h^2$, so halving the target doubles the experiment.
+for $N$ flies screened per treatment at selected proportion $P$, with $i$ the selection intensity $P$ implies. Screening 90,000 flies and selecting the longest-lived 5% ($i = 2.06$) gives 80% power at an LWP of 15 ($T_\alpha = 85.6$) to detect a region contributing 1% of phenotypic variance. $\lambda$ is linear in $h^2$, so halving the target doubles the experiment.
 
 **Partitioning.** We split the ten replicate contrasts in each treatment into two interleaved halves to give eight unbiased estimates of $\hat{h}^2$ at every step — two sexes $\times$ two diets $\times$ two halves. An orthogonal transformation of those eight numbers gives the heritability shared by all four treatments and the parts specific to sex, to diet, and to their interaction, one degree of freedom each, with the difference between the halves of a treatment carrying four. The five terms are orthogonal, so their sums of squares and degrees of freedom add. The interaction is nowhere detectable: over the significant tiles the median of $MS_{\mathrm{sex:diet}}/MS_{\mathrm{rep}}$ is 0.46 against a null median of 0.55, and five of the eighty-five tiles exceed the 5% critical value where four are expected. It is therefore pooled with the replicate difference, giving an error variance on five degrees of freedom. Writing $\overline{\hat{h}^2}$ for the mean of all eight, $\hat{h}^2_M$, $\hat{h}^2_F$, $\hat{h}^2_{SY10}$, $\hat{h}^2_{SY20}$ for the marginal means, $\hat{h}^2_{(1)}$, $\hat{h}^2_{(2)}$ for the two halves of a treatment and $d_{\mathrm{sex:diet}}$ for the interaction contrast,
 
