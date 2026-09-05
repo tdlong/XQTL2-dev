@@ -10,7 +10,9 @@
 # design realistically stops:
 #
 #   solid  = the size these experiments are actually run at
-#   dotted = plausible extension
+#   dotted = HYPOTHETICAL extension -- nobody has run these, and the figure
+#            labels them as such so it cannot be read as a claim that anyone
+#            will measure 2,000 inbred lines or genotype 3,000 outbred flies
 #     inbred lines  200 -> 2,000   rumoured extension of the panel
 #     outbred      1000 -> 3,000   a guess; nothing supports a specific ceiling
 #     8-way RILs   no extension    the panel is not expected to exceed 750
@@ -97,14 +99,20 @@ g <- ggplot(d, aes(n, power, colour = design)) +
                 labels = c("100","300","1,000","3,000","10,000","30,000","100,000")) +
   scale_y_continuous(limits = c(0,1), breaks = seq(0,1,0.2), expand = expansion(0.015)) +
   scale_colour_manual(values = COL, name = NULL) +
-  scale_linetype_manual(values = c(run = "solid", reach = "22"), guide = "none") +
+  scale_linetype_manual(values = c(run = "solid", reach = "22"), name = NULL,
+                        breaks = c("run", "reach"),
+                        labels = c("run to date", "hypothetical")) +
   labs(x = "individuals/lines phenotyped", y = "power") +
   theme_bw(base_size = 9) +
   theme(panel.grid.minor = element_blank(),
         strip.background = element_rect(fill = "grey94", colour = NA),
         strip.text = element_text(size = 8.5),
-        legend.position = "bottom", legend.margin = margin(t = -4),
-        legend.key.width = unit(20, "pt"))
+        legend.position = "bottom", legend.box = "vertical",
+        legend.margin = margin(t = -4), legend.spacing.y = unit(0, "pt"),
+        legend.key.width = unit(20, "pt")) +
+  guides(colour = guide_legend(order = 1, nrow = 1),
+         linetype = guide_legend(order = 2, nrow = 1,
+                                 override.aes = list(colour = "grey35")))
 
 ggsave(OUT, g, width = 7.2, height = 3.6, dpi = 300)
 cat("\nWrote", OUT, "\n")

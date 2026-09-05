@@ -84,6 +84,9 @@ experiments are run at; dotted is a plausible extension:
 
 - **inbred lines** 200 → 2,000, the rumoured extension of the panel
 - **outbred panel** 1,000 → 3,000, a guess, nothing supports a specific ceiling
+
+Both are labelled *hypothetical* in the figure legend. Neither has been run, and
+the figure should not be read as predicting that either will be.
 - **8-way RILs** no extension, the panel is not expected to exceed 750
 - **X-QTL** no extension, 114,000 is this experiment per treatment
 
@@ -92,6 +95,23 @@ respectably and X-QTL needs 30,000 flies to match 750 RILs. The right panel is
 the argument: at 0.5% nothing else lifts off the floor even along its dotted
 extension (inbred lines reach ~0.15 at 2,000, the outbred panel ~0.05 at 3,000)
 while X-QTL is at 0.89.
+
+## These are idealised power calculations for the conventional designs
+
+Each of A, B and C assumes a single homogeneous panel measured under one
+protocol: no batch structure, no heterogeneity between sub-experiments, every
+individual contributing full information to one analysis. Large phenotyping
+efforts are usually assembled over several experiments, and a panel of *n*
+assembled that way delivers less power than a panel of *n* run at once.
+
+The X-QTL curve is not idealised in the same way. Its non-centrality comes from
+the fitted relation `h2 = 0.00774 (T - 7)`, estimated from the observed scan, so
+replicate structure, smoothing and haplotype reconstruction error are already
+inside it.
+
+**The comparison therefore favours the conventional designs**, and the gap in
+the figure is if anything conservative. This is a general property of textbook
+power calculations and needs no claim about any particular published study.
 
 ## Simulation check
 
