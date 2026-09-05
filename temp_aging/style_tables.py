@@ -100,9 +100,9 @@ def style(tbl):
     else:
         label_row = rows[0]
 
-    if label_row:                                             # rule under labels
+    if label_row:                    # rule under the labels, labels centred
         tbl = tbl.replace(label_row, rebuild(label_row,
-              [with_props(c, '<w:tcBorders>' + rule(LIGHT) + '</w:tcBorders>')
+              [centre(with_props(c, '<w:tcBorders>' + rule(LIGHT) + '</w:tcBorders>'))
                for c in cells(label_row)]), 1)
 
     cols = [int(x) for x in re.findall(r'<w:gridCol w:w="(\d+)"', tbl)]

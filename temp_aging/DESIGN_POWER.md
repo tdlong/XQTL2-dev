@@ -48,11 +48,15 @@ threshold used throughout this paper.
 
 |                |         | h²   |      |       |
 |:---------------|--------:|-----:|-----:|------:|
-| Design         | n       | 2%   | 1%   | 0.5%  |
+|                | n       | 2%   | 1%   | 0.5%  |
 | Outbred panel  |   1,000 | 0.35 | 0.04 | 0.004 |
 | Inbred lines   |     200 | 0.02 | 0.00 | 0.000 |
 | Eight-way RILs |     750 | 0.70 | 0.16 | 0.022 |
 | X-QTL          | 114,000 | 1.00 | 1.00 | 0.894 |
+
+Note. — Power to detect a locus of heritability h² at the size each design is
+run at. Thresholds are −log₁₀P of 6 for the outbred and inbred-line panels, 4
+for the RIL scan and 7.5 for X-QTL.
 
 The 750-line RIL panel is the strongest of the three conventional designs, and at
 $h^2 = 2\%$ it has 0.70 power — good, but still missing one such region in three,
