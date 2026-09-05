@@ -51,23 +51,18 @@ SNP designs. Inbred lines and RILs are phenotyped ten times each.
 
 ### Base population — outbred diploid, MAF 0.15
 
-| | |
-|---|---|
-| genotype frequencies | aa 0.0225, Aa 0.2550, AA 0.7225 |
-| `Va(locus) = 2pq alpha^2` | 0.02, so `alpha` = 0.280 |
-| `Vg` = 0.50 | locus 0.02 + background 0.48 |
-| `Ve` | 0.50 |
+Genotype frequencies are aa 0.0225, Aa 0.2550, AA 0.7225. Setting the locus
+additive variance `Va = 2pq alpha^2 = 0.02` gives `alpha = 0.280`. Total genetic
+variance `Vg = 0.50` splits into the locus at 0.02 and background at 0.48, and
+`Ve = 0.50`.
 
 ### Inbred lines — only aa and AA, at 15% and 85%
 
-| | |
-|---|---|
-| locus variance among lines | `pq(2 alpha)^2` = 0.0400 — exactly twice the outbred 0.0200 |
-| background `Vg` among lines | `2 x 0.48` = 0.96 — unlinked genes double as well |
-| total genetic among lines | 1.00, i.e. `2 x Vg`, as it must be |
-| `Ve` on a mean of 10 measures | 0.50/10 = 0.050 |
-| `Var(line mean)` | 1.050 |
-| **locus `R^2`** | **0.0381** |
+The locus variance among lines is `pq(2 alpha)^2 = 0.0400`, exactly twice the
+outbred 0.0200. The unlinked background doubles too, `2 x 0.48 = 0.96`, so the
+total genetic variance among lines is 1.00, that is `2 x Vg` as it must be. Ten
+measures per line put `Ve` on a line mean at `0.50/10 = 0.050`, giving
+`Var(line mean) = 1.050` and a locus `R^2` of **0.0381**.
 
 The causative site does contribute more under inbreeding, but the background
 rises by the same factor, so **the doubling cancels in the ratio**. Locus `R^2`
@@ -81,12 +76,12 @@ Thresholds: 0.05/1e6 for the SNP panels, 0.05/1e4 for the RIL linkage scan, and
 the paper's own LWP 7.5 for X-QTL — stricter than a Bonferroni over 268 tiles,
 so X-QTL is handicapped here rather than flattered.
 
-| design | n | df | tests | power at 2% | power at 0.5% |
-|---|---|---|---|---|---|
-| A — outbred panel, 1 measure | 1,000 | 1 | 1e6 | 0.175 | 0.0007 |
-| B — inbred lines, 10 measures | 200 | 1 | 1e6 | 0.004 | 0.0000 |
-| C — 8-way RILs, 10 measures | 750 | 7 | 1e4 | 0.461 | 0.0039 |
-| D — X-QTL, this experiment | 114,000 | 7 | — | 1.000 | 0.894 |
+| Design | n | df | Tests | Power, 2% | Power, 0.5% |
+|:--------------------------|--------:|---:|-----:|----------:|------------:|
+| Outbred panel, 1 measure  |   1,000 |  1 | 10^6 |     0.175 |      0.0007 |
+| Inbred lines, 10 measures |     200 |  1 | 10^6 |     0.004 |      0.0000 |
+| 8-way RILs, 10 measures   |     750 |  7 | 10^4 |     0.461 |      0.0039 |
+| X-QTL, this experiment    | 114,000 |  7 |    — |     1.000 |      0.894  |
 
 Smallest locus detectable at 80% power, at the size each design is run at:
 **A 3.96%, B 10.4%, C 2.89%**, against **0.45%** for X-QTL at its LWP 7.5
@@ -145,11 +140,11 @@ power calculations and needs no claim about any particular published study.
 individuals; B a 1 df contrast on 200 line means; C a genuine 8-level ANOVA on
 750 line means with founder effects scaled to an among-line variance of 0.04.
 
-| design | analytic | simulated |
-|---|---|---|
-| A | 0.175 | 0.171 |
-| B | 0.004 | 0.007 |
-| C | 0.461 | 0.464 |
+| Design                    | Analytic | Simulated |
+|:--------------------------|---------:|----------:|
+| Outbred panel, 1 measure  |    0.175 |     0.171 |
+| Inbred lines, 10 measures |    0.004 |     0.007 |
+| 8-way RILs, 10 measures   |    0.461 |     0.464 |
 
 Analytic and simulated agree, so the models are set up correctly.
 
