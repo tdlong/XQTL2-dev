@@ -89,8 +89,15 @@ so X-QTL is handicapped here rather than flattered.
 | D — X-QTL, this experiment | 114,000 | 7 | — | 1.000 | 0.894 |
 
 Smallest locus detectable at 80% power, at the size each design is run at:
-**A 3.96%, B 10.4%, C 2.89%**, against **0.42%** for X-QTL at its LWP 7.5
-threshold. To reach 80% power at a 2% locus the conventional designs would need
+**A 3.96%, B 10.4%, C 2.89%**, against **0.45%** for X-QTL at its LWP 7.5
+threshold.
+
+That 0.45% uses the design formula, `lambda = NP i^2 / (100k) h^2`, the same
+route as the figure and the Methods. Running it instead off the fitted relation
+`h2 = 0.00774 (T - 7)`, estimated from the observed scan, gives 0.42%. The two
+routes are independent — one is the planning formula, the other is measured off
+the data — and they agree to 6.5%, which is a useful check that the design
+formula is not optimistic. To reach 80% power at a 2% locus the conventional designs would need
 roughly 1,940 individuals, 1,000 lines, or 1,044 RILs.
 
 ## The figure
@@ -156,4 +163,4 @@ Analytic and simulated agree, so the models are set up correctly.
 4. **1e6 tests for B.** A DGRP-style panel tests roughly 2M common SNPs; that
    moves the threshold by about 1.4 and barely moves power.
 5. **X-QTL held to LWP 7.5.** A Bonferroni over 268 tiles would be 1.9e-4, far
-   laxer, and would put its smallest detectable locus at 0.24% rather than 0.42%.
+   laxer, and would put its smallest detectable locus at 0.26% rather than 0.45%.
