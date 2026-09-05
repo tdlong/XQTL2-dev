@@ -37,8 +37,7 @@ W("Peaks with a local maximum LWP exceeding 15 or 7.5, each at least 5 cM from a
   "signal is the largest of the four, so it has no column of its own.\n\n")
 
 rows = list(csv.reader(open('temp_aging/TableS1.tsv'), delimiter='\t'))
-HDR   = ["Peak","cM","Interval (Mb)","Width","SY10 F","SY20 F","SY10 M","SY20 M"]
-GROUP = ["","","","","-log10 P / h2","","",""]   # spans the four treatments
+HDR = ["Peak","cM","Interval (Mb)","Width","SY10 F","SY20 F","SY10 M","SY20 M"]
 # every column left-aligned: a right-flush number beside a left-flush one
 # collides at the column boundary however wide the columns are
 RIGHT = set()
@@ -58,7 +57,7 @@ w = [max([len(HDR[i])] + [len(r[i]) for r in allr]) + 2 for i in range(len(HDR))
 sep = "|" + "|".join(("-"*n+":") if i in RIGHT else (":"+"-"*n) for i,n in enumerate(w)) + "|"
 row = lambda c: "| " + " | ".join(x.ljust(w[i]) for i,x in enumerate(c)) + " |"
 for s in sections:
-    W(f"**{s['title']}**\n\n{row(GROUP)}\n{sep}\n{row(HDR)}\n")
+    W(f"**{s['title']}**\n\n{row(HDR)}\n{sep}\n")
     for r in s["rows"]: W(row(r) + "\n")
     W("\n")
 
