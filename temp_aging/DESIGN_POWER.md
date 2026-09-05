@@ -2,8 +2,8 @@
 
 ## The designs
 
-Four ways to map a locus contributing a heritability $h^2$ to a base population
-with phenotypic variance $V_P = 1$ and $V_A = V_E = 0.5$. Autosomes only.
+Four ways to map a locus of heritability $h^2$ in a base population with
+phenotypic variance $V_P = 1$ and $V_A = V_E = 0.5$. Autosomes only.
 
 **Outbred panel.** $n$ individuals genotyped and phenotyped once, testing a
 biallelic SNP at a minor allele frequency of 0.15 on one degree of freedom.
@@ -20,33 +20,33 @@ haplotypes on seven degrees of freedom.
 
 ## How power is calculated
 
-In every case the test statistic is non-central $\chi^2$ under the alternative, so
+Under the alternative every test statistic is non-central $\chi^2$, so
 
 $$
 \mathrm{power} \;=\; \Pr\!\left(\chi^2_{\nu}(\lambda) > T_\alpha\right)
 $$
 
-For the three designs that measure units individually the non-centrality is
+$h^2$ is the heritability due to the locus, the variance explained by the
+causative factor. For the outbred panel and for X-QTL it enters directly. The two
+line-based designs measure line means instead: inbreeding doubles both the locus
+variance and the unlinked background, so those cancel, and ten measures per line
+cut the environmental term to $V_E/10$. Write
 
 $$
-\lambda \;=\; \frac{n\,h^2_u}{1 - h^2_u}
+{}^{\prime}h^{2} \;=\; \frac{2\,h^{2}V_P}{2V_A + V_E/10}
 $$
 
-where $h^2_u$ is the locus contribution to the variance of one measured unit — an
-individual, or a line mean. For X-QTL it is the relation given in the Methods,
-$\lambda = N P \bar{\imath}^{\,2} h^2 / 100k$.
-
-An individual measured once has $h^2_u = h^2$. For the line designs, inbreeding
-doubles both the locus variance and the unlinked background, so those cancel; the
-gain is replication, which cuts the environmental term to $V_E/10$. With ten
-measures per line
+for the locus on that scale, so a locus at $h^2 = 2\%$ is
+${}^{\prime}h^{2} = 3.8\%$. The non-centrality is then
 
 $$
-h^2_u \;=\; \frac{2\,h^2 V_P}{2V_A + V_E/10}
+\lambda = \frac{n\,h^{2}}{1-h^{2}}, \qquad
+\lambda = \frac{n\,{}^{\prime}h^{2}}{1-{}^{\prime}h^{2}}, \qquad
+\lambda = \frac{N P \bar{\imath}^{\,2} h^{2}}{100\,k}
 $$
 
-so a locus contributing $h^2 = 2\%$ of individual phenotypic variance is 3.8% of
-line variance.
+for the outbred panel, for the two line-based designs, and for X-QTL as given in
+the Methods.
 
 Thresholds are $-\log_{10}P$ of 6 for the two SNP panels given the number of tests,
 4 for a RIL linkage scan as established, and 7.5 for X-QTL, that being the
