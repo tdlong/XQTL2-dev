@@ -66,7 +66,10 @@ for $N$ flies screened per treatment at selected proportion $P$, with $i$ the se
 $$
 d_{\mathrm{shared}} = \overline{\hat{h}^2}, \qquad
 d_{\mathrm{sex}} = \tfrac{1}{2}\big(\hat{h}^2_M - \hat{h}^2_F\big), \qquad
-d_{\mathrm{diet}} = \tfrac{1}{2}\big(\hat{h}^2_{SY20} - \hat{h}^2_{SY10}\big), \qquad
+d_{\mathrm{diet}} = \tfrac{1}{2}\big(\hat{h}^2_{SY20} - \hat{h}^2_{SY10}\big)
+$$
+
+$$
 s^2 = \tfrac{1}{5}\Big[\tfrac{1}{2}\sum_{\mathrm{cells}} \big(\hat{h}^2_{(1)} - \hat{h}^2_{(2)}\big)^2 + 8\,d_{\mathrm{sex:diet}}^2\Big]
 $$
 
