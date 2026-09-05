@@ -15,11 +15,15 @@ flies for power 0.46, while X-QTL screening the same 7,500 flies gets 0.008.
 
 But the flies are nearly free. The trait is phenotyped **in bulk** — no
 individual is ever measured, one lets the cage age and collects the survivors —
-and genotyping is on pools rather than individuals. Neither cost scales the way
-it does when every individual must be phenotyped and genotyped separately, so
-10^5 individuals is routine here where 10^3 is a major undertaking elsewhere.
-Meanwhile a RIL panel must be constructed and maintained, and is not expected to
-exceed 750 lines however large the budget.
+and genotyping is on pools rather than individuals.
+
+What limits the other designs is not statistical efficiency but mechanics. Lines
+have to be constructed and maintained; individuals have to be handled, genotyped
+and phenotyped one at a time. Those panels are more efficient per fly and are
+struggling to scale for exactly that reason — a RIL panel is not expected to
+exceed 750 lines however large the budget. Bulk phenotyping and pooled
+sequencing remove that barrier, which is why 10^5 individuals is routine here
+where 10^3 is a major undertaking elsewhere.
 
 Note the asymmetry in the figure. The X-QTL point at 114,000 flies per treatment
 is solid: it is an experiment that has been run. Every extension that would let
