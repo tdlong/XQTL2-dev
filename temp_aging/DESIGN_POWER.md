@@ -50,6 +50,10 @@ The eight-way RIL panel is not expected to exceed 750 lines and X-QTL is drawn t
 114,000, this experiment. Points mark each design as currently practised, and the
 dashed horizontal line is 80% power.
 
+The 750-line RIL panel is the strongest of the three conventional designs, and at
+a 2% locus it has 0.70 power — good, but still missing one such region in three,
+and on an idealised calculation that assumes a single homogeneous panel.
+
 ## The point
 
 X-QTL is the least efficient of these designs per fly, but longevity is phenotyped
