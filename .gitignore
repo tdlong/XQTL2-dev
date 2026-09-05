@@ -73,3 +73,4 @@ temp_aging/archive/
 # Figures are generated on HPC3 by reproduce.sh and returned through git --
 # they are the deliverable, and fetching them over ssh has been unreliable.
 !temp_aging/*.png
+temp_aging/*.docx
