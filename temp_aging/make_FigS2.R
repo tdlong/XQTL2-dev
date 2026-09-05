@@ -2,81 +2,96 @@
 #
 #   Rscript temp_aging/make_FigS2.R
 #
-# Supplementary figure for the power supplement. Same target throughout: a
-# locus explaining 2% of individual phenotypic variance, h2 = 50%.
+# THE POINT. X-QTL is much LESS efficient per fly than a design that genotypes
+# and phenotypes individuals -- pooling and sequencing only the selected tail
+# discards what a replicated line mean keeps. Its advantage is that screening
+# flies for longevity is cheap and effectively unlimited, so the experiment can
+# be two orders of magnitude larger. Each curve therefore stops where that
+# design realistically stops:
 #
-# X axis is the number of individuals PHENOTYPED -- individuals for the outbred
-# panel and for X-QTL, lines for the inbred-line and RIL panels. That is the
-# quantity that actually costs, and it is what makes the designs comparable.
+#   solid  = the size these experiments are actually run at
+#   dotted = plausible extension
+#     inbred lines  200 -> 2,000   rumoured extension of the panel
+#     outbred      1000 -> 3,000   a guess; nothing supports a specific ceiling
+#     8-way RILs   no extension    the panel is not expected to exceed 750
+#     X-QTL        no extension    114,000 is this experiment, per treatment
 #
-# Solid = up to the size of experiments currently run. Dotted = plausible
-# extension. Thresholds are each design's own realistic genome-wide bar:
-# 0.05/1e6 for the SNP panels, 0.05/1e4 for the RIL linkage scan, and the
-# paper's own LWP 7.5 for X-QTL -- which is far stricter than a Bonferroni over
-# 268 tiles would be, so the X-QTL curve is conservative.
+# Base population: Vp = 1, h2 = 50%, MAF 0.15 for the two SNP designs, a locus
+# explaining 2% of individual phenotypic variance. Inbred lines and RILs are
+# phenotyped 10 times each; inbreeding doubles both the locus variance and the
+# unlinked background so those cancel, and the gain is replication cutting Ve.
+#
+# Thresholds are each design's own genome-wide bar: 0.05/1e6 for the SNP panels,
+# 0.05/1e4 for the RIL linkage scan, and the paper's own LWP 7.5 for X-QTL --
+# stricter than a Bonferroni over 268 tiles, so X-QTL is handicapped here.
 
 suppressMessages(library(tidyverse))
 
-p <- 0.15; q <- 1-p
-Vp <- 1; h2 <- 0.5; Vg <- h2*Vp; Ve <- Vp-Vg
-QTL <- 0.02; r <- 10
-alpha <- sqrt(QTL/(2*p*q))
-vloc_line <- p*q*(2*alpha)^2          # 0.04, inbreeding doubles it
-vbg_line  <- 2*(Vg-QTL)               # 0.96, and the background too
-Vline     <- vloc_line + vbg_line + Ve/r
-R2_line   <- vloc_line/Vline          # 0.0381
-
+OUT  <- "temp_aging/FigureS2_plot.png"
+QTL  <- 0.02          # locus explains 2% of individual phenotypic variance
+p    <- 0.15; q <- 1-p
+Vp   <- 1; h2 <- 0.5; Vg <- h2*Vp; Ve <- Vp-Vg; r <- 10
 P_SEL <- 0.05; ibar <- dnorm(qnorm(1-P_SEL))/P_SEL; k <- 2
-
-pow_R2 <- function(n, R2, df, thr) pchisq(thr, df, ncp = n*R2/(1-R2), lower.tail = FALSE)
-pow_X  <- function(N, thr) pchisq(thr, 7, ncp = (N*P_SEL)*ibar^2*(100*QTL)/(100*k),
-                                  lower.tail = FALSE)
 
 thr1 <- qchisq(0.05/1e6, 1, lower.tail = FALSE)
 thr7 <- qchisq(0.05/1e4, 7, lower.tail = FALSE)
 thrX <- qchisq(10^-7.5,  7, lower.tail = FALSE)
 
-grid <- function(a,b) exp(seq(log(a), log(b), length.out = 300))
-mk <- function(lab, n, pw, solid_to) tibble(design = lab, n = n, power = pw,
-                                            part = ifelse(n <= solid_to, "run", "extension"))
+vloc_line <- 2*QTL                     # inbreeding doubles the locus variance
+vbg_line  <- 2*(Vg-QTL)                # and the unlinked background
+Vline     <- vloc_line + vbg_line + Ve/r
+R2_line   <- vloc_line/Vline
 
-d <- bind_rows(
-  mk("Outbred panel, 1 measure",   grid(100, 3000),   pow_R2(grid(100,3000),  QTL/Vp,  1, thr1), 1000),
-  mk("Inbred lines, 10 measures",  grid(50,  2000),   pow_R2(grid(50,2000),   R2_line, 1, thr1), 200),
-  mk("8-way RILs, 10 measures",    grid(100, 1500),   pow_R2(grid(100,1500),  R2_line, 7, thr7), 750),
-  mk("X-QTL (this experiment)",    grid(1000, 2e5),   pow_X(grid(1000,2e5),   thrX),             114000))
+pow_R2 <- function(n, R2, df, thr) pchisq(thr, df, ncp = n*R2/(1-R2), lower.tail = FALSE)
+pow_X  <- function(N, thr) pchisq(thr, 7, ncp = (N*P_SEL)*ibar^2*(100*QTL)/(100*k),
+                                  lower.tail = FALSE)
+curve_for <- function(design, n) switch(design,
+  "Outbred panel, 1 measure"  = pow_R2(n, QTL/Vp,  1, thr1),
+  "Inbred lines, 10 measures" = pow_R2(n, R2_line, 1, thr1),
+  "8-way RILs, 10 measures"   = pow_R2(n, R2_line, 7, thr7),
+  "X-QTL (this experiment)"   = pow_X(n, thrX))
 
-pts <- tribble(~design, ~n, ~power,
-  "Outbred panel, 1 measure",  1000,  pow_R2(1000, QTL/Vp,  1, thr1),
-  "Inbred lines, 10 measures",  200,  pow_R2(200,  R2_line, 1, thr1),
-  "8-way RILs, 10 measures",    750,  pow_R2(750,  R2_line, 7, thr7),
-  "X-QTL (this experiment)", 114000,  pow_X(114000, thrX))
-cat("\npower at the size each design is actually run at:\n"); print(as.data.frame(pts), row.names = FALSE)
+SPEC <- tribble(
+  ~design,                       ~lo,  ~run,   ~reach,
+  "Outbred panel, 1 measure",     100,   1000,   3000,
+  "Inbred lines, 10 measures",     50,    200,   2000,
+  "8-way RILs, 10 measures",      100,    750,    750,
+  "X-QTL (this experiment)",     2000, 114000, 114000)
 
-LEV <- c("X-QTL (this experiment)","8-way RILs, 10 measures",
-         "Outbred panel, 1 measure","Inbred lines, 10 measures")
+grid <- function(a, b) exp(seq(log(a), log(b), length.out = 400))
+d <- pmap_dfr(SPEC, function(design, lo, run, reach) {
+  nn <- sort(unique(c(grid(lo, reach), run)))
+  pw <- curve_for(design, nn)               # compute before tibble(), or the
+  tibble(design = design, n = nn, power = pw,   # recycled column masks the arg
+         part = ifelse(nn <= run, "run", "reach"))
+})
+pts <- SPEC %>% transmute(design, n = run, power = map2_dbl(design, run, ~curve_for(.x, .y)))
+
+cat("power at the size each design is actually run at:\n")
+print(as.data.frame(pts %>% mutate(power = round(power, 4))), row.names = FALSE)
+
+LEV <- c("X-QTL (this experiment)", "8-way RILs, 10 measures",
+         "Outbred panel, 1 measure", "Inbred lines, 10 measures")
+COL <- c("#B4413F", "#3D6E9C", "#4E8A5B", "#8A6BA8"); names(COL) <- LEV
 d   <- d   %>% mutate(design = factor(design, levels = LEV))
 pts <- pts %>% mutate(design = factor(design, levels = LEV))
-COL <- c("#B4413F","#3D6E9C","#4E8A5B","#8A6BA8"); names(COL) <- LEV
 
 g <- ggplot(d, aes(n, power, colour = design)) +
   geom_hline(yintercept = 0.8, linewidth = 0.3, colour = "grey65", linetype = "22") +
-  geom_line(aes(linetype = part), linewidth = 0.8) +
+  geom_line(aes(linetype = part, group = interaction(design, part)), linewidth = 0.8) +
   geom_point(data = pts, size = 2.4) +
-  scale_x_log10(breaks = c(100,300,1000,3000,10000,30000,100000),
+  scale_x_log10(breaks = c(100, 300, 1000, 3000, 10000, 30000, 100000),
                 labels = c("100","300","1,000","3,000","10,000","30,000","100,000")) +
-  scale_y_continuous(limits = c(0,1), breaks = seq(0,1,0.2), expand = expansion(0.01)) +
+  scale_y_continuous(limits = c(0,1), breaks = seq(0,1,0.2), expand = expansion(0.015)) +
   scale_colour_manual(values = COL, name = NULL) +
-  scale_linetype_manual(values = c(run = "solid", extension = "22"), guide = "none") +
-  labs(x = "individuals phenotyped (lines, for the inbred and RIL panels)",
+  scale_linetype_manual(values = c(run = "solid", reach = "22"), guide = "none") +
+  labs(x = "individuals/lines phenotyped",
        y = "power to detect a locus explaining 2% of phenotypic variance") +
   theme_bw(base_size = 10) +
   theme(panel.grid.minor = element_blank(),
         legend.position = c(0.02, 0.98), legend.justification = c(0,1),
-        legend.background = element_rect(fill = alpha("white",0.85), colour = NA),
-        legend.key.height = unit(11,"pt"))
+        legend.background = element_rect(fill = alpha("white", 0.85), colour = NA),
+        legend.key.height = unit(11, "pt"))
 
-ggsave("temp_aging/FigureS2_plot.png", g, width = 6.6, height = 4.4, dpi = 300)
-cat("Wrote temp_aging/FigureS2_plot.png\n")
-cat(sprintf("\nthresholds: SNP panels %.1f (1 df), RILs %.1f (7 df), X-QTL %.1f (7 df)\n",
-            thr1, thr7, thrX))
+ggsave(OUT, g, width = 6.6, height = 4.4, dpi = 300)
+cat("\nWrote", OUT, "\n")
