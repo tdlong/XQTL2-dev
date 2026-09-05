@@ -11,11 +11,11 @@ in place pending a real calculation. That calculation is now done —
 Your three designs on one framework, with the models derived rather than
 asserted and checked against simulation:
 
-| design | n | df | tests | R² | lambda | **power at a 2% locus** | smallest at 80% |
-|---|---|---|---|---|---|---|---|
-| A — outbred diploids, 1 measure | 1000 | 1 | 1e6 | 0.0200 | 20.4 | **0.175** | 3.96% |
-| B — inbred lines, 10 measures | 200 | 1 | 1e6 | 0.0381 | 7.9 | **0.004** | 10.4% |
-| C — 8-way RILs, 10 measures | 750 | 7 | 1e4 | 0.0381 | 29.7 | **0.461** | 2.89% |
+| design                          | n    | df  | tests | R²     | lambda | **power at a 2% locus** | smallest at 80% |
+| ------------------------------- | ---- | --- | ----- | ------ | ------ | ----------------------- | --------------- |
+| A — outbred diploids, 1 measure | 1000 | 1   | 1e6   | 0.0200 | 20.4   | **0.175**               | 3.96%           |
+| B — inbred lines, 10 measures   | 200  | 1   | 1e6   | 0.0381 | 7.9    | **0.004**               | 10.4%           |
+| C — 8-way RILs, 10 measures     | 750  | 7   | 1e4   | 0.0381 | 29.7   | **0.461**               | 2.89%           |
 
 Analytic against simulated power: 0.175/0.171, 0.004/0.007, 0.461/0.464.
 
@@ -40,7 +40,9 @@ advantage is replication, not homozygosity.
 > individuals measured once, and 0.004 by two hundred inbred lines phenotyped
 > ten times.
 
-`[ ] approve   [ ] deny   [ ] modify:`
+`[ ] approve   [ ] deny   [X] modify:`
+
+I am almost OK with these two sentences.  But then in the supplemetary materials we need to go through the power calculations and assumptions.  The the little MD describing the calculation is supplementary result "X". I also think we need to compare the power of X QTL at the same time.  I am almost thinking of a figure where the Y axis is power and the X axis is "N" (number of individuals for XQTL and diploid outbred, number of lines for inbred lines and RILs).  This is the same 2%er and 15% MAF (except the XQTL and 8 way lines).  Then there is a curve for each approach.  I would make the curve solid for sort of up to "current widely employed experiments" - so what we calculated the point power for, then perhaps a dotted line to what is realistic.  So outbred diploid could get to 3K, inbred lines to 2K, RILs is sort of stuck at 750.  But X-QTL ... can be as big as this dataset even for a single character.  Again the figure would be part of this large supplement, so in the paper we can make this two sentence point about the think here is that power is just so much bigger in this experiment compared to what is being done, and then back the point up with this supplement.
 
 Or keep the current parenthetical placeholder and put the table in the
 supplement instead.
