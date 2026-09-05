@@ -1,161 +1,57 @@
 # What conventional designs could have detected
 
-Supporting the claim in Results paragraph 2 that regions contributing less than
-2% of variation would have gone undetected in prior work. Autosomes only.
+Autosomes only. Computed by `design_power.R`; the figure is `make_FigS2.R`.
 
-Computed by `temp_aging/design_power.R`; the figure is
-`temp_aging/make_FigS2.R` -> `temp_aging/FigureS2_plot.png`.
+## The designs
+
+Each design detects a locus explaining a fraction of phenotypic variance in a base
+population with `Vp = 1` and `h2 = 50%`, so `Vg = Ve = 0.5`. Power is
+
+    power = P( chi2_df(lambda) > T )      lambda = n R^2 / (1 - R^2)
+
+with `n` the number of units measured and `R^2` the locus contribution to the
+variance of one such unit. Inbreeding doubles both the locus variance and the
+unlinked background, so those cancel; the gain from lines is replication, which
+cuts the environmental term to `Ve/10`. Hence `Var(line mean) = 2Vg + Ve/10 = 1.05`
+and a locus explaining 2% of individual variance is `R^2 = 0.038` of line variance.
+
+| Design | Unit | df | Threshold | `R^2` at a 2% locus |
+|:-------------------|:-------------------------|---:|:-----------|--------:|
+| Outbred panel      | individual, one measure  |  1 | LWP 6      |  0.0200 |
+| Inbred lines       | line, ten measures       |  1 | LWP 6      |  0.0381 |
+| Eight-way RILs     | line, ten measures       |  7 | LWP 4      |  0.0381 |
+| X-QTL              | fly screened             |  7 | LWP 7.5    |       — |
+
+The two SNP designs test a biallelic locus at MAF 0.15 on one degree of freedom;
+the eight-way designs test eight founder alleles on seven. Thresholds are LWP 6
+for the SNP panels given the number of tests, LWP 4 for a RIL linkage scan as
+established, and LWP 7.5 for X-QTL because that is the threshold used throughout
+this paper. For X-QTL the non-centrality is the relation given in the Methods,
+`lambda = N P ibar^2 h^2 / (100 k)`, with `N` flies screened at selected
+proportion `P`.
+
+## Power at the sizes these designs are run at
+
+| Design | n | Power, 2% locus | Power, 1% locus | Power, 0.5% locus |
+|:-------------------|--------:|-----:|-----:|------:|
+| Outbred panel      |   1,000 | 0.35 | 0.04 | 0.004 |
+| Inbred lines       |     200 | 0.02 | 0.00 | 0.000 |
+| Eight-way RILs     |     750 | 0.70 | 0.16 | 0.022 |
+| X-QTL              | 114,000 | 1.00 | 1.00 | 0.894 |
+
+## Supplementary Figure 2
+
+Power against experiment size, at a locus explaining 2% of phenotypic variance
+(left) and 0.5%, the size resolved here (right). The x axis is individuals
+phenotyped, or lines for the inbred-line and RIL panels. Solid segments span the
+sizes these experiments are run at; dotted segments are hypothetical extensions
+that nobody has run — 2,000 inbred lines, 3,000 genotyped outbred individuals.
+The eight-way RIL panel is not expected to exceed 750 lines and X-QTL is drawn to
+114,000, this experiment. Points mark each design as currently practised, and the
+dashed horizontal line is 80% power.
 
 ## The point
 
-Per fly, X-QTL is much **less efficient** than any design that genotypes and
-phenotypes individuals. Pooling and sequencing only the selected tail discards
-what a replicated line mean keeps: 750 RILs phenotyped ten times each is 7,500
-flies for power 0.46, while X-QTL screening the same 7,500 flies gets 0.008.
-
-But the flies are nearly free. The trait is phenotyped **in bulk** — no
-individual is ever measured, one lets the cage age and collects the survivors —
-and genotyping is on pools rather than individuals.
-
-What limits the other designs is not statistical efficiency but mechanics. The
-RIL panels largely exist already; the barrier is that every line has to be
-acquired, reared and measured separately, and in an association panel every
-individual has to be genotyped and phenotyped separately. Those panels are more
-efficient per fly and are struggling to scale for exactly that reason — the
-expectation that a RIL study will not exceed 750 lines is about what people will
-acquire and measure, not about what lines are available. Bulk phenotyping and pooled
-sequencing remove that barrier, which is why 10^5 individuals is routine here
-where 10^3 is a major undertaking elsewhere.
-
-Note the asymmetry in the figure. The X-QTL point at 114,000 flies per treatment
-is solid: it is an experiment that has been run. Every extension that would let
-another design approach it — 2,000 inbred lines, 3,000 genotyped outbred
-individuals — is dotted, and there is no particular reason to expect those curves
-to be realised.
-
-**So the design is inefficient per fly and efficient per unit of effort, and it
-is the second that decides what can be detected.** The condition is that the
-trait admits bulk selection. Longevity does: survivors select themselves. For a
-trait that requires measuring individuals one at a time the argument collapses
-and the conventional designs are the better choice.
-
-## Framework
-
-Non-centrality is `lambda = n R^2 / (1 - R^2)`, where `R^2` is the locus
-contribution as a fraction of the variance of whatever unit is measured —
-individuals in A, line means in B and C. Power is
-`P(chi2_df(lambda) > threshold)` at each design's own genome-wide bar.
-
-Base population: `Vp = 1`, `h2 = 50%` (so `Vg = Ve = 0.5`), MAF 0.15 for the two
-SNP designs. Inbred lines and RILs are phenotyped ten times each.
-
-### Base population — outbred diploid, MAF 0.15
-
-Genotype frequencies are aa 0.0225, Aa 0.2550, AA 0.7225. Setting the locus
-additive variance `Va = 2pq alpha^2 = 0.02` gives `alpha = 0.280`. Total genetic
-variance `Vg = 0.50` splits into the locus at 0.02 and background at 0.48, and
-`Ve = 0.50`.
-
-### Inbred lines — only aa and AA, at 15% and 85%
-
-The locus variance among lines is `pq(2 alpha)^2 = 0.0400`, exactly twice the
-outbred 0.0200. The unlinked background doubles too, `2 x 0.48 = 0.96`, so the
-total genetic variance among lines is 1.00, that is `2 x Vg` as it must be. Ten
-measures per line put `Ve` on a line mean at `0.50/10 = 0.050`, giving
-`Var(line mean) = 1.050` and a locus `R^2` of **0.0381**.
-
-The causative site does contribute more under inbreeding, but the background
-rises by the same factor, so **the doubling cancels in the ratio**. Locus `R^2`
-goes from 2.00% in outbred individuals to only 2.67% in unreplicated inbred
-lines (0.04/1.5); it reaches 3.81% because replication cuts `Ve` tenfold.
-Nearly all of the inbred-line advantage is the replication, not the homozygosity.
-
-## The four designs
-
-Thresholds: 0.05/1e6 for the SNP panels, 0.05/1e4 for the RIL linkage scan, and
-the paper's own LWP 7.5 for X-QTL — stricter than a Bonferroni over 268 tiles,
-so X-QTL is handicapped here rather than flattered.
-
-| Design | n | df | Tests | Power, 2% | Power, 0.5% |
-|:--------------------------|--------:|---:|-----:|----------:|------------:|
-| Outbred panel, 1 measure  |   1,000 |  1 | 10^6 |     0.175 |      0.0007 |
-| Inbred lines, 10 measures |     200 |  1 | 10^6 |     0.004 |      0.0000 |
-| 8-way RILs, 10 measures   |     750 |  7 | 10^4 |     0.461 |      0.0039 |
-| X-QTL, this experiment    | 114,000 |  7 |    — |     1.000 |      0.894  |
-
-Smallest locus detectable at 80% power, at the size each design is run at:
-**A 3.96%, B 10.4%, C 2.89%**, against **0.45%** for X-QTL at its LWP 7.5
-threshold.
-
-That 0.45% uses the design formula, `lambda = NP i^2 / (100k) h^2`, the same
-route as the figure and the Methods. Running it instead off the fitted relation
-`h2 = 0.00774 (T - 7)`, estimated from the observed scan, gives 0.42%. The two
-routes are independent — one is the planning formula, the other is measured off
-the data — and they agree to 6.5%, which is a useful check that the design
-formula is not optimistic. To reach 80% power at a 2% locus the conventional designs would need
-roughly 1,940 individuals, 1,000 lines, or 1,044 RILs.
-
-## The figure
-
-`FigureS2_plot.png` plots power against individuals/lines phenotyped, two
-panels: a 2% locus and a 0.5% locus, the size this experiment actually resolves.
-
-Curves stop where each design realistically stops. Solid is the size these
-experiments are run at; dotted is a plausible extension:
-
-- **inbred lines** 200 → 2,000, the rumoured extension of the panel
-- **outbred panel** 1,000 → 3,000, a guess, nothing supports a specific ceiling
-
-Both are labelled *hypothetical* in the figure legend. Neither has been run, and
-the figure should not be read as predicting that either will be.
-- **8-way RILs** no extension, the panel is not expected to exceed 750
-- **X-QTL** no extension, 114,000 is this experiment per treatment
-
-The left panel is the honest counterweight — at a 2% locus the RIL panel does
-respectably and X-QTL needs 30,000 flies to match 750 RILs. The right panel is
-the argument: at 0.5% nothing else lifts off the floor even along its dotted
-extension (inbred lines reach ~0.15 at 2,000, the outbred panel ~0.05 at 3,000)
-while X-QTL is at 0.89.
-
-## These are idealised power calculations for the conventional designs
-
-Each of A, B and C assumes a single homogeneous panel measured under one
-protocol: no batch structure, no heterogeneity between sub-experiments, every
-individual contributing full information to one analysis. Large phenotyping
-efforts are usually assembled over several experiments, and a panel of *n*
-assembled that way delivers less power than a panel of *n* run at once.
-
-The X-QTL curve is not idealised in the same way. Its non-centrality comes from
-the fitted relation `h2 = 0.00774 (T - 7)`, estimated from the observed scan, so
-replicate structure, smoothing and haplotype reconstruction error are already
-inside it.
-
-**The comparison therefore favours the conventional designs**, and the gap in
-the figure is if anything conservative. This is a general property of textbook
-power calculations and needs no claim about any particular published study.
-
-## Simulation check
-
-2000 replicates per design, at the 2% locus. A is dosage regression on 1,000
-individuals; B a 1 df contrast on 200 line means; C a genuine 8-level ANOVA on
-750 line means with founder effects scaled to an among-line variance of 0.04.
-
-| Design                    | Analytic | Simulated |
-|:--------------------------|---------:|----------:|
-| Outbred panel, 1 measure  |    0.175 |     0.171 |
-| Inbred lines, 10 measures |    0.004 |     0.007 |
-| 8-way RILs, 10 measures   |    0.461 |     0.464 |
-
-Analytic and simulated agree, so the models are set up correctly.
-
-## Assumptions that would move the numbers
-
-1. "Explains 2%" is read as 2% of individual **phenotypic** variance in the base
-   population. If it means 2% of `Vg`, every `R^2` halves.
-2. **MAF 0.15** drops out once the locus is stated as a variance fraction. It
-   would matter if an effect size were specified instead.
-3. The **inbred doubling** applies to B and C and is doing real work.
-4. **1e6 tests for B.** A DGRP-style panel tests roughly 2M common SNPs; that
-   moves the threshold by about 1.4 and barely moves power.
-5. **X-QTL held to LWP 7.5.** A Bonferroni over 268 tiles would be 1.9e-4, far
-   laxer, and would put its smallest detectable locus at 0.26% rather than 0.45%.
+X-QTL is the least efficient of these designs per fly, but longevity is phenotyped
+in bulk, so it is the only one that can be run at 10^5 individuals — and at the
+effect sizes resolved here that is the whole of the difference.

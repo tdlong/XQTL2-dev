@@ -26,9 +26,8 @@
 # phenotyped 10 times each; inbreeding doubles both the locus variance and the
 # unlinked background so those cancel, and the gain is replication cutting Ve.
 #
-# Thresholds are each design's own genome-wide bar: 0.05/1e6 for the SNP panels,
-# 0.05/1e4 for the RIL linkage scan, and the paper's own LWP 7.5 for X-QTL --
-# stricter than a Bonferroni over 268 tiles, so X-QTL is handicapped here.
+# Thresholds: LWP 6 for the SNP panels, LWP 4 for the RIL linkage scan, LWP 7.5
+# for X-QTL, that being the threshold this paper uses throughout.
 
 suppressMessages(library(tidyverse))
 
@@ -39,9 +38,11 @@ p    <- 0.15; q <- 1-p
 Vp   <- 1; h2 <- 0.5; Vg <- h2*Vp; Ve <- Vp-Vg; r <- 10
 P_SEL <- 0.05; ibar <- dnorm(qnorm(1-P_SEL))/P_SEL; k <- 2
 
-thr1 <- qchisq(0.05/1e6, 1, lower.tail = FALSE)
-thr7 <- qchisq(0.05/1e4, 7, lower.tail = FALSE)
-thrX <- qchisq(10^-7.5,  7, lower.tail = FALSE)
+# LWP 6 for the SNP panels given the number of tests, LWP 4 for a RIL linkage
+# scan as established, LWP 7.5 for X-QTL because that is what this paper uses.
+thr1 <- qchisq(10^-6,   1, lower.tail = FALSE)
+thr7 <- qchisq(10^-4,   7, lower.tail = FALSE)
+thrX <- qchisq(10^-7.5, 7, lower.tail = FALSE)
 
 # inbreeding doubles the locus variance AND the unlinked background, so those
 # cancel in the ratio; the gain is replication cutting Ve
