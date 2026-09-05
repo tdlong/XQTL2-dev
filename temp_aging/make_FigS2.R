@@ -1,6 +1,6 @@
-# make_FigS_power.R -- power against experiment size, four designs.
+# make_FigS2.R -- power against experiment size, four designs.
 #
-#   Rscript temp_aging/make_FigS_power.R
+#   Rscript temp_aging/make_FigS2.R
 #
 # Supplementary figure for the power supplement. Same target throughout: a
 # locus explaining 2% of individual phenotypic variance, h2 = 50%.
@@ -76,7 +76,7 @@ g <- ggplot(d, aes(n, power, colour = design)) +
         legend.background = element_rect(fill = alpha("white",0.85), colour = NA),
         legend.key.height = unit(11,"pt"))
 
-ggsave("figures/FigureS_power.png", g, width = 6.6, height = 4.4, dpi = 300)
-cat("Wrote figures/FigureS_power.png\n")
+ggsave("temp_aging/FigureS2_plot.png", g, width = 6.6, height = 4.4, dpi = 300)
+cat("Wrote temp_aging/FigureS2_plot.png\n")
 cat(sprintf("\nthresholds: SNP panels %.1f (1 df), RILs %.1f (7 df), X-QTL %.1f (7 df)\n",
             thr1, thr7, thrX))
