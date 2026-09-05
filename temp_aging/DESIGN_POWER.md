@@ -21,6 +21,12 @@ it does when every individual must be phenotyped and genotyped separately, so
 Meanwhile a RIL panel must be constructed and maintained, and is not expected to
 exceed 750 lines however large the budget.
 
+Note the asymmetry in the figure. The X-QTL point at 114,000 flies per treatment
+is solid: it is an experiment that has been run. Every extension that would let
+another design approach it — 2,000 inbred lines, 3,000 genotyped outbred
+individuals — is dotted, and there is no particular reason to expect those curves
+to be realised.
+
 **So the design is inefficient per fly and efficient per unit of effort, and it
 is the second that decides what can be detected.** The condition is that the
 trait admits bulk selection. Longevity does: survivors select themselves. For a
