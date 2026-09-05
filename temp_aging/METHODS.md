@@ -52,13 +52,14 @@ $$
 
 where $n_{\mathrm{eff}} = \sum_r n_{\mathrm{eff},r}$ and $\bar{\imath}^{\,2}$ is the $n_{\mathrm{eff}}$-weighted mean of $i_r^2$. In Supplementary Figure 1 we plot observed and predicted $\hat{h}^2$ against the Wald statistic and against LWP. At non-significant steps we over-estimate heritability; over moderately significant LWPs of 5 to 15 we over-estimate it by an average of 0.05 percentage points (a 16-17% relative inflation); and at highly significant steps the estimate is accurate.
 
-The above relationship also gives the power of an X-QTL experiment. Under the alternative $T$ is non-central $\chi^2_7$ with non-centrality $\lambda = n_{\mathrm{eff}}\bar{\imath}^{\,2}h^2/100k$, so detecting a heritability $h^2$ at threshold $T_\alpha$ with power $1-\beta$ requires $\lambda$ to reach the value $\lambda_{\beta}$ at which $\Pr(\chi^2_7(\lambda) > T_\alpha) = 1-\beta$, that is
+Since $E[T]$ is the non-centrality, the power to detect a step of heritability $h^2$ at threshold $T_\alpha$ follows immediately,
 
 $$
-n_{\mathrm{eff}} \;=\; \frac{100\,k\,\lambda_{\beta}}{\bar{\imath}^{\,2}\,h^2}, \qquad N \;=\; n_{\mathrm{eff}}/P
+\mathrm{power} \;=\; \Pr\!\left(\chi^2_7(\lambda) > T_\alpha\right), \qquad
+\lambda = \frac{n_{\mathrm{eff}}\,\bar{\imath}^{\,2}}{100\,k}\,h^2
 $$
 
-flies screened per treatment at selected proportion $P$, since $\bar{\imath}$ is itself fixed by $P$. An LWP of 15 puts $T_\alpha = 85.6$ and $\lambda_{0.2} = 95.6$; selecting the longest-lived 5% gives $\bar{\imath} = 2.06$, so a step contributing 1% of phenotypic variance needs $n_{\mathrm{eff}} = 4{,}500$ and 90,000 flies screened. Requirement scales as $1/h^2$, so halving the target to 0.5% doubles the experiment.
+with $n_{\mathrm{eff}} = NP$ for $N$ flies screened at selected proportion $P$, and $\bar{\imath}$ fixed by $P$. Screening 90,000 flies per treatment and selecting the longest-lived 5% ($\bar{\imath} = 2.06$, $n_{\mathrm{eff}} = 4{,}500$) gives 80% power at an LWP of 15 ($T_\alpha = 85.6$) for a step contributing 1% of phenotypic variance. $\lambda$ is linear in $h^2$, so halving the target doubles the experiment.
 
 **Partitioning.** We split the ten replicate contrasts in each treatment into two interleaved halves to give eight unbiased estimates of $\hat{h}^2$ at every step — two sexes $\times$ two diets $\times$ two halves. An orthogonal transformation of those eight numbers gives the heritability shared by all four treatments and the parts specific to sex, to diet, and to their interaction, one degree of freedom each, with the difference between the halves of a treatment carrying four. The five terms are orthogonal, so their sums of squares and degrees of freedom add. The interaction is nowhere detectable: over the significant tiles the median of $MS_{\mathrm{sex:diet}}/MS_{\mathrm{rep}}$ is 0.46 against a null median of 0.55, and five of the eighty-five tiles exceed the 5% critical value where four are expected. It is therefore pooled with the replicate difference, giving an error variance on five degrees of freedom. Writing $\overline{\hat{h}^2}$ for the mean of all eight, $\hat{h}^2_M$, $\hat{h}^2_F$, $\hat{h}^2_{SY10}$, $\hat{h}^2_{SY20}$ for the marginal means, $\hat{h}^2_{(1)}$, $\hat{h}^2_{(2)}$ for the two halves of a treatment and $d_{\mathrm{sex:diet}}$ for the interaction contrast,
 
