@@ -69,3 +69,43 @@ cd ../XQTL2
 git pull origin main
 ```
 Your scripts automatically use the new version via the symlink.
+
+## Scientific tables
+
+Tables in manuscripts and supplements follow this format. `temp_aging/tbl_fg3.gif`
+is a worked example; `temp_aging/style_tables.py` applies it to pandoc's docx
+output and `temp_aging/make_supplement.sh` is the build.
+
+```
+────────────────────────────────────────────────────────────   full width, heavy
+                                  h²
+                        ──────────────────────────             spans only the columns it modifies
+                     n      2%      1%     0.5%
+────────────────────────────────────────────────────────────   full width, under the column headers
+  Outbred panel   1,000    0.35    0.04    0.004
+  Inbred lines      200    0.02    0.00    0.000
+  Eight-way RILs    750    0.70    0.16    0.022
+  X-QTL         114,000    1.00    1.00    0.894
+────────────────────────────────────────────────────────────   full width, heavy
+
+Note. — ...
+```
+
+- Never a vertical rule. Never a double rule.
+- Four rules only: heavy at top, under the column headers, heavy at the bottom,
+  and a lighter one under any superheader spanning **only** the columns it
+  modifies.
+- Rules are graded in weight: heaviest top and bottom, lighter under the column
+  headers, lightest for a superheader.
+- The stub column takes no header; row labels sit in it.
+- Numbers right-aligned, column headers and superheaders centred over them.
+- A `Note. —` sits below the bottom rule.
+
+Two traps when generating this with pandoc:
+
+- pandoc's default `reference.docx` defines a `Table` style with
+  `<w:tblStylePr w:type="firstRow">` that draws a full-width rule under row 1 —
+  the superheader in a grouped table. Strip it, or cell borders are overridden.
+- Never put math (`$h^2$`) in a table header. It becomes an equation, which
+  renders blank in some viewers and cannot be centred or spanned as text. Use
+  plain text, `h²`.
