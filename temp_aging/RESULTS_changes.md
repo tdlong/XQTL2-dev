@@ -1,62 +1,81 @@
-# Proposed changes to RESULTS.md — round 3
+# RESULTS.md changes — record
 
-Rounds 1 and 2 are applied. One item is open: B4, the 2% claim, which you left
-in place pending a real calculation. That calculation is now done —
-`temp_aging/design_power.R`, written up in `temp_aging/DESIGN_POWER.md`.
+All items from rounds 1–3 are **applied**. One new item is open at the bottom.
 
----
+## Applied
 
-## B4 — the 2% now has numbers behind it
+### Round 1 — forced by the Methods revision
 
-Your three designs on one framework, with the models derived rather than
-asserted and checked against simulation:
+- **A1** The three bootstrap intervals deleted from paragraph 3. The tile
+  bootstrap was removed from the analysis: resampling tiles measured how much
+  genomic locations differ from one another and reported it as uncertainty about
+  the value at a location. The 13.2% and 1.8% point estimates stand; added
+  "the sex component is present at 44% of those tiles individually and the diet
+  component at 13%".
+- **A2** Added the pooled error term — the sex by diet interaction pooled with
+  the replicate difference, five degrees of freedom.
+- **A3** "sets of five" → "two interleaved sets of five".
 
-| design                          | n    | df  | tests | R²     | lambda | **power at a 2% locus** | smallest at 80% |
-| ------------------------------- | ---- | --- | ----- | ------ | ------ | ----------------------- | --------------- |
-| A — outbred diploids, 1 measure | 1000 | 1   | 1e6   | 0.0200 | 20.4   | **0.175**               | 3.96%           |
-| B — inbred lines, 10 measures   | 200  | 1   | 1e6   | 0.0381 | 7.9    | **0.004**               | 10.4%           |
-| C — 8-way RILs, 10 measures     | 750  | 7   | 1e4   | 0.0381 | 29.7   | **0.461**               | 2.89%           |
+### Round 2 — statements that could not be supported
 
-Analytic against simulated power: 0.175/0.171, 0.004/0.007, 0.461/0.464.
+- **B1** Heritability thresholds recalculated from the refitted relation
+  (`c = 0.00774` on the current scan, 89,680 step × treatment values):
+  **0.09%, 0.32%, 0.61%** at LWP 2, 7.5 and 15, replacing 0.14/0.37/0.65.
+  `make_FigS1.R` refits rather than hardcodes, so the figure was already current.
+- **B2** Peak widths recomputed with `quantile()` on the 18 Table S1 peaks:
+  **0.25 to 1.51 cM** and **168 to 828 kb**, replacing 0.22–1.18 and 140–775.
+  `peak_table.R` also had "23 peaks" and an ordinal for 23 hardcoded while
+  pooling 18; both now derive from `nrow(tab)`.
+- **B3** "most tightly localised" reworded to Tony's version — narrowest in
+  physical terms, 55 kb, cM dropped. The claim held in kb but failed in cM,
+  where chr3L 21.62 Mb is narrower at 0.16 cM.
+- **B5** 0.4% → **0.32%**, following B1.
 
-**Your 2% stands.** No alternative design has better than a 46% chance at that
-effect size. To reach 80% they would need about 1940 individuals, 1000 lines,
-or 1044 RILs.
+### Round 3 — the 2% claim
 
-The structural point worth having in hand if a reviewer pushes: inbreeding
-doubles the locus variance but doubles the unlinked background too, so those
-cancel. Locus R² goes 2.00% to only 2.67% from homozygosity alone, and reaches
-3.81% because ten measures per line cut Ve tenfold. Almost the whole inbred-line
-advantage is replication, not homozygosity.
+- **B4** The placeholder parenthetical ("a like-for-like power comparison is
+  still to be done") replaced, since the comparison is now done:
+  `design_power.R`, `DESIGN_POWER.md`, `make_FigS2.R` → `FigureS2_plot.png`.
+  New text concedes the per-fly inefficiency, gives the mechanism, and points at
+  the supplement. Tony has this to edit.
 
-**Proposed** — replace the placeholder parenthetical currently in paragraph 2:
+### Round 1 — typos
 
-> Regions contributing less than 2% to heritable variation would have gone
-> undetected in prior work employing modestly sized mapping panels consisting of
-> several hundred RILs (cites), or association type panels consisting of 100s of
-> ILs or 1000s of genotyped individuals. On a common framework a locus
-> explaining 2% of phenotypic variance would be found with probability 0.46 by
-> 750 eight-way RILs phenotyped ten times each, 0.18 by a thousand outbred
-> individuals measured once, and 0.004 by two hundred inbred lines phenotyped
-> ten times.
+contemporaneus → contemporaneous; repectively → respectively; partititoned →
+partitioned; componet → component; "change that is observed at any other peaks"
+→ "than is observed at any other peak"; "A large-effect loci sits" → "locus".
 
-`[ ] approve   [ ] deny   [X] modify:`
+## Open
 
-I am almost OK with these two sentences.  But then in the supplemetary materials we need to go through the power calculations and assumptions.  The the little MD describing the calculation is supplementary result "X". I also think we need to compare the power of X QTL at the same time.  I am almost thinking of a figure where the Y axis is power and the X axis is "N" (number of individuals for XQTL and diploid outbred, number of lines for inbred lines and RILs).  This is the same 2%er and 15% MAF (except the XQTL and 8 way lines).  Then there is a curve for each approach.  I would make the curve solid for sort of up to "current widely employed experiments" - so what we calculated the point power for, then perhaps a dotted line to what is realistic.  So outbred diploid could get to 3K, inbred lines to 2K, RILs is sort of stuck at 750.  But X-QTL ... can be as big as this dataset even for a single character.  Again the figure would be part of this large supplement, so in the paper we can make this two sentence point about the think here is that power is just so much bigger in this experiment compared to what is being done, and then back the point up with this supplement.
+### D1. Paragraph 3 repeats the loose interaction wording
 
-Or keep the current parenthetical placeholder and put the table in the
-supplement instead.
+Paragraph 3 currently says:
 
-`[ ] table to supplement, leave the text as it stands`
+> The sex by diet interaction is nowhere detectable, exceeding its 5% critical
+> value at 6% of tiles, so it is pooled with the replicate difference…
 
----
+This is the phrasing Tony objected to in the Methods — 6% is not 5%, and the
+sentence gives no reason to treat the difference as noise. The Methods was fixed
+to lead with the distribution and give counts rather than a percentage. RESULTS
+should match:
 
-## Assumptions that would move these numbers
+> The sex by diet interaction is nowhere detectable, five of the eighty-five
+> tiles exceeding the 5% critical value where four are expected, so it is pooled
+> with the replicate difference…
 
-1. **"Explains 2%"** read as 2% of individual *phenotypic* variance in the base
-   population. If it means 2% of Vg, every R² halves.
-2. **MAF 0.15** drops out once the locus is stated as a variance fraction. It
-   would matter only if an effect size were specified instead.
-3. The **inbred doubling** applies to B and C and is doing real work.
-4. **1e6 tests for B.** A DGRP-style panel tests roughly 2M common SNPs; that
-   moves the threshold by about 1.4 and barely moves power.
+For the record: median `MS_sex:diet / MS_rep` over significant tiles is 0.46
+against a null median of 0.55, and P(X ≥ 5 | n = 85, p = 0.05) = 0.42.
+
+`[ ] approve   [ ] deny   [ ] modify:`
+
+## Checked and correct, no change
+
+Verified against the current scan and split-half files: 268 tiles; 32% above
+LWP 7.5 and 12% above 15; selected proportions 3–11% (3.1 to 10.8), mean ~5%;
+X is 24% of the map with 3% of its tiles above 7.5 and none above 15, against
+41% and 16% for the autosomes; 83 of 203 autosomal tiles above 7.5; males higher
+at 52% of those; 18 peaks (8 above 15, 10 between 7.5 and 15); r = 0.98 between
+LWP and heritability (0.979); chr3L 9.30 Mb reaching LWP 163.8 in SY20 males
+with a minimum of 36.1 across the four groups, h2 of 4.69% in SY20 males and
+1.53% in SY10 females, and "two to three times the largest of the other regions"
+holding at 2.8x against the next largest peak at 1.67%.
