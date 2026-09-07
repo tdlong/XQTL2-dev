@@ -1,7 +1,7 @@
 #!/bin/bash
 # make_supplement.sh -- build the supplementary .docx for the Longevity manuscript.
 #
-#   bash temp_aging/make_supplement.sh
+#   bash temp_aging/build/make_supplement.sh
 #
 # Writes temp_aging/Longevity_supplement.docx, for uploading to Drive and opening
 # with Google Docs. Regenerate rather than editing the .docx or any intermediate.
@@ -12,7 +12,7 @@
 # never rows inside one -- a long string in a cell makes Word autofit blow the
 # column out.
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 OUT=temp_aging/Longevity_supplement.docx
 MD=$(mktemp -t supp).md
 
@@ -36,7 +36,7 @@ W("Peaks with a local maximum LWP exceeding 15 or 7.5, each at least 5 cM from a
   "and each treatment column as **-log10 P / h² (%)**. The treatment with the strongest\n"
   "signal is the largest of the four, so it has no column of its own.\n\n")
 
-rows = list(csv.reader(open('temp_aging/TableS1.tsv'), delimiter='\t'))
+rows = list(csv.reader(open('temp_aging/analysis/TableS1.tsv'), delimiter='\t'))
 HDR = ["Peak","cM","Interval (Mb)","Width","SY10 F","SY20 F","SY10 M","SY20 M"]
 # every column left-aligned: a right-flush number beside a left-flush one
 # collides at the column boundary however wide the columns are
@@ -64,7 +64,7 @@ for s in sections:
 # ---------------- figures ----------------
 for n, f, mk in ((1, "FigureS1", "make_FigS1.R"), (2, "FigureS2", "make_FigS2.R")):
     W("## Supplementary Figure %d\n\n*File: %s_plot.png, from %s*\n\n" % (n, f, mk))
-    W(open("temp_aging/%s_legend.md" % f).read().strip() + "\n\n")
+    W(open("temp_aging/legends/%s_legend.md" % f).read().strip() + "\n\n")
 
 # ---------------- Supplementary Result X ----------------
 txt = open('temp_aging/DESIGN_POWER.md').read()
@@ -74,8 +74,8 @@ W(txt)
 md.close()
 PY
 
-pandoc "$MD" --reference-doc=temp_aging/reference.docx -o "$OUT"
-python3 temp_aging/style_tables.py "$OUT"
+pandoc "$MD" --reference-doc=temp_aging/build/reference.docx -o "$OUT"
+python3 temp_aging/build/style_tables.py "$OUT"
 
 rm -f "$MD"
 echo "Wrote $OUT"

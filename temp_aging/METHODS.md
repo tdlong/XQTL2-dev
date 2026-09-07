@@ -44,15 +44,15 @@ $$
 
 where $\hat{p}_f$ is the mean control frequency and $s^2_f/R$ removes the inflation from squaring an estimate. Being unbiased, $\hat{h}^2$ can be negative where the true value is near zero.
 
-**The relationship between the Wald test and $h^2$.** In a case-control genome-wide association study the expected value of the chi-squared statistic is the number of individuals times the variance explained by the causative factor, $E[\chi^2] \approx 1 + N \cdot 2p(1-p)\beta^2$. $T$ and $\hat{h}^2$ are likewise both quadratic in the founder frequency shifts, so
+**The relationship between the Wald test and $h^2$.** A chi-squared statistic has an expectation equal to its degrees of freedom plus a non-centrality $\lambda$ that carries the signal. In a case-control genome-wide association study the test has one degree of freedom and the non-centrality is the number of individuals times the variance explained by the causative factor, so $E[\chi^2] \approx 1 + N \cdot 2p(1-p)\beta^2$. Our Wald test has $\nu = 7$ degrees of freedom, and $T$ and $\hat{h}^2$ are likewise both quadratic in the founder frequency shifts, so
 
 $$
 E[T] \;\approx\; \nu \;+\; \frac{n_{\mathrm{eff}}\, \bar{\imath}^{\,2}}{100\,k}\; \hat{h}^2
 $$
 
-where $n_{\mathrm{eff}} = \sum_r n_{\mathrm{eff},r}$ and $\bar{\imath}^{\,2}$ is the $n_{\mathrm{eff}}$-weighted mean of $i_r^2$. Inverting this gives the line drawn in Supplementary Figure 1, where we plot observed and predicted $\hat{h}^2$ against the Wald statistic and against LWP. At non-significant steps we over-estimate heritability; over moderately significant LWPs of 5 to 15 we over-estimate it by an average of 0.05 percentage points (a 16-17% relative inflation); and at highly significant steps the estimate is accurate.
+where $n_{\mathrm{eff}} = \sum_r n_{\mathrm{eff},r}$ and $\bar{\imath}^{\,2}$ is the $n_{\mathrm{eff}}$-weighted mean of $i_r^2$, the second term being the non-centrality $\lambda$. Inverting this gives the line drawn in Supplementary Figure 1, where we plot observed and predicted $\hat{h}^2$ against the Wald statistic and against LWP. At non-significant steps we over-estimate heritability; over moderately significant LWPs of 5 to 15 we over-estimate it by an average of 0.05 percentage points (a 16-17% relative inflation); and at highly significant steps the estimate is accurate.
 
-The non-centrality is therefore $\lambda = E[T] - \nu$. Thus the power to detect a region of heritability $h^2$ at threshold $T_\alpha$ follows,
+The power to detect a region of heritability $h^2$ at threshold $T_\alpha$ follows,
 
 $$
 \mathrm{power} \;=\; \Pr\!\left(\chi^2_{\nu}(\lambda) > T_\alpha\right), \qquad

@@ -1,45 +1,37 @@
-# temp_aging — what is canonical
+# temp_aging — AGE_SY longevity X-QTL manuscript
 
-**The Google Doc "Longevity" is the manuscript.** It is the live copy of the
-title, intro, Results, figure legends 1–3 and the wet-lab Methods. Prose here
-feeds it; it does not feed back. When the two disagree, the Doc wins.
+**The Google Doc "Longevity" is canonical.** This folder feeds it; it does not
+feed back. When the Doc and a file here disagree, the Doc is right.
 
-## What this directory is for
+## Root — the manuscript, and nothing else
 
-Analysis, numbers, figures, and the text that has to be generated from them.
-
-| | |
+| file | what it is |
 |---|---|
-| `RESULTS.md`, `METHODS.md` | source for the computational text. Superseded by the Doc once pasted. |
-| `DESIGN_POWER.md` | Supplementary Result X, the power comparison |
-| `Figure*_legend.md` | one legend per figure, including `FigureS1_legend.md` and `FigureS2_legend.md` |
-| `TableS1.tsv` | Supplementary Table 1, from `make_TableS1.R` |
-| `Figure*_plot.png` | figures, each from its `make_*.R` |
+| `METHODS.md` | computational Methods |
+| `RESULTS.md` | Results |
+| `DESIGN_POWER.md` | Supplementary Result X — power of four designs |
+| `Methods.docx` | built from `METHODS.md`, for pasting into the Doc |
+| `Supplement.docx` | built from the supplement sources, likewise |
 
-## Build
+Rebuild both with `bash temp_aging/build/make_docs.sh`. Close them in Word
+first or the build writes under an open file.
 
-```
-bash temp_aging/make_docs.sh
-```
+## Folders
 
-Produces exactly two files, both for uploading to Drive and opening with Google
-Docs:
+- `legends/` — the four figure legends (`Figure1`, `Figure2`, `FigureS1`, `FigureS2`)
+- `analysis/` — every `.R` that produces a number or a figure, the figures
+  themselves, and `TableS1.tsv`. Drivers: `reproduce.sh`, `make_figures.sh`
+  (fetches from HPC3, then draws), `run_numbers.sh` (runs each analysis and
+  stamps its output with input MD5s and the pipeline commit).
+- `build/` — document machinery only: `make_docs.sh`, `make_supplement.sh`,
+  `reference.docx`, `fix_math.py` (repairs pandoc's `\bar` accents),
+  `style_tables.py` (booktabs rules and column widths), `tbl_fg3.gif` (the
+  table style we are matching).
+- `numbers/` — output of `run_numbers.sh`; every number in the prose is here
+  with the provenance of the data that produced it.
+- `superseded/` — dead. Nothing in the manuscript depends on it.
 
-| | |
-|---|---|
-| `Methods.docx` | the computational Methods, whole |
-| `Supplement.docx` | Table S1, the S1 and S2 legends, Supplementary Result X |
+## Standing constraints
 
-Supporting, not run directly: `make_supplement.sh`, `style_tables.py`
-(scientific table format, see CLAUDE.md), `fix_math.py` (repairs pandoc's bar
-accents), `reference.docx` (1 in margins, no conflicting table style),
-`make_power_table_html.sh` (the power table as HTML, when a paste works better).
-
-`.docx` output is gitignored — regenerate it, do not edit it.
-
-## superseded/
-
-Retired drafts and bookkeeping from earlier phases: `MANIFEST.md`,
-`NUMBERS_TO_UPDATE.md`, `PIPELINE.md`, `METHODS_yours.md`, `peak_table.txt`,
-`make_maintext.sh` and older `METHODS.md` / results drafts. Kept for history,
-not read by anything.
+Never push without being asked. HPC3 is unreachable from the assistant side —
+everything comes back through git.

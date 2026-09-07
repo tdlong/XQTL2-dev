@@ -138,7 +138,7 @@ fi
 
 # 3. founder frequencies around the seven zoom peaks, from the means files
 [ "$SCOPE" = figures ] || skip_or "zoom means" process/AGE_SY/AGE_SY_zoom_means.txt.gz \
-  Rscript temp_aging/make_zoom_means.R
+  Rscript temp_aging/analysis/make_zoom_means.R
 
 # H2 and H2_vc now come straight out of hap_scan.R in scan.txt (XQTL2 b93b98b);
 # h2_from_scan.R was deleted upstream, so there is no separate h2 step here any
@@ -156,12 +156,12 @@ if [ "$SCOPE" = all ]; then
   {
     echo "# partition_check.R"
     echo "# run:      $(date '+%Y-%m-%d %H:%M')"
-    echo "# script:   $(git log -1 --format=%h -- temp_aging/partition_check.R 2>/dev/null || echo uncommitted)"
+    echo "# script:   $(git log -1 --format=%h -- temp_aging/analysis/partition_check.R 2>/dev/null || echo uncommitted)"
     echo "# pipeline: $(git -C pipeline log -1 --format=%h 2>/dev/null)"
     echo "#"
   } > temp_aging/numbers/partition_check.txt
   step "partition check" bash -c \
-    'Rscript temp_aging/partition_check.R >> temp_aging/numbers/partition_check.txt 2>&1'
+    'Rscript temp_aging/analysis/partition_check.R >> temp_aging/numbers/partition_check.txt 2>&1'
   sed -n '7,80p' temp_aging/numbers/partition_check.txt
 fi
 
@@ -170,7 +170,7 @@ fi
 #     with the numbers instead of over a connection that keeps failing.
 if [ "$SCOPE" != main ]; then
   for fg in 1 2 3 rr; do
-    case $fg in rr) scr=temp_aging/make_figure_rr.R ;; *) scr=temp_aging/make_figure${fg}.R ;; esac
+    case $fg in rr) scr=temp_aging/analysis/make_figure_rr.R ;; *) scr=temp_aging/make_figure${fg}.R ;; esac
     if [ "$fg" = 1 ]; then export X_UNIT=cM; else unset X_UNIT; fi
     step "figure ${fg}" Rscript "$scr"
   done

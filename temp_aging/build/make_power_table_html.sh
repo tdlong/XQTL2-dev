@@ -8,7 +8,7 @@
 # paste and turns it into a native Docs table, so nothing HTML reaches the
 # journal -- this is transport only.
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 cat > temp_aging/power_table.html <<'HTML'
 <!doctype html><meta charset="utf-8">
 <body style="font-family:Georgia,'Times New Roman',serif;font-size:11pt;margin:40px">

@@ -61,8 +61,8 @@ fi
 echo
 for n in "${WANT[@]}"; do
   case $n in
-    rr) script=temp_aging/make_figure_rr.R ;;
-    *)  script=temp_aging/make_figure${n}.R ;;
+    rr) script=temp_aging/analysis/make_figure_rr.R ;;
+    *)  script=temp_aging/analysis/make_figure${n}.R ;;
   esac
   echo "── figure $n ─────────────────────────────────"
   # Figure 1 is the genetic axis. make_figure1.R defaults to X_UNIT=Mb, but the
@@ -79,5 +79,5 @@ for f in process/AGE_SY/Scans/*/PROVENANCE.txt; do
 done
 
 echo "written:"
-ls -lt temp_aging/*.png 2>/dev/null | awk '{printf "  %-34s %s %s %s\n", $9, $6, $7, $8}' | head
+ls -lt temp_aging/analysis/*.png 2>/dev/null | awk '{printf "  %-34s %s %s %s\n", $9, $6, $7, $8}' | head
 exit "${fail:-0}"

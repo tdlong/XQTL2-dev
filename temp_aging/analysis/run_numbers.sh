@@ -19,7 +19,7 @@ cd "$(dirname "$0")/.." || exit 1
 OUT=temp_aging/numbers
 mkdir -p "$OUT"
 
-SCRIPTS=(h2_threshold scan_resolution significant_regions peak_table chr3L_peak coverage partition_check)
+SCRIPTS=(h2_threshold design_power scan_resolution significant_regions peak_table chr3L_peak coverage partition_check)
 
 stamp_inputs() {   # script path -> lines describing each process/ file it reads
   grep -ohE '"process/[^"]+\.txt(\.gz)?"' "$1" | tr -d '"' | sort -u | while read -r f; do
@@ -35,7 +35,7 @@ stamp_inputs() {   # script path -> lines describing each process/ file it reads
 }
 
 for s in "${SCRIPTS[@]}"; do
-  src="temp_aging/$s.R"
+  src="temp_aging/analysis/$s.R"
   dst="$OUT/$s.txt"
   [ -f "$src" ] || { echo "missing $src" >&2; continue; }
   {

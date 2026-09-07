@@ -8,14 +8,14 @@
 #
 # Upload both to Drive, open with Google Docs, copy across.
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 sed '1s/^# Methods (incomplete)$/# Methods/' temp_aging/METHODS.md > /tmp/m.md
-pandoc /tmp/m.md --reference-doc=temp_aging/reference.docx -o temp_aging/Methods.docx
-python3 temp_aging/fix_math.py temp_aging/Methods.docx
+pandoc /tmp/m.md --reference-doc=temp_aging/build/reference.docx -o temp_aging/Methods.docx
+python3 temp_aging/build/fix_math.py temp_aging/Methods.docx
 echo "Wrote temp_aging/Methods.docx"
 
-bash temp_aging/make_supplement.sh >/dev/null
+bash temp_aging/build/make_supplement.sh >/dev/null
 mv -f temp_aging/Longevity_supplement.docx temp_aging/Supplement.docx
 echo "Wrote temp_aging/Supplement.docx"
 rm -f /tmp/m.md
