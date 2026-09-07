@@ -36,8 +36,9 @@ power table as HTML, when a paste works better than a .docx).
 
 `.docx` output is gitignored — regenerate it, do not edit it.
 
-## Older bookkeeping, review before trusting
+## superseded/
 
-`MANIFEST.md`, `NUMBERS_TO_UPDATE.md`, `PIPELINE.md`, `METHODS_yours.md`,
-`peak_table.txt` predate the current workflow. `superseded/` holds retired
-drafts.
+Retired drafts and bookkeeping from earlier phases: `MANIFEST.md`,
+`NUMBERS_TO_UPDATE.md`, `PIPELINE.md`, `METHODS_yours.md`, `peak_table.txt`,
+`make_maintext.sh` and older `METHODS.md` / results drafts. Kept for history,
+not read by anything.
