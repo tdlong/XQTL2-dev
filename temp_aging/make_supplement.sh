@@ -62,19 +62,9 @@ for s in sections:
     W("\n")
 
 # ---------------- figures ----------------
-W("## Supplementary Figure 1\n\n*File: FigureS1_plot.png, from make_FigS1.R*\n\n")
-W("Heritability against the Wald statistic, all four treatments pooled, with the\n"
-  "relation h² = c(T − 7) drawn as a line. At non-significant steps heritability is\n"
-  "over-estimated; over moderately significant LWPs of 5 to 15 it is over-estimated by\n"
-  "an average of 0.05 percentage points, a 16–17% relative inflation; at highly\n"
-  "significant steps the estimate is accurate.\n\n")
-W("## Supplementary Figure 2\n\n*File: FigureS2_plot.png, from make_FigS2.R*\n\n")
-W("Power against experiment size for four designs, at a locus explaining 2% of\n"
-  "phenotypic variance (left) and 0.5%, the size resolved here (right). The x axis is\n"
-  "individuals phenotyped, or lines for the inbred-line and RIL panels. Solid segments\n"
-  "span the sizes these experiments are actually run at; dotted segments are\n"
-  "hypothetical extensions that nobody has run. Points mark each design as currently\n"
-  "practised, and the dashed horizontal line is 80% power.\n\n")
+for n, f, mk in ((1, "FigureS1", "make_FigS1.R"), (2, "FigureS2", "make_FigS2.R")):
+    W("## Supplementary Figure %d\n\n*File: %s_plot.png, from %s*\n\n" % (n, f, mk))
+    W(open("temp_aging/%s_legend.md" % f).read().strip() + "\n\n")
 
 # ---------------- Supplementary Result X ----------------
 txt = open('temp_aging/DESIGN_POWER.md').read()
