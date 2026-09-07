@@ -19,8 +19,9 @@ d <- read.table(SCAN, header = TRUE, sep = "\t") %>% as_tibble() %>%
 
 # h2 = c (T - df): under the null T averages df, so heritability tracks the
 # non-centrality rather than T itself. One constant, fitted over all windows.
-cslope <- coef(lm(H2 ~ 0 + I(T - 7), data = d))[[1]]
-cat(sprintf("h2 = %.5f (T - 7)\n", cslope))
+DF <- 7                      # nu, as in the Methods
+cslope <- coef(lm(H2 ~ 0 + I(T - DF), data = d))[[1]]
+cat(sprintf("h2 = c (T - nu),  c = %.5f,  nu = %d\n", cslope, DF))
 
 # binned on T, log-spaced: nearly every window sits at low T, so a linear axis
 # stacks them all on the origin
@@ -31,7 +32,7 @@ obs <- d %>% filter(T > 7, H2 > 0) %>%
   filter(n >= 50)
 
 pred <- tibble(T = 10^seq(log10(8), log10(max(obs$T) * 1.1), length.out = 400)) %>%
-  mutate(h2 = cslope * (T - 7))
+  mutate(h2 = cslope * (T - DF))
 
 # LWP is monotone in T, so the same axis carries both
 lwp_ticks <- c(1, 2, 5, 7.5, 15, 40, 100)
@@ -52,5 +53,5 @@ ggsave(OUT, fig, width = 4.8, height = 3.6, dpi = 300)
 cat("wrote", OUT, "\n\n")
 for (l in c(2, 5, 7.5, 15)) {
   Tv <- qchisq(-l * log(10), df = 7, lower.tail = FALSE, log.p = TRUE)
-  cat(sprintf("  LWP %5.1f -> T %6.1f -> h2 %.2f%%\n", l, Tv, cslope * (Tv - 7)))
+  cat(sprintf("  LWP %5.1f -> T %6.1f -> h2 %.2f%%\n", l, Tv, cslope * (Tv - DF)))
 }

@@ -12,7 +12,7 @@ $$
 T = \frac{1}{R^2}\,(\hat{c} - \hat{z})^{\top}(V_c + V_z)^{-}(\hat{c} - \hat{z})
 $$
 
-on seven degrees of freedom, since the eight haplotype frequencies sum to one. That constraint also makes $V_c + V_z$ singular, so $(\cdot)^{-}$ is a generalised inverse, obtained by eigendecomposition with the null direction discarded and the remaining eigenvalues floored at one per cent of their mean, so that near-degenerate directions cannot inflate $T$. Significance is reported as $-\log_{10} P$.
+on $\nu = 7$ degrees of freedom, since the eight haplotype frequencies sum to one. That constraint also makes $V_c + V_z$ singular, so $(\cdot)^{-}$ is a generalised inverse, obtained by eigendecomposition with the null direction discarded and the remaining eigenvalues floored at one per cent of their mean, so that near-degenerate directions cannot inflate $T$. Significance is reported as $-\log_{10} P$.
 
 Each pool's covariance is $V = M + \Sigma$, where $M$ is the multinomial sampling covariance on sampled chromosomes with subscript denoting founder alleles,
 
@@ -47,15 +47,17 @@ where $\hat{p}_f$ is the mean control frequency and $s^2_f/R$ removes the inflat
 **The relationship between the Wald test and $h^2$.** In a case-control genome-wide association study the expected value of the chi-squared statistic is the number of individuals times the variance explained by the causative factor, $E[\chi^2] \approx N \cdot 2p(1-p)\beta^2$. $T$ and $\hat{h}^2$ are likewise both quadratic in the founder frequency shifts, so
 
 $$
-E[T] \;\approx\; \frac{n_{\mathrm{eff}}\, \bar{\imath}^{\,2}}{100\,k}\; \hat{h}^2
+E[T] \;\approx\; \nu \;+\; \frac{n_{\mathrm{eff}}\, \bar{\imath}^{\,2}}{100\,k}\; \hat{h}^2,
+\qquad\text{so}\qquad
+\hat{h}^2 \;\approx\; c\,(T - \nu), \quad c = \frac{100\,k}{n_{\mathrm{eff}}\, \bar{\imath}^{\,2}}
 $$
 
 where $n_{\mathrm{eff}} = \sum_r n_{\mathrm{eff},r}$ and $\bar{\imath}^{\,2}$ is the $n_{\mathrm{eff}}$-weighted mean of $i_r^2$. In Supplementary Figure 1 we plot observed and predicted $\hat{h}^2$ against the Wald statistic and against LWP. At non-significant steps we over-estimate heritability; over moderately significant LWPs of 5 to 15 we over-estimate it by an average of 0.05 percentage points (a 16-17% relative inflation); and at highly significant steps the estimate is accurate.
 
-$E[T]$ is the non-centrality parameter for the X-QTL design.  Thus the power to detect a region of heritability $h^2$ at threshold $T_\alpha$ follows,
+The non-centrality is therefore $\lambda = E[T] - \nu$. Thus the power to detect a region of heritability $h^2$ at threshold $T_\alpha$ follows,
 
 $$
-\mathrm{power} \;=\; \Pr\!\left(\chi^2_7(\lambda) > T_\alpha\right), \qquad
+\mathrm{power} \;=\; \Pr\!\left(\chi^2_{\nu}(\lambda) > T_\alpha\right), \qquad
 \lambda = \frac{N P\, i^{\,2}}{100\,k}\,h^2
 $$
 
