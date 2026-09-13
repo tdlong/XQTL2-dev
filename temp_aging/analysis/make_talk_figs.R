@@ -6,9 +6,10 @@
 # (h2 partition, panel C). Same data and colours as make_figure1.R; the layout
 # is five stacked rows, one per arm, so the plot is tall rather than wide.
 #
-# Talk_Fig3.png is the allelic-effects slide: a small genome-wide scan with the
-# 2L and 3L peaks pinned, and the founder frequency changes under each. One
-# treatment throughout (TRT3), as make_figure2.R draws them.
+# Talk_Fig3a.png and Talk_Fig3b.png are the allelic-effects slide, as two
+# pieces to position separately: (a) a small genome-wide scan, split y axis, with
+# the 2L and 3L peaks pinned; (b) the founder frequency changes under each. One
+# treatment throughout (TRT3).
 #
 # Every row shares one x scale -- a cM is the same width in every row, so peak
 # widths compare across arms, and arms shorter than X end short of the right
@@ -218,26 +219,52 @@ pins <- PEAKS %>% left_join(dfreq %>% distinct(locus, chr, peak_pos), by = "locu
   mutate(gx = (peak_pos + off) / 1e6,
          top = map2_dbl(chr, peak_pos, ~ max(g3$Wald_log10p[g3$chr == .x &
                                                 abs(g3$pos - .y) < 5e4])))
-YMAX3 <- max(g3$Wald_log10p) * 1.3
+# Split y axis, as in Talk_Fig1: without it the 3L peak flattens 2L into the
+# floor. Only 3L crosses the break in this treatment.
+BRK3 <- 45; LO3 <- c(0, BRK3); HI3 <- c(BRK3, 215); REL3 <- c(hi = 1, lo = 2)
+check(g3 %>% rename(wald = Wald_log10p), "wald", BRK3)
+g3 <- g3 %>% mutate(x = gx, shade = factor(as.integer(chr) %% 2 == 0),
+                    wald = Wald_log10p) %>% cross("wald", "shade", BRK3)
+# pins sit a fixed distance above the peak ON THE PAGE, so the offset in data
+# units depends on which segment the peak falls in
+pins <- pins %>% mutate(seg = ifelse(top > BRK3, "hi", "lo"),
+                        unit = ifelse(seg == "hi", diff(HI3) / REL3[["hi"]],
+                                                   diff(LO3) / REL3[["lo"]]),
+                        tri = top + 0.13 * unit, lab = top + 0.33 * unit)
+SPAN3 <- max(g3$x)
 
-manh <- ggplot(g3, aes(gx, Wald_log10p, colour = as.integer(chr) %% 2 == 0,
-                       group = chr)) +
-  geom_line(linewidth = 0.5) +
-  scale_colour_manual(values = c(`TRUE` = "grey20", `FALSE` = "grey60"), guide = "none") +
-  geom_point(data = pins, aes(gx, top + YMAX3 * 0.07), inherit.aes = FALSE,
-             shape = 25, size = 3.2, fill = PIN, colour = PIN) +
-  geom_label(data = pins, aes(gx, top + YMAX3 * 0.16, label = n), inherit.aes = FALSE,
-             fill = PIN, colour = "white", fontface = "bold", size = 5,
-             linewidth = 0, label.r = unit(2, "pt")) +
-  annotate("label", x = 0, y = YMAX3, label = trt_name, hjust = 0, vjust = 1,
-           fill = TRT_COL[[trt_name]], colour = "white", size = 5, linewidth = 0) +
-  scale_x_continuous(breaks = (off$off + off$len / 2) / 1e6, labels = CHRLAB[CHRS],
-                     expand = expansion(0.01)) +
-  scale_y_continuous(limits = c(0, YMAX3), breaks = c(0, 50, 100, 150),
-                     expand = expansion(0)) +
-  labs(x = NULL, y = expression(-log[10] * italic(P))) +
-  theme_classic(base_size = BASE) +
-  theme(axis.ticks.x = element_blank(), axis.text = element_text(size = BASE - 2))
+manh_seg <- function(r, which) {
+  pp <- pins %>% filter(seg == which)
+  p <- ggplot(seg(g3, "wald", r), aes(x, wald, colour = shade, group = chr)) +
+    geom_line(linewidth = 0.5, na.rm = TRUE) +
+    scale_colour_manual(values = c(`TRUE` = "grey20", `FALSE` = "grey60"), guide = "none") +
+    geom_point(data = pp, aes(gx, tri), inherit.aes = FALSE,
+               shape = 25, size = 3.2, fill = PIN, colour = PIN) +
+    geom_label(data = pp, aes(gx, lab, label = n), inherit.aes = FALSE,
+               fill = PIN, colour = "white", fontface = "bold", size = 5,
+               linewidth = 0, label.r = unit(2, "pt")) +
+    scale_x_continuous(breaks = (off$off + off$len / 2) / 1e6, labels = CHRLAB[CHRS],
+                       expand = expansion(0)) +
+    scale_y_continuous(breaks = if (which == "hi") c(100, 150) else c(0, 20, 40),
+                       expand = expansion(0)) +
+    coord_cartesian(xlim = c(0, SPAN3), ylim = r, clip = "off") +
+    labs(x = NULL, y = expression(-log[10] * italic(P))) +
+    theme_classic(base_size = BASE) +
+    theme(axis.ticks.x = element_blank(), axis.text = element_text(size = BASE - 2))
+  h <- diff(r) * 0.05 / REL3[[which]]; w <- SPAN3 * 0.006
+  at <- if (which == "hi") r[1] else r[2]
+  p <- p + annotate("segment", x = -w, xend = w, y = at - h, yend = at + h,
+                    colour = "black", linewidth = 0.5)
+  # the treatment label goes in the upper segment, over X, which is empty there
+  if (which == "hi") p + annotate("label", x = SPAN3 * 0.015, y = r[2], label = trt_name,
+                                  hjust = 0, vjust = 1, fill = TRT_COL[[trt_name]],
+                                  colour = "white", size = 5, linewidth = 0) +
+    theme(axis.text.x = element_blank(), axis.line.x = element_blank(),
+          plot.margin = margin(4, 4, 1, 4)) else
+    p + theme(plot.margin = margin(1, 4, 3, 4))
+}
+manh <- manh_seg(HI3, "hi") / manh_seg(LO3, "lo") +
+  plot_layout(heights = REL3[c("hi", "lo")], axis_titles = "collect")
 
 freq3 <- function(k) {
   lc <- PEAKS$locus[k]; d <- dfreq %>% filter(locus == lc)
@@ -259,9 +286,13 @@ freq3 <- function(k) {
     theme(axis.text = element_text(size = BASE - 2))
 }
 
-fig3 <- manh / (freq3(1) + freq3(2) + plot_layout(axis_titles = "collect")) +
-  plot_layout(heights = c(1, 1.7), guides = "collect") &
-  theme(legend.position = "bottom", legend.text = element_text(size = BASE - 1),
-        legend.key.width = unit(22, "pt"))
-png("temp_aging/analysis/Talk_Fig3.png", width = 10, height = 6.5, units = "in", res = DPI)
-print(fig3); invisible(dev.off()); cat("Wrote: temp_aging/analysis/Talk_Fig3.png\n")
+save3 <- function(p, f, w, h) {
+  png(f, width = w, height = h, units = "in", res = DPI)
+  print(p); invisible(dev.off()); cat("Wrote:", f, "\n")
+}
+save3(manh, "temp_aging/analysis/Talk_Fig3a.png", 7, 3)
+save3(freq3(1) + freq3(2) +
+        plot_layout(axis_titles = "collect", guides = "collect") &
+        theme(legend.position = "bottom", legend.text = element_text(size = BASE - 1),
+              legend.key.width = unit(22, "pt")),
+      "temp_aging/analysis/Talk_Fig3b.png", 10, 4.5)
