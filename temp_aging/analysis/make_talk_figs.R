@@ -6,6 +6,10 @@
 # (h2 partition, panel C). Same data and colours as make_figure1.R; the layout
 # is five stacked rows, one per arm, so the plot is tall rather than wide.
 #
+# Talk_Fig3.png is the allelic-effects slide: a small genome-wide scan with the
+# 2L and 3L peaks pinned, and the founder frequency changes under each. One
+# treatment throughout (TRT3), as make_figure2.R draws them.
+#
 # Every row shares one x scale -- a cM is the same width in every row, so peak
 # widths compare across arms, and arms shorter than X end short of the right
 # edge. Every row shares one y scale too; only 3L, the one arm that leaves it,
@@ -179,3 +183,85 @@ check(cmp, "y", 1.25)
 save(stack(cmp, "y", "term", CMP_COL, c(-0.25, 1.25), c(0, 0.5, 1),
            c(1.25, 3.2), c(2, 3), expression(italic(h)^2 ~ "(%)"), 0.6, TRUE),
      "temp_aging/analysis/Talk_Fig2.png")
+
+# ── Talk_Fig3: allelic effects at the two peaks ──────────────────────────────
+MEANS <- "process/AGE_SY/AGE_SY_zoom_means.txt.gz"
+TRT3  <- c(sugar = "SY20", sex = "M")      # both peaks are strong here: 27.2, 163.8
+PEAKS <- tibble(n = 1:2, locus = c("chr2L:11.95", "chr3L:9.31"))
+WIN3  <- 0.5e6                             # half-width drawn, as in Figure 2
+RARE  <- 0.025                             # founders under this in controls are faded
+FOUNDER_COL <- c(AB8 = "#E69F00", B1 = "#56B4E9", B2 = "#009E73", B3 = "#F0E442",
+                 B4 = "#D55E00", B5 = "#CC79A7", B6 = "#000000", B7 = "#990099")
+PIN <- "grey30"
+trt_name <- paste(TRT3[["sugar"]], if (TRT3[["sex"]] == "M") "male" else "female")
+
+means <- read.table(MEANS, header = TRUE, sep = "\t") %>% as_tibble() %>%
+  filter(!REP %in% c(8, 9), sugar == TRT3[["sugar"]], sex == TRT3[["sex"]],
+         locus %in% PEAKS$locus)
+dfreq <- means %>%
+  pivot_wider(names_from = TRT, values_from = freq, names_prefix = "f") %>%
+  group_by(locus, chr, peak_pos, pos, founder) %>%
+  summarise(D = mean(fZ - fC), fC = mean(fC), .groups = "drop") %>%
+  filter(abs(pos - peak_pos) <= WIN3) %>%
+  group_by(locus, founder) %>% mutate(rare = mean(fC) < RARE) %>% ungroup() %>%
+  arrange(!rare)                           # faded lines drawn behind
+
+# the scan for that treatment, arms end to end in Mb
+g3 <- read.table(FOURSCAN, header = TRUE, sep = "\t") %>% as_tibble() %>%
+  filter(chr %in% CHRS, sugar == TRT3[["sugar"]], sex == TRT3[["sex"]]) %>%
+  mutate(chr = factor(chr, levels = CHRS))
+off <- g3 %>% group_by(chr) %>% summarise(len = max(pos), .groups = "drop") %>%
+  mutate(off = lag(cumsum(len + 1e6), default = 0))
+g3 <- g3 %>% left_join(off, by = "chr") %>% mutate(gx = (pos + off) / 1e6)
+pins <- PEAKS %>% left_join(dfreq %>% distinct(locus, chr, peak_pos), by = "locus") %>%
+  mutate(chr = factor(chr, levels = CHRS)) %>% left_join(off, by = "chr") %>%
+  mutate(gx = (peak_pos + off) / 1e6,
+         top = map2_dbl(chr, peak_pos, ~ max(g3$Wald_log10p[g3$chr == .x &
+                                                abs(g3$pos - .y) < 5e4])))
+YMAX3 <- max(g3$Wald_log10p) * 1.3
+
+manh <- ggplot(g3, aes(gx, Wald_log10p, colour = as.integer(chr) %% 2 == 0,
+                       group = chr)) +
+  geom_line(linewidth = 0.5) +
+  scale_colour_manual(values = c(`TRUE` = "grey20", `FALSE` = "grey60"), guide = "none") +
+  geom_point(data = pins, aes(gx, top + YMAX3 * 0.07), inherit.aes = FALSE,
+             shape = 25, size = 3.2, fill = PIN, colour = PIN) +
+  geom_label(data = pins, aes(gx, top + YMAX3 * 0.16, label = n), inherit.aes = FALSE,
+             fill = PIN, colour = "white", fontface = "bold", size = 5,
+             linewidth = 0, label.r = unit(2, "pt")) +
+  annotate("label", x = 0, y = YMAX3, label = trt_name, hjust = 0, vjust = 1,
+           fill = TRT_COL[[trt_name]], colour = "white", size = 5, linewidth = 0) +
+  scale_x_continuous(breaks = (off$off + off$len / 2) / 1e6, labels = CHRLAB[CHRS],
+                     expand = expansion(0.01)) +
+  scale_y_continuous(limits = c(0, YMAX3), breaks = c(0, 50, 100, 150),
+                     expand = expansion(0)) +
+  labs(x = NULL, y = expression(-log[10] * italic(P))) +
+  theme_classic(base_size = BASE) +
+  theme(axis.ticks.x = element_blank(), axis.text = element_text(size = BASE - 2))
+
+freq3 <- function(k) {
+  lc <- PEAKS$locus[k]; d <- dfreq %>% filter(locus == lc)
+  pk <- d$peak_pos[1] / 1e6; yr <- range(d$D)
+  ggplot(d, aes(pos / 1e6, D, colour = founder, alpha = ifelse(rare, 0.25, 1))) +
+    geom_hline(yintercept = 0, colour = "grey75", linewidth = 0.3) +
+    geom_vline(xintercept = pk, linetype = "dashed", linewidth = 0.4) +
+    geom_line(linewidth = 1) +
+    annotate("label", x = pk, y = yr[2] + diff(yr) * 0.14, label = PEAKS$n[k],
+             fill = PIN, colour = "white", fontface = "bold", size = 5,
+             linewidth = 0, label.r = unit(2, "pt")) +
+    scale_colour_manual(values = FOUNDER_COL, name = NULL) + scale_alpha_identity() +
+    scale_x_continuous(expand = expansion(0)) +
+    scale_y_continuous(limits = c(yr[1] - diff(yr) * 0.04, yr[2] + diff(yr) * 0.2)) +
+    labs(x = paste0(CHRLAB[[d$chr[1]]], " position (Mb)"),
+         y = "Frequency change\n(aged − control)") +
+    guides(colour = guide_legend(nrow = 1, override.aes = list(linewidth = 2))) +
+    theme_classic(base_size = BASE) +
+    theme(axis.text = element_text(size = BASE - 2))
+}
+
+fig3 <- manh / (freq3(1) + freq3(2) + plot_layout(axis_titles = "collect")) +
+  plot_layout(heights = c(1, 1.7), guides = "collect") &
+  theme(legend.position = "bottom", legend.text = element_text(size = BASE - 1),
+        legend.key.width = unit(22, "pt"))
+png("temp_aging/analysis/Talk_Fig3.png", width = 10, height = 6.5, units = "in", res = DPI)
+print(fig3); invisible(dev.off()); cat("Wrote: temp_aging/analysis/Talk_Fig3.png\n")
