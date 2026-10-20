@@ -1,0 +1,58 @@
+cM map: 24988 steps
+
+== AGE_SY10_F ==
+  steps: 24988   reps: 10 
+    holdout 1 : kept 30 positions
+    holdout 2 : kept 30 positions
+    holdout 3 : kept 30 positions
+    holdout 4 : kept 30 positions
+    holdout 5 : kept 30 positions
+    holdout 6 : kept 30 positions
+    holdout 7 : kept 30 positions
+    holdout 10 : kept 30 positions
+    holdout 11 : kept 30 positions
+    holdout 12 : kept 30 positions
+
+== AGE_SY10_M ==
+  steps: 24988   reps: 10 
+    holdout 1 : kept 30 positions
+    holdout 2 : kept 30 positions
+    holdout 3 : kept 30 positions
+    holdout 4 : kept 30 positions
+    holdout 5 : kept 30 positions
+    holdout 6 : kept 30 positions
+    holdout 7 : kept 30 positions
+    holdout 10 : kept 30 positions
+    holdout 11 : kept 30 positions
+    holdout 12 : kept 30 positions
+
+== AGE_SY20_F ==
+  steps: 24988   reps: 10 
+    holdout 1 : kept 30 positions
+    holdout 2 : kept 30 positions
+    holdout 3 : kept 30 positions
+    holdout 4 : kept 30 positions
+    holdout 5 : kept 30 positions
+    holdout 6 : kept 30 positions
+    holdout 7 : kept 30 positions
+    holdout 10 : kept 30 positions
+    holdout 11 : kept 30 positions
+    holdout 12 : kept 30 positions
+
+== AGE_SY20_M ==
+  steps: 24988   reps: 10 
+    holdout 1 : kept 30 positions
+    holdout 2 : kept 30 positions
+    holdout 3 : kept 30 positions
+    holdout 4 : kept 30 positions
+    holdout 5 : kept 30 positions
+    holdout 6 : kept 30 positions
+    holdout 7 : kept 30 positions
+    holdout 10 : kept 30 positions
+    holdout 11 : kept 30 positions
+    holdout 12 : kept 30 positions
+
+Wrote: temp_aging/numbers/loo_positions.txt.gz , temp_aging/numbers/loo_tiles.txt.gz and temp_aging/numbers/loo_u.txt.gz 
+loo_genome.sh commits and pushes these; nothing to do by hand.
+
+── returning results through git ─────────────────────────────
