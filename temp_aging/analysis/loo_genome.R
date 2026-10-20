@@ -3,9 +3,9 @@
 # RUN ON HPC3, from /dfs7/adl/tdlong/fly_pool/XQTL2-dev:
 #   sbatch temp_aging/analysis/loo_genome.sh
 #
-# The two outputs are small and land in temp_aging/numbers/, which is tracked, so
-# they come back through git like every other result here -- commit and push them
-# from HPC3 when the job finishes.
+# The two outputs are small and land in temp_aging/numbers/, which is tracked.
+# loo_genome.sh commits and pushes them itself when the job finishes, so there is
+# nothing to stage by hand -- just sbatch here, then git pull on the laptop.
 #
 # WHY THIS NEEDS THE CLUSTER: the meansBySample files are ~257 MB each and there
 # are four. Everything here is a function of the founder frequencies they hold,
@@ -127,4 +127,4 @@ dir.create(dirname(OUT_POS), showWarnings = FALSE, recursive = TRUE)
 write.table(bind_rows(POS),  gzfile(OUT_POS),  row.names=FALSE, quote=FALSE, sep="\t")
 write.table(bind_rows(TILE), gzfile(OUT_TILE), row.names=FALSE, quote=FALSE, sep="\t")
 cat("\nWrote:", OUT_POS, "and", OUT_TILE, "\n")
-cat("Both are tracked -- commit and push them from here so they reach the laptop.\n")
+cat("loo_genome.sh commits and pushes these; nothing to do by hand.\n")
