@@ -31,10 +31,7 @@ RHOF  <- "temp_aging/numbers/loo_rho.txt"
 OUT   <- "temp_aging/analysis/LOO_fig.png"
 NSHOW <- 30      # positions shown; loo_genome.R clumps at 5 cM
 BASE  <- 13
-FOUNDER_COL <- c(AB8="#E69F00", B1="#56B4E9", B2="#009E73", B3="#F0E442",
-                 B4="#D55E00", B5="#CC79A7", B6="#000000", B7="#990099")
-TRT_LAB <- c(SY10_F="SY10 female", SY20_F="SY20 female",
-             SY10_M="SY10 male",   SY20_M="SY20 male")
+source("temp_aging/analysis/palette.R")   # FOUNDER_COL, TRT_LAB
 
 for (f in c(POS, TOTF, RHOF)) if (!file.exists(f)) stop("missing ", f,
   "\nRun loo_genome.sh on HPC3, pull, then loo_joint.R.", call. = FALSE)
@@ -97,9 +94,8 @@ cum <- map_dfr(1:NSHOW, function(N)
     se = jk(cross^2 / nine), .groups = "drop")
 
 pB <- ggplot(cum, aes(N, explained)) +
-  geom_hline(data = TOT, aes(yintercept = total,
-             linetype = "marker-based heritability (all markers)"), colour = "grey30") +
-  scale_linetype_manual(values = "dashed", name = NULL) +
+  geom_hline(data = TOT, aes(yintercept = total), linetype = "dashed",
+             colour = "grey30") +
   geom_ribbon(aes(ymin = pmax(explained - se, 0), ymax = explained + se),
               fill = "#1F4E9C", alpha = 0.18) +
   geom_line(colour = "#1F4E9C", linewidth = 0.8) +
@@ -112,7 +108,7 @@ pB <- ggplot(cum, aes(N, explained)) +
                          aspect.ratio = 1,
                          strip.background = element_rect(fill = "grey92", colour = NA))
 
-png(OUT, width = 11, height = 8.2, units = "in", res = 300)
+png(OUT, width = 11, height = 7.8, units = "in", res = 300)
 print(pA / pB + plot_layout(guides = "collect") +
       plot_annotation(tag_levels = "A") &
       theme(legend.position = "bottom", legend.box = "vertical",
