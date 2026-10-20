@@ -16,6 +16,21 @@
 # positions are ranked by h2 computed on the NINE TRAINING CAGES, which is both
 # the quantity being aggregated and free of the held-out cage.
 #
+# TILING. By default tiles are 1 cM. Set TILE_MB=1 to tile in physical distance
+# instead, 1 Mb, writing to *_mb.txt.gz. Two reasons to want both:
+#
+#   Invariance. These estimates are meant to be properties of the data, not of
+#   how markers were sampled. If the cM and Mb tilings disagree, something is
+#   wrong with the aggregation rather than with the genome.
+#
+#   Identification. In cM every interior tile has the same neighbours at the
+#   same correlations, so the LD score is constant -- 89% of tiles sit within
+#   10% of the mean. That removes exactly the variation LD score regression uses
+#   to identify h2 from a slope, leaving only a ratio. Tiled in Mb the LD score
+#   varies with local recombination rate, since the correlation between two
+#   tiles is set by the cM between them, and the regression becomes available.
+#   Both tilings therefore carry cM per tile, not just the tile index.
+#
 # WHAT EACH FOLD DOES
 #   train = 9 cages, test = the 10th.
 #   weights   e_f = mean over train of (Z - C)/i      -- per founder, per step
@@ -37,9 +52,12 @@ suppressMessages(library(tidyverse))
 SCANDIR  <- "process/AGE_SY/Scans"
 CMSRC    <- "process/AGE_SY/AGE_SY_4scan_no89.txt.gz"   # supplies cM per step
 DESDIR   <- "helpfiles/AGE_SY/nov_only"
-OUT_POS  <- "temp_aging/numbers/loo_positions.txt.gz"   # panel A + per-fold h2
-OUT_TILE <- "temp_aging/numbers/loo_tiles.txt.gz"       # per-tile h2, for the integral
-OUT_U    <- "temp_aging/numbers/loo_u.txt.gz"           # per-tile per-founder u, for the joint fit
+TILE_MB  <- Sys.getenv("TILE_MB", "0") == "1"   # physical tiles instead of genetic
+SUF      <- if (TILE_MB) "_mb" else ""
+tile_of  <- function(pos, cM) if (TILE_MB) floor(pos / 1e6) else floor(cM)
+OUT_POS  <- sprintf("temp_aging/numbers/loo_positions%s.txt.gz", SUF)   # panel A + per-fold h2
+OUT_TILE <- sprintf("temp_aging/numbers/loo_tiles%s.txt.gz", SUF)       # per-tile h2, for the integral
+OUT_U    <- sprintf("temp_aging/numbers/loo_u%s.txt.gz", SUF)           # per-tile per-founder u, for the joint fit
 DROP_REP <- c(8, 9)
 NMAX     <- 30        # positions kept per fold, so the cumulative curve runs to 30
 CLUMP_CM <- 5         # greedy clumping window; r^2 < 0.1 at 4 cM in this population
@@ -54,7 +72,7 @@ if (length(miss)) stop("missing:\n  ", paste(miss, collapse = "\n  "), call. = F
 
 cm <- read.table(CMSRC, header = TRUE, sep = "\t") %>% as_tibble() %>%
   distinct(chr, pos, cM)
-cat("cM map:", nrow(cm), "steps\n")
+cat("cM map:", nrow(cm), "steps   tiling:", if (TILE_MB) "1 Mb" else "1 cM", "\n")
 
 # greedy clumping, exactly as a GWAS clumps: take the best, drop everything
 # within CLUMP_CM on that arm, repeat
@@ -102,8 +120,9 @@ for (r in seq_len(nrow(cells))) {
 
     # per 1 cM tile, for the genome-wide integral
     TILE[[length(TILE)+1]] <- st %>%
-      group_by(chr, tile = floor(cM)) %>%
-      summarise(across(c(nine, cross, single), mean), cM = mean(cM), .groups = "drop") %>%
+      group_by(chr, tile = tile_of(pos, cM)) %>%
+      summarise(across(c(nine, cross, single), mean), cM = mean(cM),
+                pos = mean(pos), .groups = "drop") %>%
       mutate(sugar = cl$sugar, sex = cl$sex, holdout = ho)
 
     # Per-tile, per-founder standardised effects, for the joint (COJO / GREML)
@@ -111,9 +130,9 @@ for (r in seq_len(nrow(cells))) {
     # into `cross` above -- kept unsummed because the joint estimate needs each
     # founder's PROFILE along the chromosome, not the per-tile total.
     UTILE[[length(UTILE)+1]] <- j %>%
-      group_by(chr, tile = floor(cM), founder, k) %>%
+      group_by(chr, tile = tile_of(pos, cM), founder, k) %>%
       summarise(u_tr = mean(e_tr / sqrt(pd)), u_te = mean(e_te / sqrt(pd)),
-                cM = mean(cM), .groups = "drop") %>%
+                cM = mean(cM), pos = mean(pos), .groups = "drop") %>%
       mutate(sugar = cl$sugar, sex = cl$sex, holdout = ho)
 
     # positions: ranked on the TRAINING cages only, then clumped

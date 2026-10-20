@@ -18,6 +18,10 @@
 # files and this job's log -- never `git add -A`, which would sweep up whatever
 # else happens to be dirty in the tree. NO_GIT=1 to skip.
 
+# TILE_MB=1 tiles in physical distance and writes *_mb files; default is 1 cM.
+#   sbatch temp_aging/analysis/loo_genome.sh
+#   TILE_MB=1 sbatch --export=ALL,TILE_MB=1 temp_aging/analysis/loo_genome.sh
+
 module load R/4.2.2
 
 fail=0
@@ -26,9 +30,10 @@ Rscript temp_aging/analysis/loo_genome.R || fail=1
 if [ "${NO_GIT:-0}" != "1" ]; then
   echo
   echo "── returning results through git ─────────────────────────────"
-  git add temp_aging/numbers/loo_positions.txt.gz \
-          temp_aging/numbers/loo_tiles.txt.gz \
-          temp_aging/numbers/loo_u.txt.gz 2>/dev/null
+  suf=""; [ "${TILE_MB:-0}" = "1" ] && suf="_mb"
+  git add temp_aging/numbers/loo_positions${suf}.txt.gz \
+          temp_aging/numbers/loo_tiles${suf}.txt.gz \
+          temp_aging/numbers/loo_u${suf}.txt.gz 2>/dev/null
   lg="logs/loo_genome_${SLURM_JOB_ID:-manual}.out"
   [ -f "$lg" ] && git add -f "$lg" 2>/dev/null
   if git diff --cached --quiet; then
