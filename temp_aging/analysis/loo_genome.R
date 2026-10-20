@@ -39,6 +39,7 @@ CMSRC    <- "process/AGE_SY/AGE_SY_4scan_no89.txt.gz"   # supplies cM per step
 DESDIR   <- "helpfiles/AGE_SY/nov_only"
 OUT_POS  <- "temp_aging/numbers/loo_positions.txt.gz"   # panel A + per-fold h2
 OUT_TILE <- "temp_aging/numbers/loo_tiles.txt.gz"       # per-tile h2, for the integral
+OUT_U    <- "temp_aging/numbers/loo_u.txt.gz"           # per-tile per-founder u, for the joint fit
 DROP_REP <- c(8, 9)
 NMAX     <- 30        # positions kept per fold, so the cumulative curve runs to 30
 CLUMP_CM <- 5         # greedy clumping window; r^2 < 0.1 at 4 cM in this population
@@ -66,7 +67,7 @@ clump <- function(z, win, n) {
   out
 }
 
-POS <- list(); TILE <- list()
+POS <- list(); TILE <- list(); UTILE <- list()
 for (r in seq_len(nrow(cells))) {
   cl <- cells[r, ]
   cat("\n==", cl$scan, "==\n")
@@ -105,6 +106,16 @@ for (r in seq_len(nrow(cells))) {
       summarise(across(c(nine, cross, single), mean), cM = mean(cM), .groups = "drop") %>%
       mutate(sugar = cl$sugar, sex = cl$sex, holdout = ho)
 
+    # Per-tile, per-founder standardised effects, for the joint (COJO / GREML)
+    # estimate.  u = e/sqrt(p), so u_tr * u_te is exactly the integrand summed
+    # into `cross` above -- kept unsummed because the joint estimate needs each
+    # founder's PROFILE along the chromosome, not the per-tile total.
+    UTILE[[length(UTILE)+1]] <- j %>%
+      group_by(chr, tile = floor(cM), founder, k) %>%
+      summarise(u_tr = mean(e_tr / sqrt(pd)), u_te = mean(e_te / sqrt(pd)),
+                cM = mean(cM), .groups = "drop") %>%
+      mutate(sugar = cl$sugar, sex = cl$sex, holdout = ho)
+
     # positions: ranked on the TRAINING cages only, then clumped
     sel <- st %>% mutate(id = row_number(), h2 = nine)
     keep <- clump(sel, CLUMP_CM, NMAX)
@@ -126,5 +137,6 @@ for (r in seq_len(nrow(cells))) {
 dir.create(dirname(OUT_POS), showWarnings = FALSE, recursive = TRUE)
 write.table(bind_rows(POS),  gzfile(OUT_POS),  row.names=FALSE, quote=FALSE, sep="\t")
 write.table(bind_rows(TILE), gzfile(OUT_TILE), row.names=FALSE, quote=FALSE, sep="\t")
-cat("\nWrote:", OUT_POS, "and", OUT_TILE, "\n")
+write.table(bind_rows(UTILE), gzfile(OUT_U),    row.names=FALSE, quote=FALSE, sep="\t")
+cat("\nWrote:", OUT_POS, ",", OUT_TILE, "and", OUT_U, "\n")
 cat("loo_genome.sh commits and pushes these; nothing to do by hand.\n")

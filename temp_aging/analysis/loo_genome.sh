@@ -27,7 +27,8 @@ if [ "${NO_GIT:-0}" != "1" ]; then
   echo
   echo "── returning results through git ─────────────────────────────"
   git add temp_aging/numbers/loo_positions.txt.gz \
-          temp_aging/numbers/loo_tiles.txt.gz 2>/dev/null
+          temp_aging/numbers/loo_tiles.txt.gz \
+          temp_aging/numbers/loo_u.txt.gz 2>/dev/null
   lg="logs/loo_genome_${SLURM_JOB_ID:-manual}.out"
   [ -f "$lg" ] && git add -f "$lg" 2>/dev/null
   if git diff --cached --quiet; then
