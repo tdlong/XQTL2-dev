@@ -40,6 +40,8 @@
 suppressMessages(library(tidyverse))
 
 IN     <- "temp_aging/numbers/loo_u.txt.gz"
+OUT    <- "temp_aging/numbers/loo_total.txt"   # read by make_LOO_fig.R
+OUTR   <- "temp_aging/numbers/loo_rho.txt"     # likewise, for the N x N matrix
 MAXLAG <- 45     # rho is summed as rho^2, so the tail adds nothing past ~15 cM;
                  # 45 is simply well beyond where it matters (see the stability
                  # table this script prints)
@@ -91,10 +93,13 @@ RHO <- U %>% group_split(trt) %>%
 print(as.data.frame(RHO %>% filter(d %in% c(1:8, 10, 15, 20, 30)) %>%
   mutate(rho = round(rho, 3)) %>% pivot_wider(names_from = trt, values_from = rho)),
   row.names = FALSE)
+write.table(RHO, OUTR, row.names = FALSE, quote = FALSE, sep = "\t")
 
 cat("\ngenome-wide total h2 (% of phenotypic variance)\n\n")
-print(as.data.frame(U %>% group_split(trt) %>% map_dfr(~est(.x, MAXLAG)) %>%
-  mutate(across(where(is.double), ~round(.x, 2)))), row.names = FALSE)
+TOT <- U %>% group_split(trt) %>% map_dfr(~est(.x, MAXLAG))
+print(as.data.frame(TOT %>% mutate(across(where(is.double), ~round(.x, 2)))),
+  row.names = FALSE)
+write.table(TOT, OUT, row.names = FALSE, quote = FALSE, sep = "\t")
 
 cat("\nstability to where rho is truncated (it enters as rho^2, so the tail is small)\n\n")
 print(as.data.frame(map_dfr(c(10, 15, 20, 30, 45), function(L)
@@ -103,3 +108,4 @@ print(as.data.frame(map_dfr(c(10, 15, 20, 30, 45), function(L)
   pivot_wider(names_from = trt, values_from = total)), row.names = FALSE)
 
 cat("\nTruncating at 10 cM cuts real decay; past 15 cM the answer does not move.\n")
+cat("Wrote:", OUT, "\n")
