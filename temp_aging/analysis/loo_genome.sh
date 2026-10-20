@@ -36,11 +36,14 @@ if [ "${NO_GIT:-0}" != "1" ]; then
   else
     git commit -q -m "loo: genome-wide leave-one-cage-out output (job ${SLURM_JOB_ID:-manual})" \
       && echo "   committed" || echo "   commit failed" >&2
-    if git pull --rebase -q && git push -q; then
+    # No `git pull --rebase` here. It fails on ANY unstaged change, and a job
+    # that writes a log always leaves one, so the pull broke every push. Push
+    # directly; if origin has genuinely moved, the push says so and Tony
+    # resolves it at the login node where he can see the tree.
+    if git push -q; then
       echo "   pushed"
     else
-      echo "   PUSH FAILED -- committed locally, push by hand" >&2
-      fail=1
+      echo "   not pushed -- committed locally, run: git push" >&2
     fi
   fi
 fi

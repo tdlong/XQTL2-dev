@@ -139,4 +139,4 @@ write.table(bind_rows(POS),  gzfile(OUT_POS),  row.names=FALSE, quote=FALSE, sep
 write.table(bind_rows(TILE), gzfile(OUT_TILE), row.names=FALSE, quote=FALSE, sep="\t")
 write.table(bind_rows(UTILE), gzfile(OUT_U),    row.names=FALSE, quote=FALSE, sep="\t")
 cat("\nWrote:", OUT_POS, ",", OUT_TILE, "and", OUT_U, "\n")
-cat("loo_genome.sh commits and pushes these; nothing to do by hand.\n")
+cat("loo_genome.sh commits these and tries to push.\n")
