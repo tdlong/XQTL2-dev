@@ -59,12 +59,13 @@ pA <- ggplot(A, aes(pred, obs, colour = founder)) +
   geom_text(data = lab, aes(-L * 0.95, L * 0.86, label = txt), inherit.aes = FALSE,
             hjust = 0, size = 3.5, lineheight = 0.95) +
   scale_colour_manual(values = FOUNDER_COL, name = NULL) +
-  coord_fixed(xlim = c(-L, L), ylim = c(-L, L)) +
+  coord_cartesian(xlim = c(-L, L), ylim = c(-L, L)) +
   facet_wrap(~trt, nrow = 1) +
   labs(x = "predicted frequency change (from nine cages)",
        y = "observed\n(held-out cage)") +
   guides(colour = guide_legend(nrow = 1, override.aes = list(size = 3))) +
   theme_bw(BASE) + theme(panel.grid.minor = element_blank(), legend.position = "bottom",
+                         aspect.ratio = 1,
                          strip.background = element_rect(fill = "grey92", colour = NA))
 
 # ── panel B ──────────────────────────────────────────────────────────────────
@@ -108,10 +109,14 @@ pB <- ggplot(cum, aes(N, explained)) +
   expand_limits(y = 0) +
   labs(x = "markers in score", y = "heritability (%)") +
   theme_bw(BASE) + theme(panel.grid.minor = element_blank(), legend.position = "bottom",
+                         aspect.ratio = 1,
                          strip.background = element_rect(fill = "grey92", colour = NA))
 
-png(OUT, width = 12, height = 7.4, units = "in", res = 300)
-print(pA / pB + plot_layout(heights = c(1.15, 1)) + plot_annotation(tag_levels = "A"))
+png(OUT, width = 11, height = 8.2, units = "in", res = 300)
+print(pA / pB + plot_layout(guides = "collect") +
+      plot_annotation(tag_levels = "A") &
+      theme(legend.position = "bottom", legend.box = "vertical",
+            legend.margin = margin(0, 0, 0, 0)))
 invisible(dev.off())
 cat("Wrote:", OUT, "\n\n")
 
