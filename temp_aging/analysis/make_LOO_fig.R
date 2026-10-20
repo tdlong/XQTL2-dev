@@ -13,9 +13,9 @@
 # i_test x e_train with nothing fitted to it -- the dashed line is 1:1, not a
 # regression.
 #
-# PANEL B. What a score built on the top N positions explains, against the
-# genome-wide total. Both axes are percent of phenotypic variance, so the two are
-# directly comparable and no ratio is needed.
+# PANEL B. The heritability a score on the top N markers explains, against the
+# marker-based heritability of the whole genome. Both are percent of phenotypic
+# variance, so they are directly comparable and no ratio is needed.
 #
 # SPACING. Markers stay at loo_genome.R's 5 cM clumping. An earlier version
 # re-clumped to 10 cM on the theory that 5 cM double counts; the N x N matrix
@@ -96,9 +96,9 @@ cum <- map_dfr(1:NSHOW, function(N)
     se = jk(cross^2 / nine), .groups = "drop")
 
 pB <- ggplot(cum, aes(N, explained)) +
-  geom_hline(data = TOT, aes(yintercept = total), linetype = "dashed", colour = "grey30") +
-  geom_text(data = TOT, aes(x = 1, y = total, label = "all markers"), inherit.aes = FALSE,
-            hjust = 0, vjust = -0.6, size = 3.2, colour = "grey30") +
+  geom_hline(data = TOT, aes(yintercept = total,
+             linetype = "marker-based heritability (all markers)"), colour = "grey30") +
+  scale_linetype_manual(values = "dashed", name = NULL) +
   geom_ribbon(aes(ymin = pmax(explained - se, 0), ymax = explained + se),
               fill = "#1F4E9C", alpha = 0.18) +
   geom_line(colour = "#1F4E9C", linewidth = 0.8) +
@@ -106,8 +106,8 @@ pB <- ggplot(cum, aes(N, explained)) +
   facet_wrap(~trt, nrow = 1) +
   scale_x_continuous(breaks = c(1, 10, 20, 30)) +
   expand_limits(y = 0) +
-  labs(x = "markers in score", y = "% of variance explained") +
-  theme_bw(BASE) + theme(panel.grid.minor = element_blank(),
+  labs(x = "markers in score", y = "heritability (%)") +
+  theme_bw(BASE) + theme(panel.grid.minor = element_blank(), legend.position = "bottom",
                          strip.background = element_rect(fill = "grey92", colour = NA))
 
 png(OUT, width = 12, height = 7.4, units = "in", res = 300)
