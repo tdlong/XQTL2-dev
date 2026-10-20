@@ -61,11 +61,12 @@ A <- ggplot(loo, aes(pred, D, colour = founder)) +
                          strip.background=element_rect(fill="grey92", colour=NA))
 
 h2 <- loo %>% group_by(trt, REP) %>%
-  summarise(`single cage`   = sum(100*k*e^2/pmax(pbar,0.01)),
-            `mean of nine`  = sum(100*k*e_tr^2/pmax(pbar,0.01)),
-            `cross-product` = sum(100*k*e_tr*e/pmax(pbar,0.01)), .groups="drop") %>%
+  summarise(`one cage\nsquared`   = sum(100*k*e^2/pmax(pbar,0.01)),
+            `nine cages\nsquared`  = sum(100*k*e_tr^2/pmax(pbar,0.01)),
+            `nine x held-out\nunbiased` = sum(100*k*e_tr*e/pmax(pbar,0.01)), .groups="drop") %>%
   pivot_longer(-c(trt,REP), names_to="est", values_to="h2") %>%
-  mutate(est = factor(est, levels=c("single cage","mean of nine","cross-product")))
+  mutate(est = factor(est, levels=c("one cage\nsquared","nine cages\nsquared",
+                                    "nine x held-out\nunbiased")))
 
 B <- ggplot(h2, aes(est, h2, colour=est)) +
   geom_hline(yintercept=0, colour="grey80", linewidth=0.3) +
@@ -73,9 +74,12 @@ B <- ggplot(h2, aes(est, h2, colour=est)) +
   stat_summary(fun=mean, geom="crossbar", width=0.55, linewidth=0.4, colour="grey15") +
   scale_colour_manual(values=c("grey60","#1F4E9C","#D62728"), guide="none") +
   facet_wrap(~trt, nrow=1) +
-  labs(x=NULL, y=expression(italic(h)^2~"at these positions (%)")) +
+  labs(x=NULL, y=expression(italic(h)^2~"at these positions (%)"),
+       subtitle=expression(paste(italic(h)^2,
+         " sums squared frequency changes, so noise inflates it. Multiplying two independent estimates instead of squaring one does not."))) +
   theme_bw(BASE) + theme(panel.grid.minor=element_blank(),
-                         axis.text.x=element_text(angle=30, hjust=1),
+                         axis.text.x=element_text(size=BASE-3, lineheight=0.9),
+                         plot.subtitle=element_text(size=BASE-2, colour="grey25"),
                          strip.background=element_rect(fill="grey92", colour=NA))
 
 png("temp_aging/analysis/LOO_fig.png", width=12, height=7.2, units="in", res=300)
