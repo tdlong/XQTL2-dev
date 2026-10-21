@@ -23,14 +23,19 @@ Rscript temp_aging/analysis/drift_tiles.R || fail=1
 
 if [ "${NO_GIT:-0}" != "1" ]; then
   echo
-  echo "── returning results through git: committing output and this log, then silent ──"
   lg="logs/drift_tiles_${SLURM_JOB_ID:-manual}.out"
-  exec >/dev/null 2>&1
+  gl="logs/drift_tiles_${SLURM_JOB_ID:-manual}_git.txt"
+  echo "── returning results through git; what git says goes to $gl, not here ──"
+  # Everything git prints goes to a side file that is never committed, so the
+  # committed log is complete and the side file (untracked) cannot block a pull.
+  exec >"$gl" 2>&1
   git add temp_aging/numbers/drift_tiles.txt.gz
   [ -f "$lg" ] && git add -f "$lg"
-  if ! git diff --cached --quiet; then
-    git commit -q -m "drift_tiles: per-replicate pool frequencies on a 0.25 cM grid (job ${SLURM_JOB_ID:-manual})"
-    git push -q
+  git status --short
+  if git diff --cached --quiet; then
+    echo "nothing staged -- nothing to commit"
+  else
+    git commit -m "drift_tiles: per-replicate pool frequencies on a 0.25 cM grid (job ${SLURM_JOB_ID:-manual})" && git push
   fi
 fi
 exit "$fail"
