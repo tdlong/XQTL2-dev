@@ -2,7 +2,7 @@
 
 ## Methods
 
-**Out-of-sample prediction.** We asked if changes in founder haplotype frequencies at leading factors can predict an unseen experiment in a manner analogous to polygenic risk scores. Each of the ten independent replicates was held out in turn and the other nine were used to build the predictor; we write ⓡ for the held-out replicate. From the other nine we estimated founder frequency changes per unit of selection, $e_{fr} = \Delta p_{fr}/i_r$ as in the heritability estimate above, with $\bar{e}_f$ now the mean over those nine; ranked tiles by heritability explained; and kept the strongest predictors separated by at least 5 cM. The predicted change in founder frequency in the held-out replicate at a given location is its known selection intensity times that mean,
+**Out-of-sample prediction.** We asked if changes in founder haplotype frequencies at leading factors can predict an unseen experiment in a manner analogous to polygenic risk scores. Each of the ten independent replicates was held out in turn and the other nine were used to build the predictor; we write ⓡ for the held-out replicate. From the other nine we estimated founder frequency changes per unit of selection, $e_{fr} = \Delta p_{fr}/i_r$ as in the heritability estimate above, and their mean $\bar{e}_f$ (in this section the bar denotes the average over the nine non-held-out replicates, where elsewhere it is over all ten); ranked tiles by heritability explained; and kept the strongest predictors separated by at least 5 cM. The predicted change in founder frequency in the held-out replicate at a given location is its known selection intensity times that mean,
 
 $$
 \widehat{\Delta p}_{fⓡ} = i_{ⓡ}\, \bar{e}_f .
