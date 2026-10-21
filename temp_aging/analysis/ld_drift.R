@@ -6,16 +6,20 @@
 # linked to. The number of tiles is the LD score, sum over distance of g(d)^2,
 # with g(d) the correlation between a locus and a tile d cM away. It can be read
 # off a big peak's footprint, but that assumes one footprint for the genome.
-# Here it is measured independently of any selection signal: the ten cages have
-# drifted apart, and a cage's deviation from the mean at one window is carried
-# to linked windows with the same g(d). Each cage's drift is measured twice --
-# its control pool and its selected pool -- with independent sampling noise, so
-# the cross product of their deviations is noise-free at every lag, lag 0
-# included. C(d) is then the autocorrelation of g, deconvolved to g.
+# Here it is measured independently of any selection signal. There is ONE cage,
+# and the ten replicates are cohorts drawn from it at different times (two may
+# share a date). Its founder frequencies move between draws -- drift, and
+# whatever selection the cage itself is under -- and a move at one window is
+# carried to linked windows with the same g(d). A replicate's deviation from
+# the mean over the ten draws is the cage's state at that time. It is measured
+# twice, by the replicate's control pool and its selected pool, drawn from the
+# same cohort with independent sampling noise, so the cross product of their
+# deviations is noise-free at every lag, lag 0 included. C(d) is then the
+# autocorrelation of g, deconvolved to g.
 #
-# DATA. AGE_SY_zoom_means: per-cage, per-pool founder frequencies in 5 kb
+# DATA. AGE_SY_zoom_means: per-replicate, per-pool founder frequencies in 5 kb
 # windows over seven regions of 1.2 Mb around peaks (replicates 8, 9 dropped).
-# Controls are one pool per cage per sex, listed under both sugars.
+# Controls are one pool per replicate per sex, listed under both sugars.
 
 suppressMessages(library(tidyverse))
 
@@ -24,7 +28,7 @@ Z <- read.table("process/AGE_SY/AGE_SY_zoom_means.txt.gz", header = TRUE, sep = 
 cm <- read.table("process/AGE_SY/AGE_SY_4scan_no89.txt.gz", header = TRUE, sep = "\t") %>%
   distinct(chr, pos, cM)
 Z <- Z %>% inner_join(cm, by = c("chr", "pos"))
-cat("regions:", n_distinct(Z$locus), " cages:", n_distinct(Z$REP), " windows per region:",
+cat("regions:", n_distinct(Z$locus), " replicates:", n_distinct(Z$REP), " windows per region:",
     n_distinct(Z$pos) / n_distinct(Z$locus), "\n")
 
 C <- Z %>% filter(TRT == "C", sugar == "SY10") %>% group_by(locus, sex, founder, pos) %>%
@@ -43,7 +47,7 @@ xlag <- function(D, L) {
 }
 LAGS <- seq(0, 4, by = 0.5)
 A <- map_dfr(LAGS, ~xlag(D, .x)) %>% mutate(rho = s / s[lag == 0])
-cat("\nC(d): autocorrelation of cage drift along the genome, all regions pooled\n\n")
+cat("\nC(d): autocorrelation along the genome of the cage's state at each draw, all regions pooled\n\n")
 print(as.data.frame(A %>% mutate(rho = round(rho, 3), s = signif(s, 3))), row.names = FALSE)
 
 cat("\nby region (lag in cM)\n\n")
@@ -66,7 +70,7 @@ ld_all <- deconv(pmax(A$rho, 0), 0.5)
 ld_3L  <- deconv(pmax(B %>% filter(locus == "chr3L:9.31") %>% select(starts_with("d")) %>% unlist(), 0), 1)
 ld_not <- deconv(pmax(map_dbl(0:4, ~xlag(D %>% filter(locus != "chr3L:9.31"), .x)$s) /
                       xlag(D %>% filter(locus != "chr3L:9.31"), 0)$s, 0), 1)
-cat(sprintf("\nLD score (tiles a locus is counted in) from drift: all regions %.1f, 3L 9.31 %.1f, the other six %.1f\n",
+cat(sprintf("\nLD score (tiles a locus is counted in) from the cage's movement between draws: all regions %.1f, 3L 9.31 %.1f, the other six %.1f\n",
             ld_all, ld_3L, ld_not))
 cat("For comparison: the 3L 9.30 footprint of the selection signal gives 3.9-4.2 (yardstick.R);\n",
     "the cross-fold autocorrelation of the signal genome-wide, deconvolved the same way, 2.2-2.3.\n")

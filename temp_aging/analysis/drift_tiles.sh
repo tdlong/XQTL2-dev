@@ -26,7 +26,7 @@ if [ "${NO_GIT:-0}" != "1" ]; then
   if git diff --cached --quiet; then
     echo "   nothing changed"
   else
-    git commit -q -m "drift_tiles: per-cage pool frequencies on a 0.25 cM grid (job ${SLURM_JOB_ID:-manual})" \
+    git commit -q -m "drift_tiles: per-replicate pool frequencies on a 0.25 cM grid (job ${SLURM_JOB_ID:-manual})" \
       && echo "   committed" || echo "   commit failed" >&2
     if git push -q; then echo "   pushed"; else echo "   not pushed -- committed locally, run: git push" >&2; fi
   fi

@@ -1,11 +1,11 @@
-# drift_tiles.R — per-cage founder frequencies, control and selected pools, on a
+# drift_tiles.R — per-replicate founder frequencies, control and selected pools, on a
 # 0.25 cM grid genome-wide. Input to a LOCAL LD score per tile (ld_drift.R
 # measures the same thing in seven 1.2 Mb regions and finds it varies by region).
 #
 #   sbatch temp_aging/analysis/drift_tiles.sh        # HPC3, reads meansBySample
 #
 # Writes temp_aging/numbers/drift_tiles.txt.gz: chr, cM, pos, sex, sugar, pool
-# (C or Z), REP, founder, freq. Controls are one pool per cage per sex; they are
+# (C or Z), REP, founder, freq. Controls are one pool per replicate per sex; they are
 # written once, under sugar = "both". About 700k rows.
 
 suppressMessages(library(tidyverse))
