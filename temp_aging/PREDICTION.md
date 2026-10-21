@@ -65,3 +65,56 @@ Ten markers explain 6.4 to 9.5% of phenotypic variance and thirty explain 8.2 to
 What this design measures well and what it does not follow from the same fact. Concentrating the segregating variation into about 55 independent segments, each a founder haplotype at roughly 12% frequency assayed in thousands of flies, is what makes a single position's heritability precise and the prediction strong. It is also what leaves too few units to pin a genome-wide variance. A human study has a thousand times the resolution and nothing approaching the per-locus precision; the two cannot be had together.
 
 This substitutes for functional validation in the one respect functional validation would also address — that the mapped signal is real rather than a threshold artefact — and does so genome-wide rather than one locus at a time. It does not establish that the mapped intervals contain the causal sites: a linked haplotype predicts a held-out cage exactly as well as a causal one. Nor does it test whether effects combine additively across loci, which pooled sequencing cannot see, a pool reporting only the mean of its individuals' genotypes.
+
+---
+
+# For the manuscript
+
+Everything above is working notes. These two paragraphs are what goes in.
+
+## Methods — one paragraph
+
+**Out-of-sample prediction.** Each of the ten replicate cages was held out in
+turn. From the other nine we took a standardised response per founder at every
+step, $e_f = \overline{\Delta p_f / i}$, with $i$ the selection intensity implied
+by the proportion selected; the held-out cage's proportion is known, so its
+predicted founder frequency change $i_r e_f$ carries no parameter fitted to it.
+Positions were ranked by the heritability of the nine training cages and clumped
+5 cM apart, so the held-out cage neither set the weights nor chose where they
+were read. Training and held-out cages are different flies, so their sampling
+noise is independent and the cross-product $100k\sum_f e_f^{\mathrm{train}}
+e_f^{\mathrm{test}} / \hat{p}_f$ estimates heritability without the $s^2_f/R$
+correction the estimator above requires, and without winner's curse. Markers in
+linkage cannot have their heritabilities added: the heritability a set of markers
+explains is the quadratic form $100k\sum_f u_f^{\mathrm{train}\top} R^{-1}
+u_f^{\mathrm{test}}$, with $u_f = e_f/\sqrt{\hat{p}_f}$ and $R$ the correlation
+between markers, measured as the cross-fold product at lag $d$ so that no noise
+term enters at any lag. Among the markers of a score $R$ is well conditioned
+(1.4–3.1) and the correction is about 1%. Over all 273 one-cM tiles it is not:
+eight founders recombine into roughly 55 independent segments, and a genome-wide
+variance estimated from so few units across ten cages is not determined — four
+methods span 6 to 32% while out-of-sample $R^2$ stays at 0.25 — so the
+genome-wide figure is reported as an order of magnitude.
+
+## Results and discussion — one paragraph
+
+Haplotype frequency change in a population we have never seen is predictable from
+the other nine. At the ten highest-ranked markers, predicted and observed changes
+correlate at $r = 0.77$–$0.83$ across the four treatments, with regression slopes
+of 0.87–0.91 against a line of identity that was not fitted (Fig. Y a); the
+prediction is of eighty signed numbers and is as well calibrated as it is
+correlated, founder B3 predicted to fall 11.4% at chr3L 9.31 Mb in one held-out
+cage and falling 12.0%. A score built on those ten markers explains 6.4–9.5% of
+phenotypic variance, and one built on thirty explains 8.2–11.6% (Fig. Y b),
+against a marker-based heritability for the whole genome of order 10%. This is
+the validation a selection experiment can offer in place of functional work: the
+mapped signal predicts quantitatively, genome-wide, in material that contributed
+nothing to the mapping. It does not place causal sites within the mapped
+intervals — a linked haplotype predicts a held-out population as well as a causal
+one — nor test whether effects combine additively across loci, which pooled
+sequencing cannot see. What limits the genome-wide total is the same feature that
+makes the per-marker prediction precise: eight founders at appreciable frequency
+concentrate the segregating variation into roughly 55 independent segments, each
+assayed in thousands of flies. A human association study has a thousandfold more
+resolution and no comparable precision at a locus, and the two cannot be had at
+once.
