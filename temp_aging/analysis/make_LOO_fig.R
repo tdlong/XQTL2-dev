@@ -47,7 +47,7 @@ TOT <- read.table(TOTF, header = TRUE, sep = "\t") %>% as_tibble() %>%
 A <- P %>% filter(rank <= 10)
 lab <- A %>% group_by(trt) %>%
   summarise(r = cor(pred, obs), slope = coef(lm(obs ~ pred))[2], .groups = "drop") %>%
-  mutate(txt = sprintf("r = %.2f\nslope = %.2f", r, slope))
+  mutate(txt = sprintf("R\u00b2 = %.2f", r^2))
 L <- max(abs(c(A$pred, A$obs)))
 
 pA <- ggplot(A, aes(pred, obs, colour = founder)) +
