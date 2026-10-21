@@ -106,27 +106,23 @@ cum <- folds %>% group_by(trt, N) %>%
             plain_sum = mean(cross)^2 / mean(nine), .groups = "drop")
 
 # The divisor's spread: each Table S1 peak's footprint gives its own tiles per
-# locus, so its own genome-wide total = tile sum / footprint. A density of those
-# totals, weighted by peak height as the pooled divisor is, drawn as grey whose
-# darkness follows the mass. Dashed: the pooled estimate.
-DENS <- TOT %>% group_split(trt) %>% map_dfr(function(z) {
-  v <- z$sum_tiles / PK$tiles_per_locus; w <- PK$h2_peak / sum(PK$h2_peak)
-  # a divisor's uncertainty is multiplicative, so the density is taken on log h2
-  dn <- density(log(v), weights = w, bw = "nrd0", n = 512)
-  y <- exp(dn$x); tibble(trt = z$trt, y = y, dy = c(diff(y), 0), a = dn$y / max(dn$y)) })
+# locus, so its own genome-wide total = tile sum / footprint. Light grey band:
+# the 25-75% quantiles of those totals. Dashed: the pooled estimate.
+BAND <- TOT %>% group_split(trt) %>% map_dfr(function(z) {
+  v <- z$sum_tiles / PK$tiles_per_locus
+  tibble(trt = z$trt, lo = quantile(v, .25), hi = quantile(v, .75)) })
 
 # light blue: the ten held-out replicates one at a time; dark: all ten combined
 pB <- ggplot(cum, aes(N, explained)) +
-  geom_rect(data = DENS, aes(xmin = -Inf, xmax = Inf, ymin = y, ymax = y + dy, alpha = a),
-            fill = "grey40", inherit.aes = FALSE) +
-  scale_alpha_identity() +
+  geom_rect(data = BAND, aes(xmin = -Inf, xmax = Inf, ymin = lo, ymax = hi),
+            fill = "grey88", inherit.aes = FALSE) +
   geom_hline(data = TOT, aes(yintercept = total), linetype = "dashed", colour = "grey20") +
   geom_line(data = folds, aes(N, fold, group = holdout), colour = "#1F4E9C", alpha = 0.25, linewidth = 0.4) +
   geom_line(colour = "#1F4E9C", linewidth = 0.9) +
   geom_point(colour = "#1F4E9C", size = 1.4) +
   facet_wrap(~trt, nrow = 1) +
   scale_x_continuous(breaks = c(1, 10, 20, 30)) +
-  coord_cartesian(ylim = c(0, 30)) +
+  scale_y_continuous(limits = c(0, 30), breaks = seq(0, 30, 10)) +
   labs(x = "markers in predictor", y = "heritability (%)") +
   theme_bw(BASE) + theme(panel.grid.minor = element_blank(), legend.position = "bottom",
                          aspect.ratio = 1,
