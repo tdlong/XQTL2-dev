@@ -74,4 +74,8 @@ temp_aging/archive/
 # they are the deliverable, and fetching them over ssh has been unreliable.
 !temp_aging/*.png
 temp_aging/*.docx
+# ...except the paste documents Tony edits by hand: tracked so an edited copy
+# is recoverable. Never rebuild over a file he has open or edited -- build to a
+# new name (Paragraph_v3.docx, v4 ...) and let him diff.
+!temp_aging/Paragraph_v*.docx
 !temp_aging/reference.docx
