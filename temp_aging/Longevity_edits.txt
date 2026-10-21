@@ -1,7 +1,6 @@
 EDITS TO APPLY IN THE GOOGLE DOC (v2 copy)
 Italicise Drosophila / Drosophila melanogaster where they appear.
-Edit 14 contains nine [EQ: ...] markers. Paste them as literal text, highlighted
-yellow, then replace each with Insert > Equation using the LaTeX it holds.
+Edit 14 is one paste plus two equations; see its own note.
 
 ==============================================================================
 1. REPLACE the intro paragraph beginning 'Lifespan is mechanistically conserved'
@@ -71,8 +70,22 @@ Figure Y: Out-of-sample prediction. (A) Haplotype frequency change at the top 10
 ==============================================================================
 14. ADD as a NEW Methods paragraph directly after the one beginning
     'The partitioning is carried out at every step'
+    Paste the whole block, then replace the two [EQUATION n] lines using
+    Insert > Equation with the LaTeX below. Everything else is plain text:
+    set the f in s_f^2 as subscript, the 2 in s_f^2 and R^2 as superscript.
 ------------------------------------------------------------------------------
-**Out-of-sample prediction.** Each of the ten replicate cages was held out in turn. From the other nine we took a standardised response per founder at every step, [EQ: e_f = \overline{\Delta p_{fr} / i_r}], and since the held-out cage's selected proportion is known its predicted founder frequency change, [EQ: i_r e_f], carries no parameter fitted to it. Positions were ranked by the heritability of the nine training cages and clumped 5 cM apart, so the held-out cage neither set the weights nor chose where they were read. Training and held-out cages are different flies, so their sampling noise is independent and the cross-product [EQ: 100k \sum_f e_f^{train} e_f^{test} / \hat{p}_f] estimates heritability without the [EQ: s_f^2 / R] correction above and without winner's curse. Heritabilities at markers in linkage cannot be added: the heritability a set of markers explains is the quadratic form [EQ: 100k \sum_f u_f^{train \top} R^{-1} u_f^{test}] with [EQ: u_f = e_f / \sqrt{\hat{p}_f}] and [EQ: R] the correlation between markers, measured as the cross-fold product at lag [EQ: d] so that no noise term enters at any lag. This is the quantity GREML estimates through the relationship matrix, the counterpart of SNP-based heritability for this population. Among the markers of a score [EQ: R] is well conditioned (1.4-3.1) and the correction is about 1%. Over all 273 one-cM tiles it is not: eight founders recombine into roughly 55 independent segments, and a genome-wide variance from so few units across ten cages is not determined, four methods spanning 6-32% while out-of-sample [EQ: R^2] stays at 0.25, so the genome-wide figure is reported as an order of magnitude.
+Out-of-sample prediction. Each of the ten replicate cages was held out in turn. From the other nine we took the mean of the e_fr defined above, a standardised response per founder at every step, and since the held-out cage's selected proportion is known its predicted founder frequency change follows with no parameter fitted to it. Positions were ranked by the heritability of the nine training cages and clumped 5 cM apart, so the held-out cage neither set the weights nor chose where they were read. Training and held-out cages are different flies, so their sampling noise is independent and the cross-product
+
+[EQUATION 1]
+
+estimates heritability without the s_f^2/R correction above and without winner's curse. Heritabilities at markers in linkage cannot be added: the heritability a set of markers explains is the quadratic form
+
+[EQUATION 2]
+
+where each response is divided by the square root of its control frequency before the matrix is applied, and R is the correlation between markers, measured as the cross-fold product at lag d so that no noise term enters at any lag. This is the quantity GREML estimates through the relationship matrix, the counterpart of SNP-based heritability for this population. Among the markers of a score R is well conditioned (1.4-3.1) and the correction is about 1%. Over all 273 one-cM tiles it is not: eight founders recombine into roughly 55 independent segments, and a genome-wide variance from so few units across ten cages is not determined, four methods spanning 6-32% while out-of-sample R^2 stays at 0.25, so the genome-wide figure is reported as an order of magnitude.
+
+    EQUATION 1:  100k \sum_f e_f^{train} e_f^{test} / \hat{p}_f
+    EQUATION 2:  100k \sum_f u_f^{train \top} R^{-1} u_f^{test}
 
 ==============================================================================
 15. TWO ONE-WORD FIXES
