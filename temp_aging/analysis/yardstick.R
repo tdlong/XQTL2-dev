@@ -10,11 +10,12 @@
 # which give a jackknife standard error over replicates.
 #
 # THE ESTIMATE. Summing the unbiased tile h2 over the genome counts one locus at
-# every tile it is linked to. The number of tiles a locus in tile t is counted
-# in is its LD score ell_t, measured from drift in ld_local.R. Marker-based
-# heritability is sum_t h2_t / ell_t -- LD score regression's correction with
-# the LD score measured here -- and is the counterpart of SNP-based heritability
-# at the resolution of founder haplotype blocks.
+# every tile it is linked to. The number of tiles a locus is counted in is the
+# integral of its footprint, h2 against distance, divided by its peak -- read off
+# the one isolated large locus, 3L 9.30. Marker-based heritability is the sum
+# over tiles divided by that. It assumes one footprint for the genome, as LD
+# score regression assumes one LD score per SNP, and is the counterpart of
+# SNP-based heritability at the resolution of founder haplotype blocks.
 
 suppressMessages(library(tidyverse))
 
@@ -40,27 +41,42 @@ tiles <- w %>% group_by(trt, chr, tile) %>%
   summarise(h2 = mean(H2), wald = max(Wald_log10p), .groups = "drop")
 cat("tiles:", n_distinct(paste(tiles$chr, tiles$tile)), "of 1 cM\n")
 
-# ── the LD score of each tile, from drift (ld_local.R) ───────────────────────
-# ell_t = number of 1 cM tiles a locus in tile t is counted in, measured from
-# the cage's movement between draws, not from any selection signal. The 3L 9.30
-# footprint (3.9-4.2) was used here before; drift shows that locus does NOT sit
-# in a long-block region (ell = 1.1 there), so its width is not LD.
-LD <- read.table("temp_aging/numbers/ld_local.tsv", header = TRUE, sep = "\t") %>% as_tibble()
-tiles <- tiles %>% left_join(w %>% group_by(chr, tile) %>% summarise(cMmid = mean(cM), .groups = "drop"),
-                             by = c("chr", "tile")) %>%
-  mutate(ltile = floor(cMmid)) %>% left_join(LD %>% select(chr, ltile = tile, ell), by = c("chr", "ltile")) %>%
-  group_by(chr) %>% mutate(ell = ifelse(is.na(ell), median(ell, na.rm = TRUE), ell)) %>% ungroup()
-cat(sprintf("\nLD score per tile: median %.2f, 10-90%% %.2f-%.2f (ld_local.R)\n",
-            median(tiles$ell), quantile(tiles$ell, .1), quantile(tiles$ell, .9)))
+# ── the footprint of 3L 9.30: tiles per locus ────────────────────────────────
+# h2 against distance from the peak, on the distal side only -- 3L 7.43 sits
+# 7.6 cM proximal and would be integrated in. Baseline is the trait's floor, the
+# mean h2 where Wald < 2. Integrated to 6.5 cM (the profile is at the floor from
+# 5 cM; a small peak at 8.5 cM follows), doubled for the two sides, over the peak.
+#
+# This, not the genome-wide autocorrelation, is the right divisor: two distinct
+# loci 2 cM apart raise the autocorrelation but are two loci, each counted in
+# its own footprint. sum_d rho(d)^2 from loo_rho.txt is therefore an upper
+# bound, printed for comparison.
+floor <- d %>% filter(Wald_log10p < 2) %>% group_by(trt) %>% summarise(floor = mean(H2), .groups = "drop")
+fp <- d %>% filter(chr == PEAK["chr"]) %>% mutate(dist = cM - as.numeric(PEAK["cM"])) %>%
+  left_join(floor, by = "trt") %>% mutate(h = H2 - floor) %>%
+  filter(dist >= 0, dist <= 6.5) %>% group_by(trt) %>% arrange(dist, .by_group = TRUE) %>%
+  summarise(peak = max(h), half_cM = max(dist[h >= peak/2]), tenth_cM = max(dist[h >= peak/10]),
+            integral = 2 * sum(diff(dist) * (head(h, -1) + tail(h, -1)) / 2),
+            tiles_per_locus = integral / peak, .groups = "drop")
+cat("\nthe footprint of 3L 9.30: h2 above the floor against cM from the peak\n\n")
+print(as.data.frame(fp %>% mutate(across(where(is.double), ~round(.x, 2)))), row.names = FALSE)
+# pooled over traits: total integral over total peak, so the tall clean peaks
+# (males) weigh more than SY10 F, whose tail is lost in the floor
+TPL <- round(sum(fp$integral) / sum(fp$peak), 1)
+rho <- read.table("temp_aging/numbers/loo_rho.txt", header = TRUE, sep = "\t") %>%
+  group_by(trt) %>% summarise(sum_rho2 = round(1 + 2 * sum(rho[d >= 1]^2), 2), .groups = "drop")
+cat(sprintf("\n  tiles per locus: pooled %.1f, used for all four traits. It is the main\n  uncertainty in the yardstick: 2.9-4.3 across traits measured separately.\n", TPL),
+    " For comparison, the genome-wide autocorrelation gives sum_d rho(d)^2 =",
+    paste(rho$sum_rho2, collapse = ", "), "\n")
 
 # ── the yardstick, and where it comes from ───────────────────────────────────
-ys <- tiles %>% group_by(trt) %>% summarise(sum_tiles = sum(h2), h2 = sum(h2 / ell), .groups = "drop")
-TPL <- 1   # kept for the band table below, which divides each tile by its own ell
+ys <- tiles %>% group_by(trt) %>% summarise(sum_tiles = sum(h2), .groups = "drop") %>%
+  mutate(h2 = sum_tiles / TPL)
 
-cat("\nmarker-based heritability (%): sum over the genome of tile h2 / ell_t\n\n")
+cat("\nmarker-based heritability (%): sum of tile h2 over the genome / tiles per locus\n\n")
 band <- tiles %>% mutate(band = cut(wald, c(-Inf, 2, 7.5, 15, Inf),
                                     c("LWP < 2", "2 to 7.5", "7.5 to 15", "> 15"))) %>%
-  group_by(trt, band) %>% summarise(n = n(), h2 = sum(h2 / ell), .groups = "drop")
+  group_by(trt, band) %>% summarise(n = n(), h2 = sum(h2) / TPL, .groups = "drop")
 tab <- band %>% pivot_wider(names_from = trt, values_from = c(n, h2)) %>%
   select(band, starts_with("n_"), starts_with("h2_"))
 print(as.data.frame(bind_rows(
@@ -75,12 +91,10 @@ cat("\n  n = tiles in the band (by the tile's largest Wald in that treatment);\n
 # ── jackknife SE over replicates, from the per-replicate values in loo_u ─────
 u <- read.table(U, header = TRUE, sep = "\t") %>% as_tibble() %>%
   transmute(trt = paste0(sugar, "_", sex), chr, tile, founder, k, rep = holdout, u = u_te)
-u <- u %>% left_join(LD %>% select(chr, tile, ell), by = c("chr", "tile")) %>%
-  group_by(chr) %>% mutate(ell = ifelse(is.na(ell), median(ell, na.rm = TRUE), ell)) %>% ungroup()
-full <- function(z) z %>% group_by(trt, chr, tile, founder, k, ell) %>%
+full <- function(z) z %>% group_by(trt, chr, tile, founder, k) %>%
   summarise(m = mean(u), v = var(u), n = n(), .groups = "drop") %>%
-  mutate(h = 100 * k * (m^2 - v/n) / ell) %>% group_by(trt) %>%
-  summarise(h2 = sum(h), .groups = "drop")
+  mutate(h = 100 * k * (m^2 - v/n)) %>% group_by(trt) %>%
+  summarise(h2 = sum(h) / TPL, .groups = "drop")
 jk <- u %>% group_split(trt) %>% map_dfr(function(z) {
   th <- map_dbl(unique(z$rep), ~ full(z %>% filter(rep != .x))$h2)
   tibble(trt = z$trt[1], from_u = full(z)$h2,
@@ -109,6 +123,6 @@ print(as.data.frame(bind_rows(s1l %>% group_by(set, trt) %>% summarise(h2 = sum(
 cat("\n  Peak h2 is at the peak window and chosen in-sample, so these are upper\n",
     " bounds on what the peaks explain; the held-out counterpart is Fig. Yb.\n")
 
-write.table(ys %>% transmute(trt, h2, se, sum_tiles), TSV,
+write.table(ys %>% transmute(trt, h2, se, tiles_per_locus = TPL), TSV,
             row.names = FALSE, quote = FALSE, sep = "\t")
 cat("\nWrote:", TSV, "\n")
