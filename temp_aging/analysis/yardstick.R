@@ -41,33 +41,41 @@ tiles <- w %>% group_by(trt, chr, tile) %>%
   summarise(h2 = mean(H2), wald = max(Wald_log10p), .groups = "drop")
 cat("tiles:", n_distinct(paste(tiles$chr, tiles$tile)), "of 1 cM\n")
 
-# ── the footprint of 3L 9.30: tiles per locus ────────────────────────────────
-# h2 against distance from the peak, on the distal side only -- 3L 7.43 sits
-# 7.6 cM proximal and would be integrated in. Baseline is the trait's floor, the
-# mean h2 where Wald < 2. Integrated to 6.5 cM (the profile is at the floor from
-# 5 cM; a small peak at 8.5 cM follows), doubled for the two sides, over the peak.
-#
-# This, not the genome-wide autocorrelation, is the right divisor: two distinct
-# loci 2 cM apart raise the autocorrelation but are two loci, each counted in
-# its own footprint. sum_d rho(d)^2 from loo_rho.txt is therefore an upper
-# bound, printed for comparison.
+# ── tiles per locus: the footprint of every Table S1 peak ───────────────────
+# h2 against distance from the peak, in the treatment where the peak is
+# strongest, floor subtracted (the floor is the mean h2 where Wald < 2). Each
+# side is followed out to 6 cM; a side is dropped if another Table S1 peak lies
+# within 6 cM on it. Integral over peak height = tiles the locus is counted in.
+# Pooled over peaks as total integral / total peak, so tall clean peaks weigh
+# more than small ones whose tails are lost in the floor.
 floor <- d %>% filter(Wald_log10p < 2) %>% group_by(trt) %>% summarise(floor = mean(H2), .groups = "drop")
-fp <- d %>% filter(chr == PEAK["chr"]) %>% mutate(dist = cM - as.numeric(PEAK["cM"])) %>%
-  left_join(floor, by = "trt") %>% mutate(h = H2 - floor) %>%
-  filter(dist >= 0, dist <= 6.5) %>% group_by(trt) %>% arrange(dist, .by_group = TRUE) %>%
-  summarise(peak = max(h), half_cM = max(dist[h >= peak/2]), tenth_cM = max(dist[h >= peak/10]),
-            integral = 2 * sum(diff(dist) * (head(h, -1) + tail(h, -1)) / 2),
-            tiles_per_locus = integral / peak, .groups = "drop")
-cat("\nthe footprint of 3L 9.30: h2 above the floor against cM from the peak\n\n")
+S1 <- read.table(TS1, header = TRUE, sep = "\t", check.names = FALSE, fill = TRUE) %>% as_tibble() %>%
+  filter(!is.na(`Position (Mb)`)) %>%
+  transmute(peak = sprintf("%s %.2f", sub("chr", "", Chromosome), `Position (Mb)`), chr = Chromosome, cM = `Position (cM)`)
+REACH <- 6
+fp <- pmap_dfr(S1, function(peak, chr, cM) {
+  others <- S1$cM[S1$chr == chr & S1$cM != cM]
+  sides <- c(-1, 1)[c(!any(others < cM & others > cM - REACH), !any(others > cM & others < cM + REACH))]
+  if (!length(sides)) return(tibble(peak, trt = NA, h2_peak = NA, half_cM = NA, tenth_cM = NA, integral = NA, tpl = NA, sides = 0))
+  z <- d %>% filter(chr == !!chr, abs(.data$cM - !!cM) <= REACH) %>% left_join(floor, by = "trt") %>%
+    mutate(h = H2 - floor, dist = .data$cM - !!cM)
+  best <- z %>% filter(abs(dist) < 0.3) %>% group_by(trt) %>% summarise(pk = max(h), .groups = "drop") %>% slice_max(pk, n = 1)
+  z <- z %>% filter(trt == best$trt, sign(dist) %in% sides | dist == 0) %>% arrange(dist)
+  pk <- best$pk
+  one <- function(s) { w <- z %>% filter(sign(dist) == s | dist == 0) %>% arrange(abs(dist))
+    tibble(int = sum(diff(abs(w$dist)) * (head(w$h, -1) + tail(w$h, -1)) / 2),
+           half = max(abs(w$dist[w$h >= pk / 2])), tenth = max(abs(w$dist[w$h >= pk / 10]))) }
+  r <- map_dfr(sides, one)
+  # one-sided integrals are doubled so every peak is on the same two-sided footing
+  tibble(peak, trt = best$trt, h2_peak = pk, half_cM = mean(r$half), tenth_cM = mean(r$tenth),
+         integral = 2 * mean(r$int), tpl = 2 * mean(r$int) / pk, sides = length(sides))
+})
+cat("\nfootprints of the Table S1 peaks: h2 above the floor against cM; integral / peak = tiles per locus\n\n")
 print(as.data.frame(fp %>% mutate(across(where(is.double), ~round(.x, 2)))), row.names = FALSE)
-# pooled over traits: total integral over total peak, so the tall clean peaks
-# (males) weigh more than SY10 F, whose tail is lost in the floor
-TPL <- round(sum(fp$integral) / sum(fp$peak), 1)
-rho <- read.table("temp_aging/numbers/loo_rho.txt", header = TRUE, sep = "\t") %>%
-  group_by(trt) %>% summarise(sum_rho2 = round(1 + 2 * sum(rho[d >= 1]^2), 2), .groups = "drop")
-cat(sprintf("\n  tiles per locus: pooled %.1f, used for all four traits. It is the main\n  uncertainty in the yardstick: 2.9-4.3 across traits measured separately.\n", TPL),
-    " For comparison, the genome-wide autocorrelation gives sum_d rho(d)^2 =",
-    paste(rho$sum_rho2, collapse = ", "), "\n")
+ok <- fp %>% filter(!is.na(tpl))
+TPL <- round(sum(ok$integral) / sum(ok$h2_peak), 1)
+cat(sprintf("\n  %d peaks usable; tiles per locus %.1f to %.1f, median %.1f; pooled (sum integral / sum peak) %.1f -- used.\n",
+            nrow(ok), min(ok$tpl), max(ok$tpl), median(ok$tpl), TPL))
 
 # ── the yardstick, and where it comes from ───────────────────────────────────
 ys <- tiles %>% group_by(trt) %>% summarise(sum_tiles = sum(h2), .groups = "drop") %>%
