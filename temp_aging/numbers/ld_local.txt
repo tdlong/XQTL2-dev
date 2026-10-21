@@ -1,0 +1,52 @@
+# ld_local.R
+# run:    2026-10-21 16:47
+# script: 
+# pipeline: a98e3bb 2026-08-30 README: methods-section description of the H2 estim
+# reads:
+#   temp_aging/numbers/drift_tiles.txt.gz                    5.9M  2026-10-21 16:40  md5:45e2a7d7
+#
+grid points: 1079  replicates: 10 
+
+genome-wide C(d), both sexes pooled
+
+ lag_cM      C
+   0.25  0.974
+   0.50  0.919
+   1.00  0.787
+   1.50  0.663
+   2.00  0.549
+   3.00  0.348
+   4.00  0.194
+   5.00  0.095
+   6.00  0.036
+   8.00 -0.005
+  10.00  0.005
+
+  LD score genome-wide: deconvolved 1.13; exponential block lambda = 1.31 cM (= ell) with
+  fitted C(1..4) = 0.821 0.548 0.332 0.19
+There were 50 or more warnings (use warnings() to see the first 50)
+
+per-tile LD score ell_t = lambda_t, exponential fit (windows of +- 5 cM)
+
+   chr tiles median  q10   q90   max
+ chr2L    53   1.62 1.11 12.24 15.00
+ chr2R    52   1.31 1.05  1.70 15.00
+ chr3L    48   1.52 0.82  2.09 15.00
+ chr3R    55   1.48 0.94  2.32 15.00
+  chrX    66   0.94 0.67  1.38  1.89
+
+  genome: median 1.34  range 0.59-15 
+
+ell_t at the Table S1 peaks
+
+     peak  ell ell_deconv
+  3L 9.30 1.68       1.08
+  3R 8.63 0.96       0.75
+ 3L 21.62 0.67       0.65
+ 2L 11.95 1.54       1.81
+ 2L 14.85 1.21       0.82
+ 2R 13.88 1.68       1.60
+ 2R 24.08 1.12       0.88
+  3L 7.43 1.42       1.05
+
+Wrote: temp_aging/numbers/ld_local.tsv 
