@@ -14,9 +14,11 @@
 # i_test x e_train with nothing fitted to it -- the dashed line is 1:1, not a
 # regression.
 #
-# PANEL B. The heritability a score on the top N markers explains, against the
-# marker-based heritability of the whole genome. Both are percent of phenotypic
-# variance, so they are directly comparable and no ratio is needed.
+# PANEL B. The heritability a predictor on the top N markers explains, against
+# the marker-based heritability of the whole genome. Both are percent of
+# phenotypic variance. Uncertainty is shown as the pieces themselves: the ten
+# held-out replicates as light curves, the ten leave-one-replicate-out
+# heritabilities as light dashes.
 #
 # SPACING. Markers stay at loo_genome.R's 5 cM clumping; the N x N correlation
 # matrix divides out what correlation remains (up to 5% of the sum).
@@ -25,6 +27,8 @@ suppressMessages({library(tidyverse); library(patchwork)})
 
 POS   <- "temp_aging/numbers/loo_positions.txt.gz"
 TOTF  <- "temp_aging/numbers/yardstick.tsv"   # marker-based h2, yardstick.R
+PKF   <- "temp_aging/numbers/yardstick_peaks.tsv" # the per-peak divisors behind it
+PKF   <- "temp_aging/numbers/yardstick_peaks.tsv" # the per-peak divisors behind it
 RHOF  <- "temp_aging/numbers/loo_rho.txt"
 OUT   <- "temp_aging/analysis/LOO_fig.png"
 NSHOW <- 30      # positions shown; loo_genome.R clumps at 5 cM
@@ -39,6 +43,8 @@ P <- read.table(POS, header = TRUE, sep = "\t") %>% as_tibble() %>%
          trt = factor(TRT_LAB[key], levels = TRT_LAB))
 TOT <- read.table(TOTF, header = TRUE, sep = "\t") %>% as_tibble() %>%
   rename(total = h2, jk_se = se) %>% mutate(trt = factor(TRT_LAB[trt], levels = TRT_LAB))
+PK  <- read.table(PKF, header = TRUE, sep = "\t") %>% as_tibble()
+PK  <- read.table(PKF, header = TRUE, sep = "\t") %>% as_tibble()
 
 
 # ── panel A ──────────────────────────────────────────────────────────────────
@@ -93,22 +99,35 @@ rl <- split(RHO$rho, RHO$trt)
 folds <- map_dfr(1:NSHOW, function(N)
   P %>% filter(rank <= N) %>% group_split(trt, holdout) %>%
     map_dfr(~sums(.x, rl[[as.character(.x$key[1])]]) %>%
-              mutate(trt = .x$trt[1], holdout = .x$holdout[1], N = N)))
+              mutate(trt = .x$trt[1], holdout = .x$holdout[1], N = N))) %>%
+  mutate(fold = cross_C^2 / nine_C)                # each held-out replicate on its own
 cum <- folds %>% group_by(trt, N) %>%
-  summarise(explained = mean(cross_C)^2 / mean(nine_C), se = jk(cross_C^2 / nine_C),
+  summarise(explained = mean(cross_C)^2 / mean(nine_C),
             plain_sum = mean(cross)^2 / mean(nine), .groups = "drop")
 
+# The divisor's spread: each Table S1 peak's footprint gives its own tiles per
+# locus, so its own genome-wide total = tile sum / footprint. A density of those
+# totals, weighted by peak height as the pooled divisor is, drawn as grey whose
+# darkness follows the mass. Dashed: the pooled estimate.
+DENS <- TOT %>% group_split(trt) %>% map_dfr(function(z) {
+  v <- z$sum_tiles / PK$tiles_per_locus; w <- PK$h2_peak / sum(PK$h2_peak)
+  # a divisor's uncertainty is multiplicative, so the density is taken on log h2
+  dn <- density(log(v), weights = w, bw = "nrd0", n = 512)
+  y <- exp(dn$x); tibble(trt = z$trt, y = y, dy = c(diff(y), 0), a = dn$y / max(dn$y)) })
+
+# light blue: the ten held-out replicates one at a time; dark: all ten combined
 pB <- ggplot(cum, aes(N, explained)) +
-  geom_hline(data = TOT, aes(yintercept = total), linetype = "dashed",
-             colour = "grey30") +
-  geom_ribbon(aes(ymin = pmax(explained - se, 0), ymax = explained + se),
-              fill = "#1F4E9C", alpha = 0.18) +
-  geom_line(colour = "#1F4E9C", linewidth = 0.8) +
+  geom_rect(data = DENS, aes(xmin = -Inf, xmax = Inf, ymin = y, ymax = y + dy, alpha = a),
+            fill = "grey40", inherit.aes = FALSE) +
+  scale_alpha_identity() +
+  geom_hline(data = TOT, aes(yintercept = total), linetype = "dashed", colour = "grey20") +
+  geom_line(data = folds, aes(N, fold, group = holdout), colour = "#1F4E9C", alpha = 0.25, linewidth = 0.4) +
+  geom_line(colour = "#1F4E9C", linewidth = 0.9) +
   geom_point(colour = "#1F4E9C", size = 1.4) +
   facet_wrap(~trt, nrow = 1) +
   scale_x_continuous(breaks = c(1, 10, 20, 30)) +
-  expand_limits(y = 0) +
-  labs(x = "markers in score", y = "heritability (%)") +
+  coord_cartesian(ylim = c(0, 30)) +
+  labs(x = "markers in predictor", y = "heritability (%)") +
   theme_bw(BASE) + theme(panel.grid.minor = element_blank(), legend.position = "bottom",
                          aspect.ratio = 1,
                          strip.background = element_rect(fill = "grey92", colour = NA))
@@ -127,6 +146,6 @@ print(as.data.frame(lab %>% transmute(trt, r = round(r, 3),
 cat("\npanel B endpoints, and the genome-wide total:\n")
 print(as.data.frame(cum %>% filter(N %in% c(10, 30)) %>%
   transmute(trt, N, explained = round(explained, 2), plain_sum = round(plain_sum, 2)) %>%
-  left_join(TOT %>% transmute(trt, total = round(total, 2), se = round(jk_se, 2)),
+  left_join(TOT %>% transmute(trt, total = round(total, 2)),
             by = "trt") %>%
   mutate(frac_of_total = round(explained / total, 2))), row.names = FALSE)

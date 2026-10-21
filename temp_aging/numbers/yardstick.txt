@@ -1,11 +1,12 @@
 # yardstick.R
-# run:    2026-10-21 17:05
-# script: afc1332
+# run:    2026-10-21 17:14
+# script: e5c0599
 # pipeline: a98e3bb 2026-08-30 README: methods-section description of the H2 estim
 # reads:
 #   process/AGE_SY/AGE_SY_4scan_no89.txt.gz                  3.4M  2026-08-30 20:39  md5:8ded8e73
 #   temp_aging/analysis/TableS1.tsv                          4.0K  2026-08-30 23:41  md5:e090132e
 #   temp_aging/numbers/loo_u.txt.gz                          1.9M  2026-10-20 14:50  md5:f4f7d5d0
+#   temp_aging/numbers/yardstick_peaks.tsv                   4.0K  2026-10-21 17:12  md5:a216167d
 #
 tiles: 268 of 1 cM
 
@@ -77,4 +78,4 @@ the peaks of Table S1: sum of their h2, and as a fraction of the yardstick
   Peak h2 is at the peak window and chosen in-sample, so these are upper
   bounds on what the peaks explain; the held-out counterpart is Fig. Yb.
 
-Wrote: temp_aging/numbers/yardstick.tsv 
+Wrote: temp_aging/numbers/yardstick.tsv and temp_aging/numbers/yardstick_peaks.tsv 

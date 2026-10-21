@@ -73,6 +73,8 @@ fp <- pmap_dfr(S1, function(peak, chr, cM) {
 cat("\nfootprints of the Table S1 peaks: h2 above the floor against cM; integral / peak = tiles per locus\n\n")
 print(as.data.frame(fp %>% mutate(across(where(is.double), ~round(.x, 2)))), row.names = FALSE)
 ok <- fp %>% filter(!is.na(tpl))
+PKF <- "temp_aging/numbers/yardstick_peaks.tsv"   # per-peak footprints; Fig. Yb shades the divisor's spread from these
+write.table(ok %>% select(peak, trt, h2_peak, tiles_per_locus = tpl), PKF, row.names = FALSE, quote = FALSE, sep = "\t")
 TPL <- round(sum(ok$integral) / sum(ok$h2_peak), 1)
 cat(sprintf("\n  %d peaks usable; tiles per locus %.1f to %.1f, median %.1f; pooled (sum integral / sum peak) %.1f -- used.\n",
             nrow(ok), min(ok$tpl), max(ok$tpl), median(ok$tpl), TPL))
@@ -131,6 +133,6 @@ print(as.data.frame(bind_rows(s1l %>% group_by(set, trt) %>% summarise(h2 = sum(
 cat("\n  Peak h2 is at the peak window and chosen in-sample, so these are upper\n",
     " bounds on what the peaks explain; the held-out counterpart is Fig. Yb.\n")
 
-write.table(ys %>% transmute(trt, h2, se, tiles_per_locus = TPL), TSV,
+write.table(ys %>% transmute(trt, h2, se, sum_tiles, tiles_per_locus = TPL), TSV,
             row.names = FALSE, quote = FALSE, sep = "\t")
-cat("\nWrote:", TSV, "\n")
+cat("\nWrote:", TSV, "and", PKF, "\n")
