@@ -48,8 +48,8 @@ pA <- ggplot(A, aes(pred, obs, colour = founder)) +
   scale_colour_manual(values = FOUNDER_COL, name = NULL) +
   coord_cartesian(xlim = c(-L, L), ylim = c(-L, L)) +
   facet_wrap(~trt, nrow = 1) +
-  labs(x = "predicted frequency change (from nine cages)",
-       y = "observed\n(held-out cage)") +
+  labs(x = "predicted frequency change (from nine replicates)",
+       y = "observed\n(held-out replicate)") +
   guides(colour = guide_legend(nrow = 1, override.aes = list(size = 3))) +
   theme_bw(BASE) + theme(panel.grid.minor = element_blank(), legend.position = "bottom",
                          aspect.ratio = 1,
