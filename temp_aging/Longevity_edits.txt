@@ -1,5 +1,7 @@
 EDITS TO APPLY IN THE GOOGLE DOC (v2 copy)
 Italicise Drosophila / Drosophila melanogaster where they appear.
+Edit 14 contains nine [EQ: ...] markers. Paste them as literal text, highlighted
+yellow, then replace each with Insert > Equation using the LaTeX it holds.
 
 ==============================================================================
 1. REPLACE the intro paragraph beginning 'Lifespan is mechanistically conserved'
@@ -67,25 +69,13 @@ Nine replicate experiments predict the tenth. Holding out each cage in turn, fou
 Figure Y: Out-of-sample prediction. (A) Haplotype frequency change at the top 10 markers in nine populations predicts change in a tenth, held-out population. Colors are founder haplotypes as in Figure 2. The dashed line is the line of identity. (B) Heritability explained as a function of the number of markers in the score. Shaded bands are jackknife standard errors. The dashed line is the marker-based heritability of the whole genome.
 
 ==============================================================================
-14. ADD as a NEW Methods paragraph directly after the one beginning 'The partitioning is carried out at every step'  [equations: see LaTeX below]
+14. ADD as a NEW Methods paragraph directly after the one beginning
+    'The partitioning is carried out at every step'
 ------------------------------------------------------------------------------
-**Out-of-sample prediction.** Each of the ten replicate cages was held out in turn. From the other nine we took a standardised response per founder at every step, ${e}_{f}=\overline{\Delta {p}_{fr}/{i}_{r}}$, and since the held-out cage's selected proportion is known its predicted founder frequency change, ${i}_{r}{e}_{f}$, carries no parameter fitted to it. Positions were ranked by the heritability of the nine training cages and clumped 5 cM apart, so the held-out cage neither set the weights nor chose where they were read. Training and held-out cages are different flies, so their sampling noise is independent and the cross-product $100k\sum\limits_{f}^{}{e}_{f}^{train}{e}_{f}^{test}/{\hat{p}}_{f}$ estimates heritability without the ${s}_{f}^{2}/R$ correction above and without winner's curse. Heritabilities at markers in linkage cannot be added: the heritability a set of markers explains is the quadratic form $100k\sum\limits_{f}^{}{u}_{f}^{train\top }{R}^{-1}{u}_{f}^{test}$ with ${u}_{f}={e}_{f}/\sqrt{{\hat{p}}_{f}}$ and $R$ the correlation between markers, measured as the cross-fold product at lag $d$ so that no noise term enters at any lag. This is the quantity GREML estimates through the relationship matrix, the counterpart of SNP-based heritability for this population. Among the markers of a score $R$ is well conditioned (1.4–3.1) and the correction is about 1%. Over all 273 one-cM tiles it is not: eight founders recombine into roughly 55 independent segments, and a genome-wide variance from so few units across ten cages is not determined, four methods spanning 6–32% while out-of-sample ${R}^{2}$ stays at 0.25, so the genome-wide figure is reported as an order of magnitude.
+**Out-of-sample prediction.** Each of the ten replicate cages was held out in turn. From the other nine we took a standardised response per founder at every step, [EQ: e_f = \overline{\Delta p_{fr} / i_r}], and since the held-out cage's selected proportion is known its predicted founder frequency change, [EQ: i_r e_f], carries no parameter fitted to it. Positions were ranked by the heritability of the nine training cages and clumped 5 cM apart, so the held-out cage neither set the weights nor chose where they were read. Training and held-out cages are different flies, so their sampling noise is independent and the cross-product [EQ: 100k \sum_f e_f^{train} e_f^{test} / \hat{p}_f] estimates heritability without the [EQ: s_f^2 / R] correction above and without winner's curse. Heritabilities at markers in linkage cannot be added: the heritability a set of markers explains is the quadratic form [EQ: 100k \sum_f u_f^{train \top} R^{-1} u_f^{test}] with [EQ: u_f = e_f / \sqrt{\hat{p}_f}] and [EQ: R] the correlation between markers, measured as the cross-fold product at lag [EQ: d] so that no noise term enters at any lag. This is the quantity GREML estimates through the relationship matrix, the counterpart of SNP-based heritability for this population. Among the markers of a score [EQ: R] is well conditioned (1.4-3.1) and the correction is about 1%. Over all 273 one-cM tiles it is not: eight founders recombine into roughly 55 independent segments, and a genome-wide variance from so few units across ten cages is not determined, four methods spanning 6-32% while out-of-sample [EQ: R^2] stays at 0.25, so the genome-wide figure is reported as an order of magnitude.
 
 ==============================================================================
 15. TWO ONE-WORD FIXES
 ------------------------------------------------------------------------------
 Partitioning paragraph:  'with four are expected'  ->  'where four are expected'
 Supplementary Result X:  'automsomes'  ->  'autosomes'
-
-==============================================================================
-EQUATIONS FOR EDIT 14, in the order they appear (paste into Insert > Equation)
-------------------------------------------------------------------------------
-e_f = \overline{\Delta p_{fr} / i_r}
-i_r e_f
-100k \sum_f e_f^{train} e_f^{test} / \hat{p}_f
-s_f^2 / R
-100k \sum_f u_f^{train \top} R^{-1} u_f^{test}
-u_f = e_f / \sqrt{\hat{p}_f}
-R
-d
-R^2
