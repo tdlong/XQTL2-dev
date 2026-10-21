@@ -1,11 +1,12 @@
-# make_LOO_fig.R -- can nine cages predict the tenth?
+# make_LOO_fig.R -- can nine replicates predict the tenth?
 #
-#   Rscript temp_aging/analysis/loo_joint.R      # writes loo_total.txt first
+#   bash temp_aging/analysis/run_numbers.sh yardstick   # marker-based h2, the dashed line
+#   Rscript temp_aging/analysis/loo_joint.R             # rho(d), for the N x N matrix
 #   Rscript temp_aging/analysis/make_LOO_fig.R
 #
 # Genome-wide, from loo_genome.R's output. Positions are ranked on the NINE
-# training cages and h2 is read in the TENTH, so the held-out cage neither sets
-# the weights nor chooses where to look.
+# replicates and h2 is read in the held-out TENTH, so the held-out replicate
+# neither sets the weights nor chooses where to look.
 #
 # PANEL A. The prediction itself. Each point is one founder at one position in
 # one held-out cage: x is what the other nine predicted, y is what that cage did.
@@ -26,7 +27,7 @@
 suppressMessages({library(tidyverse); library(patchwork)})
 
 POS   <- "temp_aging/numbers/loo_positions.txt.gz"
-TOTF  <- "temp_aging/numbers/yardstick.txt"   # marker-based h2, yardstick.R
+TOTF  <- "temp_aging/numbers/yardstick.tsv"   # marker-based h2, yardstick.R
 RHOF  <- "temp_aging/numbers/loo_rho.txt"
 OUT   <- "temp_aging/analysis/LOO_fig.png"
 NSHOW <- 30      # positions shown; loo_genome.R clumps at 5 cM

@@ -2,7 +2,8 @@
 # run_numbers.sh — run every analysis script and record its output WITH the
 # provenance of the data that produced it.
 #
-#   bash temp_aging/run_numbers.sh
+#   bash temp_aging/analysis/run_numbers.sh            # everything
+#   bash temp_aging/analysis/run_numbers.sh yardstick  # one script
 #
 # Writes temp_aging/numbers/<script>.txt. Each file starts with a header naming
 # every input the script read, that input's size, modification time and MD5, and
@@ -14,15 +15,17 @@
 # to tell a 12-replicate number from a 10-replicate one by looking at it.
 
 set -uo pipefail
-cd "$(dirname "$0")/.." || exit 1
+cd "$(dirname "$0")/../.." || exit 1
 
 OUT=temp_aging/numbers
 mkdir -p "$OUT"
 
-SCRIPTS=(h2_threshold design_power scan_resolution significant_regions peak_table chr3L_peak coverage partition_check)
+SCRIPTS=(h2_threshold design_power scan_resolution significant_regions peak_table chr3L_peak coverage partition_check yardstick)
+[ $# -gt 0 ] && SCRIPTS=("$@")
 
-stamp_inputs() {   # script path -> lines describing each process/ file it reads
-  grep -ohE '"process/[^"]+\.txt(\.gz)?"' "$1" | tr -d '"' | sort -u | while read -r f; do
+stamp_inputs() {   # script path -> lines describing each data file it reads
+  grep -ohE '"(process|temp_aging)/[^"]+\.(txt|tsv)(\.gz)?"' "$1" | tr -d '"' | sort -u |
+    grep -v "/numbers/$(basename "$1" .R)\." | while read -r f; do   # not its own outputs
     if [ -f "$f" ]; then
       printf '#   %-52s %8s  %s  md5:%s\n' "$f" \
         "$(du -h "$f" | cut -f1)" \

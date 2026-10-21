@@ -1,4 +1,7 @@
-# loo_joint.R -- genome-wide haplotype heritability, corrected for over-counting.
+# loo_joint.R -- rho(d), the correlation of founder frequency change between
+# tiles d cM apart, from the cross-fold products; and a hold-out version of the
+# genome-wide total, printed for comparison. THE PAPER'S genome-wide number is
+# yardstick.R (full data, footprint divisor); this total is not written out.
 #
 #   Rscript temp_aging/analysis/loo_joint.R
 #
@@ -40,7 +43,6 @@
 suppressMessages(library(tidyverse))
 
 IN     <- "temp_aging/numbers/loo_u.txt.gz"
-OUT    <- "temp_aging/numbers/loo_total.txt"   # read by make_LOO_fig.R
 OUTR   <- "temp_aging/numbers/loo_rho.txt"     # likewise, for the N x N matrix
 MAXLAG <- 45     # rho is summed as rho^2, so the tail adds nothing past ~15 cM;
                  # 45 is simply well beyond where it matters (see the stability
@@ -99,7 +101,6 @@ cat("\ngenome-wide total h2 (% of phenotypic variance)\n\n")
 TOT <- U %>% group_split(trt) %>% map_dfr(~est(.x, MAXLAG))
 print(as.data.frame(TOT %>% mutate(across(where(is.double), ~round(.x, 2)))),
   row.names = FALSE)
-write.table(TOT, OUT, row.names = FALSE, quote = FALSE, sep = "\t")
 
 cat("\nstability to where rho is truncated (it enters as rho^2, so the tail is small)\n\n")
 print(as.data.frame(map_dfr(c(10, 15, 20, 30, 45), function(L)
@@ -108,4 +109,4 @@ print(as.data.frame(map_dfr(c(10, 15, 20, 30, 45), function(L)
   pivot_wider(names_from = trt, values_from = total)), row.names = FALSE)
 
 cat("\nTruncating at 10 cM cuts real decay; past 15 cM the answer does not move.\n")
-cat("Wrote:", OUT, "\n")
+cat("Wrote:", OUTR, "\n")
