@@ -72,29 +72,19 @@ This substitutes for functional validation in the one respect functional validat
 
 Everything above is working notes. These two paragraphs are what goes in.
 
-## Methods — one paragraph
+## Methods
 
-**Out-of-sample prediction.** Each of the ten replicate cages was held out in
-turn. From the other nine we took a standardised response per founder at every
-step, $e_f = \overline{\Delta p_f / i}$, with $i$ the selection intensity implied
-by the proportion selected; the held-out cage's proportion is known, so its
-predicted founder frequency change $i_r e_f$ carries no parameter fitted to it.
-Positions were ranked by the heritability of the nine training cages and clumped
-5 cM apart, so the held-out cage neither set the weights nor chose where they
-were read. Training and held-out cages are different flies, so their sampling
-noise is independent and the cross-product $100k\sum_f e_f^{\mathrm{train}}
-e_f^{\mathrm{test}} / \hat{p}_f$ estimates heritability without the $s^2_f/R$
-correction the estimator above requires, and without winner's curse. Markers in
-linkage cannot have their heritabilities added: the heritability a set of markers
-explains is the quadratic form $100k\sum_f u_f^{\mathrm{train}\top} R^{-1}
-u_f^{\mathrm{test}}$, with $u_f = e_f/\sqrt{\hat{p}_f}$ and $R$ the correlation
-between markers, measured as the cross-fold product at lag $d$ so that no noise
-term enters at any lag. Among the markers of a score $R$ is well conditioned
-(1.4–3.1) and the correction is about 1%. Over all 273 one-cM tiles it is not:
-eight founders recombine into roughly 55 independent segments, and a genome-wide
-variance estimated from so few units across ten cages is not determined — four
-methods span 6 to 32% while out-of-sample $R^2$ stays at 0.25 — so the
-genome-wide figure is reported as an order of magnitude.
+**Out-of-sample prediction.** We asked whether the mapping predicts an experiment it has not seen, by analogy with testing a polygenic score in a new cohort. Each of the ten replicate cages was held out in turn and the other nine were used to build the predictor. From those nine we estimated, at every step, each founder's frequency change per unit of selection intensity (the mean of the $e_{fr}$ defined above), ranked positions by their heritability, and kept the strongest, at least 5 cM apart. The held-out cage's selected proportion is known, so its selection intensity $i$ is known, and the predicted change in founder frequency at each chosen position is simply $i$ times the nine-cage estimate. Nothing in the prediction comes from the held-out cage: it neither sets the weights nor chooses where they are read.
+
+The same split gives an unbiased heritability. Squaring a noisy estimate inflates it, which is why the estimator above subtracts $s_f^2/R$. Here the estimate from the nine cages and the measurement in the tenth carry independent errors, so their product is unbiased with no correction,
+
+$$
+\hat{h}^2 = 100\,k \sum_f \frac{\bar{e}_{f,\mathrm{nine}}\; e_{f,\mathrm{tenth}}}{\hat{p}_f}
+$$
+
+and because the positions were chosen using the nine cages alone, the estimate is also free of winner's curse.
+
+Heritabilities at nearby positions cannot simply be added, because one locus raises the estimate at every position linked to it. For the ten to thirty positions of a score we account for this directly, dividing out the correlation between positions, which is estimated the same way, from the nine-cage and tenth-cage responses, so that it too is free of sampling noise. The correction is small: positions 5 cM apart are nearly independent, and it changes the total by about 1%. Applied genome-wide the same correction cannot be estimated. Adjacent 1 cM tiles are 89% correlated, the eight founders recombine into only about 55 independent segments, and ten cages cannot pin down a variance from so few units; defensible methods give totals anywhere from 6 to 32%. We therefore report the genome-wide figure, the counterpart of SNP-based heritability for this population, as an order of magnitude only.
 
 ## Results and discussion — one paragraph
 
