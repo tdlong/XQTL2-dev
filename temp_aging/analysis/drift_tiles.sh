@@ -10,28 +10,27 @@
 
 # Submit from the XQTL2-dev root:  sbatch temp_aging/analysis/drift_tiles.sh
 # Same inputs and memory as loo_genome.sh (which ran in about four minutes).
-# Returns the output and a log through git. The log is the R script's output,
-# written to temp_aging/numbers and closed before the commit -- NOT the SLURM
-# .out, which SLURM keeps appending to after the commit and so is dirty forever
-# once tracked (what loo_genome.sh did). NO_GIT=1 to skip.
+# Returns the output and this job's SLURM log through git. The log is committed
+# so it can be read on the laptop, acted on, then `git rm`'d. Nothing may be
+# written to the log after it is added: loo_genome.sh echoed "committed" and
+# "pushed" afterwards, so the tracked copy never matched the file and every
+# pull on HPC3 failed on it. All output stops at the git add. NO_GIT=1 to skip.
 
 module load R/4.2.2
 
 fail=0
-LOG=temp_aging/numbers/drift_tiles.log
-Rscript temp_aging/analysis/drift_tiles.R > "$LOG" 2>&1 || fail=1
-cat "$LOG"
+Rscript temp_aging/analysis/drift_tiles.R || fail=1
 
 if [ "${NO_GIT:-0}" != "1" ]; then
   echo
-  echo "── returning results through git ─────────────────────────────"
-  git add temp_aging/numbers/drift_tiles.txt.gz "$LOG" 2>/dev/null
-  if git diff --cached --quiet; then
-    echo "   nothing changed"
-  else
-    git commit -q -m "drift_tiles: per-replicate pool frequencies on a 0.25 cM grid (job ${SLURM_JOB_ID:-manual})" \
-      && echo "   committed" || echo "   commit failed" >&2
-    if git push -q; then echo "   pushed"; else echo "   not pushed -- committed locally, run: git push" >&2; fi
+  echo "── returning results through git: committing output and this log, then silent ──"
+  lg="logs/drift_tiles_${SLURM_JOB_ID:-manual}.out"
+  exec >/dev/null 2>&1
+  git add temp_aging/numbers/drift_tiles.txt.gz
+  [ -f "$lg" ] && git add -f "$lg"
+  if ! git diff --cached --quiet; then
+    git commit -q -m "drift_tiles: per-replicate pool frequencies on a 0.25 cM grid (job ${SLURM_JOB_ID:-manual})"
+    git push -q
   fi
 fi
 exit "$fail"
