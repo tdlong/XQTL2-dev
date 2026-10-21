@@ -18,11 +18,9 @@
 # marker-based heritability of the whole genome. Both are percent of phenotypic
 # variance, so they are directly comparable and no ratio is needed.
 #
-# SPACING. Markers stay at loo_genome.R's 5 cM clumping. An earlier version
-# re-clumped to 10 cM on the theory that 5 cM double counts; the N x N matrix
-# shows it does not -- the naive and matrix-corrected sums agree to ~1% (11.13 vs
-# 11.24 at N = 30). The fall seen on re-clumping was losing markers, 30 down to
-# 18, not removing redundancy.
+# SPACING. Markers stay at loo_genome.R's 5 cM clumping, and h2 is summed
+# over them without a correlation correction. The N x N matrix from rho(d) is
+# printed beside the plotted value as the check: it moves them by at most 5%.
 
 suppressMessages({library(tidyverse); library(patchwork)})
 
@@ -67,32 +65,39 @@ pA <- ggplot(A, aes(pred, obs, colour = founder)) +
                          strip.background = element_rect(fill = "grey92", colour = NA))
 
 # ── panel B ──────────────────────────────────────────────────────────────────
-# What a score on the top N markers explains, against the genome-wide total.
-# Both axes are percent of phenotypic variance. The correlation between the N
-# markers is divided out with the N x N matrix -- the condition number is 1.4 to
-# 3.1 at these spacings, so this is the exact correction, not an approximation.
+# Heritability a predictor on the N best tiles explains in the held-out
+# replicate, as a fraction of phenotypic variance.  Per fold:
+#   cross = sum over the N tiles of  100 k sum_f  e_bar_f e_f(r) / p_f   (= sum of h2_r)
+#   nine  = sum over the N tiles of  100 k sum_f  e_bar_f e_bar_f / p_f  (the predictor's variance)
+#   explained = mean(cross)^2 / mean(nine)   over the ten folds
+# which is the regression of the held-out replicate on the predictor, cov^2/var,
+# in h2 units.  Plain sums over tiles: the tiles are >= 5 cM apart.  The N x N
+# correlation matrix built from rho(d) is computed alongside and printed as a
+# check; it moves the sums by at most 5% and is not what is plotted.
 jk <- function(x) { n <- length(x); sqrt((n - 1) / n * sum((x - mean(x))^2)) }
-qform <- function(g, rho) {
+sums <- function(g, rho) {
   key <- g %>% distinct(rank, chr, cM) %>% arrange(rank); n <- nrow(key)
   R <- ifelse(outer(key$chr, key$chr, "=="),
               rho[pmin(round(abs(outer(key$cM, key$cM, "-"))), length(rho) - 1) + 1], 0)
   diag(R) <- 1; Ri <- solve(R)
   v <- g %>% mutate(v = pred / sqrt(p), w = obs / sqrt(p))
   cc <- sum(g$h2_cross) / sum(v$v * v$w)          # = 100k/i^2, recovered
-  q <- function(col) sum(map_dbl(unique(g$founder), function(f) {
+  q <- function(col, M) sum(map_dbl(unique(g$founder), function(f) {
     h <- v %>% filter(founder == f) %>% arrange(rank)
     if (nrow(h) != n) return(NA_real_)
-    cc * as.numeric(t(h$v) %*% Ri %*% h[[col]]) }), na.rm = TRUE)
-  tibble(cross = q("w"), nine = q("v"))
+    cc * as.numeric(t(h$v) %*% M %*% h[[col]]) }), na.rm = TRUE)
+  tibble(cross = q("w", diag(n)), nine = q("v", diag(n)),
+         cross_C = q("w", Ri), nine_C = q("v", Ri))
 }
 RHO <- read.table(RHOF, header = TRUE, sep = "\t") %>% as_tibble()
 rl <- split(RHO$rho, RHO$trt)
-cum <- map_dfr(1:NSHOW, function(N)
+folds <- map_dfr(1:NSHOW, function(N)
   P %>% filter(rank <= N) %>% group_split(trt, holdout) %>%
-    map_dfr(~qform(.x, rl[[as.character(.x$key[1])]]) %>%
-              mutate(trt = .x$trt[1], holdout = .x$holdout[1], N = N))) %>%
-  group_by(trt, N) %>% summarise(explained = mean(cross)^2 / mean(nine),
-    se = jk(cross^2 / nine), .groups = "drop")
+    map_dfr(~sums(.x, rl[[as.character(.x$key[1])]]) %>%
+              mutate(trt = .x$trt[1], holdout = .x$holdout[1], N = N)))
+cum <- folds %>% group_by(trt, N) %>%
+  summarise(explained = mean(cross)^2 / mean(nine), se = jk(cross^2 / nine),
+            explained_C = mean(cross_C)^2 / mean(nine_C), .groups = "drop")
 
 pB <- ggplot(cum, aes(N, explained)) +
   geom_hline(data = TOT, aes(yintercept = total), linetype = "dashed",
@@ -122,7 +127,7 @@ print(as.data.frame(lab %>% transmute(trt, r = round(r, 3),
   slope = round(slope, 3))), row.names = FALSE)
 cat("\npanel B endpoints, and the genome-wide total:\n")
 print(as.data.frame(cum %>% filter(N %in% c(10, 30)) %>%
-  transmute(trt, N, explained = round(explained, 2)) %>%
+  transmute(trt, N, explained = round(explained, 2), with_C = round(explained_C, 2)) %>%
   left_join(TOT %>% transmute(trt, total = round(total, 2), se = round(jk_se, 2)),
             by = "trt") %>%
   mutate(frac_of_total = round(explained / total, 2))), row.names = FALSE)
