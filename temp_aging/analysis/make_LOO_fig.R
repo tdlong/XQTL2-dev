@@ -18,9 +18,8 @@
 # marker-based heritability of the whole genome. Both are percent of phenotypic
 # variance, so they are directly comparable and no ratio is needed.
 #
-# SPACING. Markers stay at loo_genome.R's 5 cM clumping, and h2 is summed
-# over them without a correlation correction. The N x N matrix from rho(d) is
-# printed beside the plotted value as the check: it moves them by at most 5%.
+# SPACING. Markers stay at loo_genome.R's 5 cM clumping; the N x N correlation
+# matrix divides out what correlation remains (up to 5% of the sum).
 
 suppressMessages({library(tidyverse); library(patchwork)})
 
@@ -96,8 +95,8 @@ folds <- map_dfr(1:NSHOW, function(N)
     map_dfr(~sums(.x, rl[[as.character(.x$key[1])]]) %>%
               mutate(trt = .x$trt[1], holdout = .x$holdout[1], N = N)))
 cum <- folds %>% group_by(trt, N) %>%
-  summarise(explained = mean(cross)^2 / mean(nine), se = jk(cross^2 / nine),
-            explained_C = mean(cross_C)^2 / mean(nine_C), .groups = "drop")
+  summarise(explained = mean(cross_C)^2 / mean(nine_C), se = jk(cross_C^2 / nine_C),
+            plain_sum = mean(cross)^2 / mean(nine), .groups = "drop")
 
 pB <- ggplot(cum, aes(N, explained)) +
   geom_hline(data = TOT, aes(yintercept = total), linetype = "dashed",
@@ -127,7 +126,7 @@ print(as.data.frame(lab %>% transmute(trt, r = round(r, 3),
   slope = round(slope, 3))), row.names = FALSE)
 cat("\npanel B endpoints, and the genome-wide total:\n")
 print(as.data.frame(cum %>% filter(N %in% c(10, 30)) %>%
-  transmute(trt, N, explained = round(explained, 2), with_C = round(explained_C, 2)) %>%
+  transmute(trt, N, explained = round(explained, 2), plain_sum = round(plain_sum, 2)) %>%
   left_join(TOT %>% transmute(trt, total = round(total, 2), se = round(jk_se, 2)),
             by = "trt") %>%
   mutate(frac_of_total = round(explained / total, 2))), row.names = FALSE)
