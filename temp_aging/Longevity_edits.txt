@@ -1,0 +1,91 @@
+EDITS TO APPLY IN THE GOOGLE DOC (v2 copy)
+Italicise Drosophila / Drosophila melanogaster where they appear.
+
+==============================================================================
+1. REPLACE the intro paragraph beginning 'Lifespan is mechanistically conserved'
+------------------------------------------------------------------------------
+Lifespan is mechanistically conserved across metazoans (11336665 - Kenyon insulin review; 18340043 - delete worm aging genes in yeast and find that they more often than not impact yeast aging; 17411345 - Ruvkun finds essential worm genes that also extend lifespan and show they are conserved to humans; 28007498 - oldish DR conservation review), varies among individuals of a species, and the variation is heritable (27485207 - my DSPR RIL mapping; 40326784 - DO mouse mapping; 42020758 - Rob williams 4-way mouse mapping population; 41353149 - Trudy AIP from DGRP; 32134916 - Trudy GWAS with DGRP). In Drosophila melanogaster narrow-sense estimates run from under 10% in selection experiments to 31–47% in an outbred population derived from the same founders used here (30356225), the difference reflecting the fertility cost that confounds selection on late life. Longevity in flies is polygenic, fitness-adjacent, and measurable in large cohorts under standardized conditions. Candidate-gene and pathway studies have identified mutations, diets and drugs that extend lifespan, but efforts to characterize the standing variation that controls it, or its interaction with diet and drugs, have produced inconsistent results. One explanation is that longevity is highly polygenic in the manner of human height or BMI; another is a few genes of large to intermediate effect against a polygenic background; experiments to date have not been large enough to tell these apart. Here we use extreme QTL (X-QTL) mapping in an eight-founder advanced-intercross synthetic population, phenotyping >410,000 flies across both sexes and two dietary yeast levels in ten replicate experiments. Heritable signal is elevated across essentially the entire euchromatic genome in every sex-by-diet combination, partitions into a shared effect plus sex and diet components, and is organized in regional blocks rather than uniformly. One locus rises above the polygenic background and accounts for 2–5% of lifespan variation. Natural variation in lifespan is not concentrated in a set of aging genes; it is spread across the genome in a sex- and diet-dependent manner, and nine replicate experiments predict the tenth.
+
+==============================================================================
+2. ADD as a new paragraph directly after it (your note, moved out of the paragraph)
+------------------------------------------------------------------------------
+[TL note kept from draft: the "not concentrated in a set of aging genes" claim might need to be revised, or we have to define "aging genes" as a set and show this.]
+
+==============================================================================
+3. REPLACE the paragraph beginning 'Linkage based mapping signals'
+------------------------------------------------------------------------------
+Linkage-based mapping signals integrate polygenic architecture locally. In humans, affected-sib-pair linkage signals for height and body mass index can be reconstructed by summing GWAS effects over chromosomal segments (Sidorenko). A multiparent advanced intercross performs that integration directly: each founder haplotype block carries whatever causal variants segregate within it, and the shift in its frequency between control and selected pools measures the block's aggregate effect. The mapping signal is therefore a readout of polygenic architecture along the genome. Longevity suits this design because the phenotypic tail selects itself — a large cohort is set up, and the few flies still alive at the end are the extreme — and pooled sequencing replaces individual genotyping. The combination lets us query hundreds of thousands of flies per sex and diet, and replicate at the scale needed to detect and quantify subtle linkage signals.
+
+==============================================================================
+4. REPLACE the paragraph beginning 'Our implementation follows earlier XQTL'
+------------------------------------------------------------------------------
+Our implementation follows earlier X-QTL experiments in Drosophila [Macdonald and Long refs]. The mapping population is a synthetic population founded by intercrossing >600 recombinant inbred lines of the DSPR and maintained continuously since, six media bottles added each week and removed after three. All lines descend from eight inbred founder strains with reference-quality genome assemblies (King Genetics, Genome Res, Mahul's paper), and the population has recombined for [XX] generations, so founder haplotypes persist only as short blocks. We seeded each aging cage with roughly 10,000 flies of one sex on a sugar-yeast medium containing 10% (SY10) or 20% yeast (SY20), SY10 being a restricted diet that extends lifespan in this population (Supplementary Fig. ?), held cages at 25 °C, replaced food every two days, and harvested the last ~500 flies alive after 48–73 days depending on sex, diet and replicate. Ten replicates per sex-by-diet treatment ran over 18 months, each replicate contributing one unselected control pool per sex drawn from the same cohort at its start, so that one control serves both diets. We sequenced pooled DNA from each survivor pool and its control to 50–200×, counted reads at SNPs differentially fixed among the founders, and estimated founder haplotype frequencies in overlapping windows genome-wide (Fig. 1a). The contrast between survivor and control pools is the mapping signal. Because the population is an advanced rather than a single-generation cross, each 1 cM tile reports the aggregate effect of a short haplotype block rather than a whole chromosome arm.
+
+==============================================================================
+5. ADD directly after it (your crossing-scheme note, moved out)
+------------------------------------------------------------------------------
+[TL note kept from draft: crossing scheme - I dump 10 eggs from each RIL in a series of vials, wait for adults, then open them in a giant box; this is in my M&M, but maybe we don't add anything here?]
+
+==============================================================================
+6. REPLACE the Results paragraph beginning 'Much of the genome contributes'
+------------------------------------------------------------------------------
+Much of the genome contributes to haplotype change in long-lived individuals. Each sex × diet group was scanned independently, contrasting the longest-lived 3–11% of each of ten replicates with the unselected controls (Fig. 1a). Dividing the genetic map into 268 one-cM tiles that are not wholly heterochromatic, and scoring a tile by its largest -log10 P Wald statistic (LWP) in any treatment, 32% of tiles exceed 7.5 and 12% exceed 15. Because the population is an advanced cross, unrecombined founder haplotypes are short and the strongest peaks are correspondingly narrow: we define eight peaks with local maximum LWP above 15 and ten more above 7.5, each at least 5 cM from any stronger peak (Table S1), and two-LWP support intervals on the eighteen have an 80% range in width of 0.25–1.51 cM, or 168–828 kb.
+
+==============================================================================
+7. ADD directly after it (Stuart's note, moved out)
+------------------------------------------------------------------------------
+[SJM note kept from draft: would it be better here to FIRST define the peaks (because this is what people do with QTL plots) and let that lead to the next para?]
+
+==============================================================================
+8. REPLACE the paragraph beginning 'Wald scores establish'
+------------------------------------------------------------------------------
+Wald scores establish that a region's founder frequencies change, not by how much, and small shifts can be highly significant. The squared change in founder frequency per window, scaled by the selected proportion, estimates the heritability each window explains and places the scan on the scale of phenotypic variance (Fig. 1b). LWP and heritability are tightly related (r = 0.98), and heritability is a simple function of the number of chromosomes sequenced and the proportion selected, so LWP thresholds of 2, 7.5 and 15 correspond to heritabilities of 0.09%, 0.32% and 0.61%. The experiment resolves heritabilities as small as 0.3%, and a third of the genome is associated with variation at that scale. Reaching this limit required screening ~104,000 flies per treatment, selecting the longest-lived ~5%, and sequencing several thousand selected and control flies per treatment. Regions contributing less than 2% of heritable variation would have gone undetected in prior work with mapping panels of several hundred RILs (27485207) or association panels of hundreds of inbred lines or thousands of genotyped individuals (Supplementary Result X). The pattern recalls the reconciliation of GWAS and affected-sib linkage results for human height and BMI (Sidorenko), where linkage LOD scores are consistent with the cumulative effects of polygenes known from large GWAS.
+
+==============================================================================
+9. ADD directly after it (Stuart's two notes, moved out)
+------------------------------------------------------------------------------
+[SJM notes kept from draft: given how similar Fig. 1a and 1b are, do we need "a"? Or perhaps the SNP-based Manhattan replaces "a"? Also: the largest QTL in 27485207 (explains 5.2%) overlaps the "3R 8.63" peak here - worth a sentence?]
+
+==============================================================================
+10. REPLACE the paragraph beginning 'The X chromosome is depauperate'
+------------------------------------------------------------------------------
+The X chromosome is depauperate in peaks: it is 24% of the genetic map, yet only 3% of its 1 cM tiles exceed LWP 7.5 and none exceeds 15, against 41% and 16% for the autosomes, perhaps because partially recessive alleles are exposed to purifying selection every generation in hemizygous males. On the autosomes 83 of 203 tiles exceed 7.5 in at least one treatment. Averaging heritability over diets within sex, male peaks are the higher at 52% of those tiles, so neither sex is systematically more responsive. Partitioning heritability across the four treatments into a shared component and components due to sex and to diet (Fig. 1c), 13.2% of the variation among treatments over tiles above 7.5 is sex-specific and 1.8% diet-specific, and the partition varies with genomic location: the strongest peaks are detected in all four treatments, while weaker signal is more often sex- or diet-specific. Regional genotype-by-environment interaction of this kind would be invisible to analyses that remove sex or environment as covariates before estimating polygenic effects, the usual practice in human genetics, where environment is not manipulated and may covary geographically with genotype. Longevity under two diets is a single example, but if the observation is general it bears on polygenic risk scores.
+
+==============================================================================
+11. REPLACE the paragraph beginning 'A large-effect locus sits on top'
+------------------------------------------------------------------------------
+A large-effect locus sits on top of the polygenic background. The peak on chromosome 3L at 9.30 Mb reaches an LWP of 163.8 in high-sugar males and exceeds 36 in all four groups, in a genome where only 12% of tiles exceed 15 in any group. It accounts for 4.7% of phenotypic variance in high-sugar males and 1.5% in low-sugar females, two to three times the largest of the other regions we detect, and has the narrowest support interval in physical terms of any peak in Table S1, 55 kb. The change in founder frequencies here is dominated by founder B3 (Fig. 2d), which falls by 6.3% in low-sugar females to 10.3% in high-sugar males in the selected pools, a far larger shift than at any other peak. The B3 haplotype is not unconditionally deleterious: its frequency over time in the synthetic population is typical of other regions and founders (Fig. 2h). B3 carries a naturally occurring allele, or alleles, that reduce representation among long-lived flies in both sexes and on both diets. The mapped interval contains the upstream regulatory region of peptidoglycan recognition protein LA (PGRP-LA), part of a gene complex in innate immune signalling, a gene not previously identified as a candidate for longevity nor in intervention studies.
+
+==============================================================================
+12. ADD as a NEW Results paragraph directly after it
+------------------------------------------------------------------------------
+Nine replicate experiments predict the tenth. Holding out each cage in turn, founder-frequency changes at the ten highest-ranked markers, estimated from the other nine cages, predict those in the held-out cage at r = 0.77–0.83 across treatments, with regression slopes of 0.87–0.91 against a line of identity that was not fitted (Fig. Ya). Founder B3 at chr3L 9.30 Mb, predicted to fall 11.4% in one held-out cage, fell 12.0%. A score on those ten markers explains 6.4–9.5% of phenotypic variance and one on thirty explains 8.2–11.6% (Fig. Yb), against a marker-based heritability for the whole genome of order 10%. The mapped signal therefore predicts quantitatively, genome-wide, in material that contributed nothing to the mapping, the validation available to a selection experiment in place of functional work. It does not place causal sites within intervals, since a linked haplotype predicts as well as a causal one, nor test additivity across loci, which pooled sequencing cannot see. Eight founders at appreciable frequency concentrate the segregating variation into roughly 55 independent segments, each assayed in thousands of flies; that is what makes a locus precise and the prediction strong, and what leaves too few units to pin the genome-wide total.
+
+==============================================================================
+13. REPLACE the Figure Y legend
+------------------------------------------------------------------------------
+Figure Y: Out-of-sample prediction. (A) Haplotype frequency change at the top 10 markers in nine populations predicts change in a tenth, held-out population. Colors are founder haplotypes as in Figure 2. The dashed line is the line of identity. (B) Heritability explained as a function of the number of markers in the score. Shaded bands are jackknife standard errors. The dashed line is the marker-based heritability of the whole genome.
+
+==============================================================================
+14. ADD as a NEW Methods paragraph directly after the one beginning 'The partitioning is carried out at every step'  [equations: see LaTeX below]
+------------------------------------------------------------------------------
+**Out-of-sample prediction.** Each of the ten replicate cages was held out in turn. From the other nine we took a standardised response per founder at every step, ${e}_{f}=\overline{\Delta {p}_{fr}/{i}_{r}}$, and since the held-out cage's selected proportion is known its predicted founder frequency change, ${i}_{r}{e}_{f}$, carries no parameter fitted to it. Positions were ranked by the heritability of the nine training cages and clumped 5 cM apart, so the held-out cage neither set the weights nor chose where they were read. Training and held-out cages are different flies, so their sampling noise is independent and the cross-product $100k\sum\limits_{f}^{}{e}_{f}^{train}{e}_{f}^{test}/{\hat{p}}_{f}$ estimates heritability without the ${s}_{f}^{2}/R$ correction above and without winner's curse. Heritabilities at markers in linkage cannot be added: the heritability a set of markers explains is the quadratic form $100k\sum\limits_{f}^{}{u}_{f}^{train\top }{R}^{-1}{u}_{f}^{test}$ with ${u}_{f}={e}_{f}/\sqrt{{\hat{p}}_{f}}$ and $R$ the correlation between markers, measured as the cross-fold product at lag $d$ so that no noise term enters at any lag. This is the quantity GREML estimates through the relationship matrix, the counterpart of SNP-based heritability for this population. Among the markers of a score $R$ is well conditioned (1.4–3.1) and the correction is about 1%. Over all 273 one-cM tiles it is not: eight founders recombine into roughly 55 independent segments, and a genome-wide variance from so few units across ten cages is not determined, four methods spanning 6–32% while out-of-sample ${R}^{2}$ stays at 0.25, so the genome-wide figure is reported as an order of magnitude.
+
+==============================================================================
+15. TWO ONE-WORD FIXES
+------------------------------------------------------------------------------
+Partitioning paragraph:  'with four are expected'  ->  'where four are expected'
+Supplementary Result X:  'automsomes'  ->  'autosomes'
+
+==============================================================================
+EQUATIONS FOR EDIT 14, in the order they appear (paste into Insert > Equation)
+------------------------------------------------------------------------------
+e_f = \overline{\Delta p_{fr} / i_r}
+i_r e_f
+100k \sum_f e_f^{train} e_f^{test} / \hat{p}_f
+s_f^2 / R
+100k \sum_f u_f^{train \top} R^{-1} u_f^{test}
+u_f = e_f / \sqrt{\hat{p}_f}
+R
+d
+R^2
