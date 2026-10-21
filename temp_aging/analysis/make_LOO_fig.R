@@ -26,7 +26,7 @@
 suppressMessages({library(tidyverse); library(patchwork)})
 
 POS   <- "temp_aging/numbers/loo_positions.txt.gz"
-TOTF  <- "temp_aging/numbers/loo_total.txt"
+TOTF  <- "temp_aging/numbers/yardstick.txt"   # marker-based h2, yardstick.R
 RHOF  <- "temp_aging/numbers/loo_rho.txt"
 OUT   <- "temp_aging/analysis/LOO_fig.png"
 NSHOW <- 30      # positions shown; loo_genome.R clumps at 5 cM
@@ -40,7 +40,7 @@ P <- read.table(POS, header = TRUE, sep = "\t") %>% as_tibble() %>%
   mutate(key = paste0(sugar, "_", sex),
          trt = factor(TRT_LAB[key], levels = TRT_LAB))
 TOT <- read.table(TOTF, header = TRUE, sep = "\t") %>% as_tibble() %>%
-  mutate(trt = factor(TRT_LAB[trt], levels = TRT_LAB))
+  rename(total = h2, jk_se = se) %>% mutate(trt = factor(TRT_LAB[trt], levels = TRT_LAB))
 
 
 # ── panel A ──────────────────────────────────────────────────────────────────
