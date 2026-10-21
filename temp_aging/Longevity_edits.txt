@@ -89,7 +89,7 @@ $$
 \hat{h}^2_{N,r} = 100\,k \sum_f \tilde{e}_{f,-r}^{\top} C^{-1} \tilde{e}_{fr} .
 $$
 
-At 5 cM spacing $C$ is close to the identity and the correction is about 1%. Over all 273 tiles adjacent entries of $C$ are 0.89 and the genome comprises about 55 independent segments; the genome-wide total, the analogue of SNP-based heritability, is then not well determined, ranging from 6 to 32% across methods, and is reported as an order of magnitude only.
+At 5 cM spacing $C$ is close to the identity and the correction is about 1%. Over all 273 tiles adjacent entries of $C$ are 0.89 and the genome comprises about 55 independent segments; the marker-based heritability of the whole genome, the counterpart of SNP-based heritability, is then not well determined, ranging from 6 to 32% across methods, and is reported as an order of magnitude only.
 
 ==============================================================================
 15. TWO ONE-WORD FIXES
