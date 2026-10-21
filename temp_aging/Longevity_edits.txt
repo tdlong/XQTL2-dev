@@ -60,7 +60,7 @@ A large-effect locus sits on top of the polygenic background. The peak on chromo
 ==============================================================================
 12. ADD as a NEW Results paragraph directly after it
 ------------------------------------------------------------------------------
-Nine replicate experiments predict the tenth. Holding out each cage in turn, founder-frequency changes at the ten highest-ranked markers, estimated from the other nine cages, predict those in the held-out cage at r = 0.77–0.83 across treatments, with regression slopes of 0.87–0.91 against a line of identity that was not fitted (Fig. Ya). Founder B3 at chr3L 9.30 Mb, predicted to fall 11.4% in one held-out cage, fell 12.0%. A score on those ten markers explains 6.4–9.5% of phenotypic variance and one on thirty explains 8.2–11.6% (Fig. Yb), against a marker-based heritability for the whole genome of order 10%. The mapped signal therefore predicts quantitatively, genome-wide, in material that contributed nothing to the mapping, the validation available to a selection experiment in place of functional work. It does not place causal sites within intervals, since a linked haplotype predicts as well as a causal one, nor test additivity across loci, which pooled sequencing cannot see. Eight founders at appreciable frequency concentrate the segregating variation into roughly 55 independent segments, each assayed in thousands of flies; that is what makes a locus precise and the prediction strong, and what leaves too few units to pin the genome-wide total.
+Nine replicate experiments predict the tenth. Holding out each replicate in turn, founder-frequency changes at the ten highest-ranked tiles, estimated from the other nine replicates, predict those in the held-out replicate at r = 0.77–0.83 across treatments, with regression slopes of 0.87–0.91 against a line of identity that was not fitted (Fig. Ya). Founder B3 at chr3L 9.30 Mb, predicted to fall 11.4% in one held-out replicate, fell 12.0%. A predictor built on those ten tiles explains 6.4–9.5% of phenotypic variance and one built on thirty explains 8.2–11.6% (Fig. Yb), against a marker-based heritability for the whole genome of order 10%. The mapped signal therefore predicts quantitatively, genome-wide, in material that contributed nothing to the mapping, the validation available to a selection experiment in place of functional work. It does not place causal sites within intervals, since a linked haplotype predicts as well as a causal one, nor test additivity across tiles, which pooled sequencing cannot see. Eight founders at appreciable frequency concentrate the segregating variation into roughly 55 independent segments, each assayed in thousands of flies; that is what makes a locus precise and the prediction strong, and what leaves too few units to pin the genome-wide total.
 
 ==============================================================================
 13. REPLACE the Figure Y legend
@@ -73,23 +73,23 @@ Figure Y: Out-of-sample prediction. (A) Haplotype frequency change at the top 10
     Paste from temp_aging/Paragraph_to_paste.docx (upload to Drive, open as
     a Google Doc, copy, paste) -- the equation comes across formatted.
 ------------------------------------------------------------------------------
-**Out-of-sample prediction.** We asked if changes in founder haplotype frequencies at leading factors can predict an unseen experiment, by analogy with polygenic risk scores. Each of the ten independent replicate cages was held out in turn and the other nine were used to build the predictor. From those nine we estimated founder frequency changes (the mean of the $e_{fr}$ defined above), ranked tiles by heritability explained, and kept the strongest predictors separated by at least 5 cM. The predicted change in founder frequency at chosen positions is simply the known selection intensity, $i$, times the nine-cage estimate. We similarly estimate heritability explained by the estimator.
+**Out-of-sample prediction.** We asked if changes in founder haplotype frequencies at leading factors can predict an unseen experiment, by analogy with polygenic risk scores. Each of the ten independent replicates was held out in turn and the other nine were used to build the predictor. From those nine we estimated founder frequency changes (the mean of the $e_{fr}$ defined above), ranked tiles by heritability explained, and kept the strongest predictors separated by at least 5 cM. The predicted change in founder frequency at chosen positions is simply the known selection intensity, $i$, times the estimate from the other nine replicates. We similarly estimate heritability explained by the predictor.
 
-At each chosen tile the nine cages give $\bar{e}_{f,\mathrm{nine}}$, the mean of $e_{fr}$ over those cages, and the held-out cage gives $e_{f,\mathrm{tenth}}$. Heritability explained at the tile is
-
-$$
-\hat{h}^2 = 100\,k \sum_f \frac{\bar{e}_{f,\mathrm{nine}}\; e_{f,\mathrm{tenth}}}{\hat{p}_f}
-$$
-
-where $\hat{p}_f$ is the mean control frequency. The two factors carry independent sampling error, so no $s_f^2/R$ term is needed, and as tiles were chosen on the nine cages alone the estimate is free of winner's curse. The heritability a score on $N$ tiles explains (Fig. Yb) is this cross-product multiplied by its ratio to the nine-cage estimate, $100k\sum_f \bar{e}_{f,\mathrm{nine}}^{\,2}/\hat{p}_f$.
-
-Tiles in linkage share signal, so heritability over $N$ tiles is combined through the $N \times N$ matrix $R$ of correlations among them, estimated as the correlation of $\bar{e}_{\mathrm{nine}}$ at one tile with $e_{\mathrm{tenth}}$ at another,
+For held-out replicate $r$, write $\bar{e}_{f,-r}$ for the mean of $e_{fr'}$ over the nine remaining replicates. Heritability explained at a chosen tile is
 
 $$
-\hat{h}^2_N = 100\,k \sum_f \mathbf{u}_{f,\mathrm{nine}}^{\top} R^{-1} \mathbf{u}_{f,\mathrm{tenth}}
+\hat{h}^2_r = 100\,k \sum_f \frac{\bar{e}_{f,-r}\; e_{fr}}{\hat{p}_f}
 $$
 
-with $u_f = e_f/\sqrt{\hat{p}_f}$ over the $N$ tiles. At 5 cM spacing $R$ is close to the identity and the correction is about 1%. Over all 273 tiles adjacent entries of $R$ are 0.89 and the genome holds about 55 independent segments; the total, the analogue of SNP-based heritability, is then not well determined, ranging from 6 to 32% across methods, and is reported as an order of magnitude.
+where $e_{fr}$ is the held-out replicate's own response. The two factors carry independent sampling error, so the $s_f^2/R$ term is not required, and as tiles were chosen on the nine remaining replicates the estimate is not inflated by that choice. Heritability explained by a predictor built on $N$ tiles (Fig. Yb) is this cross-product multiplied by its ratio to the nine-replicate estimate $100k\sum_f \bar{e}_{f,-r}^{\,2}/\hat{p}_f$.
+
+Tiles in linkage share signal, so heritability over the $N$ tiles is combined through $C$, the $N \times N$ matrix of correlations among them, estimated as the correlation of $\bar{e}_{-r}$ at one tile with $e_r$ at another. Writing $\tilde{e}_{fr} = e_{fr}/\sqrt{\hat{p}_f}$ as a vector over the $N$ tiles,
+
+$$
+\hat{h}^2_{N,r} = 100\,k \sum_f \tilde{e}_{f,-r}^{\top} C^{-1} \tilde{e}_{fr} .
+$$
+
+At 5 cM spacing $C$ is close to the identity and the correction is about 1%. Over all 273 tiles adjacent entries of $C$ are 0.89 and the genome comprises about 55 independent segments; the genome-wide total, the analogue of SNP-based heritability, is then not well determined, ranging from 6 to 32% across methods, and is reported as an order of magnitude only.
 
 ==============================================================================
 15. TWO ONE-WORD FIXES
