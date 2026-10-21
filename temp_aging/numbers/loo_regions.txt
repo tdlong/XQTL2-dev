@@ -1,0 +1,63 @@
+# loo_regions.R
+# run:    2026-10-21 16:56
+# script: 
+# pipeline: a98e3bb 2026-08-30 README: methods-section description of the H2 estim
+# reads:
+#   temp_aging/numbers/loo_tiles.txt.gz                      340K  2026-10-20 13:55  md5:851be519
+#   temp_aging/numbers/loo_u.txt.gz                          1.9M  2026-10-20 14:50  md5:f4f7d5d0
+#
+tiles: 273  folds: 10 
+
+genome-wide sum of tile h2, full ten replicates (the denominator; % x LD score)
+    trt sum_full
+ SY10_F     43.8
+ SY10_M     63.8
+ SY20_F     51.5
+ SY20_M     61.8
+
+fraction of marker-based heritability explained in the held-out replicate
+by the top N regions of +-W cM (W = 0: single tiles; Inf: every tile)
+
+   W   N SY10_F SY10_M SY20_F SY20_M
+   0   1   0.03   0.05   0.03   0.07
+   0   5   0.11   0.11   0.09   0.11
+   0  10   0.14   0.14   0.14   0.14
+   0  20   0.17   0.16   0.17   0.16
+   0  30   0.18   0.18   0.17   0.18
+   1   1   0.06   0.10   0.07   0.13
+   1   5   0.20   0.20   0.17   0.21
+   1  10   0.23   0.24   0.23   0.25
+   1  20   0.29   0.29   0.28   0.28
+   1  30   0.32   0.32   0.29   0.32
+   2   1   0.07   0.16   0.12   0.21
+   2   5   0.29   0.31   0.27   0.32
+   2  10   0.37   0.38   0.40   0.39
+   2  20   0.48   0.47   0.48   0.45
+   2  30   0.52   0.53   0.50   0.51
+   3   1   0.09   0.20   0.15   0.26
+   3   5   0.36   0.38   0.34   0.40
+   3  10   0.46   0.48   0.51   0.50
+   3  20   0.61   0.60   0.62   0.59
+   3  30   0.66   0.67   0.65   0.66
+   5   1   0.12   0.23   0.19   0.30
+   5   5   0.42   0.45   0.40   0.49
+   5  10   0.52   0.56   0.63   0.62
+   5  20   0.71   0.73   0.72   0.72
+   5  30   0.75   0.80   0.76   0.80
+ Inf Inf   0.77   0.84   0.79   0.83
+
+tiles in the predictor, mean over folds (SY10_F)
+
+   W  1  5 10  20  30 Inf
+   0  1  5 10  20  30  NA
+   1  2  8 18  37  57  NA
+   2  3 16 34  71 108  NA
+   3  4 24 52 106 161  NA
+   5  6 38 76 153 219  NA
+ Inf NA NA NA  NA  NA 273
+
+  The W = Inf row is the ceiling: an all-marker predictor built on nine
+  replicates explains this fraction of what the tenth carries. At W = 0 the
+  thirty markers are 30 of 273 tiles; at W = 3 they cover ~160.
+
+Wrote: temp_aging/numbers/loo_regions.tsv 

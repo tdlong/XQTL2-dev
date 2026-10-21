@@ -20,7 +20,7 @@ cd "$(dirname "$0")/../.." || exit 1
 OUT=temp_aging/numbers
 mkdir -p "$OUT"
 
-SCRIPTS=(h2_threshold design_power scan_resolution significant_regions peak_table chr3L_peak coverage partition_check yardstick ld_drift ld_local)
+SCRIPTS=(h2_threshold design_power scan_resolution significant_regions peak_table chr3L_peak coverage partition_check yardstick ld_drift ld_local loo_regions)
 [ $# -gt 0 ] && SCRIPTS=("$@")
 
 stamp_inputs() {   # script path -> lines describing each data file it reads
