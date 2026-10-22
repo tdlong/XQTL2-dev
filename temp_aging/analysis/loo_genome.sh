@@ -29,11 +29,13 @@ Rscript temp_aging/analysis/loo_genome.R || fail=1
 
 if [ "${NO_GIT:-0}" != "1" ]; then
   echo
-  echo "── returning results through git ─────────────────────────────"
+  echo "── returning results through git; git's own messages go to a side file ──"
   suf=""; [ "${TILE_MB:-0}" = "1" ] && suf="_mb"
+  exec >"logs/loo_genome_${SLURM_JOB_ID:-manual}_git.txt" 2>&1
   git add temp_aging/numbers/loo_positions${suf}.txt.gz \
           temp_aging/numbers/loo_tiles${suf}.txt.gz \
-          temp_aging/numbers/loo_u${suf}.txt.gz 2>/dev/null
+          temp_aging/numbers/loo_u${suf}.txt.gz \
+          temp_aging/numbers/loo_pos_reps${suf}.txt.gz 2>/dev/null
   lg="logs/loo_genome_${SLURM_JOB_ID:-manual}.out"
   [ -f "$lg" ] && git add -f "$lg" 2>/dev/null
   if git diff --cached --quiet; then

@@ -58,8 +58,9 @@ tile_of  <- function(pos, cM) if (TILE_MB) floor(pos / 1e6) else floor(cM)
 OUT_POS  <- sprintf("temp_aging/numbers/loo_positions%s.txt.gz", SUF)   # panel A + per-fold h2
 OUT_TILE <- sprintf("temp_aging/numbers/loo_tiles%s.txt.gz", SUF)       # per-tile h2, for the integral
 OUT_U    <- sprintf("temp_aging/numbers/loo_u%s.txt.gz", SUF)           # per-tile per-founder u, for the joint fit
+OUT_R    <- sprintf("temp_aging/numbers/loo_pos_reps%s.txt.gz", SUF)    # EVERY replicate at EVERY chosen position
 DROP_REP <- c(8, 9)
-NMAX     <- 30        # positions kept per fold, so the cumulative curve runs to 30
+NMAX     <- 60        # positions kept per fold; curves run to 30, 60 leaves room
 CLUMP_CM <- 5         # greedy clumping window; r^2 < 0.1 at 4 cM in this population
 AF_FLOOR <- 0.01      # as in heritability_rep(), keeps 1/p from exploding
 
@@ -85,7 +86,7 @@ clump <- function(z, win, n) {
   out
 }
 
-POS <- list(); TILE <- list(); UTILE <- list()
+POS <- list(); TILE <- list(); UTILE <- list(); REPS <- list()
 for (r in seq_len(nrow(cells))) {
   cl <- cells[r, ]
   cat("\n==", cl$scan, "==\n")
@@ -102,6 +103,7 @@ for (r in seq_len(nrow(cells))) {
            k = if (cl$sex == "M") ifelse(chr == "chrX", 1, 2) else 2)
   reps <- sort(unique(d$REP))
   cat("  steps:", n_distinct(paste(d$chr, d$pos)), "  reps:", length(reps), "\n")
+  chosen_pos <- list()     # every position any fold selects, for the per-replicate dump
 
   for (ho in reps) {
     tr <- d %>% filter(REP != ho) %>%
@@ -148,8 +150,21 @@ for (r in seq_len(nrow(cells))) {
                 h2_nine   = 100 * k * e_tr^2 / pd,       # panel B, per founder
                 h2_cross  = 100 * k * e_tr * e_te / pd,
                 h2_single = 100 * k * e_te^2 / pd)
+    chosen_pos[[length(chosen_pos)+1]] <- chosen %>% select(chr, pos)
     cat("    holdout", ho, ": kept", length(keep), "positions\n")
   }
+
+  # Per-replicate values at every position any fold chose. POS above stores only
+  # the MEAN over the nine, which is enough for the prediction itself but not for
+  # anything needing the spread among replicates -- a variance, a jackknife, the
+  # s^2/R correction applied to the nine. Those then need another cluster run,
+  # which is what this avoids. One row per replicate x founder x position.
+  REPS[[length(REPS)+1]] <- d %>%
+    inner_join(bind_rows(chosen_pos) %>% distinct(chr, pos), by = c("chr", "pos")) %>%
+    transmute(sugar = cl$sugar, sex = cl$sex, REP, chr, pos, cM, founder, k,
+              p = C, z = Z, dp = D, e, i)
+  cat("  per-replicate dump:", n_distinct(paste(bind_rows(chosen_pos)$chr, bind_rows(chosen_pos)$pos)),
+      "distinct positions over all folds\n")
   rm(d); gc()
 }
 
@@ -157,5 +172,6 @@ dir.create(dirname(OUT_POS), showWarnings = FALSE, recursive = TRUE)
 write.table(bind_rows(POS),  gzfile(OUT_POS),  row.names=FALSE, quote=FALSE, sep="\t")
 write.table(bind_rows(TILE), gzfile(OUT_TILE), row.names=FALSE, quote=FALSE, sep="\t")
 write.table(bind_rows(UTILE), gzfile(OUT_U),    row.names=FALSE, quote=FALSE, sep="\t")
-cat("\nWrote:", OUT_POS, ",", OUT_TILE, "and", OUT_U, "\n")
+write.table(bind_rows(REPS), gzfile(OUT_R),    row.names=FALSE, quote=FALSE, sep="\t")
+cat("\nWrote:", OUT_POS, ",", OUT_TILE, ",", OUT_U, "and", OUT_R, "\n")
 cat("loo_genome.sh commits these and tries to push.\n")
