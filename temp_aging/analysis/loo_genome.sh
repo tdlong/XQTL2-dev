@@ -35,7 +35,8 @@ if [ "${NO_GIT:-0}" != "1" ]; then
   git add temp_aging/numbers/loo_positions${suf}.txt.gz \
           temp_aging/numbers/loo_tiles${suf}.txt.gz \
           temp_aging/numbers/loo_u${suf}.txt.gz \
-          temp_aging/numbers/loo_pos_reps${suf}.txt.gz 2>/dev/null
+          temp_aging/numbers/loo_pos_reps${suf}.txt.gz \
+          temp_aging/numbers/loo_split${suf}.txt.gz 2>/dev/null
   lg="logs/loo_genome_${SLURM_JOB_ID:-manual}.out"
   [ -f "$lg" ] && git add -f "$lg" 2>/dev/null
   if git diff --cached --quiet; then

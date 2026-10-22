@@ -59,6 +59,7 @@ OUT_POS  <- sprintf("temp_aging/numbers/loo_positions%s.txt.gz", SUF)   # panel 
 OUT_TILE <- sprintf("temp_aging/numbers/loo_tiles%s.txt.gz", SUF)       # per-tile h2, for the integral
 OUT_U    <- sprintf("temp_aging/numbers/loo_u%s.txt.gz", SUF)           # per-tile per-founder u, for the joint fit
 OUT_R    <- sprintf("temp_aging/numbers/loo_pos_reps%s.txt.gz", SUF)    # EVERY replicate at EVERY chosen position
+OUT_S    <- sprintf("temp_aging/numbers/loo_split%s.txt.gz", SUF)       # disjoint rank/estimate split: the honest ceiling
 DROP_REP <- c(8, 9)
 NMAX     <- 60        # positions kept per fold; curves run to 30, 60 leaves room
 CLUMP_CM <- 5         # greedy clumping window; r^2 < 0.1 at 4 cM in this population
@@ -86,7 +87,10 @@ clump <- function(z, win, n) {
   out
 }
 
-POS <- list(); TILE <- list(); UTILE <- list(); REPS <- list()
+NSPLIT   <- 5         # random rank/estimate splits of the nine, per fold
+RANK_N   <- 5         # replicates used to RANK; the other four estimate the effect
+
+POS <- list(); TILE <- list(); UTILE <- list(); REPS <- list(); SPLIT <- list()
 for (r in seq_len(nrow(cells))) {
   cl <- cells[r, ]
   cat("\n==", cl$scan, "==\n")
@@ -165,6 +169,43 @@ for (r in seq_len(nrow(cells))) {
               p = C, z = Z, dp = D, e, i)
   cat("  per-replicate dump:", n_distinct(paste(bind_rows(chosen_pos)$chr, bind_rows(chosen_pos)$pos)),
       "distinct positions over all folds\n")
+
+  # ── the honest ceiling: rank and estimate in DISJOINT replicates ─────────────
+  # The cross-product above is still inflated wherever positions were chosen using
+  # the same nine replicates that supply e_bar: at a chosen position e_bar is
+  # biased upward, so e_bar * e_te has expectation (t + bias) * t rather than t^2
+  # -- about 10% at this noise level (simulation, 2026-10-22). Splitting the nine
+  # removes it: RANK_N replicates choose the positions, the rest estimate the
+  # effect, and the held-out replicate scores it, so nothing that chose a position
+  # contributes to its effect. Noisier (four replicates, not nine), hence NSPLIT
+  # random splits per fold to average down.
+  for (ho in reps) {
+    others <- setdiff(reps, ho)
+    for (sp in seq_len(NSPLIT)) {
+      set.seed(1000 * ho + sp)
+      rank_set <- sort(sample(others, RANK_N))
+      est_set  <- setdiff(others, rank_set)
+
+      rk <- d %>% filter(REP %in% rank_set) %>%
+        group_by(chr, pos, cM, founder, k) %>%
+        summarise(m = mean(e), pbar = mean(C), .groups = "drop") %>%
+        group_by(chr, pos, cM) %>%
+        summarise(h2 = sum(100 * k * m^2 / pmax(pbar, AF_FLOOR)), .groups = "drop") %>%
+        mutate(id = row_number())
+      sel <- rk[clump(rk, CLUMP_CM, NMAX), ] %>% mutate(rank = row_number()) %>% select(chr, pos, rank)
+
+      est <- d %>% filter(REP %in% est_set) %>% inner_join(sel, by = c("chr", "pos")) %>%
+        group_by(chr, pos, cM, founder, k, rank) %>%
+        summarise(e_est = mean(e), p = mean(C), .groups = "drop")
+      te <- d %>% filter(REP == ho) %>% inner_join(sel, by = c("chr", "pos")) %>%
+        select(chr, pos, founder, e_te = e)
+
+      SPLIT[[length(SPLIT)+1]] <- est %>% inner_join(te, by = c("chr", "pos", "founder")) %>%
+        transmute(sugar = cl$sugar, sex = cl$sex, holdout = ho, split = sp,
+                  rank, chr, pos, cM, founder, k, p, e_est, e_te)
+    }
+  }
+  cat("  disjoint-split ceiling:", NSPLIT, "splits x", length(reps), "folds\n")
   rm(d); gc()
 }
 
@@ -173,5 +214,6 @@ write.table(bind_rows(POS),  gzfile(OUT_POS),  row.names=FALSE, quote=FALSE, sep
 write.table(bind_rows(TILE), gzfile(OUT_TILE), row.names=FALSE, quote=FALSE, sep="\t")
 write.table(bind_rows(UTILE), gzfile(OUT_U),    row.names=FALSE, quote=FALSE, sep="\t")
 write.table(bind_rows(REPS), gzfile(OUT_R),    row.names=FALSE, quote=FALSE, sep="\t")
-cat("\nWrote:", OUT_POS, ",", OUT_TILE, ",", OUT_U, "and", OUT_R, "\n")
+write.table(bind_rows(SPLIT), gzfile(OUT_S),   row.names=FALSE, quote=FALSE, sep="\t")
+cat("\nWrote:", OUT_POS, ",", OUT_TILE, ",", OUT_U, ",", OUT_R, "and", OUT_S, "\n")
 cat("loo_genome.sh commits these and tries to push.\n")
