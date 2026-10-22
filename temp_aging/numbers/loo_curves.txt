@@ -1,0 +1,32 @@
+# loo_curves.R
+# run:    2026-10-22 10:19
+# script: 
+# pipeline: a98e3bb 2026-08-30 README: methods-section description of the H2 estim
+# reads:
+#   temp_aging/numbers/loo_positions.txt.gz                  804K  2026-10-22 10:15  md5:38004629
+#   temp_aging/numbers/loo_split.txt.gz                      2.2M  2026-10-22 10:15  md5:0b869495
+#   temp_aging/numbers/yardstick.tsv                         4.0K  2026-10-21 17:14  md5:5dc6f54b
+#
+curves run to N = 39 (5 cM clumping leaves this many positions)
+
+heritability (% of phenotypic variance)
+
+    trt  N regions hold predictor explains trait h2 hold/trait explains/hold
+ SY10_F 10          6.7                6.3     11.4       0.59          0.93
+ SY10_F 20          8.5                7.6     11.4       0.75          0.89
+ SY10_F 30          9.6                8.3     11.4       0.84          0.86
+ SY10_F 39         10.2                8.3     11.4       0.90          0.81
+ SY10_M 10          9.8                9.6     17.1       0.57          0.99
+ SY10_M 20         12.3               11.5     17.1       0.72          0.94
+ SY10_M 30         13.9               12.7     17.1       0.82          0.91
+ SY10_M 39         15.1               13.2     17.1       0.88          0.87
+ SY20_F 10          7.8                7.6     13.4       0.58          0.98
+ SY20_F 20          9.5                8.8     13.4       0.71          0.93
+ SY20_F 30         10.5                8.8     13.4       0.78          0.84
+ SY20_F 39         11.3                9.3     13.4       0.85          0.82
+ SY20_M 10          9.7                9.3     16.4       0.59          0.96
+ SY20_M 20         11.6               11.0     16.4       0.71          0.95
+ SY20_M 30         13.0               11.6     16.4       0.79          0.89
+ SY20_M 39         13.9               12.1     16.4       0.84          0.87
+
+Wrote: temp_aging/numbers/loo_curves.tsv 

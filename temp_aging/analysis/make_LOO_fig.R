@@ -28,7 +28,9 @@ suppressMessages({library(tidyverse); library(patchwork)})
 POS   <- "temp_aging/numbers/loo_positions.txt.gz"
 TOTF  <- "temp_aging/numbers/yardstick.tsv"   # marker-based h2, yardstick.R
 PKF   <- "temp_aging/numbers/yardstick_peaks.tsv" # the per-peak divisors behind it
+CURF  <- "temp_aging/numbers/loo_curves.tsv"   # both curves, loo_curves.R
 PKF   <- "temp_aging/numbers/yardstick_peaks.tsv" # the per-peak divisors behind it
+CURF  <- "temp_aging/numbers/loo_curves.tsv"   # both curves, loo_curves.R
 RHOF  <- "temp_aging/numbers/loo_rho.txt"
 OUT   <- "temp_aging/analysis/LOO_fig.png"
 NSHOW <- 30      # positions shown; loo_genome.R clumps at 5 cM
@@ -70,60 +72,42 @@ pA <- ggplot(A, aes(pred, obs, colour = founder)) +
                          strip.background = element_rect(fill = "grey92", colour = NA))
 
 # ── panel B ──────────────────────────────────────────────────────────────────
-# Heritability a predictor on the N best tiles explains in the held-out
-# replicate, as a fraction of phenotypic variance.  Per fold:
-#   cross = sum over the N tiles of  100 k sum_f  e_bar_f e_f(r) / p_f   (= sum of h2_r)
-#   nine  = sum over the N tiles of  100 k sum_f  e_bar_f e_bar_f / p_f  (the predictor's variance)
-#   explained = mean(cross)^2 / mean(nine)   over the ten folds
-# which is the regression of the held-out replicate on the predictor, cov^2/var,
-# in h2 units.  Plain sums over tiles: the tiles are >= 5 cM apart.  The N x N
-# correlation matrix built from rho(d) is computed alongside and printed as a
-# check; it moves the sums by at most 5% and is not what is plotted.
-jk <- function(x) { n <- length(x); sqrt((n - 1) / n * sum((x - mean(x))^2)) }
-sums <- function(g, rho) {
-  key <- g %>% distinct(rank, chr, cM) %>% arrange(rank); n <- nrow(key)
-  R <- ifelse(outer(key$chr, key$chr, "=="),
-              rho[pmin(round(abs(outer(key$cM, key$cM, "-"))), length(rho) - 1) + 1], 0)
-  diag(R) <- 1; Ri <- solve(R)
-  v <- g %>% mutate(v = pred / sqrt(p), w = obs / sqrt(p))
-  cc <- sum(g$h2_cross) / sum(v$v * v$w)          # = 100k/i^2, recovered
-  q <- function(col, M) sum(map_dbl(unique(g$founder), function(f) {
-    h <- v %>% filter(founder == f) %>% arrange(rank)
-    if (nrow(h) != n) return(NA_real_)
-    cc * as.numeric(t(h$v) %*% M %*% h[[col]]) }), na.rm = TRUE)
-  tibble(cross = q("w", diag(n)), nine = q("v", diag(n)),
-         cross_C = q("w", Ri), nine_C = q("v", Ri))
-}
-RHO <- read.table(RHOF, header = TRUE, sep = "\t") %>% as_tibble()
-rl <- split(RHO$rho, RHO$trt)
-folds <- map_dfr(1:NSHOW, function(N)
-  P %>% filter(rank <= N) %>% group_split(trt, holdout) %>%
-    map_dfr(~sums(.x, rl[[as.character(.x$key[1])]]) %>%
-              mutate(trt = .x$trt[1], holdout = .x$holdout[1], N = N))) %>%
-  mutate(fold = cross_C^2 / nine_C)                # each held-out replicate on its own
-cum <- folds %>% group_by(trt, N) %>%
-  summarise(explained = mean(cross_C)^2 / mean(nine_C),
-            plain_sum = mean(cross)^2 / mean(nine), .groups = "drop")
-
-# The divisor's spread: each Table S1 peak's footprint gives its own tiles per
-# locus, so its own genome-wide total = tile sum / footprint. Light grey band:
-# the 25-75% quantiles of those totals. Dashed: the pooled estimate.
+# Two curves against the marker-based heritability of the trait (dashed), all in
+# percent of phenotypic variance (loo_curves.R):
+#   CEILING, how much heritability the top N regions hold -- ranked in five
+#     replicates, effects from four others, scored on the held-out one, so no
+#     winner's curse. Conservative: the predictor ranks on nine.
+#   PREDICTOR, what an N-marker predictor built on the nine explains in the
+#     held-out replicate, with the ten replicates drawn individually in light blue.
+# The gap up to the dashed line is heritability outside the N regions; the gap
+# between the curves is what is lost to estimating the effects.
+CUR <- read.table(CURF, header = TRUE, sep = "\t") %>% as_tibble() %>%
+  mutate(trt = factor(TRT_LAB[trt], levels = TRT_LAB))
+folds <- map_dfr(1:max(CUR$N), function(N) P %>% filter(rank <= N) %>% group_by(trt, holdout) %>%
+  summarise(fold = sum(h2_cross)^2 / sum(h2_nine), .groups = "drop") %>% mutate(N = N))
 BAND <- TOT %>% group_split(trt) %>% map_dfr(function(z) {
   v <- z$sum_tiles / PK$tiles_per_locus
   tibble(trt = z$trt, lo = quantile(v, .25), hi = quantile(v, .75)) })
+LONG <- CUR %>% select(trt, N, ceiling, predictor) %>%
+  pivot_longer(c(ceiling, predictor), names_to = "what", values_to = "h2") %>%
+  mutate(what = factor(ifelse(what == "ceiling", "heritability at the N regions",
+                              "explained by the N-marker predictor"),
+                       levels = c("heritability at the N regions", "explained by the N-marker predictor")))
 
-# light blue: the ten held-out replicates one at a time; dark: all ten combined
-pB <- ggplot(cum, aes(N, explained)) +
+pB <- ggplot(LONG, aes(N, h2, colour = what)) +
   geom_rect(data = BAND, aes(xmin = -Inf, xmax = Inf, ymin = lo, ymax = hi),
             fill = "grey88", inherit.aes = FALSE) +
   geom_hline(data = TOT, aes(yintercept = total), linetype = "dashed", colour = "grey20") +
-  geom_line(data = folds, aes(N, fold, group = holdout), colour = "#1F4E9C", alpha = 0.25, linewidth = 0.4) +
-  geom_line(colour = "#1F4E9C", linewidth = 0.9) +
-  geom_point(colour = "#1F4E9C", size = 1.4) +
+  geom_line(data = folds, aes(N, fold, group = holdout), colour = "#1F4E9C",
+            alpha = 0.3, linewidth = 0.4, inherit.aes = FALSE) +
+  geom_line(linewidth = 0.9) +
+  scale_colour_manual(values = c("heritability at the N regions" = "#C0392B",
+                                 "explained by the N-marker predictor" = "#1F4E9C"), name = NULL) +
   facet_wrap(~trt, nrow = 1) +
   scale_x_continuous(breaks = c(1, 10, 20, 30)) +
   scale_y_continuous(limits = c(0, 30), breaks = seq(0, 30, 10)) +
   labs(x = "markers in predictor", y = "heritability (%)") +
+  guides(colour = guide_legend(nrow = 1)) +
   theme_bw(BASE) + theme(panel.grid.minor = element_blank(), legend.position = "bottom",
                          aspect.ratio = 1,
                          strip.background = element_rect(fill = "grey92", colour = NA))
@@ -139,9 +123,7 @@ cat("Wrote:", OUT, "\n\n")
 cat("panel A, top 10 positions:\n")
 print(as.data.frame(lab %>% transmute(trt, r = round(r, 3),
   slope = round(slope, 3))), row.names = FALSE)
-cat("\npanel B endpoints, and the genome-wide total:\n")
-print(as.data.frame(cum %>% filter(N %in% c(10, 30)) %>%
-  transmute(trt, N, explained = round(explained, 2), plain_sum = round(plain_sum, 2)) %>%
-  left_join(TOT %>% transmute(trt, total = round(total, 2)),
-            by = "trt") %>%
-  mutate(frac_of_total = round(explained / total, 2))), row.names = FALSE)
+cat("\npanel B at N = 10, 30 and the end:\n")
+print(as.data.frame(CUR %>% filter(N %in% c(10, 30, max(N))) %>%
+  transmute(trt, N, `regions hold` = round(ceiling, 1), `predictor explains` = round(predictor, 1),
+            `trait h2` = round(trait, 1))), row.names = FALSE)
