@@ -32,63 +32,60 @@ ROW <- 7                                                 # the SNP pulled out be
 th  <- theme_void(BASE) + theme(plot.title = element_text(hjust = .5, face = "bold", size = BASE + 1),
                                 plot.subtitle = element_text(hjust = .5, size = BASE - 1))
 
-# ── slide 1: the three blocks ────────────────────────────────────────────────
+# ── slide 1: Y, X, and the b that fits ──────────────────────────────────────
+# Y is observed with pool-seq noise, so no b reproduces it exactly: b is the
+# vector that makes X b as close to Y as possible. Two candidates are shown
+# side by side -- equal founder frequencies, and the least-squares b -- each
+# with its X b in the same grey scale as Y, its residuals, and its sum of squares.
+COV1 <- 60
+Yobs <- rbinom(S, COV1, Y) / COV1
+fitb <- function(y) { f <- solve.QP(Dmat = crossprod(X) + diag(1e-8, 8), dvec = crossprod(X, y),
+  Amat = cbind(rep(1, 8), diag(8)), bvec = c(1, rep(0, 8)), meq = 1); setNames(f$solution, fnd) }
+b_eq  <- setNames(rep(1/8, 8), fnd)
+b_hat <- fitb(Yobs)
+snpf  <- factor(rownames(X), levels = rev(rownames(X)))
+grey  <- scale_fill_gradient(low = "grey97", high = "grey30", limits = c(0, 1), guide = "none")
+col_of <- function(v, title, sub = NULL, digits = 2) ggplot(tibble(snp = snpf, v = v), aes(1, snp)) +
+  geom_tile(aes(fill = v), colour = "white", linewidth = 1) +
+  geom_text(aes(label = sprintf(paste0("%.", digits, "f"), v)), size = 3.4, colour = ifelse(v > .55, "white", "black")) +
+  grey + coord_equal(clip = "off") + labs(title = title, subtitle = sub) + th
+res_of <- function(r, title) ggplot(tibble(snp = snpf, r = r), aes(1, snp)) +
+  geom_tile(aes(fill = r), colour = "white", linewidth = 1) +
+  geom_text(aes(label = sprintf("%+.2f", r)), size = 3.2) +
+  scale_fill_gradient2(low = "#1F4E9C", mid = "white", high = "#C0392B", limits = c(-.5, .5), guide = "none") +
+  coord_equal(clip = "off") + labs(title = title, subtitle = sprintf("sum of squares\n%.3f", sum(r^2))) + th
+bcol <- function(bv, title) ggplot(tibble(founder = factor(fnd, levels = rev(fnd)), b = bv), aes(1, founder)) +
+  geom_tile(fill = "white", colour = "grey70", linewidth = .4) +
+  geom_text(aes(label = sprintf("%s  %.2f", founder, b)), size = 3.4) +
+  coord_equal(clip = "off") + labs(title = title) + th
+
 Xl <- as_tibble(X, rownames = "snp") %>% pivot_longer(-snp, names_to = "founder", values_to = "alt") %>%
   mutate(snp = factor(snp, levels = rev(rownames(X))), founder = factor(founder, levels = fnd))
 pX <- ggplot(Xl, aes(founder, snp)) +
   geom_tile(aes(fill = factor(alt)), colour = "grey70", linewidth = .4) +
-  geom_text(aes(label = alt, colour = factor(alt)), size = 3.6) +
-  geom_tile(data = Xl %>% filter(snp == paste0("SNP ", ROW)), fill = NA, colour = "red", linewidth = 1.3) +
+  geom_text(aes(label = alt, colour = factor(alt)), size = 3.4) +
   scale_fill_manual(values = c(`0` = "white", `1` = "black"), guide = "none") +
   scale_colour_manual(values = c(`0` = "grey55", `1` = "white"), guide = "none") +
   scale_x_discrete(position = "top") + coord_equal() +
-  labs(title = "X", subtitle = "founder genotypes at each SNP, known") + th +
-  theme(axis.text.x = element_text(size = BASE - 3), axis.text.y = element_text(size = BASE - 4, hjust = 1))
+  labs(title = "X", subtitle = "founder genotypes, known") + th +
+  theme(axis.text.x = element_text(size = BASE - 4), axis.text.y = element_text(size = BASE - 5, hjust = 1))
+eq <- function(s) ggplot() + annotate("text", 0, 0, label = s, size = 11) + th
+blank <- ggplot() + th
 
-Yl <- tibble(snp = factor(rownames(X), levels = rev(rownames(X))), y = Y)
-pY <- ggplot(Yl, aes(1, snp)) +
-  geom_tile(fill = "white", colour = "grey70", linewidth = .4) +
-  geom_text(aes(label = sprintf("%.2f", y)), size = 3.8) +
-  geom_tile(data = Yl %>% filter(snp == paste0("SNP ", ROW)), fill = NA, colour = "red", linewidth = 1.3) +
-  coord_equal(clip = "off") + labs(title = "Y", subtitle = "SNP frequencies\nin the pool, observed") + th
-
-bl <- tibble(founder = factor(fnd, levels = rev(fnd)), b = b[fnd])
-pb <- ggplot(bl, aes(1, founder)) +
-  geom_tile(fill = "white", colour = "grey70", linewidth = .4) +
-  geom_text(aes(label = sprintf("%s  %.2f", founder, b)), size = 3.8) +
-  coord_equal(ratio = 1, clip = "off") +
-  labs(title = "b", subtitle = "founder frequencies,\nestimated; sum to 1") + th
-
-eq <- function(s) ggplot() + annotate("text", 0, 0, label = s, size = 12) + th
-
-# the boxed row as a dot product: X row, b underneath, the products, the sum
-xr <- X[ROW, ]; pr <- xr * b
-strip <- bind_rows(
-  tibble(row = "row of X", founder = fnd, lab = as.character(xr), on = xr == 1),
-  tibble(row = "b",        founder = fnd, lab = sprintf("%.2f", b), on = xr == 1),
-  tibble(row = "product",  founder = fnd, lab = ifelse(xr == 1, sprintf("%.2f", pr), "0"), on = xr == 1)) %>%
-  mutate(row = factor(row, levels = rev(c("row of X", "b", "product"))), founder = factor(founder, levels = fnd))
-pS <- ggplot(strip, aes(founder, row)) +
-  geom_tile(fill = "white", colour = "grey70", linewidth = .4) +
-  geom_text(aes(label = lab, colour = on, fontface = ifelse(on, "bold", "plain")), size = 4.2) +
-  scale_colour_manual(values = c(`TRUE` = "black", `FALSE` = "grey60"), guide = "none") +
-  scale_x_discrete(position = "top") +
-  annotate("text", x = 8.9, y = 1, label = sprintf("sum = %.2f = Y for SNP %d", Y[ROW], ROW), hjust = 0, size = 4.6, fontface = "bold") +
-  annotate("text", x = 8.9, y = 3, label = sprintf("SNP %d", ROW), hjust = 0, size = 4.2, colour = "red") +
-  coord_cartesian(xlim = c(.5, 11.5), clip = "off") +
-  labs(subtitle = "each SNP frequency is the sum of the b of the founders carrying its alt allele") +
-  th + theme(axis.text.x = element_text(size = BASE - 4), axis.text.y = element_text(size = BASE - 3, hjust = 1),
-             plot.subtitle = element_text(hjust = 0))
-
-top <- (pY | eq("=") | pX | eq("×") | pb) + plot_layout(widths = c(1.4, .5, 5, .5, 1.8))
-png(OUT1, width = 11, height = 8.5, units = "in", res = 250)
-print((top / pS) + plot_layout(heights = c(6, 1.6)) +
+pY   <- col_of(Yobs, "Y", "observed SNP\nfrequencies, pool-seq")
+left <- (pY | eq("\u2248") | pX | eq("\u00d7") | bcol(b_hat, "b, fitted")) + plot_layout(widths = c(1.3, .4, 4.2, .4, 1.6))
+mid  <- (col_of(as.numeric(X %*% b_eq), "X b", "with b = 1/8\nfor every founder") | res_of(Yobs - as.numeric(X %*% b_eq), "Y \u2212 X b") |
+         blank | col_of(as.numeric(X %*% b_hat), "X b", "with the\nfitted b") | res_of(Yobs - as.numeric(X %*% b_hat), "Y \u2212 X b")) +
+        plot_layout(widths = c(1.3, 1.3, .5, 1.3, 1.3))
+png(OUT1, width = 14, height = 7.5, units = "in", res = 250)
+print(wrap_plots(wrap_elements(full = left), blank, wrap_elements(full = mid), nrow = 1, widths = c(7.9, .4, 5.7)) +
       plot_annotation(title = "Local founder frequencies from pool-seq, founders known",
-                      subtitle = "find the b that best explains Y, with b \u2265 0 and summing to 1",
+                      subtitle = "b is the vector of founder frequencies, each \u2265 0 and summing to 1, that makes X b closest to Y:\nthe one that minimises the sum of squared residuals. Right: a guess of equal founders, and the fitted b.",
                       theme = theme(plot.title = element_text(size = BASE + 3, face = "bold"),
-                                    plot.subtitle = element_text(size = BASE),
-                                    plot.margin = margin(5, 10, 5, 25))))
+                                    plot.subtitle = element_text(size = BASE - 2),
+                                    plot.margin = margin(5, 10, 5, 20))))
 invisible(dev.off())
+cat(sprintf("slide 1: fitted b vs true b, max abs error %.3f\n", max(abs(b_hat - b))))
 
 # ── slide 2: back-imputation beats the raw frequencies ───────────────────────
 S2 <- 60; COV <- 60
