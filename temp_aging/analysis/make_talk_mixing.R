@@ -1,96 +1,73 @@
-# make_talk_mixing.R -- the classic block diagram of Y = X b + e, drawn to the
-# dimensions of the pool-seq problem: thousands of SNPs down, eight founders
-# across. Blocks are lightly filled with what they hold (Y greys, X black/white,
-# b founder colours, e faint).
+# make_talk_mixing.R -- founder frequencies from pool-seq as a loss being
+# minimised: the pie (b) changes while sum (Y - X b)^2 shrinks.
 #
-#   Rscript temp_aging/analysis/make_talk_mixing.R   ->  Talk_Yxb.png
+#   Rscript temp_aging/analysis/make_talk_mixing.R
+#
+#   Talk_loss.gif        the animation: gradient descent on b, projected onto
+#                        the simplex each step, 60 frames
+#   Talk_loss_strip.png  six frames of it side by side, for a static deck
+#   Talk_loss_frames/    the individual frames
+#
+# Toy data: 8 founders, b from the chr3L 9.30 control frequencies, 40 SNPs,
+# pool-seq noise at 80x. Started from equal founders.
 
-suppressMessages({library(tidyverse); library(patchwork)})
+suppressMessages({library(tidyverse); library(patchwork); library(magick)})
 source("temp_aging/analysis/palette.R")
 BASE <- 16; set.seed(5)
 fnd <- names(FOUNDER_COL)
-b   <- c(AB8 = .052, B1 = .145, B2 = .031, B3 = .151, B4 = .016, B5 = .041, B6 = .539, B7 = .024)
-n <- 24                                          # rows drawn; stands for thousands
-X <- matrix(rbinom(n * 8, 1, .4), n, 8); X[rowSums(X) == 0, 1] <- 1
-Y <- as.numeric(X %*% b) + rnorm(n, 0, .04); Y <- pmin(pmax(Y, 0), 1)
-e <- Y - as.numeric(X %*% b)
+b_true <- c(AB8 = .052, B1 = .145, B2 = .031, B3 = .151, B4 = .016, B5 = .041, B6 = .539, B7 = .024)
+n <- 40; COV <- 80
+X <- matrix(rbinom(n * 8, 1, .45), n, 8, dimnames = list(NULL, fnd)); X[rowSums(X) == 0, 1] <- 1
+Y <- rbinom(n, COV, as.numeric(X %*% b_true)) / COV
+loss <- function(b) sum((Y - X %*% b)^2)
 
-blk <- function(base, w, h, title, dims, words, ylim = c(0, h)) {
-  base + coord_equal(xlim = c(0, w), ylim = ylim, expand = FALSE, clip = "off") + theme_void(BASE) +
-    annotate("rect", xmin = 0, xmax = w, ymin = 0, ymax = h, fill = NA, colour = "black", linewidth = 1) +
-    annotate("text", x = w/2, y = h + 2.2, label = title, size = 10, fontface = "bold") +
-    annotate("text", x = w/2, y = h + .8, label = dims, size = 4.5, colour = "grey30") +
-    annotate("text", x = w/2, y = -1.0, label = words, size = 4.6, lineheight = .95, vjust = 1) +
-    theme(plot.margin = margin(40, 4, 80, 4))
+# projection onto {b >= 0, sum b = 1}
+proj <- function(v) { u <- sort(v, decreasing = TRUE); css <- cumsum(u)
+  rho <- max(which(u - (css - 1) / seq_along(u) > 0)); th <- (css[rho] - 1) / rho; pmax(v - th, 0) }
+NIT <- 60; lr <- 0.005
+path <- matrix(NA, NIT + 1, 8, dimnames = list(NULL, fnd)); path[1, ] <- rep(1/8, 8)
+for (i in 1:NIT) path[i + 1, ] <- proj(path[i, ] - lr * as.numeric(-2 * t(X) %*% (Y - X %*% path[i, ])))
+L <- apply(path, 1, loss)
+cat(sprintf("loss: start %.3f, end %.4f; b-hat vs truth max abs error %.3f\n", L[1], L[NIT + 1], max(abs(path[NIT + 1, ] - b_true))))
+
+frame <- function(i) {
+  bi <- path[i, ]
+  pie <- ggplot(tibble(f = factor(fnd, levels = fnd), b = bi), aes(1, b, fill = f)) +
+    geom_col(width = 1, colour = "white", linewidth = .8) + coord_polar(theta = "y") +
+    geom_text(aes(label = ifelse(b > .06, sprintf("%s", f), "")), position = position_stack(vjust = .5),
+              size = 4.5, colour = ifelse(fnd %in% c("B6", "B7"), "white", "black")) +
+    scale_fill_manual(values = FOUNDER_COL, guide = "none") +
+    labs(title = "b: the founder frequencies", subtitle = "the unknowns -- the weights") +
+    theme_void(BASE) + theme(plot.title = element_text(hjust = .5, size = BASE + 1, face = "bold"),
+                             plot.subtitle = element_text(hjust = .5, size = BASE - 1))
+  fit <- ggplot(tibble(s = 1:n, Y = Y, Xb = as.numeric(X %*% bi)), aes(s)) +
+    geom_segment(aes(xend = s, y = Y, yend = Xb), colour = "#C0392B", linewidth = .9, alpha = .7) +
+    geom_point(aes(y = Y), size = 2.6) + geom_point(aes(y = Xb), size = 2.6, shape = 21, fill = "white", colour = "#1F4E9C", stroke = 1.1) +
+    scale_y_continuous(limits = c(0, 1)) +
+    labs(title = "Y, the observed SNP frequencies (black)   vs   X b, what this pie predicts (blue)",
+         subtitle = "red: the residuals Y - X b", x = "SNPs in the window", y = "allele frequency") +
+    theme_bw(BASE) + theme(panel.grid.minor = element_blank(), plot.title = element_text(size = BASE),
+                           plot.subtitle = element_text(size = BASE - 2))
+  lc <- ggplot(tibble(it = 0:NIT, L = L), aes(it, L)) + geom_line(colour = "grey50") +
+    geom_point(data = tibble(it = i - 1, L = L[i]), size = 4.5, colour = "#C0392B") +
+    scale_y_log10() +
+    labs(title = expression(bold("loss  " * sum((Y - Xb)^2))), subtitle = sprintf("step %d", i - 1),
+         x = "step", y = NULL) +
+    theme_bw(BASE) + theme(panel.grid.minor = element_blank(), plot.title = element_text(size = BASE + 1),
+                           plot.subtitle = element_text(size = BASE - 1))
+  ((pie | lc) + plot_layout(widths = c(1, 1.3))) / fit + plot_layout(heights = c(1.1, 1)) +
+    plot_annotation(title = "Find the weights b that minimise the loss",
+                    subtitle = "exactly what training any model does -- here the model is eight founders mixing into a pool",
+                    theme = theme(plot.title = element_text(size = BASE + 4, face = "bold"),
+                                  plot.subtitle = element_text(size = BASE)))
 }
-Yg <- ggplot(tibble(y = n:1 - .5, v = Y), aes(1, y, fill = v)) + geom_tile(width = 1.9, height = .92) +
-  scale_fill_gradient(low = "grey96", high = "grey35", limits = c(0, 1), guide = "none")
-Xg <- ggplot(as_tibble(X) %>% mutate(y = n:1 - .5) %>% pivot_longer(-y, names_to = "f", values_to = "a") %>%
-             mutate(x = as.integer(sub("V", "", f)) - .5), aes(x, y, fill = factor(a))) + geom_tile(width = .92, height = .92) +
-  scale_fill_manual(values = c(`0` = "white", `1` = "black"), guide = "none")
-bg <- ggplot(tibble(y = 8:1 - .5, f = factor(fnd, levels = fnd)), aes(1, y, fill = f)) + geom_tile(width = 1.9, height = .92) +
-  geom_text(aes(label = f), size = 4, colour = ifelse(fnd %in% c("B6", "B7"), "white", "black")) +
-  scale_fill_manual(values = FOUNDER_COL, guide = "none")
-eg <- ggplot(tibble(y = n:1 - .5, v = e), aes(1, y, fill = v)) + geom_tile(width = 1.9, height = .92) +
-  scale_fill_gradient2(low = "#1F4E9C", mid = "white", high = "#C0392B", limits = c(-.12, .12), guide = "none")
-
-pY <- blk(Yg, 2, n, "Y", "n × 1", "SNP frequencies\nin the pool\n\nobserved;\nn in the thousands")
-pX <- blk(Xg, 8, n, "X", "n × 8", "founder genotypes\nat each SNP\n\nknown; 0 or 1")
-pb <- blk(bg, 2, 8, "b", "8 × 1", "founder frequencies\nin the pool\n\nunknown;\n≥ 0, sum to 1",
-          ylim = c(-(n - 8)/2, n - (n - 8)/2))
-pe <- blk(eg, 2, n, "e", "n × 1", "sequencing error\n\nbinomial,\n50–100 reads")
-op <- function(s) ggplot() + annotate("text", 0, 0, label = s, size = 13) + theme_void() +
-  coord_cartesian(xlim = c(-1, 1), ylim = c(-1, 1), clip = "off") + theme(plot.margin = margin(40, 0, 80, 0))
-
-p <- (pY | op("=") | pX | op("×") | pb | op("+") | pe) + plot_layout(widths = c(2, 1.2, 8, 1.2, 2, 1.2, 2)) +
-  plot_annotation(
-    title = "Y = X b + e",
-    subtitle = "Thousands of equations, eight unknowns.\nb is the least-squares solution: the founder frequencies that best reproduce the observed SNP frequencies.",
-    theme = theme(plot.title = element_text(size = BASE + 8, face = "bold", hjust = .5),
-                  plot.subtitle = element_text(size = BASE, hjust = .5, lineheight = 1.05),
-                  plot.margin = margin(10, 20, 10, 20)))
-ggsave("temp_aging/analysis/Talk_Yxb.png", p, width = 13, height = 8.5, dpi = 220, bg = "white")
-cat("Wrote temp_aging/analysis/Talk_Yxb.png\n")
-
-# ── Talk_barcode.png: the same idea with no algebra ───────────────────────────
-# Each founder's alleles along a window are a black/white barcode. The pool is a
-# blend of the eight in unknown proportions, so its barcode is grey: at each
-# stripe the grey level is the summed proportion of founders with a black
-# stripe there. Thousands of stripes, eight proportions to find.
-set.seed(3); NS <- 70
-Xb <- matrix(rbinom(NS * 8, 1, .45), NS, 8, dimnames = list(NULL, fnd))
-pool <- as.numeric(Xb %*% b)
-bars <- as_tibble(Xb) %>% mutate(s = 1:NS) %>% pivot_longer(-s, names_to = "f", values_to = "a") %>%
-  mutate(f = factor(f, levels = rev(fnd)))
-pF <- ggplot(bars, aes(s, f, fill = factor(a))) + geom_tile(width = 1, height = .78) +
-  geom_tile(data = distinct(bars, f), aes(x = -4, y = f), fill = FOUNDER_COL[as.character(distinct(bars, f)$f)],
-            width = 3, height = .78, inherit.aes = FALSE) +
-  scale_fill_manual(values = c(`0` = "white", `1` = "black"), guide = "none") +
-  coord_cartesian(xlim = c(-6, NS + .5), expand = FALSE) +
-  labs(title = "eight founders, fully sequenced: each has a known barcode of alleles along the chromosome") +
-  theme_void(BASE) + theme(axis.text.y = element_text(size = BASE - 2, hjust = 1, margin = margin(r = 4)),
-                           plot.title = element_text(size = BASE, hjust = 0), plot.margin = margin(5, 10, 15, 5))
-pP <- ggplot(tibble(s = 1:NS, g = pool), aes(s, 1, fill = g)) + geom_tile(width = 1, height = .78) +
-  scale_fill_gradient(low = "white", high = "black", limits = c(0, 1), guide = "none") +
-  coord_cartesian(xlim = c(-6, NS + .5), expand = FALSE) +
-  annotate("text", x = -3, y = 1, label = "pool", size = BASE/2.8) +
-  labs(title = "the pool of hundreds of flies, sequenced together: a grey barcode — the blend of the eight",
-       subtitle = "each stripe's grey level is the share of the pool carrying the black allele there") +
-  theme_void(BASE) + theme(plot.title = element_text(size = BASE, hjust = 0), plot.subtitle = element_text(size = BASE - 2, hjust = 0),
-                           plot.margin = margin(5, 10, 15, 5))
-rec <- tibble(f = factor(fnd, levels = fnd), b = b[fnd]) %>% mutate(xmax = cumsum(b), xmin = xmax - b, mid = (xmin + xmax)/2)
-pR <- ggplot(rec) +
-  geom_rect(aes(xmin = xmin, xmax = xmax, ymin = 0, ymax = 1, fill = f), colour = "white", linewidth = .8) +
-  geom_text(aes(x = mid, y = .5, label = ifelse(b > .045, sprintf("%s\n%.0f%%", f, 100 * b), "")),
-            size = 4.4, lineheight = .9, colour = ifelse(rec$f %in% c("B6", "B7"), "white", "black")) +
-  annotate("text", x = -.03, y = .5, label = "?", size = 14, fontface = "bold", hjust = 1) +
-  scale_fill_manual(values = FOUNDER_COL, guide = "none") + coord_cartesian(xlim = c(-.09, 1), ylim = c(0, 1), expand = FALSE) +
-  labs(title = "the question: in what proportions?  (the founder frequencies)",
-       subtitle = sprintf("one grey barcode of %d stripes — thousands, in reality — determines eight proportions", NS)) +
-  theme_void(BASE) + theme(plot.title = element_text(size = BASE, hjust = 0), plot.subtitle = element_text(size = BASE - 2, hjust = 0),
-                           plot.margin = margin(5, 10, 5, 5))
-pBC <- pF / pP / pR + plot_layout(heights = c(8, 1.8, 1.8)) +
-  plot_annotation(title = "Reading founder frequencies from a sequenced pool",
-                  theme = theme(plot.title = element_text(size = BASE + 3, face = "bold")))
-ggsave("temp_aging/analysis/Talk_barcode.png", pBC, width = 13, height = 8.5, dpi = 220, bg = "white")
-cat("Wrote temp_aging/analysis/Talk_barcode.png\n")
+dir.create("temp_aging/analysis/Talk_loss_frames", showWarnings = FALSE)
+for (i in 1:(NIT + 1)) ggsave(sprintf("temp_aging/analysis/Talk_loss_frames/f%03d.png", i), frame(i),
+                              width = 12, height = 8, dpi = 110, bg = "white")
+imgs <- image_read(sprintf("temp_aging/analysis/Talk_loss_frames/f%03d.png", 1:(NIT + 1)))
+delays <- c(rep(60, 1), rep(12, NIT - 1), 200)   # hold the first and last
+gif <- image_animate(image_join(imgs), delay = delays, optimize = TRUE)
+image_write(gif, "temp_aging/analysis/Talk_loss.gif")
+strip <- image_append(image_scale(imgs[c(1, 16, NIT + 1)], "x600"))
+image_write(strip, "temp_aging/analysis/Talk_loss_strip.png")
+cat("Wrote Talk_loss.gif, Talk_loss_strip.png, Talk_loss_frames/\n")
