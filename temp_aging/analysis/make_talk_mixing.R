@@ -51,3 +51,46 @@ p <- (pY | op("=") | pX | op("×") | pb | op("+") | pe) + plot_layout(widths = c
                   plot.margin = margin(10, 20, 10, 20)))
 ggsave("temp_aging/analysis/Talk_Yxb.png", p, width = 13, height = 8.5, dpi = 220, bg = "white")
 cat("Wrote temp_aging/analysis/Talk_Yxb.png\n")
+
+# ── Talk_barcode.png: the same idea with no algebra ───────────────────────────
+# Each founder's alleles along a window are a black/white barcode. The pool is a
+# blend of the eight in unknown proportions, so its barcode is grey: at each
+# stripe the grey level is the summed proportion of founders with a black
+# stripe there. Thousands of stripes, eight proportions to find.
+set.seed(3); NS <- 70
+Xb <- matrix(rbinom(NS * 8, 1, .45), NS, 8, dimnames = list(NULL, fnd))
+pool <- as.numeric(Xb %*% b)
+bars <- as_tibble(Xb) %>% mutate(s = 1:NS) %>% pivot_longer(-s, names_to = "f", values_to = "a") %>%
+  mutate(f = factor(f, levels = rev(fnd)))
+pF <- ggplot(bars, aes(s, f, fill = factor(a))) + geom_tile(width = 1, height = .78) +
+  geom_tile(data = distinct(bars, f), aes(x = -4, y = f), fill = FOUNDER_COL[as.character(distinct(bars, f)$f)],
+            width = 3, height = .78, inherit.aes = FALSE) +
+  scale_fill_manual(values = c(`0` = "white", `1` = "black"), guide = "none") +
+  coord_cartesian(xlim = c(-6, NS + .5), expand = FALSE) +
+  labs(title = "eight founders, fully sequenced: each has a known barcode of alleles along the chromosome") +
+  theme_void(BASE) + theme(axis.text.y = element_text(size = BASE - 2, hjust = 1, margin = margin(r = 4)),
+                           plot.title = element_text(size = BASE, hjust = 0), plot.margin = margin(5, 10, 15, 5))
+pP <- ggplot(tibble(s = 1:NS, g = pool), aes(s, 1, fill = g)) + geom_tile(width = 1, height = .78) +
+  scale_fill_gradient(low = "white", high = "black", limits = c(0, 1), guide = "none") +
+  coord_cartesian(xlim = c(-6, NS + .5), expand = FALSE) +
+  annotate("text", x = -3, y = 1, label = "pool", size = BASE/2.8) +
+  labs(title = "the pool of hundreds of flies, sequenced together: a grey barcode — the blend of the eight",
+       subtitle = "each stripe's grey level is the share of the pool carrying the black allele there") +
+  theme_void(BASE) + theme(plot.title = element_text(size = BASE, hjust = 0), plot.subtitle = element_text(size = BASE - 2, hjust = 0),
+                           plot.margin = margin(5, 10, 15, 5))
+rec <- tibble(f = factor(fnd, levels = fnd), b = b[fnd]) %>% mutate(xmax = cumsum(b), xmin = xmax - b, mid = (xmin + xmax)/2)
+pR <- ggplot(rec) +
+  geom_rect(aes(xmin = xmin, xmax = xmax, ymin = 0, ymax = 1, fill = f), colour = "white", linewidth = .8) +
+  geom_text(aes(x = mid, y = .5, label = ifelse(b > .045, sprintf("%s\n%.0f%%", f, 100 * b), "")),
+            size = 4.4, lineheight = .9, colour = ifelse(rec$f %in% c("B6", "B7"), "white", "black")) +
+  annotate("text", x = -.03, y = .5, label = "?", size = 14, fontface = "bold", hjust = 1) +
+  scale_fill_manual(values = FOUNDER_COL, guide = "none") + coord_cartesian(xlim = c(-.09, 1), ylim = c(0, 1), expand = FALSE) +
+  labs(title = "the question: in what proportions?  (the founder frequencies)",
+       subtitle = sprintf("one grey barcode of %d stripes — thousands, in reality — determines eight proportions", NS)) +
+  theme_void(BASE) + theme(plot.title = element_text(size = BASE, hjust = 0), plot.subtitle = element_text(size = BASE - 2, hjust = 0),
+                           plot.margin = margin(5, 10, 5, 5))
+pBC <- pF / pP / pR + plot_layout(heights = c(8, 1.8, 1.8)) +
+  plot_annotation(title = "Reading founder frequencies from a sequenced pool",
+                  theme = theme(plot.title = element_text(size = BASE + 3, face = "bold")))
+ggsave("temp_aging/analysis/Talk_barcode.png", pBC, width = 13, height = 8.5, dpi = 220, bg = "white")
+cat("Wrote temp_aging/analysis/Talk_barcode.png\n")
