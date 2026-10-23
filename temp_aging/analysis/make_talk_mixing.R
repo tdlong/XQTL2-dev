@@ -34,45 +34,59 @@ th  <- theme_void(BASE) + theme(plot.title = element_text(hjust = .5, face = "bo
 
 # ── slide 1: the three blocks ────────────────────────────────────────────────
 Xl <- as_tibble(X, rownames = "snp") %>% pivot_longer(-snp, names_to = "founder", values_to = "alt") %>%
-  mutate(snp = factor(snp, levels = rev(rownames(X))), founder = factor(founder, levels = fnd),
-         fill = ifelse(alt == 1, as.character(founder), "ref"))
+  mutate(snp = factor(snp, levels = rev(rownames(X))), founder = factor(founder, levels = fnd))
 pX <- ggplot(Xl, aes(founder, snp)) +
-  geom_tile(aes(fill = fill), colour = "white", linewidth = 1) +
-  geom_tile(data = Xl %>% filter(snp == paste0("SNP ", ROW)), fill = NA, colour = "black", linewidth = 1.2) +
-  scale_fill_manual(values = c(FOUNDER_COL, ref = "grey92"), guide = "none") +
+  geom_tile(aes(fill = factor(alt)), colour = "grey70", linewidth = .4) +
+  geom_text(aes(label = alt, colour = factor(alt)), size = 3.6) +
+  geom_tile(data = Xl %>% filter(snp == paste0("SNP ", ROW)), fill = NA, colour = "red", linewidth = 1.3) +
+  scale_fill_manual(values = c(`0` = "white", `1` = "black"), guide = "none") +
+  scale_colour_manual(values = c(`0` = "grey55", `1` = "white"), guide = "none") +
   scale_x_discrete(position = "top") + coord_equal() +
-  labs(title = "X", subtitle = "founder genotypes, known") + th +
+  labs(title = "X", subtitle = "founder genotypes at each SNP, known") + th +
   theme(axis.text.x = element_text(size = BASE - 3), axis.text.y = element_text(size = BASE - 4, hjust = 1))
 
 Yl <- tibble(snp = factor(rownames(X), levels = rev(rownames(X))), y = Y)
 pY <- ggplot(Yl, aes(1, snp)) +
-  geom_tile(aes(fill = y), colour = "white", linewidth = 1) +
-  geom_text(aes(label = sprintf("%.2f", y)), size = 3.6, colour = ifelse(Yl$y > .5, "white", "black")) +
-  geom_tile(data = Yl %>% filter(snp == paste0("SNP ", ROW)), fill = NA, colour = "black", linewidth = 1.2) +
-  scale_fill_gradient(low = "grey95", high = "grey25", limits = c(0, 1), guide = "none") +
-  coord_equal(clip = "off") + labs(title = "Y", subtitle = "SNP frequencies\nin the pool") + th
+  geom_tile(fill = "white", colour = "grey70", linewidth = .4) +
+  geom_text(aes(label = sprintf("%.2f", y)), size = 3.8) +
+  geom_tile(data = Yl %>% filter(snp == paste0("SNP ", ROW)), fill = NA, colour = "red", linewidth = 1.3) +
+  coord_equal(clip = "off") + labs(title = "Y", subtitle = "SNP frequencies\nin the pool, observed") + th
 
 bl <- tibble(founder = factor(fnd, levels = rev(fnd)), b = b[fnd])
-pb <- ggplot(bl, aes(1, b, fill = founder)) +
-  geom_col(width = .9, colour = "white", linewidth = 1) +
-  geom_text(aes(label = ifelse(b > .04, sprintf("%s %.2f", founder, b), "")),
-            position = position_stack(vjust = .5), size = 3.4, colour = ifelse(rev(fnd) == "B6", "white", "black")) +
-  scale_fill_manual(values = FOUNDER_COL, guide = "none") +
-  coord_cartesian(xlim = c(.3, 1.7)) +
+pb <- ggplot(bl, aes(1, founder)) +
+  geom_tile(fill = "white", colour = "grey70", linewidth = .4) +
+  geom_text(aes(label = sprintf("%s  %.2f", founder, b)), size = 3.8) +
+  coord_equal(ratio = 1, clip = "off") +
   labs(title = "b", subtitle = "founder frequencies,\nestimated; sum to 1") + th
 
 eq <- function(s) ggplot() + annotate("text", 0, 0, label = s, size = 12) + th
-carriers <- fnd[X[ROW, ] == 1]
-expl <- sprintf("SNP %d is the alt allele in %s,\nso its frequency is %s = %.2f",
-                ROW, paste(carriers, collapse = ", "),
-                paste(sprintf("%.2f", b[carriers]), collapse = " + "), Y[ROW])
-pE <- ggplot() + annotate("text", 0, 0, label = expl, size = 5, lineheight = .95) + th
 
-top <- (pY | eq("=") | pX | eq("×") | pb) + plot_layout(widths = c(1.4, .5, 5, .5, 1.6))
-png(OUT1, width = 11, height = 7.5, units = "in", res = 250)
-print((top / pE) + plot_layout(heights = c(6, 1)) +
+# the boxed row as a dot product: X row, b underneath, the products, the sum
+xr <- X[ROW, ]; pr <- xr * b
+strip <- bind_rows(
+  tibble(row = "row of X", founder = fnd, lab = as.character(xr), on = xr == 1),
+  tibble(row = "b",        founder = fnd, lab = sprintf("%.2f", b), on = xr == 1),
+  tibble(row = "product",  founder = fnd, lab = ifelse(xr == 1, sprintf("%.2f", pr), "0"), on = xr == 1)) %>%
+  mutate(row = factor(row, levels = rev(c("row of X", "b", "product"))), founder = factor(founder, levels = fnd))
+pS <- ggplot(strip, aes(founder, row)) +
+  geom_tile(fill = "white", colour = "grey70", linewidth = .4) +
+  geom_text(aes(label = lab, colour = on, fontface = ifelse(on, "bold", "plain")), size = 4.2) +
+  scale_colour_manual(values = c(`TRUE` = "black", `FALSE` = "grey60"), guide = "none") +
+  scale_x_discrete(position = "top") +
+  annotate("text", x = 8.9, y = 1, label = sprintf("sum = %.2f = Y for SNP %d", Y[ROW], ROW), hjust = 0, size = 4.6, fontface = "bold") +
+  annotate("text", x = 8.9, y = 3, label = sprintf("SNP %d", ROW), hjust = 0, size = 4.2, colour = "red") +
+  coord_cartesian(xlim = c(.5, 11.5), clip = "off") +
+  labs(subtitle = "each SNP frequency is the sum of the b of the founders carrying its alt allele") +
+  th + theme(axis.text.x = element_text(size = BASE - 4), axis.text.y = element_text(size = BASE - 3, hjust = 1),
+             plot.subtitle = element_text(hjust = 0))
+
+top <- (pY | eq("=") | pX | eq("×") | pb) + plot_layout(widths = c(1.4, .5, 5, .5, 1.8))
+png(OUT1, width = 11, height = 8.5, units = "in", res = 250)
+print((top / pS) + plot_layout(heights = c(6, 1.6)) +
       plot_annotation(title = "Local founder frequencies from pool-seq, founders known",
+                      subtitle = "find the b that best explains Y, with b \u2265 0 and summing to 1",
                       theme = theme(plot.title = element_text(size = BASE + 3, face = "bold"),
+                                    plot.subtitle = element_text(size = BASE),
                                     plot.margin = margin(5, 10, 5, 25))))
 invisible(dev.off())
 
