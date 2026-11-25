@@ -1,0 +1,11 @@
+Maximum -log10P in the two published QTL intervals, per scan.
+Published (2022 ANOVA, 8 pools): chr2R ~5.2 at 12.29 Mb, chr3L ~4.9 at 6.16 Mb.
+Stuart's rerun of the current pipeline: chr2R ~19.6, chr3L ~5.2.
+
+                             scan max_wald_chr2R 10-14 Mb max_wald_chr3L 5-7.5 Mb at_Mb_chr2R 10-14 Mb at_Mb_chr3L 5-7.5 Mb
+               malathion_2022_all                   19.63                    5.22               12.180                6.215
+                malathion_2022_R1                    3.06                    1.74               12.005                6.390
+                malathion_2022_R2                    3.41                    1.48               12.270                6.365
+                malathion_2022_R3                    7.09                    0.40               12.210                6.080
+                malathion_2022_R4                    7.05                    2.33               12.155                6.180
+ malathion_2022_all [paper ANOVA]                    5.09                    4.69               12.240                6.185
