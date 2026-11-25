@@ -161,7 +161,7 @@ if ("anova_log10p" %in% names(out)) {
            at_Mb = round(r$pos[which.max(r$anova_log10p)] / 1e6, 3))
   }) %>% pivot_wider(names_from = region, values_from = c(max_wald, at_Mb)))
 }
-f_summ <- file.path(p$out, "peak_summary.txt")
+f_summ <- file.path(p$out, paste0(p$scan, ".peak_summary.txt"))
 sink(f_summ)
 cat("Maximum -log10P in the two published QTL intervals, per scan.\n")
 cat("Published (2022 ANOVA, 8 pools): chr2R ~5.2 at 12.29 Mb, chr3L ~4.9 at 6.16 Mb.\n")
