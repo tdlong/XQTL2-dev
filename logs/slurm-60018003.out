@@ -18,7 +18,7 @@ Processing chr3R ...
 
 Overall mean R²:   0.950
 Correction factor: 1.052  (= 1 / mean R²)
-R² written to process/malathion_2022/Scans/malathion_2022_all/malathion_2022_all.smooth_r2.txt
+R² written to process/malathion_2022_pairs/Scans/malathion_2022_all/malathion_2022_all.smooth_r2.txt
 
 ── R² per chromosome × TRT × REP × founder ──────────────────────────
 # A tibble: 320 × 8
@@ -344,4 +344,4 @@ R² written to process/malathion_2022/Scans/malathion_2022_all/malathion_2022_al
 318 chr3R Z         4 A6         0.079  0.074  0.971  0.952
 319 chr3R Z         4 A7         0.146  0.089  0.981  0.969
 320 chr3R Z         4 AB8        0.076  0.069  0.975  0.97 
-Output written to process/malathion_2022/Scans/malathion_2022_all/smooth_r2_diag.txt
+Output written to process/malathion_2022_pairs/Scans/malathion_2022_all/smooth_r2_diag.txt

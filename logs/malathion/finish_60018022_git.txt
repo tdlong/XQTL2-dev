@@ -1,0 +1,23 @@
+A  logs/malathion/finish_60018022.out
+A  logs/malathion/malathion_2022_R1.Manhattan.png
+A  logs/malathion/malathion_2022_R2.Manhattan.png
+A  logs/malathion/malathion_2022_R3.Manhattan.png
+A  logs/malathion/malathion_2022_R4.Manhattan.png
+A  logs/malathion/malathion_2022_all.anova.txt.gz
+A  logs/malathion/malathion_2022_all.peak_shifts.txt
+A  logs/malathion/malathion_2022_all.peak_summary.txt
+A  logs/malathion/malathion_2022_all.wald_vs_anova.png
+?? logs/malathion/finish_60018022_git.txt
+[main b70550f] malathion 2022 rerun: paper ANOVA vs pipeline Wald, per-pair scans (job 60018022)
+ 9 files changed, 64 insertions(+)
+ create mode 100644 logs/malathion/finish_60018022.out
+ create mode 100644 logs/malathion/malathion_2022_R1.Manhattan.png
+ create mode 100644 logs/malathion/malathion_2022_R2.Manhattan.png
+ create mode 100644 logs/malathion/malathion_2022_R3.Manhattan.png
+ create mode 100644 logs/malathion/malathion_2022_R4.Manhattan.png
+ create mode 100644 logs/malathion/malathion_2022_all.anova.txt.gz
+ create mode 100644 logs/malathion/malathion_2022_all.peak_shifts.txt
+ create mode 100644 logs/malathion/malathion_2022_all.peak_summary.txt
+ create mode 100644 logs/malathion/malathion_2022_all.wald_vs_anova.png
+To https://github.com/tdlong/XQTL2-dev.git
+   5dd0b9f..b70550f  main -> main

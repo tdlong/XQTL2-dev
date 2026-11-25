@@ -8,31 +8,14 @@
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
 ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-
-Attaching package: ‘limSolve’
-
-The following object is masked from ‘package:ggplot2’:
-
-    resolution
-
-
-Attaching package: ‘data.table’
-
-The following objects are masked from ‘package:lubridate’:
-
-    hour, isoweek, isoyear, mday, minute, month, quarter, second, wday,
-    week, yday, year
-
-The following objects are masked from ‘package:dplyr’:
-
-    between, first, last
-
-The following object is masked from ‘package:purrr’:
-
-    transpose
-
-df2 is now made
-`summarise()` has grouped output by 'CHROM'. You can override using the
-`.groups` argument.
-Joining with `by = join_by(CHROM, POS)`
-df3 is now made
+null device 
+          1 
+null device 
+          1 
+null device 
+          1 
+malathion_2022_R4.scan.txt
+malathion_2022_R4.meansBySample.txt
+malathion_2022_R4.5panel.cM.png
+malathion_2022_R4.5panel.Mb.png
+malathion_2022_R4.Manhattan.png
