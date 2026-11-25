@@ -1,3 +1,0 @@
-Wed Nov 25 00:33:41 PST 2026  task 5: SRR20063677 = c_F_2 (Rep2_Female_Con)
-  fetching https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR200/077/SRR20063677/SRR20063677_1.fastq.gz -> data/raw/malathion_2022/SRR20063677-SRA-R1.fastq.gz
-[2026-11-25T00:40:14.635] error: *** JOB 60011902 ON hpc3-23-18 CANCELLED AT 2026-11-25T00:40:14 DUE to SIGNAL Terminated ***
