@@ -13,14 +13,13 @@
 # PRJNA857080) from the ENA mirror, with wget, each file checked against ENA's
 # md5. No sra-tools needed.
 #
-# WHERE TO RUN IT: on the data-transfer host, not in a batch job. HPC3's rule is
-# that wget/curl/rsync go through access-hpc3.rcic.uci.edu (pipeline/Slurm.md,
-# "Downloads"); transfers on compute nodes get killed. That host has no Slurm,
-# so from the repo root there:
-#   nohup bash scripts_oneoffs/malathion/fetch_sra.sh &
-# It then fetches all eight runs in parallel and logs to
-# logs/malathion/fetch_dtn.out. The SBATCH header is kept so the script also
-# works as an array job (one run per task) on a cluster that allows it.
+# Runs as a batch array, one run per task, both mates. A task exits non-zero
+# unless both files match ENA's md5, so a chain that waits on it with afterok
+# never starts on a partial download. Submitted by rerun_2022_from_reads.sh;
+# by hand from the repo root:
+#   sbatch scripts_oneoffs/malathion/fetch_sra.sh
+# Without SLURM (plain `bash`, e.g. on a transfer host) it fetches all eight in
+# parallel and logs to logs/malathion/fetch_dtn.out.
 #
 # Files land in data/raw/malathion_2022 as <run>-SRA-R1.fastq.gz and -R2, which is
 # the naming fq2bam.sh looks for: it greps the barcode pair "<colA>-<colB>" and
