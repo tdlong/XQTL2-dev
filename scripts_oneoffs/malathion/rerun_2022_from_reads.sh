@@ -8,10 +8,8 @@
 # of pipeline/README.md with SLURM dependencies, the way run_full_pipeline.sh
 # chains them, plus the per-pair scans and the paper's ANOVA from rerun_2022.sh:
 #
-#   stage 0 (one wget typed on access-hpc3, then verify_reads.sh as a job)
-#   wget -i sra_urls.txt  8 runs x 2 mates from ENA       -> data/raw/malathion_2022
-#   verify_reads.sh       rename for fq2bam, md5, markers
 #   stage 1 (this script, login node; everything below is sbatch)
+#   fetch_sra.sh          8 runs x 2 mates from ENA, md5  -> data/raw/malathion_2022
 #   build_catalog.sh      A-founder catalog (none on HPC3; AGE_SY's is B founders)
 #   fq2bam.sh             align, one job per sample       -> data/bam/malathion_2022
 #   stage 2 (rerun_2022_part2.sh, an sbatch job that waits on stage 1)
@@ -30,11 +28,12 @@
 # Verified reads, an existing catalog and existing BAMs are reused; anything
 # downstream is recomputed. Do not rerun while its jobs are still in the queue.
 #
-# Login node: bash and sbatch only. Once the reads are verified, from the root:
+# Login node: bash and sbatch only. Run once from the repo root:
 #   bash scripts_oneoffs/malathion/rerun_2022_from_reads.sh
 #
-# Wall time: catalog hours, alignment up to a day per sample in parallel, then
-# calls, haplotypes (up to a day on highmem) and scans. Two to three days.
+# Wall time: download and catalog in parallel (hours), alignment up to a day per
+# sample in parallel, then calls, haplotypes (up to a day on highmem) and
+# scans. Two to three days end to end.
 ###############################################################################
 set -euo pipefail
 [ -d scripts_oneoffs/malathion ] || { echo "ERROR: run from the XQTL2-dev root" >&2; exit 1; }
@@ -74,19 +73,22 @@ if [ -e "$DIR/Scans/${PREFIX}_all" ]; then
 fi
 mkdir -p "$RAW" "$BAM" "$DIR" logs/malathion
 
-# ── 1. reads: downloaded on the transfer host, verified by a job ─────────────
-# One wget typed on access-hpc3 (see verify_reads.sh header), then
-# sbatch scripts_oneoffs/malathion/verify_reads.sh renames the files the way
-# fq2bam.sh expects and leaves a .md5ok marker beside each one that matches
-# ENA's md5. Nothing is submitted here unless all 16 markers exist.
+# ── 1. reads: a batch array, one run per task, both mates, md5-checked ────────
+# A task exits non-zero unless both of its files match ENA's md5, and every job
+# below waits on the whole array with afterok, so nothing can start on a partial
+# or corrupt file. A verified file carries a .md5ok marker; with all 16 present
+# the fetch is skipped. Never run two fetches into the same folder at once.
 n_ok=$(ls "$RAW"/*.md5ok 2>/dev/null | wc -l)
-if [ "$n_ok" -ne 16 ]; then
-  echo "ERROR: $n_ok / 16 fastq files verified in $RAW." >&2
-  echo "       Download on access-hpc3, then: sbatch scripts_oneoffs/malathion/verify_reads.sh" >&2
-  echo "       (the wget command is in the header of verify_reads.sh)" >&2
-  exit 1
+if [ "$n_ok" -eq 16 ]; then
+  JID_FETCH=""
+  echo "reads:      16 / 16 verified in $RAW, fetch skipped"
+else
+  if squeue -u "$USER" -h -n sra_fetch | grep -q .; then
+    echo "ERROR: an sra_fetch job is already in the queue; wait for it or scancel it first" >&2; exit 1
+  fi
+  JID_FETCH=$(sbatch --parsable -A $ACCOUNT scripts_oneoffs/malathion/fetch_sra.sh | cut -d_ -f1)
+  echo "fetch:      $JID_FETCH  (8 runs x 2 mates from ENA -> $RAW, md5-checked; $n_ok / 16 already verified)"
 fi
-echo "reads:      16 / 16 verified in $RAW"
 
 # ── 2. catalog, in parallel with the download ────────────────────────────────
 if [ -f "$CATALOG/catalog.tsv.gz" ]; then
@@ -109,7 +111,7 @@ if [ "$nbam" -eq 8 ]; then
   JID_BAM=""
   echo "fq2bam:     all 8 BAMs exist in $BAM, reused"
 else
-  JID_BAM=$(sbatch --parsable -A $ACCOUNT \
+  JID_BAM=$(sbatch --parsable ${JID_FETCH:+--dependency=afterok:$JID_FETCH} -A $ACCOUNT \
       --array=1-$NBC pipeline/scripts/fq2bam.sh "$BARCODES" "$RAW" "$BAM" | cut -d_ -f1)
   echo "fq2bam:     $JID_BAM  (8 samples -> $BAM)"
 fi
