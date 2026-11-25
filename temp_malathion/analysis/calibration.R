@@ -156,3 +156,34 @@ cat("  estimated, which is the fundamental reason the modelled variance wins her
 sink()
 cat(readLines(out_tab), sep = "\n")
 cat("\nwrote", out_png, "\n")
+
+# ── PART 5: is the Wald's denominator too small or too big? ─────────────────
+# The direct question, answered from the null distribution of its own statistic
+# rather than from argument. The statistic is a chi-square on 7 df, so on null
+# windows its median should be qchisq(0.5, 7) = 6.346 and its mean 7. If the
+# denominator were too small the observed values would exceed those.
+wnull <- read.table(rep1_file, header = TRUE) %>%
+  filter(!is_qtl(chr, cM), is.finite(Wald_log10p))
+chi <- qchisq(10^(-wnull$Wald_log10p), 7, lower.tail = FALSE)
+fac <- qchisq(0.5, 7) / median(chi)
+chi_pk <- qchisq(10^(-6.92), 7, lower.tail = FALSE)
+lp_corr <- -pchisq(chi_pk * fac, 7, lower.tail = FALSE, log.p = TRUE)/log(10)
+sink(out_tab, append = TRUE)
+cat("\n\nPART 5  Is the Wald's denominator too small or too big?\n\n")
+cat(sprintf("  %d null windows, statistic is chi-square on 7 df\n", nrow(wnull)))
+cat(sprintf("    median observed %.3f   expected %.3f\n", median(chi), qchisq(0.5, 7)))
+cat(sprintf("    mean   observed %.3f   expected %.3f\n", mean(chi), 7))
+cat(sprintf("    => the denominator is about %.2fx too LARGE, not too small\n\n", fac))
+cat(sprintf("  chr2R peak as reported: -log10P 6.92, chi-square %.1f\n", chi_pk))
+cat(sprintf("  with the denominator rescaled by that factor: -log10P %.1f\n\n", lp_corr))
+cat("  So 6.9 is a floor. Correcting the denominator to the size the null says\n")
+cat("  it should be raises the peak, it does not lower it. The 2022 denominator\n")
+cat("  errs the other way: too small, by the sum-to-one effect in PART 4's\n")
+cat("  simulation and by the locally low estimate at that window.\n\n")
+cat("  Measured on replicate 1 only, where pools are 43 and 65 flies. The\n")
+cat("  denominator has a multinomial part that shrinks as 1/N and a smoothing\n")
+cat("  and reconstruction part that does not, so this factor is not portable to\n")
+cat("  replicate 2's much larger pools. That is the measurement that matters for\n")
+cat("  the 19.6, and the 8-pool run supplies it.\n")
+sink()
+cat("\n"); cat(readLines(out_tab)[grep("PART 5", readLines(out_tab)):length(readLines(out_tab))], sep = "\n")

@@ -46,3 +46,25 @@ PART 4  chr2R alone, both pipelines, replicate 1, data held fixed
   paying a degrees-of-freedom penalty, -5 for a bigger variance. With only
   two replicate pairs an empirical denominator is both expensive and poorly
   estimated, which is the fundamental reason the modelled variance wins here.
+
+
+PART 5  Is the Wald's denominator too small or too big?
+
+  21887 null windows, statistic is chi-square on 7 df
+    median observed 4.725   expected 6.346
+    mean   observed 5.279   expected 7.000
+    => the denominator is about 1.34x too LARGE, not too small
+
+  chr2R peak as reported: -log10P 6.92, chi-square 45.3
+  with the denominator rescaled by that factor: -log10P 10.0
+
+  So 6.9 is a floor. Correcting the denominator to the size the null says
+  it should be raises the peak, it does not lower it. The 2022 denominator
+  errs the other way: too small, by the sum-to-one effect in PART 4's
+  simulation and by the locally low estimate at that window.
+
+  Measured on replicate 1 only, where pools are 43 and 65 flies. The
+  denominator has a multinomial part that shrinks as 1/N and a smoothing
+  and reconstruction part that does not, so this factor is not portable to
+  replicate 2's much larger pools. That is the measurement that matters for
+  the 19.6, and the 8-pool run supplies it.
