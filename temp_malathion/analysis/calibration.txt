@@ -1,0 +1,30 @@
+Replicate 1 only, the same four pools through each test.
+
+PART 1  Where each test gets its yardstick, at the published peaks
+  chr2R  signal MS 0.0176  error MS 0.00169  F 10.4
+  chr3L  signal MS 0.0109  error MS 0.00115  F  9.5
+  2R carries 1.6x the signal of 3L but also 1.5x the residual, so the two F
+  values nearly match. The ANOVA's residual is measured at that window and
+  grows when the replicates disagree. The Wald's variance is modelled from
+  pool size, is near enough equal at both peaks, and so lets the 1.6x in
+  signal pass straight through. That is the whole of 5.1 -> 6.9.
+
+PART 2  Genome-wide calibration, QTL regions removed
+
+         test n_windows median_mlog10p lambda frac_above_2 frac_above_3
+   2022 ANOVA      4480          0.508  2.260       0.0404      0.00446
+ current Wald     21900          0.159  0.342       0.0000      0.00000
+
+  lambda is the median chi-square over its null expectation: 1 is calibrated.
+  Under a correct null the median -log10P is 0.30 and 10% of windows exceed 1.
+
+PART 3  Do the replicates agree as closely as pool size predicts?
+
+  predicted variance of the female-minus-male shift, from 43 and 65 flies: 0.00966
+  observed median squared difference, genome-wide, QTL removed:          0.00290
+  ratio observed / predicted: 0.30
+
+  Above 1 means the pools differ by more than counting flies explains, so a
+  variance built only from pool size understates the real one. Part of any
+  excess is haplotype reconstruction error, which the Wald does model, so
+  this ratio is an upper bound on what the Wald misses.
