@@ -73,6 +73,16 @@ NBC=$(wc -l < "$BARCODES")
 if [ -e "$DIR/Scans/${PREFIX}_all" ]; then
   echo "ERROR: $DIR/Scans/${PREFIX}_all exists; remove it or change PREFIX rather than overwrite" >&2; exit 1
 fi
+if squeue -u "$USER" -h -n sra_fetch | grep -q .; then
+  echo "ERROR: an sra_fetch job is still in the queue; wait for it to finish, then rerun" >&2; exit 1
+fi
+# catalog jobs already in the queue (names from build_catalog.sh), as a
+# dependency string; empty if none
+CAT_QUEUED=$(squeue -u "$USER" -h -o "%i %j" | awk '$2=="catalog_build"||$2=="catalog_gather"||$2=="catalog_filter"{sub(/_.*/,"",$1); print $1}' | sort -u | paste -sd: -)
+if [ -d "$CATALOG/work" ] && [ ! -f "$CATALOG/catalog.tsv.gz" ] && [ -z "$CAT_QUEUED" ]; then
+  echo "ERROR: $CATALOG has a half-built work/ and no catalog job in the queue; a build" >&2
+  echo "       failed or was cancelled. Remove $CATALOG and rerun to rebuild." >&2; exit 1
+fi
 mkdir -p "$RAW" "$BAM" "$DIR" logs/malathion
 
 # ── 1. reads: a batch array, one run per task, both mates, md5-checked ────────
@@ -85,9 +95,6 @@ if [ "$n_ok" -eq 16 ]; then
   JID_FETCH=""
   echo "reads:      16 / 16 verified in $RAW, fetch skipped"
 else
-  if squeue -u "$USER" -h -n sra_fetch | grep -q .; then
-    echo "ERROR: an sra_fetch job is already in the queue; wait for it or scancel it first" >&2; exit 1
-  fi
   JID_FETCH=$(sbatch --parsable -A $ACCOUNT scripts_oneoffs/malathion/fetch_sra.sh | cut -d_ -f1)
   echo "fetch:      $JID_FETCH  (8 runs x 2 mates from ENA -> $RAW, md5-checked; $n_ok / 16 already verified)"
 fi
@@ -96,11 +103,9 @@ fi
 if [ -f "$CATALOG/catalog.tsv.gz" ]; then
   JID_CAT=""
   echo "catalog:    exists, reused ($CATALOG)"
-elif [ -d "$CATALOG/work" ]; then
-  echo "ERROR: $CATALOG is still being built (work/ present, no catalog.tsv.gz)." >&2
-  echo "       Wait for the catalog jobs to finish (squeue -u \$USER), then rerun." >&2
-  echo "       If they failed, remove $CATALOG and rerun to rebuild." >&2
-  exit 1
+elif [ -n "$CAT_QUEUED" ]; then
+  JID_CAT=$CAT_QUEUED
+  echo "catalog:    still building (jobs $JID_CAT); the rest will wait on them"
 else
   JID_CAT=$(bash pipeline/scripts/build_catalog.sh --founders "$FOUNDERS" --out "$CATALOG" -A $ACCOUNT -p $PARTITION | tail -1)
   echo "catalog:    $JID_CAT  (A founders -> $CATALOG)"

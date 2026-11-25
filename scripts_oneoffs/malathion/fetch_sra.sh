@@ -6,6 +6,7 @@
 #SBATCH --mem-per-cpu=2G
 #SBATCH --time=12:00:00
 #SBATCH --array=1-8
+#SBATCH --requeue
 #SBATCH -o logs/malathion/fetch_%A_%a.out
 #SBATCH -e logs/malathion/fetch_%A_%a.out
 
@@ -15,13 +16,18 @@
 #
 # Runs as a batch array, one run per task, both mates. RCIC's acceptable-use
 # page puts large downloads in Slurm jobs, not on login nodes; the transfer host
-# access-hpc3 is a restricted shell we could not use for this. A task exits
-# non-zero unless both files match ENA's md5, so a chain that waits on it with
-# afterok never starts on a partial download. Submitted by
-# rerun_2022_from_reads.sh; by hand from the repo root:
+# access-hpc3 is a restricted shell we could not use for this.
+#
+# Not every compute node can reach the internet: on 2026-11-25 four of eight
+# tasks died in their first second with zero-byte files while the other four
+# downloaded normally. So each task first checks it can reach the ENA server,
+# and if it cannot it requeues itself (up to MAX_REQUEUE times) to land on
+# another node, logging the hostname so the bad nodes become known. wget itself
+# retries transient errors. A task exits non-zero unless both files match ENA's
+# md5, so a chain that waits on it with afterok never starts on a partial
+# download. Submitted by rerun_2022_from_reads.sh; by hand from the repo root:
 #   sbatch scripts_oneoffs/malathion/fetch_sra.sh
-# If a task is killed, rerun it: files already verified are skipped and wget -c
-# resumes the rest. verify_reads.sh can re-check everything afterwards.
+# Rerunning is safe: verified files are skipped and wget -c resumes the rest.
 #
 # Files land in data/raw/malathion_2022 as <run>-SRA-R1.fastq.gz and -R2, which is
 # the naming fq2bam.sh looks for: it greps the barcode pair "<colA>-<colB>" and
@@ -33,8 +39,25 @@
 
 TSV=helpfiles/malathion/sra_runs.tsv
 OUT=data/raw/malathion_2022
+MAX_REQUEUE=6
 [ -f "$TSV" ] || { echo "run from the XQTL2-dev root ($TSV not found)" >&2; exit 1; }
 mkdir -p "$OUT" logs/malathion
+
+# Can this node reach ENA at all? If not, move to another node rather than fail.
+if [ -n "${SLURM_JOB_ID:-}" ]; then
+  if ! curl -sS -I --max-time 30 https://ftp.sra.ebi.ac.uk/ >/dev/null 2>&1; then
+    n=${SLURM_RESTART_COUNT:-0}
+    echo "$(date '+%F %T')  $(hostname): no route to ftp.sra.ebi.ac.uk (restart $n of $MAX_REQUEUE)"
+    if [ "$n" -lt "$MAX_REQUEUE" ]; then
+      sleep 20   # let the scheduler see us as running before we ask to be requeued
+      scontrol requeue "${SLURM_ARRAY_JOB_ID:-$SLURM_JOB_ID}_${SLURM_ARRAY_TASK_ID:-}" 2>/dev/null \
+        || scontrol requeue "$SLURM_JOB_ID"
+      sleep 60; exit 0   # Slurm kills this instance when the requeue takes effect
+    fi
+    echo "giving up: no network after $MAX_REQUEUE requeues" >&2; exit 1
+  fi
+  echo "$(date '+%F %T')  $(hostname): network ok"
+fi
 
 fetch_one () {  # fetch_one <row number 1-8>; returns 1 on any failure
   local line run sample alias url1 url2 md5_1 md5_2 bytes1 bytes2 i url md5 dest got fail=0
@@ -51,8 +74,10 @@ fetch_one () {  # fetch_one <row number 1-8>; returns 1 on any failure
     if [ -s "$dest" ] && [ "$(md5sum "$dest" | cut -d' ' -f1)" = "$md5" ]; then
       echo "  have $dest (md5 ok)"; touch "$dest.md5ok"; continue
     fi
+    [ -e "$dest" ] && [ ! -s "$dest" ] && rm -f "$dest"      # zero-byte leftover of a failed start
     echo "  fetching https://$url -> $dest"
-    wget -c -q -O "$dest" "https://$url" || { echo "  wget failed for $url" >&2; fail=1; continue; }
+    wget -c -q --tries=10 --waitretry=30 --retry-connrefused -O "$dest" "https://$url" \
+      || { echo "  wget failed for $url" >&2; fail=1; continue; }
     got=$(md5sum "$dest" | cut -d' ' -f1)
     if [ "$got" = "$md5" ]; then
       touch "$dest.md5ok"
