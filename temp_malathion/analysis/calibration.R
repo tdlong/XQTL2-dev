@@ -130,5 +130,29 @@ cat("  variance built only from pool size understates the real one. Part of any\
 cat("  excess is haplotype reconstruction error, which the Wald does model, so\n")
 cat("  this ratio is an upper bound on what the Wald misses.\n")
 sink()
+
+# ── PART 4: 2R alone, across pipelines, with the data held fixed ────────────
+# 3L barely moves (4.0 -> 3.4) and is not what needs explaining. The question
+# is why the SAME shifts at Cyp6g1 give 5.1 under one test and 6.9 under the
+# other. Two large effects that nearly cancel.
+Fv <- 10.40; d1 <- 7; d2 <- 16; wald_lp <- 6.92
+lp_F     <- -pf(Fv, d1, d2, lower.tail = FALSE, log.p = TRUE)/log(10)
+lp_chisq <- -pchisq(d1*Fv, d1, lower.tail = FALSE, log.p = TRUE)/log(10)
+chi_wald <- qchisq(10^(-wald_lp), d1, lower.tail = FALSE)
+sink(out_tab, append = TRUE)
+cat("\n\nPART 4  chr2R alone, both pipelines, replicate 1, data held fixed\n\n")
+cat(sprintf("  signal-to-noise at the peak window is F = %.2f either way.\n\n", Fv))
+cat(sprintf("  as F(%d,%d), denominator ESTIMATED from the replicates : -log10P = %5.2f\n", d1, d2, lp_F))
+cat(sprintf("  as chi-square, same ratio, denominator treated as KNOWN: -log10P = %5.2f\n", lp_chisq))
+cat(sprintf("     => estimating the denominator on %d df costs %.1f units\n\n", d2, lp_chisq - lp_F))
+cat(sprintf("  the Wald reports -log10P = %.2f, i.e. chi-square %.1f on %d df,\n", wald_lp, chi_wald, d1))
+cat(sprintf("  against %.1f if its variance equalled the ANOVA residual,\n", d1*Fv))
+cat(sprintf("     => the Wald's modelled variance is about %.2fx larger, worth -%.1f units\n\n",
+            d1*Fv/chi_wald, lp_chisq - wald_lp))
+cat("  So the gap is the small residue of two large opposing effects: +8 for not\n")
+cat("  paying a degrees-of-freedom penalty, -5 for a bigger variance. With only\n")
+cat("  two replicate pairs an empirical denominator is both expensive and poorly\n")
+cat("  estimated, which is the fundamental reason the modelled variance wins here.\n")
+sink()
 cat(readLines(out_tab), sep = "\n")
 cat("\nwrote", out_png, "\n")

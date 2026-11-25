@@ -28,3 +28,21 @@ PART 3  Do the replicates agree as closely as pool size predicts?
   variance built only from pool size understates the real one. Part of any
   excess is haplotype reconstruction error, which the Wald does model, so
   this ratio is an upper bound on what the Wald misses.
+
+
+PART 4  chr2R alone, both pipelines, replicate 1, data held fixed
+
+  signal-to-noise at the peak window is F = 10.40 either way.
+
+  as F(7,16), denominator ESTIMATED from the replicates : -log10P =  4.20
+  as chi-square, same ratio, denominator treated as KNOWN: -log10P = 12.40
+     => estimating the denominator on 16 df costs 8.2 units
+
+  the Wald reports -log10P = 6.92, i.e. chi-square 45.3 on 7 df,
+  against 72.8 if its variance equalled the ANOVA residual,
+     => the Wald's modelled variance is about 1.61x larger, worth -5.5 units
+
+  So the gap is the small residue of two large opposing effects: +8 for not
+  paying a degrees-of-freedom penalty, -5 for a bigger variance. With only
+  two replicate pairs an empirical denominator is both expensive and poorly
+  estimated, which is the fundamental reason the modelled variance wins here.
