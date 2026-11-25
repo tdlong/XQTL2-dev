@@ -15,6 +15,7 @@
 # once process/malathion_2022/Catalog/catalog.tsv.gz and the eight BAMs exist:
 #   bash scripts_oneoffs/malathion/rerun_2022_part2.sh
 set -euo pipefail
+trap 'echo "ERROR: $0 aborted at line $LINENO (exit $?)" >&2' ERR
 [ -d scripts_oneoffs/malathion ] || { echo "ERROR: run from the XQTL2-dev root" >&2; exit 1; }
 
 PREFIX=malathion_2022

@@ -79,6 +79,6 @@ pids=(); rows=()
 for t in 1 2 3 4 5 6 7 8; do fetch_one "$t" & pids+=($!); rows+=($t); done
 fail=0
 for k in "${!pids[@]}"; do wait "${pids[$k]}" || { echo "row ${rows[$k]} FAILED"; fail=1; }; done
-n_ok=$(ls "$OUT"/*.md5ok 2>/dev/null | wc -l)
+n_ok=$(find "$OUT" -maxdepth 1 -name '*.md5ok' | wc -l)
 echo "=== $(date '+%F %T')  done: $n_ok / 16 files verified, exit $fail ==="
 exit $fail

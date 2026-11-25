@@ -36,6 +36,8 @@
 # scans. Two to three days end to end.
 ###############################################################################
 set -euo pipefail
+trap 'echo "ERROR: $0 aborted at line $LINENO (exit $?)" >&2' ERR
+shopt -s nullglob
 [ -d scripts_oneoffs/malathion ] || { echo "ERROR: run from the XQTL2-dev root" >&2; exit 1; }
 
 PROJECT=malathion_2022
@@ -78,7 +80,7 @@ mkdir -p "$RAW" "$BAM" "$DIR" logs/malathion
 # below waits on the whole array with afterok, so nothing can start on a partial
 # or corrupt file. A verified file carries a .md5ok marker; with all 16 present
 # the fetch is skipped. Never run two fetches into the same folder at once.
-n_ok=$(ls "$RAW"/*.md5ok 2>/dev/null | wc -l)
+ok_files=("$RAW"/*.md5ok); n_ok=${#ok_files[@]}
 if [ "$n_ok" -eq 16 ]; then
   JID_FETCH=""
   echo "reads:      16 / 16 verified in $RAW, fetch skipped"

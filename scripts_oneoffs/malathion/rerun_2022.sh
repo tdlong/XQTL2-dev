@@ -43,6 +43,7 @@
 #                       pass "" to refit)
 ###############################################################################
 set -euo pipefail
+trap 'echo "ERROR: $0 aborted at line $LINENO (exit $?)" >&2' ERR
 [ -d scripts_oneoffs/malathion ] || { echo "ERROR: run from the XQTL2-dev root" >&2; exit 1; }
 
 REFALT=process/MALATHION_v1
