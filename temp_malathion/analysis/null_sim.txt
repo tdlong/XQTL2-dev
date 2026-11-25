@@ -1,0 +1,17 @@
+Null simulation: no QTL, pools are multinomial draws of 2N chromosomes.
+Replicate 1 sizes (43 and 65 flies per pool). 4000 simulated windows.
+A valid test gives median 0.301, lambda 1.00, and rejection rates 0.05 / 0.01 / 0.001.
+
+              test median lambda P<0.05  P<0.01 P<0.001
+             anova  0.381   1.45 0.0840 0.01700 0.00275
+ anova_independent  0.310   1.05 0.0435 0.00900 0.00025
+              wald  0.304   1.02 0.0458 0.00975 0.00025
+
+Both tests are handed the same numerator. Only the denominator differs:
+the ANOVA estimates it from 16 residual df, treating the 8 founder values
+in a pool as 8 independent observations; the Wald uses the multinomial
+covariance, which knows they sum to one, and spends no df on it.
+
+anova_independent is the control: the identical ANOVA on 8 INDEPENDENT
+values per pool instead of proportions summing to one. It is calibrated,
+so the sum-to-one constraint is what inflates the test, nothing else.
