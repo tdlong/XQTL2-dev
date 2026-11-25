@@ -1,7 +1,0 @@
-Smoothing R²: 0.9505  (correction factor: 1.0521)
-Reading process/malathion_2022_pairs/Scans/malathion_2022_all/malathion_2022_all.smooth.chr2L.rds 
-Replicates used (4): 1, 2, 3, 4
-Building arrays for chr2L...
-Running Wald scan on chr2L (4645 windows)...
-Writing process/malathion_2022_pairs/Scans/malathion_2022_all/malathion_2022_all.scan.chr2L.txt 
-Done.

@@ -4,6 +4,7 @@ Maximum -log10P at the two published QTL.
     2022 pipeline replicate 1 only (4 pools)   5.11   3.95    64.96    16.63
     2022 pipeline  both replicates (8 pools)   5.11   4.91    65.76    16.08
  current pipeline replicate 1 only (4 pools)   6.92   3.40    65.32    16.96
+ current pipeline  both replicates (8 pools)  19.63   5.22    65.59    16.54
 
 Published Table 1 peaks: chr2R 65.6 cM (12,294,089 bp), chr3L 16.6 cM (6,162,469 bp).
 Published Fig. 2 peaks are just above 5 (2R) and about 4.9 (3L); the 2022-pipeline,
