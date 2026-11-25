@@ -8,8 +8,9 @@
 # of pipeline/README.md with SLURM dependencies, the way run_full_pipeline.sh
 # chains them, plus the per-pair scans and the paper's ANOVA from rerun_2022.sh:
 #
-#   stage 0 (fetch_on_dtn.sh from the login node; runs on access-hpc3)
-#   fetch_sra.sh          8 runs x 2 mates from ENA, md5  -> data/raw/malathion_2022
+#   stage 0 (one wget typed on access-hpc3, then verify_reads.sh as a job)
+#   wget -i sra_urls.txt  8 runs x 2 mates from ENA       -> data/raw/malathion_2022
+#   verify_reads.sh       rename for fq2bam, md5, markers
 #   stage 1 (this script, login node; everything below is sbatch)
 #   build_catalog.sh      A-founder catalog (none on HPC3; AGE_SY's is B founders)
 #   fq2bam.sh             align, one job per sample       -> data/bam/malathion_2022
@@ -73,15 +74,16 @@ if [ -e "$DIR/Scans/${PREFIX}_all" ]; then
 fi
 mkdir -p "$RAW" "$BAM" "$DIR" logs/malathion
 
-# ── 1. reads: fetched beforehand on the data-transfer host ───────────────────
-# Transfers run only on access-hpc3.rcic.uci.edu (pipeline/Slurm.md, "Downloads").
-# fetch_on_dtn.sh starts the download there from the login node; fetch_sra.sh
-# leaves a .md5ok marker beside every file that matched ENA's md5. Nothing is
-# submitted here unless all 16 are present.
+# ── 1. reads: downloaded on the transfer host, verified by a job ─────────────
+# One wget typed on access-hpc3 (see verify_reads.sh header), then
+# sbatch scripts_oneoffs/malathion/verify_reads.sh renames the files the way
+# fq2bam.sh expects and leaves a .md5ok marker beside each one that matches
+# ENA's md5. Nothing is submitted here unless all 16 markers exist.
 n_ok=$(ls "$RAW"/*.md5ok 2>/dev/null | wc -l)
 if [ "$n_ok" -ne 16 ]; then
   echo "ERROR: $n_ok / 16 fastq files verified in $RAW." >&2
-  echo "       bash scripts_oneoffs/malathion/fetch_on_dtn.sh   then   tail logs/malathion/fetch_dtn.out" >&2
+  echo "       Download on access-hpc3, then: sbatch scripts_oneoffs/malathion/verify_reads.sh" >&2
+  echo "       (the wget command is in the header of verify_reads.sh)" >&2
   exit 1
 fi
 echo "reads:      16 / 16 verified in $RAW"
