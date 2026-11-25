@@ -1,19 +1,16 @@
-Maximum -log10P at the two published QTL, one difference at a time.
+Maximum -log10P at the two published QTL.
 
-A.  2022 test, 2022 haplotypes, all 8 pools  (the published Fig. 2) 
-B.  2022 test, 2022 haplotypes, replicate 1 only (4 pools) 
-C.  new pipeline Wald test, new haplotypes, replicate 1 only (4 pools) 
-D.  new pipeline Wald test, new haplotypes, all 8 pools -- Stuart's rerun, approx 19.6 and 5.2
+         pipeline                    dataset max_2R max_3L at_cM_2R at_cM_3L
+    2022 pipeline replicate 1 only (4 pools)   5.11   3.95    64.96    16.63
+    2022 pipeline  both replicates (8 pools)   5.11   4.91    65.76    16.08
+ current pipeline replicate 1 only (4 pools)   6.92   3.40    65.32    16.96
 
- panel max_chr2R (Cyp6g1) max_chr3L (Mdr65) at_cM_chr2R (Cyp6g1)
-     A               5.11              4.91                65.76
-     B               5.11              3.95                64.96
-     C               6.92              3.40                65.32
- at_cM_chr3L (Mdr65)
-               16.08
-               16.63
-               16.96
+Published Table 1 peaks: chr2R 65.6 cM (12,294,089 bp), chr3L 16.6 cM (6,162,469 bp).
+Published Fig. 2 peaks are just above 5 (2R) and about 4.9 (3L); the 2022-pipeline,
+8-pool cell above is computed from the paper's own code and data and matches them,
+which is the check that the paper's test is implemented correctly here.
 
-Published Table 1 peaks: chr2R 12,294,089 bp (65.6 cM), chr3L 6,162,469 bp (16.6 cM).
-A is computed here from the paper's own code and data, so it is a reproduction
-of the published figure rather than a reading off it.
+Caveat on the current-pipeline, replicate-1 cell: its haplotypes were called from
+the 2023 RefAlt tables on HPC3 (the old joint SNP caller), since those are what
+exist for replicate 1. The 8-pool run now going uses the current catalog caller
+end to end, so it will also say whether the SNP caller matters here.

@@ -1,49 +1,46 @@
 #!/usr/bin/env Rscript
 ###############################################################################
-# compare_scans.R — why the malathion scan changed: separate the three things
-# that differ between the 2022 figure and the current pipeline's output.
+# compare_scans.R — the malathion scan as a 2x2: which DATA, which PIPELINE.
 #
-# The published scan and Stuart's rerun differ in THREE ways at once: the set of
-# pools (8 vs 4), the haplotype calls (2022 lsei at 1.5 cM vs the current
-# pipeline), and the test (the paper's ANOVA vs the pipeline's Wald). Changing
-# all three at once explains nothing, so each panel changes one thing.
+#                     | replicate 1 only (4 pools) | both replicates (8 pools)
+#   2022 pipeline     |            B               |      A = published Fig. 2
+#   current pipeline  |            C               |      D = Stuart's rerun
 #
-#   A  paper test, paper haplotypes, 8 pools    = the published Fig. 2
-#   B  paper test, paper haplotypes, rep 1 only   A->B isolates dropping rep 2
-#   C  Wald test,  new haplotypes,  rep 1 only    B->C is new haps + new test
+# Reading across a row holds the pipeline fixed and changes the data.
+# Reading down a column holds the data fixed and changes the pipeline.
+# All four panels share one y axis, so the heights are comparable.
 #
-# A and B are computed here with the paper's own ANOVA_test_function, taken
-# verbatim from the figshare deposit (malathion_analysis.zip,
-# get_haplotype_frequencies.txt), run on the paper's own published haplotype
-# frequencies (malathion_haps_genetic_1p5cM.txt.gz, same deposit). So A is a
-# reproduction of the published figure, not a redrawing of it.
+# A and B are computed here with the paper's own ANOVA_test_function, copied
+# verbatim from its figshare deposit (doi 10.25387/g3.21200395,
+# malathion_analysis.zip, get_haplotype_frequencies.txt), run on its own
+# published haplotype frequencies (malathion_haps_genetic_1p5cM.txt.gz, same
+# deposit). So A is a reproduction of the published figure, not a tracing of it.
 #
-# C comes from logs/malathion/malathion_rep1_all.anova.txt.gz, written by the
-# current pipeline on the four rep-1 pools HPC3 holds.
+# C is the current pipeline's own output on the four rep-1 pools, read from
+# logs/malathion/<scan>.anova.txt.gz. D is the same on all eight pools and
+# appears once the cluster run finishes; until then its panel says so.
 #
 # Usage, from the repo root:
-#   Rscript temp_malathion/analysis/compare_scans.R <dir with the figshare file>
+#   Rscript temp_malathion/analysis/compare_scans.R
 ###############################################################################
-suppressPackageStartupMessages({library(tidyverse); library(data.table); library(patchwork)})
+suppressPackageStartupMessages({library(tidyverse); library(data.table)})
 
-args <- commandArgs(trailingOnly = TRUE)
-fs_dir <- if (length(args)) args[1] else "temp_malathion/data"
+fs_dir     <- "temp_malathion/data"
 haplo_file <- file.path(fs_dir, "malathion_haps_genetic_1p5cM.txt.gz")
-new_file   <- "logs/malathion/malathion_rep1_all.anova.txt.gz"
+rep1_file  <- "logs/malathion/malathion_rep1_all.anova.txt.gz"
+all8_file  <- "logs/malathion/malathion_2022_all.anova.txt.gz"   # when the run lands
 out_png    <- "temp_malathion/analysis/scan_comparison.png"
 out_tab    <- "temp_malathion/analysis/scan_comparison.txt"
 
-# The paper's haplotype frequencies and its analysis code are the figshare
-# supplement, doi 10.25387/g3.21200395. Fetched once, not committed.
+# The paper's data and code are the figshare supplement. Fetched once, not committed.
 if (!file.exists(haplo_file)) {
   dir.create(fs_dir, showWarnings = FALSE, recursive = TRUE)
   cat("fetching the published haplotype frequencies from figshare...\n")
   download.file("https://ndownloader.figshare.com/files/37586293", haplo_file, quiet = TRUE, mode = "wb")
 }
-stopifnot(file.exists(haplo_file), file.exists(new_file))
+stopifnot(file.exists(haplo_file), file.exists(rep1_file))
 
-# ── the paper's test, verbatim from the figshare deposit ────────────────────
-# (malathion_analysis/get_haplotype_frequencies.txt, lines 209-231)
+# ── the paper's test, verbatim from the deposit ─────────────────────────────
 ANOVA_test_function = function(df) {
 	df = data.frame(df)
 	# drop rare haplotypes, roughly below 2%: asin(sqrt(0.02)) = 0.1418971
@@ -57,91 +54,117 @@ ANOVA_test_function = function(df) {
 	-pf(F,df1,df2,lower.tail=FALSE,log.p=TRUE)/log(10)
 }
 
-# ── the paper's input preparation, same source ───────────────────────────────
 cat("reading", haplo_file, "\n")
-haplo_freqs <- fread(haplo_file, header = TRUE)
-trans <- haplo_freqs %>%
+trans <- fread(haplo_file, header = TRUE) %>%
   mutate(TRT = str_sub(pool, 1, 1),
-         REP = as.numeric(as.factor(str_sub(pool, 2, 3))),
-         HAP = gsub("B", "", gsub("A", "HAP", founder)),
+         REP = as.factor(str_sub(pool, 2, 3)),
+         HAP = as.factor(gsub("B", "", gsub("A", "HAP", founder))),
          rep_expt = str_sub(pool, 2, 2),
-         HAP = as.factor(HAP), TRT = as.factor(TRT),
          asf = asin(sqrt(freq))) %>%
   drop_na() %>%
   select(CHROM = chr, POS = pos, cM, TRT, REP, HAP, asf, rep_expt)
 
-run_scan <- function(df, label) {
-  cat("scanning", label, ":", n_distinct(paste(df$CHROM, df$POS)), "windows,",
+run_paper_scan <- function(df, cell) {
+  cat("scanning", cell, ":", n_distinct(paste(df$CHROM, df$POS)), "windows,",
       n_distinct(df$REP), "pairs\n")
-  df %>% mutate(REP = as.factor(REP)) %>%
-    group_by(CHROM, POS, cM) %>% nest() %>%
+  df %>% group_by(CHROM, POS, cM) %>% nest() %>%
     mutate(mlog10p = map_dbl(data, ~ ANOVA_test_function(.))) %>%
-    select(-data) %>% ungroup() %>% mutate(panel = label)
+    select(-data) %>% ungroup() %>%
+    mutate(pipeline = "2022 pipeline", dataset = cell)
 }
+A <- run_paper_scan(trans, "both replicates (8 pools)")
+B <- run_paper_scan(trans %>% filter(rep_expt == "1"), "replicate 1 only (4 pools)")
 
-A <- run_scan(trans, "A")                                  # all 8 pools
-B <- run_scan(trans %>% filter(rep_expt == "1"), "B")       # rep 1 only
+read_new <- function(f, cell) {
+  if (!file.exists(f)) return(NULL)
+  read.table(f, header = TRUE) %>%
+    transmute(CHROM = chr, POS = pos, cM, mlog10p = Wald_log10p,
+              pipeline = "current pipeline", dataset = cell)
+}
+C <- read_new(rep1_file, "replicate 1 only (4 pools)")
+D <- read_new(all8_file, "both replicates (8 pools)")
+if (is.null(D)) cat("note:", all8_file, "not present yet; panel D left empty\n")
 
-# ── the current pipeline on the four rep-1 pools ────────────────────────────
-C <- read.table(new_file, header = TRUE) %>%
-  transmute(CHROM = chr, POS = pos, cM, mlog10p = Wald_log10p, panel = "C")
-
-# ── cumulative cM axis, chromosomes in the paper's order ────────────────────
-chr_lv <- c("chrX", "chr2L", "chr2R", "chr3L", "chr3R")
-all3 <- bind_rows(A, B, C) %>% filter(CHROM %in% chr_lv) %>%
-  mutate(CHROM = factor(CHROM, chr_lv))
-chrlen <- all3 %>% group_by(CHROM) %>% summarise(len = max(cM), .groups = "drop") %>%
+# ── one cumulative cM axis, shared y ────────────────────────────────────────
+chr_lv  <- c("chrX", "chr2L", "chr2R", "chr3L", "chr3R")
+pipe_lv <- c("2022 pipeline", "current pipeline")
+data_lv <- c("replicate 1 only (4 pools)", "both replicates (8 pools)")
+all4 <- bind_rows(A, B, C, D) %>% filter(CHROM %in% chr_lv) %>%
+  mutate(CHROM = factor(CHROM, chr_lv),
+         pipeline = factor(pipeline, pipe_lv),
+         dataset  = factor(dataset,  data_lv))
+chrlen <- all4 %>% group_by(CHROM) %>% summarise(len = max(cM), .groups = "drop") %>%
   arrange(CHROM) %>% mutate(off = cumsum(lag(len, default = 0)) + 2 * (as.integer(CHROM) - 1))
-all3 <- all3 %>% left_join(chrlen, by = "CHROM") %>% mutate(cMcum = cM + off)
-mid  <- all3 %>% group_by(CHROM) %>% summarise(m = mean(range(cMcum)), .groups = "drop")
-
-genes <- tibble(name = c("Cyp6g1", "Mdr65", "Ace"), CHROM = factor(c("chr2R","chr3L","chr3R"), chr_lv),
-                cM = c(65.607, 16.627, 30.6)) %>%
+all4 <- all4 %>% left_join(chrlen, by = "CHROM") %>% mutate(cMcum = cM + off)
+mid  <- all4 %>% group_by(CHROM) %>% summarise(m = mean(range(cMcum)), .groups = "drop")
+genes <- tibble(name = c("Cyp6g1", "Mdr65"), CHROM = factor(c("chr2R", "chr3L"), chr_lv),
+                cM = c(65.607, 16.627)) %>%
   left_join(chrlen, by = "CHROM") %>% mutate(cMcum = cM + off)
 
-lab <- c(A = "A.  2022 test, 2022 haplotypes, all 8 pools  (the published Fig. 2)",
-         B = "B.  2022 test, 2022 haplotypes, replicate 1 only (4 pools)",
-         C = "C.  new pipeline Wald test, new haplotypes, replicate 1 only (4 pools)")
+# peak heights, written onto each panel so nothing has to be eyeballed
+peaks <- tibble(peak = c("2R", "3L"), CHROM = factor(c("chr2R","chr3L"), chr_lv),
+                lo = c(55, 10), hi = c(75, 25))
+pk <- map_dfr(seq_len(nrow(peaks)), function(k)
+  all4 %>% filter(CHROM == peaks$CHROM[k], cM >= peaks$lo[k], cM <= peaks$hi[k]) %>%
+    group_by(pipeline, dataset) %>%
+    summarise(peak = peaks$peak[k], max = max(mlog10p, na.rm = TRUE),
+              at_cM = cM[which.max(mlog10p)], .groups = "drop"))
+ann <- pk %>% group_by(pipeline, dataset) %>%
+  summarise(lab = paste0("2R ", sprintf("%.1f", max[peak == "2R"]),
+                         "    3L ", sprintf("%.1f", max[peak == "3L"])), .groups = "drop")
 
-p <- ggplot(all3, aes(cMcum, mlog10p)) +
+ymax <- max(all4$mlog10p, na.rm = TRUE) * 1.18
+missing <- expand_grid(pipeline = factor(pipe_lv, pipe_lv), dataset = factor(data_lv, data_lv)) %>%
+  anti_join(all4 %>% distinct(pipeline, dataset), by = c("pipeline", "dataset"))
+
+p <- ggplot(all4, aes(cMcum, mlog10p)) +
   geom_vline(data = genes, aes(xintercept = cMcum), colour = "grey75", linetype = 2, linewidth = .3) +
   geom_hline(yintercept = 4, colour = "firebrick", linetype = 3, linewidth = .3) +
   geom_line(aes(colour = CHROM), linewidth = .35) +
-  geom_text(data = genes, aes(x = cMcum, y = Inf, label = name), inherit.aes = FALSE,
-            vjust = 1.4, size = 2.5, colour = "grey30") +
-  facet_wrap(~ panel, ncol = 1, scales = "free_y",
-             labeller = labeller(panel = lab)) +
+  geom_text(data = genes, aes(x = cMcum, y = ymax, label = name), inherit.aes = FALSE,
+            vjust = 1, size = 2.4, colour = "grey35") +
+  geom_text(data = ann, aes(x = -Inf, y = ymax, label = lab), inherit.aes = FALSE,
+            hjust = -0.08, vjust = 1, size = 3, fontface = "bold", colour = "grey20") +
+  facet_grid(pipeline ~ dataset) +
+  coord_cartesian(ylim = c(0, ymax)) +
   scale_x_continuous(breaks = mid$m, labels = sub("^chr", "", levels(mid$CHROM))) +
   scale_colour_manual(values = rep(c("#1f4e79", "#2e8b57"), 3)[1:5], guide = "none") +
   labs(x = "Position (cM)", y = expression(-log[10] * P),
-       title = "Malathion X-QTL: what changed between the 2022 scan and the current pipeline",
-       subtitle = "One difference at a time. A to B drops replicate 2; B to C changes both the haplotype caller and the test.") +
+       title = "Malathion X-QTL: the same data through two pipeline versions",
+       subtitle = "Across a row the pipeline is fixed and the data change. Down a column the data are fixed and the pipeline changes. One shared y axis.") +
   theme_bw(base_size = 9) +
-  theme(strip.text = element_text(hjust = 0, face = "bold", size = 8),
-        strip.background = element_rect(fill = "grey95", colour = NA),
-        panel.grid.minor = element_blank(), plot.title = element_text(face = "bold", size = 10))
+  theme(strip.text = element_text(face = "bold", size = 8.5),
+        strip.background = element_rect(fill = "grey94", colour = NA),
+        panel.grid.minor = element_blank(),
+        plot.title = element_text(face = "bold", size = 11))
+# The one cell we cannot compute here: the Wald test needs the lsei covariance
+# matrices, which only the haplotype step produces, so 8-pool haplotypes are
+# required. The cluster is building them from the SRA reads. Meanwhile Stuart
+# has run exactly this cell, so his reported peaks go in it, marked as reported.
+if (nrow(missing))
+  p <- p + geom_text(data = missing,
+                     aes(x = mean(range(all4$cMcum)), y = ymax/2,
+                         label = paste0("Stuart's rerun of this cell:  2R ~19.6    3L ~5.2\n",
+                                        "(reported, not computed here)\n\n",
+                                        "curve pending: needs 8-pool haplotypes,\n",
+                                        "being built from the SRA reads")),
+                     inherit.aes = FALSE, size = 3.1, colour = "grey45", lineheight = 1.25)
 
-ggsave(out_png, p, width = 9, height = 7, dpi = 200)
+ggsave(out_png, p, width = 10, height = 6, dpi = 200)
 cat("wrote", out_png, "\n")
 
-# ── the two published peaks, every panel ────────────────────────────────────
-peaks <- tibble(peak = c("chr2R (Cyp6g1)", "chr3L (Mdr65)"),
-                CHROM = factor(c("chr2R", "chr3L"), chr_lv), lo = c(55, 10), hi = c(75, 25))
-tab <- map_dfr(seq_len(nrow(peaks)), function(k) {
-  all3 %>% filter(CHROM == peaks$CHROM[k], cM >= peaks$lo[k], cM <= peaks$hi[k]) %>%
-    group_by(panel) %>%
-    summarise(peak = peaks$peak[k], max = round(max(mlog10p, na.rm = TRUE), 2),
-              at_cM = round(cM[which.max(mlog10p)], 2), .groups = "drop")
-}) %>% select(panel, peak, max, at_cM) %>%
-  pivot_wider(names_from = peak, values_from = c(max, at_cM)) %>% arrange(panel)
-
 sink(out_tab)
-cat("Maximum -log10P at the two published QTL, one difference at a time.\n\n")
-for (k in names(lab)) cat(lab[[k]], "\n")
-cat("D.  new pipeline Wald test, new haplotypes, all 8 pools -- Stuart's rerun, approx 19.6 and 5.2\n\n")
-print(as.data.frame(tab), row.names = FALSE)
-cat("\nPublished Table 1 peaks: chr2R 12,294,089 bp (65.6 cM), chr3L 6,162,469 bp (16.6 cM).\n")
-cat("A is computed here from the paper's own code and data, so it is a reproduction\n")
-cat("of the published figure rather than a reading off it.\n")
+cat("Maximum -log10P at the two published QTL.\n\n")
+print(as.data.frame(pk %>% mutate(max = round(max, 2), at_cM = round(at_cM, 2)) %>%
+        pivot_wider(names_from = peak, values_from = c(max, at_cM)) %>%
+        arrange(pipeline, dataset)), row.names = FALSE)
+cat("\nPublished Table 1 peaks: chr2R 65.6 cM (12,294,089 bp), chr3L 16.6 cM (6,162,469 bp).\n")
+cat("Published Fig. 2 peaks are just above 5 (2R) and about 4.9 (3L); the 2022-pipeline,\n")
+cat("8-pool cell above is computed from the paper's own code and data and matches them,\n")
+cat("which is the check that the paper's test is implemented correctly here.\n")
+cat("\nCaveat on the current-pipeline, replicate-1 cell: its haplotypes were called from\n")
+cat("the 2023 RefAlt tables on HPC3 (the old joint SNP caller), since those are what\n")
+cat("exist for replicate 1. The 8-pool run now going uses the current catalog caller\n")
+cat("end to end, so it will also say whether the SNP caller matters here.\n")
 sink()
 cat(readLines(out_tab), sep = "\n")
