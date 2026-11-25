@@ -12,15 +12,17 @@
 # all-pools haplotypes, writes the peak tables and figures into logs/malathion/,
 # and returns them through git (the only route off the cluster). Submitted by
 # rerun_2022.sh with a dependency on the five scans; can also be run by hand:
-#   sbatch scripts_oneoffs/malathion/finish_2022.sh process/malathion_2022 malathion_2022
+#   sbatch scripts_oneoffs/malathion/finish_2022.sh <dir> <prefix> <R1 scan,R2 scan,...>
+#   e.g.  process/malathion_rep1 malathion_rep1 malathion_rep1_R1,malathion_rep1_R2
 #
 # Same git discipline as temp_aging/analysis/drift_tiles.sh: nothing is written
 # to this log after it is staged, and what git prints goes to an untracked side
 # file so the committed log is complete. NO_GIT=1 skips the commit.
 
 module load R/4.2.2
-DIR=${1:-process/malathion_2022}
-PREFIX=${2:-malathion_2022}
+DIR=${1:?project dir}
+PREFIX=${2:?scan prefix}
+ALSO=${3:-}
 OUT=logs/malathion
 mkdir -p "$OUT"
 
@@ -28,16 +30,17 @@ fail=0
 Rscript scripts_oneoffs/malathion/anova_scan.R \
     --dir  "$DIR" \
     --scan "${PREFIX}_all" \
-    --also "${PREFIX}_R1,${PREFIX}_R2,${PREFIX}_R3,${PREFIX}_R4" \
+    --also "$ALSO" \
     --out  "$OUT" || fail=1
 
-for s in all R1 R2 R3 R4; do
-  f="$DIR/Scans/${PREFIX}_$s/${PREFIX}_$s.Manhattan.png"
+SCANS="${PREFIX}_all${ALSO:+,$ALSO}"
+for s in ${SCANS//,/ }; do
+  f="$DIR/Scans/$s/$s.Manhattan.png"
   if [ -f "$f" ]; then cp "$f" "$OUT/"; else echo "missing $f"; fail=1; fi
 done
 echo "smoothing R2 per scan:"
-for s in all R1 R2 R3 R4; do
-  printf '  %-22s %s\n' "${PREFIX}_$s" "$(cat "$DIR/Scans/${PREFIX}_$s/${PREFIX}_$s.smooth_r2.txt" 2>/dev/null || echo '?')"
+for s in ${SCANS//,/ }; do
+  printf '  %-22s %s\n' "$s" "$(cat "$DIR/Scans/$s/$s.smooth_r2.txt" 2>/dev/null || echo '?')"
 done
 
 if [ "${NO_GIT:-0}" != "1" ]; then
