@@ -1,0 +1,316 @@
+<title>Why Cyp6g1 Grew Fourfold</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
+
+<style>
+  /* Palette taken from the genome-scan figure itself: the chromosome blue and
+     green, the firebrick threshold rule, and greys biased toward that blue. */
+  :root {
+    --paper:      #ffffff;
+    --paper-sunk: #f4f6f8;
+    --ink:        #18212c;
+    --ink-soft:   #55616f;
+    --ink-faint:  #8d98a6;
+    --rule:       #dce3ea;
+    --rule-heavy: #18212c;
+    --accent:     #1f4e79;
+    --accent-2:   #2e8b57;
+    --flag:       #a2342a;
+    --measure: 34rem;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #11161c;
+      --paper-sunk: #171e26;
+      --ink:        #e4e9ee;
+      --ink-soft:   #a3aeba;
+      --ink-faint:  #6d7884;
+      --rule:       #2b343e;
+      --rule-heavy: #c3ccd5;
+      --accent:     #7fb0dd;
+      --accent-2:   #6cc08b;
+      --flag:       #e0796c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:      #11161c;
+    --paper-sunk: #171e26;
+    --ink:        #e4e9ee;
+    --ink-soft:   #a3aeba;
+    --ink-faint:  #6d7884;
+    --rule:       #2b343e;
+    --rule-heavy: #c3ccd5;
+    --accent:     #7fb0dd;
+    --accent-2:   #6cc08b;
+    --flag:       #e0796c;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Source Serif 4", Charter, Georgia, serif;
+    font-size: 1.0625rem;
+    line-height: 1.62;
+    margin: 0;
+    padding: 4rem 1.5rem 6rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.25rem;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .block { width: 100%; max-width: var(--measure); }
+  .wide  { width: 100%; max-width: 54rem; }
+
+  /* ---- masthead ---- */
+  header.masthead { display: flex; flex-direction: column; gap: 0.75rem; }
+  .eyebrow {
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 0.7rem; font-weight: 600;
+    letter-spacing: 0.13em; text-transform: uppercase;
+    color: var(--accent);
+  }
+  h1 {
+    font-size: clamp(1.9rem, 1.3rem + 2.2vw, 2.7rem);
+    line-height: 1.12; font-weight: 600; margin: 0;
+    text-wrap: balance; letter-spacing: -0.015em;
+  }
+  .standfirst {
+    font-size: 1.1875rem; line-height: 1.5; color: var(--ink-soft);
+    margin: 0.25rem 0 0; text-wrap: pretty;
+  }
+  .byline {
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 0.8125rem; color: var(--ink-faint);
+    padding-top: 0.9rem; border-top: 1px solid var(--rule);
+    display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem;
+  }
+
+  /* ---- prose ---- */
+  h2 {
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 0.78rem; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent);
+    margin: 1.75rem 0 0; padding-bottom: 0.45rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  p { margin: 1.05em 0; text-wrap: pretty; }
+  h2 + p { margin-top: 1.1rem; }
+  strong { font-weight: 600; }
+  em { font-style: italic; }
+  .gene { font-style: italic; }
+  code {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.86em; color: var(--ink-soft);
+    background: var(--paper-sunk);
+    padding: 0.1em 0.34em; border-radius: 2px;
+  }
+  .lede { font-size: 1.09rem; }
+
+  /* ---- scientific tables, per the lab's house format:
+         four rules only, none vertical, graded in weight; stub column takes no
+         header; numerals right-aligned under centred headers; Note. — below. ---- */
+  figure.tab { margin: 2rem 0 0; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+  table th, table td { border: 0; padding: 0.42rem 0.7rem; }
+  table thead tr.super th { font-weight: 500; text-align: center; padding-bottom: 0.15rem; }
+  table thead tr.super th.span { border-bottom: 1px solid var(--rule); }
+  table thead tr.head th { font-weight: 600; text-align: center; }
+  table thead tr.head th.stub { text-align: left; }
+  table tbody td { color: var(--ink); }
+  table tbody td.stub { text-align: left; color: var(--ink); white-space: nowrap; }
+  table td.num, table th.num { text-align: right; }
+  .rule-top    { border-top: 1.75px solid var(--rule-heavy); }
+  .rule-head   { border-bottom: 1px solid var(--rule-heavy); }
+  .rule-bottom { border-bottom: 1.75px solid var(--rule-heavy); }
+  tr.emph td { font-weight: 600; }
+  tr.emph td.stub { color: var(--accent); }
+  .tnote {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 0.875rem; line-height: 1.5;
+    color: var(--ink-soft); margin: 0.7rem 0 0;
+  }
+  .tnote::before { content: "Note. — "; font-style: italic; }
+  .scroll { overflow-x: auto; }
+
+  /* ---- figure ---- */
+  figure.fig { margin: 0.5rem 0 0; display: flex; flex-direction: column; gap: 0.85rem; }
+  figure.fig img {
+    width: 100%; height: auto; display: block;
+    border: 1px solid var(--rule); border-radius: 2px;
+    background: #ffffff;
+  }
+  figcaption {
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 0.8125rem; line-height: 1.55; color: var(--ink-soft);
+  }
+  figcaption b { color: var(--ink); font-weight: 600; }
+
+  /* ---- the one lifted element: the single-sentence finding ---- */
+  .finding {
+    border-left: 2.5px solid var(--accent);
+    padding: 0.1rem 0 0.1rem 1.1rem;
+    margin: 1.6rem 0;
+    font-size: 1.1rem; line-height: 1.5;
+  }
+
+  ul { margin: 1.05em 0; padding-left: 1.2rem; }
+  li { margin: 0.5em 0; }
+  li::marker { color: var(--ink-faint); }
+
+  .footer {
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 0.8125rem; color: var(--ink-faint);
+    border-top: 1px solid var(--rule); padding-top: 1rem; margin-top: 1rem;
+  }
+  .footer code { font-size: 0.95em; background: none; padding: 0; }
+
+  a { color: var(--accent); text-underline-offset: 0.18em; }
+  a:focus-visible, :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<header class="masthead block">
+  <div class="eyebrow">Malathion X-QTL · reanalysis note</div>
+  <h1>Why <span class="gene">Cyp6g1</span> Grew Fourfold</h1>
+  <p class="standfirst">The 2022 data, run through the current pipeline, give a peak near 20 where the paper reported just above 5. The reads, the SNP calls and the haplotype frequencies are not what changed. The test is.</p>
+  <div class="byline">
+    <span>Long lab · XQTL2</span>
+    <span>25 November 2026</span>
+    <span>Macdonald &amp; Long 2022, <em>G3</em> 12:jkac279</span>
+  </div>
+</header>
+
+<main class="block">
+
+  <h2>Summary</h2>
+
+  <p class="lede">All eight pools of the 2022 experiment were re-fetched from the SRA and run end to end through the current pipeline. It reproduces the larger peak: <strong>19.6</strong> at <span class="gene">Cyp6g1</span> and <strong>5.2</strong> at <span class="gene">Mdr65</span>. The published test, applied to those same new haplotype frequencies, reproduces the published figure: <strong>5.1</strong> and <strong>4.7</strong>.</p>
+
+  <p class="finding">Same reads, same SNP calls, same haplotype frequencies, two tests, both published pictures. Nothing in the data or the haplotype caller contributes to the discrepancy.</p>
+
+  <p>The two tests disagree about one thing: what a larger pool is worth. The 2022 test cannot use the extra flies in replicate 2. The current test can, and three independent checks say its yardstick is close to correct while the 2022 one is too small.</p>
+
+</main>
+
+<figure class="fig wide">
+  <img src="figure1.png" alt="Four genome scans in a two-by-two grid. Rows are pipeline version, columns are which pools were used. The lower-right panel, current pipeline with all eight pools, shows a chr2R peak reaching 19.6; the other three panels peak near 5.">
+  <figcaption><b>Figure 1.</b> The malathion genome scan under each combination of data and pipeline, on one shared vertical scale. Across a row the pipeline is held fixed and the pools change; down a column the pools are held fixed and the pipeline changes. The upper-right panel is the published scan, recomputed here from the paper's own code and its deposited 1.5&nbsp;cM haplotype frequencies. The lower-right panel is the current pipeline on all eight pools. Dashed verticals mark <span class="gene">Cyp6g1</span> and <span class="gene">Mdr65</span>; the dotted horizontal is the paper's genome-wide threshold of 4.</figcaption>
+</figure>
+
+<main class="block">
+
+  <h2>What was run</h2>
+
+  <p>The eight pools of BioProject PRJNA857080 were downloaded from the ENA mirror, checked against the archive's MD5 sums, aligned with <code>bwa mem</code>, counted against a catalogue of SNPs segregating among the eight pA founder strains, and resolved into founder haplotype frequencies in 50&nbsp;kb windows smoothed over 250&nbsp;kb. Nothing from the original analysis was reused.</p>
+
+  <p>For the comparison, the paper's own <code>ANOVA_test_function</code> was taken verbatim from its figshare deposit, including the rule that drops founders below about 2% at each window. Applied to the paper's own deposited frequencies it returns 5.11 at 65.8&nbsp;cM and 4.91 at 16.1&nbsp;cM, against published peaks of just above 5 and about 4.9. The published test is therefore implemented correctly here, and every comparison below is like for like.</p>
+
+  <h2>The haplotype frequencies did not change</h2>
+
+  <p>Taking the four replicate-1 pools, which exist under both pipelines, the founder frequency shifts at the two peaks agree founder by founder and sex by sex at <em>r</em>&nbsp;=&nbsp;0.996 on 2R and 0.995 on 3L. The sum of squared shifts matches to within a few percent. Whatever changed, the estimate of what the flies did did not.</p>
+
+  <h2>What the extra flies are worth</h2>
+
+  <p>The published test asks whether the four control-selected pairs agree with one another, measured against how much such pairs disagree. Its yardstick is the scatter among the pairs, and that scatter does not shrink when a pool contains 700 flies instead of 43. The test therefore cannot distinguish a frequency shift measured on 43 flies from the same shift measured on 700.</p>
+
+  <p>The current test asks whether the shift exceeds the sampling noise expected from the number of flies actually pooled. A pool of 700 has far less sampling error than a pool of 43, so the same shift is far better established. That is ordinary binomial sampling.</p>
+
+  <p>Replicate 2 held 264 control flies and 693 or 403 selected, against 43 and 65 in replicate 1. Most of the experiment's information sits there, and the published analysis could not reach it. Two observations make this concrete rather than rhetorical.</p>
+
+  <p><strong>Adding replicate 2 does not move the published test.</strong> At <span class="gene">Cyp6g1</span> it gives 5.11 on replicate 1 alone and 5.09 on all eight pools. A second, much larger experiment changed the answer by 0.02.</p>
+
+  <p><strong>Run each pair alone and the pattern inverts.</strong> The replicate-2 pairs carry visibly smaller frequency shifts than the replicate-1 pairs, and yield roughly twice the evidence, because they counted roughly six times as many flies.</p>
+
+  <figure class="tab">
+    <div class="scroll">
+    <table>
+      <thead>
+        <tr class="super rule-top">
+          <th></th>
+          <th class="span" colspan="2">Flies pooled</th>
+          <th></th>
+          <th></th>
+        </tr>
+        <tr class="head rule-head">
+          <th class="stub"></th>
+          <th class="num">Control</th>
+          <th class="num">Selected</th>
+          <th class="num">Shift size</th>
+          <th class="num">&minus;log<sub>10</sub><i>P</i></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="stub">Replicate 1, females</td><td class="num">43</td><td class="num">43</td><td class="num">0.054</td><td class="num">3.06</td></tr>
+        <tr><td class="stub">Replicate 1, males</td><td class="num">65</td><td class="num">65</td><td class="num">0.086</td><td class="num">3.41</td></tr>
+        <tr class="emph"><td class="stub">Replicate 2, females</td><td class="num">264</td><td class="num">693</td><td class="num">0.023</td><td class="num">7.09</td></tr>
+        <tr class="emph"><td class="stub">Replicate 2, males</td><td class="num">264</td><td class="num">403</td><td class="num">0.032</td><td class="num">7.05</td></tr>
+        <tr class="rule-bottom"><td class="stub">All four together</td><td class="num">614</td><td class="num">1,204</td><td class="num">&mdash;</td><td class="num">19.63</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="tnote">Each control-selected pair scanned on its own through the current pipeline, at <span class="gene">Cyp6g1</span>. Shift size is the sum of squared founder frequency differences, selected minus control, at the peak window. The replicate-2 pairs carry between a third and a half of replicate 1's shift and return more than twice the evidence; the only thing that differs is how many flies were counted.</p>
+  </figure>
+
+  <h2>Which yardstick is right</h2>
+
+  <p>This is the part that matters, and it is measurable rather than arguable. Across the roughly 95% of the genome carrying no QTL, a correctly calibrated test produces a known distribution of values. The current test's statistic is a chi-square on seven degrees of freedom, so its median across null windows should be 6.346.</p>
+
+  <figure class="tab">
+    <div class="scroll">
+    <table>
+      <thead>
+        <tr class="head rule-top rule-head">
+          <th class="stub"></th>
+          <th class="num">Null windows</th>
+          <th class="num">Median statistic</th>
+          <th class="num">Denominator</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="stub">Replicate 1 only, 4 pools</td><td class="num">21,887</td><td class="num">4.725</td><td class="num">1.34&times; too large</td></tr>
+        <tr class="emph"><td class="stub">Both replicates, 8 pools</td><td class="num">21,865</td><td class="num">5.864</td><td class="num">1.08&times; too large</td></tr>
+        <tr class="rule-bottom"><td class="stub">Correctly calibrated</td><td class="num">&mdash;</td><td class="num">6.346</td><td class="num">1.00&times;</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="tnote">Calibration of the current test on null windows, with both QTL regions excluded. The denominator becomes more accurate as the pools grow, not less, which was the obvious worry. The test errs on the cautious side throughout, so 19.6 is marginally an underestimate rather than an overstatement.</p>
+  </figure>
+
+  <p>The published test's yardstick fails in the opposite direction, for two reasons that are structural rather than incidental.</p>
+
+  <ul>
+    <li><strong>It treats the eight founder frequencies at a locus as eight independent numbers.</strong> They are proportions constrained to sum to one, and so are negatively correlated. Simulating a null with no QTL and no reconstruction error at all, the test still rejects at 8.4% when it should reject at 5%. Running the identical model on eight genuinely independent values per pool restores calibration exactly, which identifies the constraint as the cause.</li>
+    <li><strong>It cannot see uncertainty in the haplotype estimate itself.</strong> Its denominator is the variation between pools, so reconstruction error shared by all pools at a locus never enters it, while it does move the numerator. On the published frequencies the test's inflation is measurably worse at windows where the haplotype fit sits on a constraint boundary and founders are least separable.</li>
+  </ul>
+
+  <p>There is a third contribution, smaller but in the same direction. The 2022 denominator is re-estimated at every window from sixteen residual degrees of freedom and is not smoothed. Neighbouring windows overlap by 97%, so that estimate barely moves between them, but at 1.5&nbsp;cM, where windows stop sharing data, it wanders by exactly the amount pure estimation noise predicts. It is essentially all noise, correlated over one window width, which is also the width of a QTL peak. At <span class="gene">Cyp6g1</span> that noise happened to fall low, worth about one unit of the published 5.11.</p>
+
+  <p>The published 5.1 is therefore not a conservative version of 19.6. It is a different and worse measurement that happens to be smaller.</p>
+
+  <h2>What this changes, and what it does not</h2>
+
+  <p>It does not change the biology. The founder shifts are the same to within half a percent: A5 and A6 rise under selection and A7 falls at <span class="gene">Cyp6g1</span>, consistently in all four pairs, with A5 at +0.17, +0.25, +0.04 and +0.09 and A7 at &minus;0.02, &minus;0.13, &minus;0.12 and &minus;0.14. The QTL intervals, the candidate genes and the conclusions of the paper all stand. A larger &minus;log<sub>10</sub><i>P</i> is more confidence in the same effect, not a bigger effect.</p>
+
+  <p>What it does change is that the 2022 experiment was better powered than the published analysis was able to show, because the analysis could not spend replicate 2's flies. It also means the paper's genome-wide threshold of 4 does not transfer: it was calibrated by simulation for a test whose null distribution is different, and the two numbers are not on a common scale.</p>
+
+  <p>One limitation is worth stating plainly. Both tests assume the pools differ only by selection, and neither can detect a batch effect that mimics it. Here that would have to push the same founders in the same direction in two experiments run 48 generations apart, prepared separately and sequenced on different read lengths, and land on the most replicated insecticide resistance locus in the organism. It is not a serious alternative, but it is the assumption both analyses rest on.</p>
+
+  <h2>Reproducing this</h2>
+
+  <p>Everything above is in the <code>XQTL2-dev</code> repository. The scan comparison and the paper's test re-implemented from its deposit are in <code>temp_malathion/analysis/compare_scans.R</code>; the agreement between haplotype callers in <code>compare_shifts.R</code>; the calibration measurements in <code>calibration.R</code>; the null simulation and its independence control in <code>null_sim.R</code>; the denominator noise analysis in <code>denominator_noise.R</code>. The eight-pool run itself is <code>scripts_oneoffs/malathion/go_2022.sh</code>, and its outputs are under <code>logs/malathion/</code>.</p>
+
+  <p class="footer">Published haplotype frequencies and analysis code from Macdonald &amp; Long 2022 were taken from the figshare supplement, <code>doi:10.25387/g3.21200395</code>. Raw reads are NCBI BioProject <code>PRJNA857080</code>.</p>
+
+</main>
