@@ -34,3 +34,13 @@ The 2022 scan, replicate 1. Numerator and denominator separated.
 
 The numerator is identical in all three. Everything that changes is where
 the denominator comes from, and how many df it is credited with.
+
+Reading it: raw 5.11 -> sm 4.15 under one reference shows the local
+denominator at this window was low, worth about 1 unit of -log10P, which is
+the inflation a per-window 16 df estimate buys. sm 4.15 -> sm_rightdf 10.29
+shows the degrees-of-freedom penalty is worth about 6 units, far more. So a
+noisy local denominator does inflate peaks, but the 2022 test loses much
+more by estimating the denominator at all than it gains by estimating it
+locally. Borrowing is close to valid here: at 10 cM the error variance
+wanders 1.23x what pure noise predicts, so the genuine variation in the true
+error variance across the genome is only about 25%.
