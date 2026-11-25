@@ -12,8 +12,10 @@
 #   sbatch scripts_oneoffs/malathion/go_2022.sh
 # Polls every 5 minutes. Resubmits fetch_sra.sh until all 16 reads are verified,
 # builds the A-founder catalog if nothing is building it, and when both are
-# there runs the standard pipeline (run_full_pipeline.sh). Then exits. Its log
-# is logs/malathion/driver_<jobid>.out.
+# there runs the standard pipeline (run_full_pipeline.sh). Waits for that to
+# finish, then runs the per-pair scans and the paper's ANOVA on the new
+# haplotypes (rerun_2022.sh -> finish_2022.sh, which pushes the results to
+# logs/malathion/), and finally syncs its own log. Nothing to do by hand.
 set -uo pipefail
 shopt -s nullglob
 [ -d scripts_oneoffs/malathion ] || { echo "ERROR: run from the XQTL2-dev root" >&2; exit 1; }
@@ -57,4 +59,31 @@ while :; do
 done
 
 echo "$(date '+%F %T')  reads 16/16 and catalog present: running the standard pipeline"
-bash scripts_oneoffs/malathion/run_2022.sh
+out=$(bash scripts_oneoffs/malathion/run_2022.sh) || { echo "$out"; echo "run_2022.sh failed" >&2; bash scripts/cluster_sync.sh; exit 1; }
+echo "$out"
+final=$(printf '%s\n' "$out" | sed -n 's/.*Final job: \([0-9]*\).*/\1/p' | tail -1)
+[ -n "$final" ] || { echo "could not find the final job id in run_full_pipeline output" >&2; bash scripts/cluster_sync.sh; exit 1; }
+
+# wait for the standard pipeline (figures job is last)
+while squeue -h -j "$final" 2>/dev/null | grep -q .; do
+  echo "$(date '+%F %T')  pipeline running (final job $final)"; sleep 600
+done
+SCAN=process/malathion_2022/Scans/malathion_2022_all/malathion_2022_all.scan.txt
+if [ ! -f "$SCAN" ] || [ ! -f process/malathion_2022/Haps/R.haps.chr3R.out.rds ]; then
+  echo "$(date '+%F %T')  pipeline ended without $SCAN; see the slurm-*.out logs" >&2
+  bash scripts/cluster_sync.sh; exit 1
+fi
+echo "$(date '+%F %T')  standard pipeline done: $SCAN"
+
+# per-pair scans + the paper's ANOVA on these haplotypes; finish_2022.sh pushes
+mkdir -p logs/malathion
+cp process/malathion_2022/Scans/malathion_2022_all/*.png logs/malathion/ 2>/dev/null
+bash scripts_oneoffs/malathion/rerun_2022.sh \
+    --refalt process/malathion_2022/Calls \
+    --reuse-haps process/malathion_2022/Haps \
+    --design helpfiles/malathion/design_2022.txt \
+    --parfile helpfiles/malathion/hap_params_2022.R \
+    --dir process/malathion_2022_pairs \
+    --prefix malathion_2022
+echo "$(date '+%F %T')  diagnostics submitted; finish job pushes results. syncing this log."
+bash scripts/cluster_sync.sh
