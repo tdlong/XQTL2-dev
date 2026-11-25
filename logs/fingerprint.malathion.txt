@@ -1,0 +1,12 @@
+################ process/malathion_test ################
+  newest mtime : 2026-03-22 12:58
+  layout       : flat (pre-#28) — needs reorganize_project.sh
+  Catalog/     : no
+  calls.bcf    : top=5  Calls/=0
+  counts/      : none
+  RefAlt       : top=5 (real=5 symlink=0)  Calls/=0
+  RefAlt/founder (fromsites): 0
+  R.haps       : top=10  Haps/=0
+  scan dirs    : top=[MALATHION_TEST_smooth125 MALATHION_TEST_v2_smooth125 MALATHION_TEST_v2_smooth250 ] Scans/=[]
+  samples (19): c_F_1 c_M_1 s_F_1 s_M_1 A1 A2 A3 A4 ...
+

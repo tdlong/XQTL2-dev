@@ -1,0 +1,168 @@
+## Tue Nov 24 23:59:24 PST 2026  login-i15
+
+## process fingerprints
+################ process/MALATHION_v1 ################
+  newest mtime : 2026-03-14 11:44
+  layout       : flat (pre-#28) — needs reorganize_project.sh
+  Catalog/     : no
+  calls.bcf    : top=0  Calls/=0
+  counts/      : none
+  RefAlt       : top=5 (real=0 symlink=5)  Calls/=0
+  RefAlt/founder (fromsites): 0
+  R.haps       : top=10  Haps/=0
+  scan dirs    : top=[MALATHION_freqs100 MALATHION_freqs250 ] Scans/=[]
+  samples (19): A1 A2 A3 A4 A5 A6 A7 AB8 ...
+
+################ process/malathion_test ################
+  newest mtime : 2026-03-22 12:58
+  layout       : flat (pre-#28) — needs reorganize_project.sh
+  Catalog/     : no
+  calls.bcf    : top=5  Calls/=0
+  counts/      : none
+  RefAlt       : top=5 (real=5 symlink=0)  Calls/=0
+  RefAlt/founder (fromsites): 0
+  R.haps       : top=10  Haps/=0
+  scan dirs    : top=[MALATHION_TEST_smooth125 MALATHION_TEST_v2_smooth125 MALATHION_TEST_v2_smooth250 ] Scans/=[]
+  samples (19): c_F_1 c_M_1 s_F_1 s_M_1 A1 A2 A3 A4 ...
+
+################ process/XQTL_talk ################
+  newest mtime : 2026-03-19 13:37
+  layout       : flat (pre-#28) — needs reorganize_project.sh
+  Catalog/     : no
+  calls.bcf    : top=0  Calls/=0
+  counts/      : none
+  RefAlt       : top=0 (real=0 symlink=0)  Calls/=0
+  RefAlt/founder (fromsites): 0
+  R.haps       : top=0  Haps/=0
+  scan dirs    : top=[AGING MALATHION PUPATION ZINC2 ] Scans/=[]
+
+## RefAlt sample columns (the whole header, one dir per block)
+-- process/MALATHION_v1/RefAlt.chrX.txt
+   resolves to: /dfs7/adl/tdlong/fly_pool/newpipeline_Nov23/process/RefAlt.chrX.txt
+   size: 18M   rows: 298515
+   columns: CHROM POS REF_A1 ALT_A1 REF_A2 ALT_A2 REF_A3 ALT_A3 REF_A4 ALT_A4 REF_A5 ALT_A5 REF_A6 ALT_A6 REF_A7 ALT_A7 REF_AB8 ALT_AB8 REF_B1 ALT_B1 REF_B2 ALT_B2 REF_B3 ALT_B3 REF_B4 ALT_B4 REF_B5 ALT_B5 REF_B6 ALT_B6 REF_B7 ALT_B7 REF_c_F_1 ALT_c_F_1 REF_c_M_1 ALT_c_M_1 REF_s_F_1 ALT_s_F_1 REF_s_M_1 ALT_s_M_1 
+-- process/XQTL_talk/MALATHION/RefAlt.chrX.txt
+   resolves to: /dfs7/adl/tdlong/fly_pool/newpipeline_Nov23/process/RefAlt.chrX.txt
+   size: 18M   rows: 298515
+   columns: CHROM POS REF_A1 ALT_A1 REF_A2 ALT_A2 REF_A3 ALT_A3 REF_A4 ALT_A4 REF_A5 ALT_A5 REF_A6 ALT_A6 REF_A7 ALT_A7 REF_AB8 ALT_AB8 REF_B1 ALT_B1 REF_B2 ALT_B2 REF_B3 ALT_B3 REF_B4 ALT_B4 REF_B5 ALT_B5 REF_B6 ALT_B6 REF_B7 ALT_B7 REF_c_F_1 ALT_c_F_1 REF_c_M_1 ALT_c_M_1 REF_s_F_1 ALT_s_F_1 REF_s_M_1 ALT_s_M_1 
+-- process/malathion_test/RefAlt.chrX.txt
+   resolves to: /dfs7/adl/tdlong/fly_pool/XQTL2-dev/process/malathion_test/RefAlt.chrX.txt
+   size: 21M   rows: 312105
+   columns: CHROM POS REF_c_F_1 ALT_c_F_1 REF_c_M_1 ALT_c_M_1 REF_s_F_1 ALT_s_F_1 REF_s_M_1 ALT_s_M_1 REF_A1 ALT_A1 REF_A2 ALT_A2 REF_A3 ALT_A3 REF_A4 ALT_A4 REF_A5 ALT_A5 REF_A6 ALT_A6 REF_A7 ALT_A7 REF_AB8 ALT_AB8 REF_B1 ALT_B1 REF_B2 ALT_B2 REF_B3 ALT_B3 REF_B4 ALT_B4 REF_B5 ALT_B5 REF_B6 ALT_B6 REF_B7 ALT_B7 
+
+## samples inside the existing haplotype fits
+-- process/MALATHION_v1/R.haps.chrX.out.rds
+   windows: 4273  samples: c_F_1 c_M_1 s_F_1 s_M_1 
+-- process/malathion_test/R.haps.chrX.out.rds
+   windows: 4273  samples: c_F_1 c_M_1 s_F_1 s_M_1 
+
+## the Nov 2023 reanalysis directory (resolved from the MALATHION_v1 symlink)
+-- base: /dfs7/adl/tdlong/fly_pool/newpipeline_Nov23
+total 454
+drwxrwsr-x  8 tdlong tdlong_lab_share     11 Jan 16  2024 .
+drwxrwsr-x 27 tdlong tdlong_lab_share     80 Mar 30  2026 ..
+drwxrwsr-x  8 tdlong tdlong_lab_share     11 Nov 25  2023 .git
+-rw-rw-r--  1 tdlong tdlong_lab_share    161 Nov 15  2023 .gitignore
+-rw-rw-r--  1 tdlong tdlong_lab_share  35149 Nov 14  2023 LICENSE
+-rw-rw-r--  1 tdlong tdlong_lab_share 740636 Nov 10  2023 R.pseudoscan.txt
+-rw-rw-r--  1 tdlong tdlong_lab_share   2571 Nov 14  2023 README.md
+drwxrwsr-x  4 tdlong tdlong_lab_share      2 Nov  9  2023 data
+drwxrwsr-x  2 tdlong tdlong_lab_share      4 Nov 24  2023 helperfiles
+drwxrwsr-x  2 tdlong tdlong_lab_share     46 Dec 22  2023 process
+drwxrwsr-x  2 tdlong tdlong_lab_share     13 Nov 25  2024 ref
+drwxrwsr-x  2 tdlong tdlong_lab_share     16 Dec 22  2023 scripts
+-rw-rw-r--  1 tdlong tdlong_lab_share   2158 Nov 10  2023 test_region.rds
+-- BAMs:
+total 15108785
+drwxrwsr-x 2 tdlong tdlong_lab_share          9 Nov 14  2023 .
+drwxrwsr-x 4 tdlong tdlong_lab_share          2 Nov  9  2023 ..
+-rw-rw-r-- 1 tdlong tdlong_lab_share          0 Nov 14  2023 .gitkeep
+-rw-rw-r-- 1 tdlong tdlong_lab_share 4300691373 Nov  9  2023 c_F_1.bam
+-rw-rw-r-- 1 tdlong tdlong_lab_share     567208 Nov  9  2023 c_F_1.bam.bai
+-rw-rw-r-- 1 tdlong tdlong_lab_share 3690464320 Nov  9  2023 c_M_1.bam
+-rw-rw-r-- 1 tdlong tdlong_lab_share     571408 Nov  9  2023 c_M_1.bam.bai
+-rw-rw-r-- 1 tdlong tdlong_lab_share 4227340357 Nov  9  2023 s_F_1.bam
+-rw-rw-r-- 1 tdlong tdlong_lab_share     565880 Nov  9  2023 s_F_1.bam.bai
+-rw-rw-r-- 1 tdlong tdlong_lab_share 3624775839 Nov  9  2023 s_M_1.bam
+-rw-rw-r-- 1 tdlong tdlong_lab_share     570768 Nov  9  2023 s_M_1.bam.bai
+-- helperfiles:
+== /dfs7/adl/tdlong/fly_pool/newpipeline_Nov23/helperfiles/bams.txt
+/dfs7/adl/tdlong/DSPR/DNAseq/May9/A1.RG.bam
+/dfs7/adl/tdlong/DSPR/DNAseq/May9/A2.RG.bam
+/dfs7/adl/tdlong/DSPR/DNAseq/May9/A3.RG.bam
+/dfs7/adl/tdlong/DSPR/DNAseq/May9/A4.RG.bam
+/dfs7/adl/tdlong/DSPR/DNAseq/May9/A5.RG.bam
+/dfs7/adl/tdlong/DSPR/DNAseq/May9/A6.RG.bam
+/dfs7/adl/tdlong/DSPR/DNAseq/May9/A7.RG.bam
+/dfs7/adl/tdlong/DSPR/DNAseq/May9/AB8.RG.bam
+/dfs7/adl/tdlong/DSPR/DNAseq/May9/B1.RG.bam
+/dfs7/adl/tdlong/DSPR/DNAseq/May9/B2.RG.bam
+/dfs7/adl/tdlong/DSPR/DNAseq/May9/B3.RG.bam
+/dfs7/adl/tdlong/DSPR/DNAseq/May9/B4.RG.bam
+/dfs7/adl/tdlong/DSPR/DNAseq/May9/B5.RG.bam
+/dfs7/adl/tdlong/DSPR/DNAseq/May9/B6.RG.bam
+/dfs7/adl/tdlong/DSPR/DNAseq/May9/B7.RG.bam
+data/bam/c_F_1.bam
+data/bam/c_M_1.bam
+data/bam/s_F_1.bam
+data/bam/s_M_1.bam
+== /dfs7/adl/tdlong/fly_pool/newpipeline_Nov23/helperfiles/flymap.r6.txt
+chrX	256098	0
+chrX	534533	0
+chrX	745790	0
+chrX	911072	0
+chrX	1.12293e+06	0.1
+chrX	1311681	0.1
+chrX	1.42211e+06	0.2
+chrX	1.72389e+06	0.2
+chrX	2.02761e+06	0.5
+chrX	2.12811e+06	0.6
+chrX	2198272	0.8
+chrX	2.2759e+06	0.9
+chrX	2497296	1
+chrX	2735195	1.5
+chrX	3.05821e+06	2
+chrX	3463239	3
+chrX	3689645	4
+chrX	3860262	5
+chrX	4.03556e+06	6
+chrX	4224456	7
+== /dfs7/adl/tdlong/fly_pool/newpipeline_Nov23/helperfiles/param_file.R
+##########	
+#  R project specific parameters
+#  malathion.parameters.R
+##########
+# directory to use for all results
+mydir="process"
+# file used for Mb->cM mapping
+# we list marker position in Mb (physical) and cM (genetic) coordinates
+# this utilizes a file from flybase for converting physical to genetic
+# it takes place in a function = add_genetic, as there are several such converters
+flymap="helperfiles/flymap.r6.txt"
+# list of founders for the specific population of the experiment
+# take from the RGs of the bam, and generally abbreviate the standard DSPR way
+founders=c("A1","A2","A3","A4","A5","A6","A7","AB8")
+# list of samples
+# the list of sample names to consider, they should match up with the 
+# names given to the earlier fq2bam, as these are taken from the RGs of the bam 
+# note the naming convention ... explained above ... TRT_REP_repInREP
+samples=c("c_F_1","c_M_1","s_F_1","s_M_1")
+# Numflies
+== /dfs7/adl/tdlong/fly_pool/newpipeline_Nov23/helperfiles/readname.mapping.txt
+c_F_1	data/raw/mal_conF_S5_R1_001.fastq.gz	data/raw/mal_conF_S5_R2_001.fastq.gz
+c_M_1	data/raw/mal_conM_S3_R1_001.fastq.gz	data/raw/mal_conM_S3_R2_001.fastq.gz
+s_F_1	data/raw/mal_selF_S6_R1_001.fastq.gz	data/raw/mal_selF_S6_R2_001.fastq.gz
+s_M_1	data/raw/mal_selM_S4_R1_001.fastq.gz	data/raw/mal_selM_S4_R2_001.fastq.gz
+
+## BAMs in this repo
+total 5
+drwxr-sr-x  2 tdlong tdlong_lab_share  8 Mar 19  2026 .
+drwxrwsr-x 12 tdlong tdlong_lab_share 10 May 27 10:14 ..
+lrwxrwxrwx  1 tdlong tdlong_lab_share 62 Mar 19  2026 c_F_1.bam -> /dfs7/adl/tdlong/fly_pool/newpipeline_Nov23/data/bam/c_F_1.bam
+lrwxrwxrwx  1 tdlong tdlong_lab_share 66 Mar 19  2026 c_F_1.bam.bai -> /dfs7/adl/tdlong/fly_pool/newpipeline_Nov23/data/bam/c_F_1.bam.bai
+lrwxrwxrwx  1 tdlong tdlong_lab_share 62 Mar 19  2026 c_M_1.bam -> /dfs7/adl/tdlong/fly_pool/newpipeline_Nov23/data/bam/c_M_1.bam
+lrwxrwxrwx  1 tdlong tdlong_lab_share 66 Mar 19  2026 c_M_1.bam.bai -> /dfs7/adl/tdlong/fly_pool/newpipeline_Nov23/data/bam/c_M_1.bam.bai
+lrwxrwxrwx  1 tdlong tdlong_lab_share 62 Mar 19  2026 s_F_1.bam -> /dfs7/adl/tdlong/fly_pool/newpipeline_Nov23/data/bam/s_F_1.bam
+lrwxrwxrwx  1 tdlong tdlong_lab_share 66 Mar 19  2026 s_F_1.bam.bai -> /dfs7/adl/tdlong/fly_pool/newpipeline_Nov23/data/bam/s_F_1.bam.bai
+lrwxrwxrwx  1 tdlong tdlong_lab_share 62 Mar 19  2026 s_M_1.bam -> /dfs7/adl/tdlong/fly_pool/newpipeline_Nov23/data/bam/s_M_1.bam
+lrwxrwxrwx  1 tdlong tdlong_lab_share 66 Mar 19  2026 s_M_1.bam.bai -> /dfs7/adl/tdlong/fly_pool/newpipeline_Nov23/data/bam/s_M_1.bam.bai

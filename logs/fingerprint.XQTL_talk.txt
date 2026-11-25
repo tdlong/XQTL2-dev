@@ -1,0 +1,11 @@
+################ process/XQTL_talk ################
+  newest mtime : 2026-03-19 13:37
+  layout       : flat (pre-#28) — needs reorganize_project.sh
+  Catalog/     : no
+  calls.bcf    : top=0  Calls/=0
+  counts/      : none
+  RefAlt       : top=0 (real=0 symlink=0)  Calls/=0
+  RefAlt/founder (fromsites): 0
+  R.haps       : top=0  Haps/=0
+  scan dirs    : top=[AGING MALATHION PUPATION ZINC2 ] Scans/=[]
+
