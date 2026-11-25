@@ -1,0 +1,9 @@
+Reading process/malathion_2022/Haps/R.haps.chr2L.out.rds 
+  4645 windows | step 5000 bp | smooth_half 50 windows (+/-250 kb)
+Smoothing frequencies...
+  Masked 1120 / 297280 founder-window estimates (0.4%) as unresolvable
+Smoothing covariance matrices...
+  Masked 15680 / 2378240 covariance entries (0.7%) as unresolvable
+Writing smoothed RDS: process/malathion_2022/Scans/malathion_2022_all/malathion_2022_all.smooth.chr2L.rds 
+Writing meansBySample: process/malathion_2022/Scans/malathion_2022_all/malathion_2022_all.meansBySample.chr2L.txt 
+Done.

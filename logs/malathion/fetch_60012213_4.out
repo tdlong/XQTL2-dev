@@ -1,0 +1,6 @@
+2026-11-25 00:57:41  SRR20063682 = s_M_1 (Rep1_Male_MalSel)
+  fetching https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR200/082/SRR20063682/SRR20063682_1.fastq.gz -> data/raw/malathion_2022/SRR20063682-SRA-R1.fastq.gz
+  MD5 MISMATCH data/raw/malathion_2022/SRR20063682-SRA-R1.fastq.gz: got b82071150d2a19f60f8312a36d74fd81 want 26d317d050a2a7b9ec2419a90c5b387f -- removing
+  fetching https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR200/082/SRR20063682/SRR20063682_2.fastq.gz -> data/raw/malathion_2022/SRR20063682-SRA-R2.fastq.gz
+  ok   data/raw/malathion_2022/SRR20063682-SRA-R2.fastq.gz  1.8G
+2026-11-25 02:22:38  done, exit 1

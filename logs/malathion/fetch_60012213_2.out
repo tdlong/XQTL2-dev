@@ -1,0 +1,6 @@
+2026-11-25 00:57:41  SRR20063683 = s_F_1 (Rep1_Female_MalSel)
+  fetching https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR200/083/SRR20063683/SRR20063683_1.fastq.gz -> data/raw/malathion_2022/SRR20063683-SRA-R1.fastq.gz
+  wget failed for ftp.sra.ebi.ac.uk/vol1/fastq/SRR200/083/SRR20063683/SRR20063683_1.fastq.gz
+  fetching https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR200/083/SRR20063683/SRR20063683_2.fastq.gz -> data/raw/malathion_2022/SRR20063683-SRA-R2.fastq.gz
+  wget failed for ftp.sra.ebi.ac.uk/vol1/fastq/SRR200/083/SRR20063683/SRR20063683_2.fastq.gz
+2026-11-25 00:57:41  done, exit 1

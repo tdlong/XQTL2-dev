@@ -1,0 +1,6 @@
+2026-11-25 02:43:27  hpc3-23-18: network ok
+2026-11-25 02:43:27  SRR20063682 = s_M_1 (Rep1_Male_MalSel)
+  fetching https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR200/082/SRR20063682/SRR20063682_1.fastq.gz -> data/raw/malathion_2022/SRR20063682-SRA-R1.fastq.gz
+  ok   data/raw/malathion_2022/SRR20063682-SRA-R1.fastq.gz  1.8G
+  have data/raw/malathion_2022/SRR20063682-SRA-R2.fastq.gz (verified earlier)
+2026-11-25 03:23:57  done, exit 0

@@ -1,0 +1,6 @@
+2026-11-25 00:57:41  SRR20063680 = c_M_1 (Rep1_Male_Con)
+  fetching https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR200/080/SRR20063680/SRR20063680_1.fastq.gz -> data/raw/malathion_2022/SRR20063680-SRA-R1.fastq.gz
+  wget failed for ftp.sra.ebi.ac.uk/vol1/fastq/SRR200/080/SRR20063680/SRR20063680_1.fastq.gz
+  fetching https://ftp.sra.ebi.ac.uk/vol1/fastq/SRR200/080/SRR20063680/SRR20063680_2.fastq.gz -> data/raw/malathion_2022/SRR20063680-SRA-R2.fastq.gz
+  wget failed for ftp.sra.ebi.ac.uk/vol1/fastq/SRR200/080/SRR20063680/SRR20063680_2.fastq.gz
+2026-11-25 00:57:41  done, exit 1
