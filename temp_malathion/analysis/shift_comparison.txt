@@ -1,0 +1,67 @@
+Founder frequency shift (selected - control) at the two published peaks,
+replicate 1 only, the SAME four pools through each pipeline.
+R1 = females, R2 = males.
+
+  peak founder REP   2022 current
+ chr2R      A1  R1 -0.063  -0.049
+ chr2R      A2  R1 -0.035  -0.042
+ chr2R      A3  R1 -0.043  -0.047
+ chr2R      A4  R1 -0.058  -0.060
+ chr2R      A5  R1  0.185   0.168
+ chr2R      A6  R1  0.094   0.105
+ chr2R      A7  R1 -0.027  -0.015
+ chr2R     AB8  R1 -0.054  -0.059
+ chr2R      A1  R2 -0.043  -0.035
+ chr2R      A2  R2 -0.034  -0.035
+ chr2R      A3  R2 -0.011  -0.011
+ chr2R      A4  R2 -0.027  -0.029
+ chr2R      A5  R2  0.246   0.240
+ chr2R      A6  R2  0.040   0.050
+ chr2R      A7  R2 -0.120  -0.126
+ chr2R     AB8  R2 -0.051  -0.054
+ chr3L      A1  R1  0.008   0.011
+ chr3L      A2  R1 -0.067  -0.064
+ chr3L      A3  R1 -0.131  -0.127
+ chr3L      A4  R1  0.044   0.047
+ chr3L      A5  R1 -0.072  -0.072
+ chr3L      A6  R1  0.069   0.071
+ chr3L      A7  R1  0.009   0.008
+ chr3L     AB8  R1  0.139   0.126
+ chr3L      A1  R2  0.014   0.013
+ chr3L      A2  R2 -0.101  -0.094
+ chr3L      A3  R2 -0.091  -0.099
+ chr3L      A4  R2  0.018   0.020
+ chr3L      A5  R2  0.070   0.083
+ chr3L      A6  R2  0.020   0.026
+ chr3L      A7  R2 -0.006  -0.009
+ chr3L     AB8  R2  0.076   0.058
+
+Correlation between the two pipelines' shifts, across founders and sexes:
+  peak     r
+ chr2R 0.996
+ chr3L 0.995
+
+Sum of squared shifts (the signal each test is given):
+  peak REP   2022 current
+ chr2R  R1 0.0571  0.0529
+ chr2R  R2 0.0831  0.0823
+ chr3L  R1 0.0528  0.0487
+ chr3L  R2 0.0301  0.0302
+
+2R / 3L ratio of that signal, per pipeline:
+ REP 2022 current
+  R1 1.08    1.09
+  R2 2.76    2.72
+
+If the ratios agree, both callers see the same relative signal at the two
+peaks and the difference in peak HEIGHT is the test. If they disagree, the
+caller is contributing too.
+
+
+The paper's ANOVA at each peak, replicate 1 only, from the published frequencies.
+MS_signal is the treatment-by-founder mean square; MS_error is the residual,
+which is where disagreement between the two sexes goes.
+
+  peak founders_kept MS_signal df_signal MS_error df_error     F mlog10p
+ chr2R             8    0.0176         7  0.00169       16 10.40    4.19
+ chr3L             8    0.0109         7  0.00115       16  9.49    3.95
