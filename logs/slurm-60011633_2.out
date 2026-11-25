@@ -1,0 +1,7 @@
+Smoothing R²: 0.9442  (correction factor: 1.0591)
+Reading process/malathion_rep1/Scans/malathion_rep1_R1/malathion_rep1_R1.smooth.chr2L.rds 
+Replicates used (1): 1
+Building arrays for chr2L...
+Running Wald scan on chr2L (4645 windows)...
+Writing process/malathion_rep1/Scans/malathion_rep1_R1/malathion_rep1_R1.scan.chr2L.txt 
+Done.

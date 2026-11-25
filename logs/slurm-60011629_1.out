@@ -1,0 +1,8 @@
+Smoothing R²: 0.9467  (correction factor: 1.0563)
+Reading process/malathion_rep1/Scans/malathion_rep1_all/malathion_rep1_all.smooth.chrX.rds 
+chrX ploidy factor: 0.75 (sex = mixed)
+Replicates used (2): 1, 2
+Building arrays for chrX...
+Running Wald scan on chrX (4273 windows)...
+Writing process/malathion_rep1/Scans/malathion_rep1_all/malathion_rep1_all.scan.chrX.txt 
+Done.
