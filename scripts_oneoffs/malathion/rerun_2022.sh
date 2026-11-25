@@ -25,33 +25,33 @@
 # Before submitting it checks the RefAlt header for every pool in the design
 # and every founder, and stops if one is missing.
 #
-# HPC3 holds rep 1 only (logs/malathion/inventory.txt, 2026-11-24), so here:
-#   bash scripts_oneoffs/malathion/rerun_2022.sh \
-#       --design helpfiles/malathion/design_rep1.txt \
-#       --parfile helpfiles/malathion/hap_params.R \
-#       --reuse-haps process/MALATHION_v1 \
-#       --dir process/malathion_rep1 --prefix malathion_rep1
-# With all 8 pools (Stuart's data) the defaults apply and haplotypes are refit.
+# HPC3 holds rep 1 only (logs/malathion/inventory.txt, 2026-11-24), so the
+# defaults are the rep-1 run on the existing haplotypes, and no flags are needed:
+#   bash scripts_oneoffs/malathion/rerun_2022.sh
+# With all 8 pools (Stuart's data) pass the 8-pool files and refit haplotypes:
+#   --design helpfiles/malathion/design_2022.txt --parfile helpfiles/malathion/hap_params_2022.R
+#   --reuse-haps "" --refalt <his Calls dir> --dir process/malathion_2022 --prefix malathion_2022
 # Options:
 #   --refalt <dir>      folder holding RefAlt.chr*.txt   (default process/MALATHION_v1)
-#   --dir <dir>         project folder to create         (default process/malathion_2022)
-#   --prefix <name>     scan name prefix                 (default malathion_2022)
-#   --design <file>     design, any number of REP        (default helpfiles/malathion/design_2022.txt)
-#   --parfile <file>    haplotype parameters             (default helpfiles/malathion/hap_params_2022.R)
+#   --dir <dir>         project folder to create         (default process/malathion_rep1)
+#   --prefix <name>     scan name prefix                 (default malathion_rep1)
+#   --design <file>     design, any number of REP        (default helpfiles/malathion/design_rep1.txt)
+#   --parfile <file>    haplotype parameters             (default helpfiles/malathion/hap_params.R)
 #   --smooth <kb>       smoothing half-window            (default 250, the pipeline default)
-#   --reuse-haps <dir>  folder holding R.haps.chr*.out.rds fit from the SAME pools;
-#                       symlinked instead of recomputed (skips a day of highmem)
+#   --reuse-haps <dir>  folder holding R.haps.chr*.out.rds fit from the SAME pools,
+#                       symlinked instead of recomputed (default process/MALATHION_v1;
+#                       pass "" to refit)
 ###############################################################################
 set -euo pipefail
 [ -d scripts_oneoffs/malathion ] || { echo "ERROR: run from the XQTL2-dev root" >&2; exit 1; }
 
 REFALT=process/MALATHION_v1
-DIR=process/malathion_2022
-PREFIX=malathion_2022
-DESIGN=helpfiles/malathion/design_2022.txt
-PARFILE=helpfiles/malathion/hap_params_2022.R
+DIR=process/malathion_rep1
+PREFIX=malathion_rep1
+DESIGN=helpfiles/malathion/design_rep1.txt
+PARFILE=helpfiles/malathion/hap_params.R
 SMOOTH=250
-REUSE_HAPS=""
+REUSE_HAPS=process/MALATHION_v1
 while [[ $# -gt 0 ]]; do
   case $1 in
     --refalt)     REFALT="$2";     shift 2 ;;
