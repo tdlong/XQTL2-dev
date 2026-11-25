@@ -1,0 +1,22 @@
+reading malathion_rep1_all 
+ANOVA over 25389 windows
+replicates per window: 2   founders: 8
+wrote logs/malathion/malathion_rep1_all.anova.txt.gz 
+wrote logs/malathion/malathion_rep1_all.wald_vs_anova.png 
+wrote logs/malathion/malathion_rep1_all.peak_shifts.txt 
+wrote logs/malathion/peak_summary.txt 
+Maximum -log10P in the two published QTL intervals, per scan.
+Published (2022 ANOVA, 8 pools): chr2R ~5.2 at 12.29 Mb, chr3L ~4.9 at 6.16 Mb.
+Stuart's rerun of the current pipeline: chr2R ~19.6, chr3L ~5.2.
+
+                             scan max_wald_chr2R 10-14 Mb max_wald_chr3L 5-7.5 Mb at_Mb_chr2R 10-14 Mb at_Mb_chr3L 5-7.5 Mb
+               malathion_rep1_all                    6.92                    3.40               12.045                6.360
+                malathion_rep1_R1                    3.14                    1.79               11.995                6.375
+                malathion_rep1_R2                    3.19                    1.44               12.275                6.365
+ malathion_rep1_all [paper ANOVA]                    3.36                    1.64               11.810                6.290
+smoothing R2 per scan:
+  malathion_rep1_all     0.946744384255351
+  malathion_rep1_R1      0.944235830642969
+  malathion_rep1_R2      0.949186923298985
+
+── returning results through git; what git says goes to logs/malathion/finish_60011639_git.txt, not here ──

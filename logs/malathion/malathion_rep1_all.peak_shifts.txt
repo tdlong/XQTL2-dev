@@ -1,0 +1,27 @@
+Founder frequency shift (selected - control) at the window nearest each published peak,
+per replicate pair, from the smoothed haplotype frequencies the Wald test used.
+REP labels as in the design file of the scan (design_2022: R1 = F rep1, R2 = M rep1, R3 = F rep2, R4 = M rep2).
+Compare to Fig. 4 of Macdonald & Long 2022.
+
+         peak   window founder     R1     R2   mean
+ chr2R_Cyp6g1 12295000      A1 -0.049 -0.035 -0.042
+ chr2R_Cyp6g1 12295000      A2 -0.042 -0.035 -0.039
+ chr2R_Cyp6g1 12295000      A3 -0.047 -0.011 -0.029
+ chr2R_Cyp6g1 12295000      A4 -0.060 -0.029 -0.045
+ chr2R_Cyp6g1 12295000      A5  0.168  0.240  0.204
+ chr2R_Cyp6g1 12295000      A6  0.105  0.050  0.078
+ chr2R_Cyp6g1 12295000      A7 -0.015 -0.126 -0.071
+ chr2R_Cyp6g1 12295000     AB8 -0.059 -0.054 -0.056
+  chr3L_Mdr65  6160000      A1  0.011  0.013  0.012
+  chr3L_Mdr65  6160000      A2 -0.064 -0.094 -0.079
+  chr3L_Mdr65  6160000      A3 -0.127 -0.099 -0.113
+  chr3L_Mdr65  6160000      A4  0.047  0.020  0.033
+  chr3L_Mdr65  6160000      A5 -0.072  0.083  0.006
+  chr3L_Mdr65  6160000      A6  0.071  0.026  0.049
+  chr3L_Mdr65  6160000      A7  0.008 -0.009  0.000
+  chr3L_Mdr65  6160000     AB8  0.126  0.058  0.092
+
+Sum of squared shifts per replicate (how much signal each pair carries):
+         peak     R1     R2
+ chr2R_Cyp6g1 0.0530 0.0824
+  chr3L_Mdr65 0.0487 0.0303
