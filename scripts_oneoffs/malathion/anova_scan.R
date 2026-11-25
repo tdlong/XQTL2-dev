@@ -3,7 +3,7 @@
 # anova_scan.R — the 2022 paper's test, run on the current pipeline's haplotypes.
 #
 # Macdonald & Long 2022 (G3, jkac279) tested, at each window,
-#     ASF ~ H + TRT + H:TRT,   H:TRT against the R:H:TRT error term,
+#     ASF ~ TRT + H + TRT:H,  TRT:H against the residual,
 # with ASF = asin(sqrt(founder frequency)), H = 8 founders, R = 4 control/selected
 # pairs (2 replicates x 2 sexes). Every replicate counts equally and the error is
 # how much the replicates disagree. The pipeline's Wald test instead weights
@@ -13,10 +13,9 @@
 # Running the paper's statistic on the SAME smoothed frequencies the Wald test
 # used separates "the test changed" from "the haplotype calls changed".
 #
-# Closed form, with d[r,h] = ASF_Z - ASF_C for replicate r and founder h:
-#   F = [ R * sum_h (dbar_h - dbar)^2 / (H-1) ]
-#     / [ sum_rh (d - dbar_h - dbar_r + dbar)^2 / ((R-1)(H-1)) ]
-# Checked against anova(lm(y ~ R*H*TRT)) to 6 decimals.
+# The test used here is the paper's own ANOVA_test_function, copied verbatim
+# from its figshare deposit, so this scan differs from the published one only
+# in the haplotype frequencies fed to it.
 #
 # Also writes, for the two published peaks (Table 1: chr2R 12,294,089 and
 # chr3L 6,162,469), the per-replicate founder shifts -- the pipeline's version
@@ -56,25 +55,36 @@ means <- read_means(p$scan)                       # chr pos TRT REP founder freq
 wald  <- read_scan(p$scan) %>% select(chr, pos, cM, Wald_log10p)
 
 d <- means %>%
-  mutate(asf = asin(sqrt(pmin(pmax(freq, 0), 1)))) %>%
-  select(chr, pos, TRT, REP, founder, asf) %>%
-  pivot_wider(names_from = TRT, values_from = asf) %>%
-  filter(!is.na(C), !is.na(Z)) %>%
-  mutate(d = Z - C)
+  mutate(asf = asin(sqrt(pmin(pmax(freq, 0), 1))),
+         HAP = as.factor(founder), TRT = as.factor(TRT), REP = as.factor(REP)) %>%
+  select(chr, pos, TRT, REP, HAP, asf) %>%
+  filter(!is.na(asf))
 
-anova_window <- function(df) {
-  m <- xtabs(d ~ REP + founder, df)               # R x H
-  R <- nrow(m); H <- ncol(m)
-  if (R < 2 || H < 2) return(tibble(F = NA_real_, anova_log10p = NA_real_, R = R, H = H))
-  e  <- m - outer(rowMeans(m), colMeans(m), "+") + mean(m)
-  Fv <- (R * sum((colMeans(m) - mean(m))^2) / (H - 1)) / (sum(e^2) / ((R - 1) * (H - 1)))
-  tibble(F = Fv, anova_log10p = -pf(Fv, H - 1, (R - 1) * (H - 1), lower.tail = FALSE, log.p = TRUE) / log(10),
-         R = R, H = H)
+# The paper's test, taken verbatim from the figshare deposit
+# (malathion_analysis.zip, get_haplotype_frequencies.txt, ANOVA_test_function).
+# Two details that matter and are easy to get wrong: founders averaging below
+# asin(sqrt(0.02)) = 0.1419 are dropped at that window, so the degrees of
+# freedom vary along the genome; and the error term is the residual of
+# asf ~ TRT + HAP + TRT:HAP, which absorbs REP and every REP interaction.
+ANOVA_test_function <- function(df) {
+  df <- data.frame(df)
+  tt  <- tapply(df$asf, df$HAP, mean)
+  tt2 <- names(tt)[tt > 0.14]
+  df3 <- df %>% filter(HAP %in% tt2) %>% droplevels()
+  if (nlevels(df3$HAP) < 2 || nlevels(df3$TRT) < 2) return(NA_real_)
+  out <- tryCatch(anova(lm(asf ~ TRT + HAP + TRT:HAP, data = df3)), error = function(e) NULL)
+  if (is.null(out) || nrow(out) < 4 || out[4, 1] < 1 || out[4, 3] <= 0) return(NA_real_)
+  -pf(out[3, 3] / out[4, 3], out[3, 1], out[4, 1], lower.tail = FALSE, log.p = TRUE) / log(10)
 }
 
-cat("ANOVA over", n_distinct(paste(d$chr, d$pos)), "windows\n")
+anova_window <- function(df) {
+  tibble(anova_log10p = ANOVA_test_function(df),
+         R = n_distinct(df$REP), H = n_distinct(df$HAP))
+}
+
+cat("ANOVA over", n_distinct(paste(d$chr, d$pos)), "windows (paper's test, verbatim)\n")
 an <- d %>% group_by(chr, pos) %>% group_modify(~ anova_window(.x)) %>% ungroup()
-cat(sprintf("replicates per window: %s   founders: %s\n",
+cat(sprintf("replicate pairs per window: %s   founders kept (>2%%): %s\n",
             paste(sort(unique(an$R)), collapse = "/"), paste(sort(unique(an$H)), collapse = "/")))
 
 # concat_Chromosome_Scans.R slides the Wald over +/-5 windows; do the same here.
@@ -85,7 +95,7 @@ out <- wald %>% inner_join(an, by = c("chr", "pos")) %>%
   ungroup()
 
 f_tab <- file.path(p$out, paste0(p$scan, ".anova.txt.gz"))
-write.table(out %>% select(chr, pos, cM, Wald_log10p, anova_log10p, anova_log10p_raw, F),
+write.table(out %>% select(chr, pos, cM, Wald_log10p, anova_log10p, anova_log10p_raw, R, H),
             gzfile(f_tab), row.names = FALSE, quote = FALSE)
 cat("wrote", f_tab, "\n")
 

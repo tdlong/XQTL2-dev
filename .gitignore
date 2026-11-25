@@ -78,3 +78,6 @@ temp_aging/*.docx
 # edited copy can be committed and recovered. ASK him before rebuilding it.
 !temp_aging/Paragraph_to_paste.docx
 !temp_aging/reference.docx
+
+# published supplements fetched by analysis scripts, not ours to track
+temp_malathion/data/
