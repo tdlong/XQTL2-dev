@@ -8,8 +8,9 @@
 # of pipeline/README.md with SLURM dependencies, the way run_full_pipeline.sh
 # chains them, plus the per-pair scans and the paper's ANOVA from rerun_2022.sh:
 #
-#   stage 1 (this script, login node)
+#   stage 0 (by hand, on access-hpc3.rcic.uci.edu, the data-transfer host)
 #   fetch_sra.sh          8 runs from the ENA mirror     -> data/raw/malathion_2022
+#   stage 1 (this script, login node)
 #   build_catalog.sh      A-founder catalog (none on HPC3; AGE_SY's is B founders)
 #   fq2bam.sh             align, one job per sample       -> data/bam/malathion_2022
 #   stage 2 (rerun_2022_part2.sh, an sbatch job that waits on stage 1)
@@ -25,16 +26,14 @@
 # alignments have finished, and submits the rest from there.
 #
 # Everything is relative to the repo root; nothing touches an existing folder.
-# Fetched files with a good md5 and an existing catalog are reused; if all
-# eight BAMs exist the alignment is skipped. Do not rerun while stage-1 jobs
-# are still in the queue: two fetches into the same file corrupt it.
+# An existing catalog is reused; if all eight BAMs exist the alignment is
+# skipped. Do not rerun while its jobs are still in the queue.
 #
-# Login node: bash and sbatch only. Run once from the repo root:
+# Login node: bash and sbatch only. Once the reads are verified, from the root:
 #   bash scripts_oneoffs/malathion/rerun_2022_from_reads.sh
 #
-# Wall time: the download and the catalog run in parallel (hours), alignment is
-# up to a day per sample in parallel, then calls, haplotypes (up to a day on
-# highmem) and scans. Expect two to three days end to end.
+# Wall time: catalog hours, alignment up to a day per sample in parallel, then
+# calls, haplotypes (up to a day on highmem) and scans. Two to three days.
 ###############################################################################
 set -euo pipefail
 [ -d scripts_oneoffs/malathion ] || { echo "ERROR: run from the XQTL2-dev root" >&2; exit 1; }
@@ -74,14 +73,28 @@ if [ -e "$DIR/Scans/${PREFIX}_all" ]; then
 fi
 mkdir -p "$RAW" "$BAM" "$DIR" logs/malathion
 
-# ── 1. reads ─────────────────────────────────────────────────────────────────
-JID_FETCH=$(sbatch --parsable -A $ACCOUNT scripts_oneoffs/malathion/fetch_sra.sh)
-echo "fetch:      $JID_FETCH  (8 runs, ENA -> $RAW)"
+# ── 1. reads: fetched beforehand on the data-transfer host ───────────────────
+# HPC3 kills downloads on compute nodes and routes wget through
+# access-hpc3.rcic.uci.edu (pipeline/Slurm.md, "Downloads"), so the fetch is not
+# a batch job. Run it there first:  nohup bash scripts_oneoffs/malathion/fetch_sra.sh &
+# It leaves a .md5ok marker beside every verified file; this stage needs all 16.
+n_ok=$(ls "$RAW"/*.md5ok 2>/dev/null | wc -l)
+if [ "$n_ok" -ne 16 ]; then
+  echo "ERROR: $n_ok / 16 fastq files verified in $RAW." >&2
+  echo "       Fetch them on the data-transfer host first (see the header), then rerun." >&2
+  exit 1
+fi
+echo "reads:      16 / 16 verified in $RAW"
 
 # ── 2. catalog, in parallel with the download ────────────────────────────────
 if [ -f "$CATALOG/catalog.tsv.gz" ]; then
   JID_CAT=""
   echo "catalog:    exists, reused ($CATALOG)"
+elif [ -d "$CATALOG/work" ]; then
+  echo "ERROR: $CATALOG is still being built (work/ present, no catalog.tsv.gz)." >&2
+  echo "       Wait for the catalog jobs to finish (squeue -u \$USER), then rerun." >&2
+  echo "       If they failed, remove $CATALOG and rerun to rebuild." >&2
+  exit 1
 else
   JID_CAT=$(bash pipeline/scripts/build_catalog.sh --founders "$FOUNDERS" --out "$CATALOG" -A $ACCOUNT -p $PARTITION | tail -1)
   echo "catalog:    $JID_CAT  (A founders -> $CATALOG)"
@@ -94,7 +107,7 @@ if [ "$nbam" -eq 8 ]; then
   JID_BAM=""
   echo "fq2bam:     all 8 BAMs exist in $BAM, reused"
 else
-  JID_BAM=$(sbatch --parsable --dependency=afterok:$JID_FETCH -A $ACCOUNT \
+  JID_BAM=$(sbatch --parsable -A $ACCOUNT \
       --array=1-$NBC pipeline/scripts/fq2bam.sh "$BARCODES" "$RAW" "$BAM" | cut -d_ -f1)
   echo "fq2bam:     $JID_BAM  (8 samples -> $BAM)"
 fi
