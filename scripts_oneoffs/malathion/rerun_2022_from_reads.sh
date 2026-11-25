@@ -8,18 +8,26 @@
 # of pipeline/README.md with SLURM dependencies, the way run_full_pipeline.sh
 # chains them, plus the per-pair scans and the paper's ANOVA from rerun_2022.sh:
 #
+#   stage 1 (this script, login node)
 #   fetch_sra.sh          8 runs from the ENA mirror     -> data/raw/malathion_2022
 #   build_catalog.sh      A-founder catalog (none on HPC3; AGE_SY's is B founders)
 #   fq2bam.sh             align, one job per sample       -> data/bam/malathion_2022
+#   stage 2 (rerun_2022_part2.sh, an sbatch job that waits on stage 1)
 #   call_samples.sh       count against the catalog       -> process/malathion_2022/Calls
 #   refalt_qc / bam_qc    advisory, not in the chain      -> logs/malathion/qc_*.out
 #   run_haps.sh           haplotypes, 8 pools             -> process/malathion_2022/Haps
 #   run_scan.sh x5        all pools + one scan per pair   -> process/malathion_2022/Scans
 #   finish_2022.sh        paper ANOVA, Fig.4 tables       -> logs/malathion/, git push
 #
+# Two stages because call_samples.sh checks that catalog.tsv.gz exists when it
+# is SUBMITTED, so it cannot be chained behind a catalog that is still building.
+# Stage 2 is therefore submitted as a job that starts after the catalog and the
+# alignments have finished, and submits the rest from there.
+#
 # Everything is relative to the repo root; nothing touches an existing folder.
-# Idempotent where it is cheap: fetched files with a good md5, an existing
-# catalog, and existing BAMs are reused; anything downstream is recomputed.
+# Fetched files with a good md5 and an existing catalog are reused; if all
+# eight BAMs exist the alignment is skipped. Do not rerun while stage-1 jobs
+# are still in the queue: two fetches into the same file corrupt it.
 #
 # Login node: bash and sbatch only. Run once from the repo root:
 #   bash scripts_oneoffs/malathion/rerun_2022_from_reads.sh
@@ -80,51 +88,23 @@ else
 fi
 
 # ── 3. align ─────────────────────────────────────────────────────────────────
-JID_BAM=$(sbatch --parsable --dependency=afterok:$JID_FETCH -A $ACCOUNT \
-    --array=1-$NBC pipeline/scripts/fq2bam.sh "$BARCODES" "$RAW" "$BAM" | cut -d_ -f1)
-echo "fq2bam:     $JID_BAM  (8 samples -> $BAM)"
+nbam=0
+while read -r b; do [ -e "$b" ] && nbam=$((nbam+1)); done < <(head -8 "$BAMLIST")
+if [ "$nbam" -eq 8 ]; then
+  JID_BAM=""
+  echo "fq2bam:     all 8 BAMs exist in $BAM, reused"
+else
+  JID_BAM=$(sbatch --parsable --dependency=afterok:$JID_FETCH -A $ACCOUNT \
+      --array=1-$NBC pipeline/scripts/fq2bam.sh "$BARCODES" "$RAW" "$BAM" | cut -d_ -f1)
+  echo "fq2bam:     $JID_BAM  (8 samples -> $BAM)"
+fi
 
-# ── 4. count against the catalog ─────────────────────────────────────────────
-DEP_CALL="$JID_BAM${JID_CAT:+:$JID_CAT}"
-JID_REFALT=$(bash pipeline/scripts/call_samples.sh --catalog "$CATALOG" --bamlist "$BAMLIST" \
-    --dir "$DIR" --after "$DEP_CALL" -A $ACCOUNT -p $PARTITION | tail -1)
-echo "RefAlt:     $JID_REFALT  (-> $DIR/Calls)"
-
-# advisory QC, as run_full_pipeline.sh does; never gates the chain
-QC="module load R/4.2.2 && Rscript pipeline/scripts/refalt_qc.R --dir $DIR --parfile $PARFILE"
-QC="$QC && module load samtools/1.10 && bash pipeline/scripts/bam_qc.sh --bamlist $BAMLIST --out $DIR/Calls/bam_qc.txt"
-JID_QC=$(sbatch --parsable --dependency=afterok:$JID_REFALT -A $ACCOUNT -p $PARTITION \
-    --cpus-per-task=1 --mem-per-cpu=8G --time=2:00:00 -o logs/malathion/qc_%j.out --wrap="$QC")
-echo "sample QC:  $JID_QC  (-> $DIR/Calls/refalt_qc.txt, logs/malathion/qc_$JID_QC.out)"
-
-# ── 5. haplotypes ────────────────────────────────────────────────────────────
-JID_HAPS=$(bash pipeline/scripts/run_haps.sh --parfile "$PARFILE" --dir "$DIR" --after "$JID_REFALT" -A $ACCOUNT)
-echo "haplotypes: $JID_HAPS  (REFALT2haps, 5 chromosomes, highmem)"
-
-# ── 6. scans: all pools, then one per pair (same as rerun_2022.sh) ──────────
-submit_scan () {  # submit_scan <name> <design> <sex>
-  local out jid
-  out=$(bash pipeline/scripts/run_scan.sh --design "$2" --dir "$DIR" --scan "$1" \
-          --smooth "$SMOOTH" --sex "$3" --after "$JID_HAPS")
-  jid=$(printf '%s\n' "$out" | awk '/^done:/{print $2}')
-  [ -n "$jid" ] || { echo "ERROR: no concat job id for $1" >&2; printf '%s\n' "$out" >&2; exit 1; }
-  JIDS="${JIDS:+$JIDS:}$jid"
-  echo "scan:       $1  ($2, --sex $3, concat job $jid)"
-}
-JIDS=""; ALSO=""
-submit_scan "${PREFIX}_all" "$DESIGN" mixed
-for r in 1 2 3 4; do
-  dr="helpfiles/malathion/design_2022_R$r.txt"
-  sex=mixed
-  if   grep -q '_F_' "$dr" && ! grep -q '_M_' "$dr"; then sex=F
-  elif grep -q '_M_' "$dr" && ! grep -q '_F_' "$dr"; then sex=M; fi
-  submit_scan "${PREFIX}_R$r" "$dr" "$sex"
-  ALSO="${ALSO:+$ALSO,}${PREFIX}_R$r"
-done
-
-# ── 7. diagnostics + return through git ──────────────────────────────────────
-JID_FIN=$(sbatch --parsable --dependency=afterok:"$JIDS" -A $ACCOUNT \
-    scripts_oneoffs/malathion/finish_2022.sh "$DIR" "$PREFIX" "$ALSO")
-echo "finish:     $JID_FIN  (paper ANOVA, peak tables, figures -> logs/malathion/, then git push)"
+# ── stage 2, once the catalog and the BAMs are there ────────────────────────
+DEP=$(printf '%s:%s' "$JID_CAT" "$JID_BAM" | sed 's/^://; s/:$//')
+JID_P2=$(sbatch --parsable ${DEP:+--dependency=afterok:$DEP} -A $ACCOUNT \
+    scripts_oneoffs/malathion/rerun_2022_part2.sh)
+echo "stage 2:    $JID_P2  (waits on ${DEP:-nothing}; submits calls, haplotypes, scans, finish)"
 echo
-echo "Everything is submitted. squeue -u \$USER shows the chain; the finish job pushes when done."
+echo "Stage 1 submitted. Stage 2 submits the rest when the catalog and BAMs exist;"
+echo "its log is logs/malathion/part2_$JID_P2.out. The finish job pushes when all is done."
+
