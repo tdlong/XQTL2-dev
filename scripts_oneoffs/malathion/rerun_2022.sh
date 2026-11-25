@@ -87,7 +87,10 @@ fi
 # Every pool in the design, and every founder, must be a column of RefAlt.
 header=$(head -1 "$REFALT/RefAlt.chrX.txt" | tr ' \t' '\n' | grep -v '^$')
 pools=$(awk 'NR>1 {gsub(/"/,"",$2); print $2}' "$DESIGN")
-founders=$(Rscript -e 'source(commandArgs(TRUE)[1]); cat(founders)' "$PARFILE")
+# founders <- c("A1","A2",...) read with sed: no R on the login node, like the
+# other submitters in scripts_oneoffs/.
+founders=$(sed -n 's/^founders *<- *c(\(.*\)).*/\1/p' "$PARFILE" | tr -d '" ' | tr ',' ' ')
+[ -n "$founders" ] || { echo "ERROR: no 'founders <- c(...)' line in $PARFILE" >&2; exit 1; }
 missing=""
 for s in $pools $founders; do
   printf '%s\n' "$header" | grep -qx "REF_$s" || missing="$missing $s"
